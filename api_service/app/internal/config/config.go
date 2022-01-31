@@ -11,13 +11,31 @@ import (
 type (
 	Config struct {
 		Environment string
+		Redis       RedisConfig
+		Auth        AuthConfig
 		Http        HttpConfig
 		Limiter     LimiterConfig
 	}
 
+	RedisConfig struct {
+		Host     string `mapstructure:"Host"`
+		Port     string `mapstructure:"Port"`
+		DB       int    `mapstructure:"DB"`
+		Password string
+	}
+
+	AuthConfig struct {
+		JWT JWTConfig
+	}
+
+	JWTConfig struct {
+		AccessTokenTTL  time.Duration `mapstructure:"accessTokenTTL"`
+		RefreshTokenTTL time.Duration `mapstructure:"refreshTokenTTL"`
+		Key             string
+	}
+
 	HttpConfig struct {
-		URL                string
-		ServiceName        string        `mapstructure:"serviceName"`
+		Domain             string        `mapstructure:"domain"`
 		Host               string        `mapstructure:"host"`
 		Port               string        `mapstructure:"port"`
 		ReadTimeout        time.Duration `mapstructure:"readTimeout"`
@@ -68,6 +86,9 @@ func unmarhal(conf *Config) error {
 
 func setFromEnv(conf *Config) error {
 	if err := envconfig.Process("http", &conf.Http); err != nil {
+		return err
+	}
+	if err := envconfig.Process("jwt", &conf.Auth.JWT); err != nil {
 		return err
 	}
 	conf.Environment = os.Getenv("APP_ENV")
