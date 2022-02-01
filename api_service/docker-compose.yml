@@ -1,17 +1,17 @@
-version: "3.4"
+version: "3.8"
 
 services:
-    redis:
-        image: "redis:6.2-alpine"
-        volumes:
-            - ./.data/redis/redis.conf:/usr/local/etc/redis/redis.conf
-            - ./.data/redis/data:/var/lib/redis
-        ports:
-            - 6379:6379
+  redis:
+    image: "redis:6.2-alpine"
+    volumes:
+      - ./.data/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./.data/redis/data:/var/lib/redis
+    ports:
+      - 6379:6379
 
-        networks:
-            node_net:
-                ipv4_address: 172.28.1.4
+    networks:
+      node_net:
+        ipv4_address: 172.28.1.4
 
 networks:
   node_net:
