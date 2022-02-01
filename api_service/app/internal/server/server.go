@@ -12,7 +12,6 @@ type Server struct {
 }
 
 func NewServer(conf *config.Config, handler http.Handler) *Server {
-	//TODO добавить автоматическое получение сертификата или что-то в этом роде
 	return &Server{
 		httpServer: &http.Server{
 			Addr:           ":" + conf.Http.Port,
@@ -25,7 +24,7 @@ func NewServer(conf *config.Config, handler http.Handler) *Server {
 }
 
 func (s *Server) Run() error {
-	return s.httpServer.ListenAndServeTLS("localhost.cert", "localhost.key")
+	return s.httpServer.ListenAndServe()
 }
 
 func (s *Server) Stop(ctx context.Context) error {

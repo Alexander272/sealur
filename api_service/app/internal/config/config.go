@@ -74,10 +74,16 @@ func parseConfigFile(folder string) error {
 }
 
 func unmarhal(conf *Config) error {
+	if err := viper.UnmarshalKey("redis", &conf.Redis); err != nil {
+		return err
+	}
 	if err := viper.UnmarshalKey("http", &conf.Http); err != nil {
 		return err
 	}
 	if err := viper.UnmarshalKey("limiter", &conf.Limiter); err != nil {
+		return err
+	}
+	if err := viper.UnmarshalKey("auth", &conf.Auth.JWT); err != nil {
 		return err
 	}
 

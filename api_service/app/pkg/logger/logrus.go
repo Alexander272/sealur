@@ -8,7 +8,7 @@ import (
 
 func Init(out io.Writer, env string) {
 	if env == "dev" {
-		logrus.SetLevel(logrus.DebugLevel)
+		logrus.SetLevel(logrus.TraceLevel)
 		logrus.SetFormatter(&logrus.TextFormatter{
 			FullTimestamp: true,
 		})

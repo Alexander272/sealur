@@ -7,8 +7,8 @@ import (
 	"github.com/Alexander272/sealur/api_service/docs"
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/service"
+	httpV1 "github.com/Alexander272/sealur/api_service/internal/transport/http/v1"
 	"github.com/Alexander272/sealur/api_service/pkg/limiter"
-	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -43,7 +43,7 @@ func (h *Handler) Init(conf *config.Config) *gin.Engine {
 	}
 
 	if conf.Environment != "prod" {
-		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		router.GET("/api/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
 	// Init router
@@ -57,10 +57,9 @@ func (h *Handler) Init(conf *config.Config) *gin.Engine {
 }
 
 func (h *Handler) initAPI(router *gin.Engine) {
-	// handlerV1 := v1.NewHandler(h.services)
+	handlerV1 := httpV1.NewHandler(h.services)
 	api := router.Group("/api")
 	{
-		logger.Debug(api)
-		// handlerV1.Init(api)
+		handlerV1.Init(api)
 	}
 }

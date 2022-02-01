@@ -20,7 +20,7 @@ import (
 	"github.com/subosito/gotenv"
 )
 
-// @title Sealur Prop
+// @title Sealur Pro
 // @version 0.1
 // @description API Service
 
@@ -31,7 +31,7 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	if err := gotenv.Load(); err != nil {
+	if err := gotenv.Load("../../.env"); err != nil {
 		logger.Fatalf("error loading env variables: %s", err.Error())
 	}
 	conf, err := config.Init("configs")
