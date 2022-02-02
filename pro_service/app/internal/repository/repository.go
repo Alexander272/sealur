@@ -6,10 +6,10 @@ import (
 )
 
 type Stand interface {
-	GetAll(stand proto.GetStands) ([]proto.Stand, error)
-	Create(stand proto.CreateStand) (string, error)
-	Update(stand proto.UpdateStand) error
-	Delete(stand proto.DeleteStand) error
+	GetAll(stand *proto.GetStandsRequest) ([]*proto.Stand, error)
+	Create(stand *proto.CreateStandRequest) (string, error)
+	Update(stand *proto.UpdateStandRequest) error
+	Delete(stand *proto.DeleteStandRequest) error
 }
 
 type Repositories struct {

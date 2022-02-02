@@ -8,11 +8,12 @@ It is generated from these files:
 	proto/stand.proto
 
 It has these top-level messages:
-	GetStands
-	CreateStand
-	UpdateStand
-	DeleteStand
+	GetStandsRequest
+	CreateStandRequest
+	UpdateStandRequest
+	DeleteStandRequest
 	Stand
+	StandResponse
 	Id
 */
 package proto
@@ -37,64 +38,64 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto1.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type GetStands struct {
+type GetStandsRequest struct {
 }
 
-func (m *GetStands) Reset()                    { *m = GetStands{} }
-func (m *GetStands) String() string            { return proto1.CompactTextString(m) }
-func (*GetStands) ProtoMessage()               {}
-func (*GetStands) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (m *GetStandsRequest) Reset()                    { *m = GetStandsRequest{} }
+func (m *GetStandsRequest) String() string            { return proto1.CompactTextString(m) }
+func (*GetStandsRequest) ProtoMessage()               {}
+func (*GetStandsRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-type CreateStand struct {
+type CreateStandRequest struct {
 	Title string `protobuf:"bytes,1,opt,name=title" json:"title,omitempty"`
 }
 
-func (m *CreateStand) Reset()                    { *m = CreateStand{} }
-func (m *CreateStand) String() string            { return proto1.CompactTextString(m) }
-func (*CreateStand) ProtoMessage()               {}
-func (*CreateStand) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (m *CreateStandRequest) Reset()                    { *m = CreateStandRequest{} }
+func (m *CreateStandRequest) String() string            { return proto1.CompactTextString(m) }
+func (*CreateStandRequest) ProtoMessage()               {}
+func (*CreateStandRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *CreateStand) GetTitle() string {
+func (m *CreateStandRequest) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-type UpdateStand struct {
+type UpdateStandRequest struct {
 	Id    string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
 	Title string `protobuf:"bytes,2,opt,name=title" json:"title,omitempty"`
 }
 
-func (m *UpdateStand) Reset()                    { *m = UpdateStand{} }
-func (m *UpdateStand) String() string            { return proto1.CompactTextString(m) }
-func (*UpdateStand) ProtoMessage()               {}
-func (*UpdateStand) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (m *UpdateStandRequest) Reset()                    { *m = UpdateStandRequest{} }
+func (m *UpdateStandRequest) String() string            { return proto1.CompactTextString(m) }
+func (*UpdateStandRequest) ProtoMessage()               {}
+func (*UpdateStandRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
-func (m *UpdateStand) GetId() string {
+func (m *UpdateStandRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *UpdateStand) GetTitle() string {
+func (m *UpdateStandRequest) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-type DeleteStand struct {
+type DeleteStandRequest struct {
 	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
 }
 
-func (m *DeleteStand) Reset()                    { *m = DeleteStand{} }
-func (m *DeleteStand) String() string            { return proto1.CompactTextString(m) }
-func (*DeleteStand) ProtoMessage()               {}
-func (*DeleteStand) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (m *DeleteStandRequest) Reset()                    { *m = DeleteStandRequest{} }
+func (m *DeleteStandRequest) String() string            { return proto1.CompactTextString(m) }
+func (*DeleteStandRequest) ProtoMessage()               {}
+func (*DeleteStandRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
-func (m *DeleteStand) GetId() string {
+func (m *DeleteStandRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
@@ -125,6 +126,22 @@ func (m *Stand) GetTitle() string {
 	return ""
 }
 
+type StandResponse struct {
+	Stands []*Stand `protobuf:"bytes,1,rep,name=stands" json:"stands,omitempty"`
+}
+
+func (m *StandResponse) Reset()                    { *m = StandResponse{} }
+func (m *StandResponse) String() string            { return proto1.CompactTextString(m) }
+func (*StandResponse) ProtoMessage()               {}
+func (*StandResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+
+func (m *StandResponse) GetStands() []*Stand {
+	if m != nil {
+		return m.Stands
+	}
+	return nil
+}
+
 type Id struct {
 	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
 }
@@ -132,7 +149,7 @@ type Id struct {
 func (m *Id) Reset()                    { *m = Id{} }
 func (m *Id) String() string            { return proto1.CompactTextString(m) }
 func (*Id) ProtoMessage()               {}
-func (*Id) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+func (*Id) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
 func (m *Id) GetId() string {
 	if m != nil {
@@ -142,11 +159,12 @@ func (m *Id) GetId() string {
 }
 
 func init() {
-	proto1.RegisterType((*GetStands)(nil), "proto.GetStands")
-	proto1.RegisterType((*CreateStand)(nil), "proto.CreateStand")
-	proto1.RegisterType((*UpdateStand)(nil), "proto.UpdateStand")
-	proto1.RegisterType((*DeleteStand)(nil), "proto.DeleteStand")
+	proto1.RegisterType((*GetStandsRequest)(nil), "proto.GetStandsRequest")
+	proto1.RegisterType((*CreateStandRequest)(nil), "proto.CreateStandRequest")
+	proto1.RegisterType((*UpdateStandRequest)(nil), "proto.UpdateStandRequest")
+	proto1.RegisterType((*DeleteStandRequest)(nil), "proto.DeleteStandRequest")
 	proto1.RegisterType((*Stand)(nil), "proto.Stand")
+	proto1.RegisterType((*StandResponse)(nil), "proto.StandResponse")
 	proto1.RegisterType((*Id)(nil), "proto.Id")
 }
 
@@ -161,10 +179,10 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for StandService service
 
 type StandServiceClient interface {
-	GetAll(ctx context.Context, in *GetStands, opts ...grpc.CallOption) (*Stand, error)
-	Create(ctx context.Context, in *CreateStand, opts ...grpc.CallOption) (*Id, error)
-	Update(ctx context.Context, in *UpdateStand, opts ...grpc.CallOption) (*Id, error)
-	Delete(ctx context.Context, in *DeleteStand, opts ...grpc.CallOption) (*Id, error)
+	GetAll(ctx context.Context, in *GetStandsRequest, opts ...grpc.CallOption) (*StandResponse, error)
+	CreateStand(ctx context.Context, in *CreateStandRequest, opts ...grpc.CallOption) (*Id, error)
+	UpdateStand(ctx context.Context, in *UpdateStandRequest, opts ...grpc.CallOption) (*Id, error)
+	DeleteStand(ctx context.Context, in *DeleteStandRequest, opts ...grpc.CallOption) (*Id, error)
 }
 
 type standServiceClient struct {
@@ -175,8 +193,8 @@ func NewStandServiceClient(cc *grpc.ClientConn) StandServiceClient {
 	return &standServiceClient{cc}
 }
 
-func (c *standServiceClient) GetAll(ctx context.Context, in *GetStands, opts ...grpc.CallOption) (*Stand, error) {
-	out := new(Stand)
+func (c *standServiceClient) GetAll(ctx context.Context, in *GetStandsRequest, opts ...grpc.CallOption) (*StandResponse, error) {
+	out := new(StandResponse)
 	err := grpc.Invoke(ctx, "/proto.StandService/GetAll", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -184,27 +202,27 @@ func (c *standServiceClient) GetAll(ctx context.Context, in *GetStands, opts ...
 	return out, nil
 }
 
-func (c *standServiceClient) Create(ctx context.Context, in *CreateStand, opts ...grpc.CallOption) (*Id, error) {
+func (c *standServiceClient) CreateStand(ctx context.Context, in *CreateStandRequest, opts ...grpc.CallOption) (*Id, error) {
 	out := new(Id)
-	err := grpc.Invoke(ctx, "/proto.StandService/Create", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/proto.StandService/CreateStand", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *standServiceClient) Update(ctx context.Context, in *UpdateStand, opts ...grpc.CallOption) (*Id, error) {
+func (c *standServiceClient) UpdateStand(ctx context.Context, in *UpdateStandRequest, opts ...grpc.CallOption) (*Id, error) {
 	out := new(Id)
-	err := grpc.Invoke(ctx, "/proto.StandService/Update", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/proto.StandService/UpdateStand", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *standServiceClient) Delete(ctx context.Context, in *DeleteStand, opts ...grpc.CallOption) (*Id, error) {
+func (c *standServiceClient) DeleteStand(ctx context.Context, in *DeleteStandRequest, opts ...grpc.CallOption) (*Id, error) {
 	out := new(Id)
-	err := grpc.Invoke(ctx, "/proto.StandService/Delete", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/proto.StandService/DeleteStand", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -214,10 +232,10 @@ func (c *standServiceClient) Delete(ctx context.Context, in *DeleteStand, opts .
 // Server API for StandService service
 
 type StandServiceServer interface {
-	GetAll(context.Context, *GetStands) (*Stand, error)
-	Create(context.Context, *CreateStand) (*Id, error)
-	Update(context.Context, *UpdateStand) (*Id, error)
-	Delete(context.Context, *DeleteStand) (*Id, error)
+	GetAll(context.Context, *GetStandsRequest) (*StandResponse, error)
+	CreateStand(context.Context, *CreateStandRequest) (*Id, error)
+	UpdateStand(context.Context, *UpdateStandRequest) (*Id, error)
+	DeleteStand(context.Context, *DeleteStandRequest) (*Id, error)
 }
 
 func RegisterStandServiceServer(s *grpc.Server, srv StandServiceServer) {
@@ -225,7 +243,7 @@ func RegisterStandServiceServer(s *grpc.Server, srv StandServiceServer) {
 }
 
 func _StandService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetStands)
+	in := new(GetStandsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -237,61 +255,61 @@ func _StandService_GetAll_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/proto.StandService/GetAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StandServiceServer).GetAll(ctx, req.(*GetStands))
+		return srv.(StandServiceServer).GetAll(ctx, req.(*GetStandsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _StandService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateStand)
+func _StandService_CreateStand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateStandRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StandServiceServer).Create(ctx, in)
+		return srv.(StandServiceServer).CreateStand(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.StandService/Create",
+		FullMethod: "/proto.StandService/CreateStand",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StandServiceServer).Create(ctx, req.(*CreateStand))
+		return srv.(StandServiceServer).CreateStand(ctx, req.(*CreateStandRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _StandService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateStand)
+func _StandService_UpdateStand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateStandRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StandServiceServer).Update(ctx, in)
+		return srv.(StandServiceServer).UpdateStand(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.StandService/Update",
+		FullMethod: "/proto.StandService/UpdateStand",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StandServiceServer).Update(ctx, req.(*UpdateStand))
+		return srv.(StandServiceServer).UpdateStand(ctx, req.(*UpdateStandRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _StandService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteStand)
+func _StandService_DeleteStand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteStandRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StandServiceServer).Delete(ctx, in)
+		return srv.(StandServiceServer).DeleteStand(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.StandService/Delete",
+		FullMethod: "/proto.StandService/DeleteStand",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StandServiceServer).Delete(ctx, req.(*DeleteStand))
+		return srv.(StandServiceServer).DeleteStand(ctx, req.(*DeleteStandRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -305,16 +323,16 @@ var _StandService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _StandService_GetAll_Handler,
 		},
 		{
-			MethodName: "Create",
-			Handler:    _StandService_Create_Handler,
+			MethodName: "CreateStand",
+			Handler:    _StandService_CreateStand_Handler,
 		},
 		{
-			MethodName: "Update",
-			Handler:    _StandService_Update_Handler,
+			MethodName: "UpdateStand",
+			Handler:    _StandService_UpdateStand_Handler,
 		},
 		{
-			MethodName: "Delete",
-			Handler:    _StandService_Delete_Handler,
+			MethodName: "DeleteStand",
+			Handler:    _StandService_DeleteStand_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -324,19 +342,22 @@ var _StandService_serviceDesc = grpc.ServiceDesc{
 func init() { proto1.RegisterFile("proto/stand.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 216 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2c, 0x28, 0xca, 0x2f,
-	0xc9, 0xd7, 0x2f, 0x2e, 0x49, 0xcc, 0x4b, 0xd1, 0x03, 0xb3, 0x85, 0x58, 0xc1, 0x94, 0x12, 0x37,
-	0x17, 0xa7, 0x7b, 0x6a, 0x49, 0x30, 0x48, 0xa2, 0x58, 0x49, 0x99, 0x8b, 0xdb, 0xb9, 0x28, 0x35,
-	0xb1, 0x24, 0x15, 0xcc, 0x17, 0x12, 0xe1, 0x62, 0x2d, 0xc9, 0x2c, 0xc9, 0x49, 0x95, 0x60, 0x54,
-	0x60, 0xd4, 0xe0, 0x0c, 0x82, 0x70, 0x94, 0x8c, 0xb9, 0xb8, 0x43, 0x0b, 0x52, 0xe0, 0x8a, 0xf8,
-	0xb8, 0x98, 0x32, 0x53, 0xa0, 0x2a, 0x98, 0x32, 0x91, 0x34, 0x31, 0x21, 0x6b, 0x92, 0xe5, 0xe2,
-	0x76, 0x49, 0xcd, 0x49, 0xc5, 0xa1, 0x49, 0x49, 0x97, 0x8b, 0x95, 0x14, 0xd3, 0x44, 0xb8, 0x98,
-	0x3c, 0x31, 0xd4, 0x1a, 0x6d, 0x66, 0xe4, 0xe2, 0x01, 0x9b, 0x12, 0x9c, 0x5a, 0x54, 0x96, 0x99,
-	0x9c, 0x2a, 0xa4, 0xc1, 0xc5, 0xe6, 0x9e, 0x5a, 0xe2, 0x98, 0x93, 0x23, 0x24, 0x00, 0xf1, 0xb4,
-	0x1e, 0xdc, 0xab, 0x52, 0x3c, 0x50, 0x11, 0x88, 0xb5, 0xea, 0x5c, 0x6c, 0x10, 0x8f, 0x0b, 0x09,
-	0x41, 0xc5, 0x91, 0xc2, 0x41, 0x8a, 0x13, 0x2a, 0xe6, 0x09, 0x56, 0x08, 0xf1, 0x3c, 0x5c, 0x21,
-	0x52, 0x58, 0xa0, 0x29, 0x84, 0x78, 0x18, 0xae, 0x10, 0xc9, 0xff, 0x48, 0x0a, 0x9d, 0xb8, 0xa2,
-	0x38, 0xf4, 0xf4, 0xad, 0xc1, 0xdc, 0x24, 0x36, 0x30, 0x65, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff,
-	0xca, 0x72, 0xd5, 0x70, 0xaf, 0x01, 0x00, 0x00,
+	// 264 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x90, 0x4d, 0x4b, 0xc3, 0x40,
+	0x10, 0x86, 0x49, 0x24, 0xc1, 0x4e, 0xab, 0xe8, 0x10, 0xb0, 0xf6, 0x54, 0x96, 0x1e, 0x8a, 0x60,
+	0x0a, 0x2d, 0x22, 0xe8, 0xc9, 0x0f, 0x28, 0xbd, 0xb6, 0x78, 0xf1, 0x56, 0xdd, 0x39, 0x04, 0x96,
+	0x26, 0x66, 0x47, 0x7f, 0xb2, 0xbf, 0x43, 0x3a, 0x59, 0xe3, 0x9a, 0x05, 0xf1, 0xb4, 0xd9, 0x99,
+	0xf7, 0x79, 0x93, 0x3c, 0x70, 0x5a, 0xd5, 0x25, 0x97, 0x33, 0xcb, 0xdb, 0x9d, 0xce, 0xe5, 0x19,
+	0x13, 0x39, 0x14, 0xc2, 0xc9, 0x92, 0x78, 0xb3, 0x5f, 0xd8, 0x35, 0xbd, 0xbd, 0x93, 0x65, 0x75,
+	0x01, 0xf8, 0x50, 0xd3, 0x96, 0x49, 0xc6, 0x6e, 0x8a, 0x19, 0x24, 0x5c, 0xb0, 0xa1, 0x61, 0x34,
+	0x8e, 0xa6, 0xbd, 0x75, 0x73, 0x51, 0x37, 0x80, 0x4f, 0x95, 0xee, 0x66, 0x8f, 0x21, 0x2e, 0xb4,
+	0x0b, 0xc6, 0x85, 0xfe, 0x61, 0x63, 0x9f, 0x9d, 0x00, 0x3e, 0x92, 0xa1, 0xbf, 0x59, 0x75, 0x09,
+	0x89, 0xec, 0xff, 0x59, 0x7a, 0x05, 0x47, 0xae, 0xce, 0x56, 0xe5, 0xce, 0x12, 0x4e, 0x20, 0x95,
+	0xff, 0xb6, 0xc3, 0x68, 0x7c, 0x30, 0xed, 0xcf, 0x07, 0x8d, 0x80, 0xbc, 0x49, 0xb9, 0x9d, 0xca,
+	0x20, 0x5e, 0x05, 0xaf, 0x98, 0x7f, 0x46, 0x30, 0x90, 0xdc, 0x86, 0xea, 0x8f, 0xe2, 0x95, 0xf0,
+	0x1a, 0xd2, 0x25, 0xf1, 0x9d, 0x31, 0x78, 0xe6, 0x6a, 0xba, 0xf6, 0x46, 0xd9, 0xaf, 0xfe, 0xef,
+	0xaf, 0x58, 0x40, 0xdf, 0x73, 0x8a, 0xe7, 0x2e, 0x14, 0x7a, 0x1e, 0xf5, 0xdc, 0x6a, 0xa5, 0xf7,
+	0x90, 0x27, 0xb7, 0x85, 0x42, 0xe1, 0x1d, 0xc8, 0xb3, 0xda, 0x42, 0xa1, 0x69, 0x0f, 0xba, 0x87,
+	0xe7, 0xc3, 0x7c, 0x76, 0x2b, 0xd7, 0x97, 0x54, 0x8e, 0xc5, 0x57, 0x00, 0x00, 0x00, 0xff, 0xff,
+	0x3f, 0x97, 0x44, 0x6b, 0x35, 0x02, 0x00, 0x00,
 }

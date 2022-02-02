@@ -17,7 +17,7 @@ func NewStandRepo(db *sqlx.DB) *StandRepo {
 	return &StandRepo{db: db}
 }
 
-func (r *StandRepo) GetAll(stand proto.GetStands) (stands []proto.Stand, err error) {
+func (r *StandRepo) GetAll(stand *proto.GetStandsRequest) (stands []*proto.Stand, err error) {
 	query := fmt.Sprintf("SELECT id, title FROM %s", StandTable)
 
 	if err = r.db.Select(&stands, query); err != nil {
@@ -27,7 +27,7 @@ func (r *StandRepo) GetAll(stand proto.GetStands) (stands []proto.Stand, err err
 	return stands, nil
 }
 
-func (r *StandRepo) Create(stand proto.CreateStand) (id string, err error) {
+func (r *StandRepo) Create(stand *proto.CreateStandRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", StandTable)
 	res, err := r.db.Exec(query, stand.Title)
 	if err != nil {
@@ -44,7 +44,7 @@ func (r *StandRepo) Create(stand proto.CreateStand) (id string, err error) {
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *StandRepo) Update(stand proto.UpdateStand) error {
+func (r *StandRepo) Update(stand *proto.UpdateStandRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET title=$1 WHERE id=$2", StandTable)
 
 	id, err := strconv.Atoi(stand.Id)
@@ -62,7 +62,7 @@ func (r *StandRepo) Update(stand proto.UpdateStand) error {
 	return nil
 }
 
-func (r *StandRepo) Delete(stand proto.DeleteStand) error {
+func (r *StandRepo) Delete(stand *proto.DeleteStandRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", StandTable)
 
 	id, err := strconv.Atoi(stand.Id)

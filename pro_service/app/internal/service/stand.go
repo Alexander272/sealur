@@ -14,7 +14,7 @@ func NewStandService(repo repository.Stand) *StandService {
 	return &StandService{repo: repo}
 }
 
-func (s *StandService) GetAll(req proto.GetStands) (stands []proto.Stand, err error) {
+func (s *StandService) GetAll(req *proto.GetStandsRequest) (stands []*proto.Stand, err error) {
 	stands, err = s.repo.GetAll(req)
 	if err != nil {
 		logger.Error("failed to get stands. error: %w", err)
@@ -23,16 +23,16 @@ func (s *StandService) GetAll(req proto.GetStands) (stands []proto.Stand, err er
 	return stands, nil
 }
 
-func (s *StandService) Create(stand proto.CreateStand) (st proto.Id, err error) {
+func (s *StandService) Create(stand *proto.CreateStandRequest) (st *proto.Id, err error) {
 	id, err := s.repo.Create(stand)
 	if err != nil {
 		logger.Error("failed to create stand. error: %w", err)
-		return proto.Id{}, err
+		return nil, err
 	}
-	return proto.Id{Id: id}, nil
+	return &proto.Id{Id: id}, nil
 }
 
-func (s *StandService) Update(stand proto.UpdateStand) error {
+func (s *StandService) Update(stand *proto.UpdateStandRequest) error {
 	if err := s.repo.Update(stand); err != nil {
 		logger.Error("failed to update stand. error: %w", err)
 		return err
@@ -40,7 +40,7 @@ func (s *StandService) Update(stand proto.UpdateStand) error {
 	return nil
 }
 
-func (s *StandService) Delete(stand proto.DeleteStand) error {
+func (s *StandService) Delete(stand *proto.DeleteStandRequest) error {
 	if err := s.repo.Delete(stand); err != nil {
 		logger.Error("failed to delete stand. error: %w", err)
 		return err

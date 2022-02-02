@@ -6,10 +6,10 @@ import (
 )
 
 type Stand interface {
-	GetAll(req proto.GetStands) (stands []proto.Stand, err error)
-	Create(stand proto.CreateStand) (st proto.Id, err error)
-	Update(stand proto.UpdateStand) error
-	Delete(stand proto.DeleteStand) error
+	GetAll(req *proto.GetStandsRequest) (stands []*proto.Stand, err error)
+	Create(stand *proto.CreateStandRequest) (st *proto.Id, err error)
+	Update(stand *proto.UpdateStandRequest) error
+	Delete(stand *proto.DeleteStandRequest) error
 }
 
 type Services struct {

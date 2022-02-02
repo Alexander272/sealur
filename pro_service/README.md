@@ -6,4 +6,5 @@ docker run -v /app/migrations:/migrations --network host migrate/migrate -path=/
 
 docker run -v /app/migrations:/migrations --network host migrate/migrate create -ext sql -dir ./migrations -seq init
 
-protoc -I internal/transport/grpc internal/transport/grpc/proto/stand.proto --go_out=plugins=grpc:internal/transport/grpc/proto
+генерация proto файлов
+    protoc -I internal/transport/grpc internal/transport/grpc/proto/stand.proto --go_out=plugins=grpc:internal/transport/grpc/proto

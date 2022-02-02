@@ -3,18 +3,18 @@ syntax = "proto3";
 package proto;
 option go_package = "./;proto";
 
-message GetStands{}
+message GetStandsRequest{}
 
-message CreateStand {
+message CreateStandRequest {
     string title = 1;
 }
 
-message UpdateStand {
+message UpdateStandRequest {
     string id = 1;
     string title = 2;
 }
 
-message DeleteStand {
+message DeleteStandRequest {
     string id = 1;
 }
 
@@ -22,14 +22,17 @@ message Stand {
     string id = 1;
     string title = 2;
 }
+message StandResponse {
+    repeated Stand stands = 1;
+}
 
 message Id {
     string id = 1;
 }
 
 service StandService {
-    rpc GetAll (GetStands) returns (Stand);
-    rpc Create (CreateStand) returns (Id);
-    rpc Update (UpdateStand) returns (Id);
-    rpc Delete (DeleteStand) returns (Id);
+    rpc GetAll (GetStandsRequest) returns (StandResponse);
+    rpc CreateStand (CreateStandRequest) returns (Id);
+    rpc UpdateStand (UpdateStandRequest) returns (Id);
+    rpc DeleteStand (DeleteStandRequest) returns (Id);
 }
