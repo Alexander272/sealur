@@ -26,6 +26,7 @@ type (
 
 	HttpConfig struct {
 		ServiceName        string        `mapstructure:"serviceName"`
+		Host               string        `mapstructure:"host"`
 		Port               string        `mapstructure:"port"`
 		ReadTimeout        time.Duration `mapstructure:"readTimeout"`
 		WriteTimeout       time.Duration `mapstructure:"writeTimeout"`
@@ -74,6 +75,7 @@ func setFromEnv(conf *Config) error {
 	// if err := envconfig.Process("http", &conf.Http); err != nil {
 	// 	return err
 	// }
+	conf.Http.Host = os.Getenv("PRO_HOST")
 	conf.Http.Port = os.Getenv("PRO_PORT")
 	if len(conf.Http.Port) == 0 {
 		conf.Http.Port = "9001"

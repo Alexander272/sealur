@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "./;proto";
+
+message GetStands{}
+
+message CreateStand {
+    string title = 1;
+}
+
+message UpdateStand {
+    string id = 1;
+    string title = 2;
+}
+
+message DeleteStand {
+    string id = 1;
+}
+
+message Stand {
+    string id = 1;
+    string title = 2;
+}
+
+message Id {
+    string id = 1;
+}
+
+service StandService {
+    rpc GetAll (GetStands) returns (Stand);
+    rpc Create (CreateStand) returns (Id);
+    rpc Update (UpdateStand) returns (Id);
+    rpc Delete (DeleteStand) returns (Id);
+}

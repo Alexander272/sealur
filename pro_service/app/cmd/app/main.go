@@ -40,5 +40,5 @@ func main() {
 	repos := repository.NewRepo(db)
 	_ = service.NewServices(repos)
 	// services := service.NewServices(repos)
-
+	//TODO дописать
 }
