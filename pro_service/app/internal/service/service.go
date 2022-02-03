@@ -7,7 +7,7 @@ import (
 
 type Stand interface {
 	GetAll(req *proto.GetStandsRequest) (stands []*proto.Stand, err error)
-	Create(stand *proto.CreateStandRequest) (st *proto.Id, err error)
+	Create(stand *proto.CreateStandRequest) (st *proto.IdResponse, err error)
 	Update(stand *proto.UpdateStandRequest) error
 	Delete(stand *proto.DeleteStandRequest) error
 }

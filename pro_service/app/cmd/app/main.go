@@ -8,7 +8,6 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/service"
 	handlers "github.com/Alexander272/sealur/pro_service/internal/transport/grpc"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/pro_service/pkg/database/postgres"
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	"github.com/subosito/gotenv"
@@ -43,16 +42,18 @@ func main() {
 
 	repos := repository.NewRepo(db)
 	services := service.NewServices(repos)
-	handlers := handlers.NewHandler(services)
+	// handlers := handlers.NewHandler(services)
+	_ = handlers.NewHandler(services)
 	//TODO надо посмотреть как это по нормальному пишется
 
 	//* GRPC Server
 
 	server := grpc.NewServer()
 
-	proto.RegisterStandServiceServer(server, handlers)
+	// proto.RegisterStandServiceServer(server, handlers)
+	// proto.RegisterProServiceServer(server, handlers)
 
-	listener, err := net.Listen("tcp", ":8080")
+	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {
 		logger.Fatal("Unable to create grpc listener:", err)
 	}

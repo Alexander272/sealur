@@ -1,0 +1,234 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "./;proto";
+
+// Flange Service ----------------------------------------------------------------
+message GetAllFlangeRequest {}
+
+message CreateFlangeRequest {
+    string title = 1;
+    string short = 2;
+}
+
+message UpdateFlangeRequest {
+    string id = 1;
+    string title = 2;
+    string short = 3;
+}
+
+message DeleteFlangeRequest {
+    string id = 1;
+}
+
+message Flange {
+    string id = 1;
+    string title = 2;
+    string short = 3;
+}
+message FlangeResponse {
+    repeated Flange flanges = 1;
+}
+
+// Stand Service ----------------------------------------------------------------
+message GetStandsRequest{}
+
+message CreateStandRequest {
+    string title = 1;
+}
+
+message UpdateStandRequest {
+    string id = 1;
+    string title = 2;
+}
+
+message DeleteStandRequest {
+    string id = 1;
+}
+
+message Stand {
+    string id = 1;
+    string title = 2;
+}
+message StandResponse {
+    repeated Stand stands = 1;
+}
+
+// Additional Service ----------------------------------------------------------------
+message GetAllAddRequest {}
+
+message CreateAddRequest {
+    string materials = 1;
+    string mod = 2;
+    string temperature = 3;
+    string mounting = 4;
+}
+
+message UpdateAddMatRequest {
+    string id = 1;
+    string materials = 2;
+}
+message UpdateAddModRequest {
+    string id = 1;
+    string mod = 2;
+}
+message UpdateAddTemRequest {
+    string id = 1;
+    string temperature = 2;
+}
+message UpdateAddMounRequest {
+    string id = 1;
+    string mounting = 2;
+}
+
+message Additional {
+    string id = 1;
+    string materials = 2;
+    string mod = 3;
+    string temperature = 4;
+    string mounting = 5;
+}
+message AdditionalResponse {
+    repeated Additional additionals = 1;
+}
+
+message SuccessResponse {
+    bool success = 1;
+}
+
+// Size Service ----------------------------------------------------------------
+message GetSizesRequest {
+    string flange = 1;
+    string typeFl = 2;
+    string typePr = 3;
+    string standId = 4;
+}
+
+message CreateSizeRequest {
+    string flange = 1;
+    string typeFl = 2;
+    int32 dn = 3;
+    int32 pn = 4;
+    string typePr = 5;
+    string standId = 6;
+    int32 d4 = 7;
+    int32 d3 = 8;
+    int32 d2 = 9;
+    int32 d1 = 10;
+    int32 h = 11; 
+}
+
+message UpdateSizeRequest {
+    string flange = 1;
+    string typeFl = 2;
+    string id = 3;
+    int32 dn = 4;
+    int32 pn = 5;
+    string typePr = 6;
+    string standId = 7;
+    int32 d4 = 8;
+    int32 d3 = 9;
+    int32 d2 = 10;
+    int32 d1 = 11;
+    int32 h = 12; 
+}
+
+message DeleteSizeRequest {
+    string flange = 1;
+    string typeFl = 2;
+    string id = 3;
+}
+
+message Size {
+    string id = 1;
+    int32 dn = 2;
+    int32 pn = 3;
+    string typePr = 4;
+    string standId = 5;
+    int32 d4 = 6;
+    int32 d3 = 7;
+    int32 d2 = 8;
+    int32 d1 = 9;
+    int32 h = 10; 
+}
+message SizeResponse {
+    repeated Size sizes = 1;
+}
+
+// SNP Service ----------------------------------------------------------------
+message GetSNPRequest {
+    string standId = 1;
+    string typeFl = 2;
+}
+
+message CreateSNPRequest {
+    string standId = 1;
+    string typeFl = 2;
+    string typeP = 3;
+    string fillers = 4;
+    string materials = 5;
+}
+
+message UpdateSNPRequest {
+    string id = 1;
+    string standId = 2;
+    string typeFl = 3;
+    string typeP = 4;
+    string fillers = 5;
+    string materials = 6;
+}
+
+message DeleteSNPRequest {
+    string id = 1;
+}
+
+message SNP {
+    string id = 1;
+    string standId = 2;
+    string typeFl = 3;
+    string typeP = 4;
+    string fillers = 5;
+    string materials = 6;
+}
+message SNPResponse {
+    repeated SNP snp = 1;
+}
+
+// commmon ----------------------------------------------------------------
+message IdResponse {
+    string id = 1;
+}
+
+
+service ProService {
+    // Flange Service ----------------------------------------------------------------
+    rpc GetAllFlanges (GetAllFlangeRequest) returns (FlangeResponse);
+    rpc CreateFlange (CreateFlangeRequest) returns (IdResponse);
+    rpc UpdateFlange (UpdateFlangeRequest) returns (IdResponse);
+    rpc DeleteFlange (DeleteFlangeRequest) returns (IdResponse);
+
+    // Stand Service ----------------------------------------------------------------
+    rpc GetAllStands (GetStandsRequest) returns (StandResponse);
+    rpc CreateStand (CreateStandRequest) returns (IdResponse);
+    rpc UpdateStand (UpdateStandRequest) returns (IdResponse);
+    rpc DeleteStand (DeleteStandRequest) returns (IdResponse);
+
+    // Additional Service ----------------------------------------------------------------
+    rpc CreateAdditional (CreateAddRequest) returns (SuccessResponse);
+    rpc UpdateMat (UpdateAddMatRequest) returns (SuccessResponse);
+    rpc UpdateMod (UpdateAddModRequest) returns (SuccessResponse);
+    rpc UpdateTemp (UpdateAddTemRequest) returns (SuccessResponse);
+    rpc UpdateMoun (UpdateAddMounRequest) returns (SuccessResponse);
+
+    //Size Service ----------------------------------------------------------------
+    rpc GetSizes (GetSizesRequest) returns (SizeResponse);
+    rpc CreateSize (CreateSizeRequest) returns (IdResponse);
+    rpc UpdateSize (UpdateSizeRequest) returns (IdResponse);
+    rpc DeleteSize (DeleteSizeRequest) returns (IdResponse);
+
+    // SNP Service ----------------------------------------------------------------
+    rpc GetSNP (GetSNPRequest) returns (SNPResponse);
+    rpc CreateSNP (CreateSNPRequest) returns (IdResponse);
+    rpc UpdateSNP (UpdateSNPRequest) returns (IdResponse);
+    rpc DeleteSNP (DeleteSNPRequest) returns (IdResponse);
+}

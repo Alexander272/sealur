@@ -26,13 +26,13 @@ message StandResponse {
     repeated Stand stands = 1;
 }
 
-message Id {
+message IdResponse {
     string id = 1;
 }
 
 service StandService {
-    rpc GetAll (GetStandsRequest) returns (StandResponse);
-    rpc CreateStand (CreateStandRequest) returns (Id);
-    rpc UpdateStand (UpdateStandRequest) returns (Id);
-    rpc DeleteStand (DeleteStandRequest) returns (Id);
+    rpc GetAllStands (GetStandsRequest) returns (StandResponse);
+    rpc CreateStand (CreateStandRequest) returns (IdResponse);
+    rpc UpdateStand (UpdateStandRequest) returns (IdResponse);
+    rpc DeleteStand (DeleteStandRequest) returns (IdResponse);
 }

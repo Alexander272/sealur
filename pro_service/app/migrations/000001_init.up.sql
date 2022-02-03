@@ -13,6 +13,7 @@ CREATE TABLE flange
 
 CREATE TABLE additional
 (
+    id          serial not null unique,
     materials   text
     mod         text
     temperature text
@@ -21,9 +22,10 @@ CREATE TABLE additional
 
 CREATE TABLE snp
 (
-    id       serial                                      not null unique,
-    stand_id int references stand (id) on delete cascade not null,
-    type_p   text
-    type_fl  text
-    filler   text
+    id        serial                                      not null unique,
+    stand_id  int references stand (id) on delete cascade not null,
+    type_p    text
+    type_fl   text
+    filler    text
+    materials text
 )
