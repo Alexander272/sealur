@@ -7,7 +7,7 @@ import (
 )
 
 func (h *Handler) GetAllStands(ctx context.Context, dto *proto.GetStandsRequest) (stands *proto.StandResponse, err error) {
-	arr, err := h.service.GetAll(dto)
+	arr, err := h.service.Stand.GetAll(dto)
 	if err != nil {
 		return nil, err
 	}
@@ -18,7 +18,7 @@ func (h *Handler) GetAllStands(ctx context.Context, dto *proto.GetStandsRequest)
 }
 
 func (h *Handler) CreateStand(ctx context.Context, dto *proto.CreateStandRequest) (stand *proto.IdResponse, err error) {
-	stand, err = h.service.Create(dto)
+	stand, err = h.service.Stand.Create(dto)
 	if err != nil {
 		return nil, nil
 	}
@@ -27,7 +27,7 @@ func (h *Handler) CreateStand(ctx context.Context, dto *proto.CreateStandRequest
 }
 
 func (h *Handler) UpdateStand(ctx context.Context, dto *proto.UpdateStandRequest) (*proto.IdResponse, error) {
-	err := h.service.Update(dto)
+	err := h.service.Stand.Update(dto)
 	if err != nil {
 		return nil, nil
 	}
@@ -36,7 +36,7 @@ func (h *Handler) UpdateStand(ctx context.Context, dto *proto.UpdateStandRequest
 }
 
 func (h *Handler) DeleteStand(ctx context.Context, dto *proto.DeleteStandRequest) (*proto.IdResponse, error) {
-	err := h.service.Delete(dto)
+	err := h.service.Stand.Delete(dto)
 	if err != nil {
 		return nil, nil
 	}
