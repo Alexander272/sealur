@@ -51,15 +51,15 @@ func (h *Handler) Init(conf *config.Config) *gin.Engine {
 		c.String(http.StatusOK, "pong")
 	})
 
-	h.initAPI(router)
+	h.initAPI(conf.Services, router)
 
 	return router
 }
 
-func (h *Handler) initAPI(router *gin.Engine) {
+func (h *Handler) initAPI(conf config.ServicesConfig, router *gin.Engine) {
 	handlerV1 := httpV1.NewHandler(h.services)
 	api := router.Group("/api")
 	{
-		handlerV1.Init(api)
+		handlerV1.Init(conf, api)
 	}
 }

@@ -3,6 +3,8 @@ package main
 import (
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/Alexander272/sealur/pro_service/internal/config"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
@@ -11,6 +13,7 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/pro_service/pkg/database/postgres"
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
+	_ "github.com/lib/pq"
 	"github.com/subosito/gotenv"
 	"google.golang.org/grpc"
 )
@@ -50,16 +53,24 @@ func main() {
 	//* GRPC Server
 
 	server := grpc.NewServer()
-
-	// proto.RegisterStandServiceServer(server, handlers)
 	proto.RegisterProServiceServer(server, handlers)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {
-		logger.Fatal("Unable to create grpc listener:", err)
+		logger.Fatalf("failed to create grpc listener:", err)
 	}
 
-	if err = server.Serve(listener); err != nil {
-		logger.Fatal("Unable to start server:", err)
-	}
+	go func() {
+		if err = server.Serve(listener); err != nil {
+			logger.Fatalf("failed to start server:", err)
+		}
+	}()
+	logger.Infof("Application started on port: %s", conf.Http.Port)
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+
+	<-quit
+
+	server.GracefulStop()
 }

@@ -1,1 +1,1 @@
-CREATE DATABASE sealur_pro;
+CREATE DATABASE IF NOT EXISTS sealur_pro;

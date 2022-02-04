@@ -223,8 +223,18 @@ message IdResponse {
     string id = 1;
 }
 
+message PingRequest {
+    
+}
+message PingResponse {
+    string ping = 1;
+}
+
 
 service ProService {
+    // common -----------------------------------------------------------------------
+    rpc Ping (PingRequest) returns (PingResponse);
+
     // Flange Service ----------------------------------------------------------------
     rpc GetAllFlanges (GetAllFlangeRequest) returns (FlangeResponse);
     rpc CreateFlange (CreateFlangeRequest) returns (IdResponse);

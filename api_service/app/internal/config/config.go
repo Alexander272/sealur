@@ -15,6 +15,8 @@ type (
 		Auth        AuthConfig
 		Http        HttpConfig
 		Limiter     LimiterConfig
+
+		Services ServicesConfig
 	}
 
 	RedisConfig struct {
@@ -47,6 +49,14 @@ type (
 		RPS   int           `mapstructure:"rps"`
 		Burst int           `mapstructure:"burst"`
 		TTL   time.Duration `mapstructure:"ttl"`
+	}
+
+	ServicesConfig struct {
+		ProService ProConfig
+	}
+
+	ProConfig struct {
+		Url string
 	}
 )
 
@@ -98,6 +108,9 @@ func setFromEnv(conf *Config) error {
 		return err
 	}
 	conf.Environment = os.Getenv("APP_ENV")
+
+	// TODO надо это будет делать через консул (хз пока как)
+	conf.Services.ProService.Url = os.Getenv("PRO_HOST") + ":" + os.Getenv("PRO_PORT")
 
 	return nil
 }

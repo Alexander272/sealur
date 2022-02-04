@@ -20,7 +20,7 @@ type (
 		Port     string `mapstructure:"port"`
 		Username string `mapstructure:"username"`
 		Password string
-		DbName   string `mapstructure:"databaseName"`
+		DbName   string `mapstructure:"dbname"`
 		SSLMode  string `mapstructure:"sslmode"`
 	}
 
