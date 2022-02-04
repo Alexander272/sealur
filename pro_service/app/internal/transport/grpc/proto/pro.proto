@@ -62,6 +62,8 @@ message CreateAddRequest {
     string mod = 2;
     string temperature = 3;
     string mounting = 4;
+    string graphite = 5;
+    string typeFl = 6;
 }
 
 message UpdateAddMatRequest {
@@ -80,6 +82,14 @@ message UpdateAddMounRequest {
     string id = 1;
     string mounting = 2;
 }
+message UpdateAddGrapRequest {
+    string id = 1;
+    string graphite = 2;
+}
+message UpdateAddTypeFlRequest {
+    string id = 1;
+    string typeFl = 2;
+}
 
 message Additional {
     string id = 1;
@@ -87,6 +97,8 @@ message Additional {
     string mod = 3;
     string temperature = 4;
     string mounting = 5;
+    string graphite = 6;
+    string typeFl = 7;
 }
 message AdditionalResponse {
     repeated Additional additionals = 1;
@@ -167,6 +179,10 @@ message CreateSNPRequest {
     string typeP = 3;
     string fillers = 4;
     string materials = 5;
+    string mod = 6;
+    string temperature = 7;
+    string mounting = 8;
+    string graphite = 9;
 }
 
 message UpdateSNPRequest {
@@ -176,6 +192,10 @@ message UpdateSNPRequest {
     string typeP = 4;
     string fillers = 5;
     string materials = 6;
+    string mod = 7;
+    string temperature = 8;
+    string mounting = 9;
+    string graphite = 10;
 }
 
 message DeleteSNPRequest {
@@ -189,6 +209,10 @@ message SNP {
     string typeP = 4;
     string fillers = 5;
     string materials = 6;
+    string mod = 7;
+    string temperature = 8;
+    string mounting = 9;
+    string graphite = 10;
 }
 message SNPResponse {
     repeated SNP snp = 1;
@@ -214,11 +238,14 @@ service ProService {
     rpc DeleteStand (DeleteStandRequest) returns (IdResponse);
 
     // Additional Service ----------------------------------------------------------------
+    rpc GetAllAdditional (GetAllAddRequest) returns (AdditionalResponse);
     rpc CreateAdditional (CreateAddRequest) returns (SuccessResponse);
     rpc UpdateMat (UpdateAddMatRequest) returns (SuccessResponse);
     rpc UpdateMod (UpdateAddModRequest) returns (SuccessResponse);
     rpc UpdateTemp (UpdateAddTemRequest) returns (SuccessResponse);
     rpc UpdateMoun (UpdateAddMounRequest) returns (SuccessResponse);
+    rpc UpdateGrap (UpdateAddGrapRequest) returns (SuccessResponse);
+    rpc UpdateTypeFl (UpdateAddTypeFlRequest) returns (SuccessResponse);
 
     //Size Service ----------------------------------------------------------------
     rpc GetSizes (GetSizesRequest) returns (SizeResponse);

@@ -62,3 +62,17 @@ func (s *AdditService) UpdateMoun(addit *proto.UpdateAddMounRequest) (*proto.Suc
 	}
 	return &proto.SuccessResponse{Success: true}, nil
 }
+
+func (s *AdditService) UpdateGrap(addit *proto.UpdateAddGrapRequest) (*proto.SuccessResponse, error) {
+	if err := s.repo.UpdateGrap(addit); err != nil {
+		return nil, fmt.Errorf("failed to update graphite. error: %w", err)
+	}
+	return &proto.SuccessResponse{Success: true}, nil
+}
+
+func (s *AdditService) UpdateTypeFl(addit *proto.UpdateAddTypeFlRequest) (*proto.SuccessResponse, error) {
+	if err := s.repo.UpdateTypeFl(addit); err != nil {
+		return nil, fmt.Errorf("failed to update type_fl. error: %w", err)
+	}
+	return &proto.SuccessResponse{Success: true}, nil
+}

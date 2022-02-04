@@ -18,7 +18,7 @@ func NewStandService(repo repository.Stand) *StandService {
 func (s *StandService) GetAll(req *proto.GetStandsRequest) (stands []*proto.Stand, err error) {
 	stands, err = s.repo.GetAll(req)
 	if err != nil {
-		return stands, fmt.Errorf("failed to get stands. error: %w", err)
+		return nil, fmt.Errorf("failed to get stands. error: %w", err)
 	}
 	return stands, nil
 }

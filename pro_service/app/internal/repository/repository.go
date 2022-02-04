@@ -26,6 +26,8 @@ type Addit interface {
 	UpdateMod(mod *proto.UpdateAddModRequest) error
 	UpdateTemp(temp *proto.UpdateAddTemRequest) error
 	UpdateMoun(moun *proto.UpdateAddMounRequest) error
+	UpdateGrap(grap *proto.UpdateAddGrapRequest) error
+	UpdateTypeFl(typeFl *proto.UpdateAddTypeFlRequest) error
 }
 
 type Size interface {
