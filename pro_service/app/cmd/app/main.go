@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"net"
 	"os"
 	"os/signal"
@@ -16,6 +17,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/subosito/gotenv"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func main() {
@@ -52,7 +54,16 @@ func main() {
 
 	//* GRPC Server
 
-	server := grpc.NewServer()
+	cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
+	if err != nil {
+		logger.Fatalf("failed to load certificate. error: %w", err)
+	}
+
+	opts := []grpc.ServerOption{
+		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
+	}
+
+	server := grpc.NewServer(opts...)
 	proto.RegisterProServiceServer(server, handlers)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)

@@ -17,7 +17,7 @@ require (
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	golang.org/x/sys v0.0.0-20211210111614-af8b64212486 // indirect
+	golang.org/x/sys v0.0.0-20220128215802-99c3d69c2c27 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11
 	gopkg.in/ini.v1 v1.66.2 // indirect
@@ -47,15 +47,16 @@ require (
 	github.com/swaggo/swag v1.7.8 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
-	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d // indirect
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/tools v0.1.7 // indirect
-	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
+	google.golang.org/genproto v0.0.0-20220201184016-50beb8ab5c44 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 )
 
 require github.com/go-redis/redis/v8 v8.11.4
 
 require (
+	github.com/Alexander272/sealur/pro_service v0.0.0-00010101000000-000000000000
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gin-gonic/contrib v0.0.0-20201101042839-6a891bf89f19
@@ -64,3 +65,5 @@ require (
 	github.com/swaggo/gin-swagger v1.4.0
 	google.golang.org/grpc v1.44.0
 )
+
+replace github.com/Alexander272/sealur/pro_service => ../../pro_service/app
