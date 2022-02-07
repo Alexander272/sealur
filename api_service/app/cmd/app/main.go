@@ -20,9 +20,9 @@ import (
 	"github.com/subosito/gotenv"
 )
 
-// @title Sealur Pro
+// @title Sealur
 // @version 0.1
-// @description API Service
+// @description API Service for Sealur
 
 // @host localhost:8080
 // @BasePath /api/v1

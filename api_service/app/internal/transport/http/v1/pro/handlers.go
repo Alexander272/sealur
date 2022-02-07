@@ -35,9 +35,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	if err != nil {
 		logger.Fatalf("failed connection to pro service. error: %w", err)
 	}
-
 	proClient := proto.NewProServiceClient(connect)
-
 	h.proClient = proClient
 
 	pro := api.Group("/sealur-pro")
@@ -45,6 +43,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		pro.GET("/ping", h.pingPro)
 
 		h.initStandRoutes(pro)
+		h.initFlangeRoutes(pro)
 	}
 }
 
@@ -54,6 +53,7 @@ func (h *Handler) pingPro(c *gin.Context) {
 	res, err := h.proClient.Ping(c, &proto.PingRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
 	}
 	c.JSON(http.StatusOK, models.DataResponse{Data: res.Ping})
 }

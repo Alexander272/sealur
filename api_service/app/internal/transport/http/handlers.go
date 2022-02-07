@@ -37,9 +37,9 @@ func (h *Handler) Init(conf *config.Config) *gin.Engine {
 		}),
 	)
 
-	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", conf.Http.Host, conf.Http.Port)
+	docs.SwaggerInfo_swagger.Host = fmt.Sprintf("%s:%s", conf.Http.Host, conf.Http.Port)
 	if conf.Environment != "dev" {
-		docs.SwaggerInfo.Host = conf.Http.Host
+		docs.SwaggerInfo_swagger.Host = conf.Http.Host
 	}
 
 	if conf.Environment != "prod" {

@@ -15,7 +15,7 @@ type IdResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
-type errorResponse struct {
+type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
@@ -25,5 +25,5 @@ type StatusResponse struct {
 
 func NewErrorResponse(c *gin.Context, statusCode int, err, message string) {
 	logger.Errorf("Url: %s | ClientIp: %s | ErrorResponse: %s", c.Request.URL, c.ClientIP(), err)
-	c.AbortWithStatusJSON(statusCode, errorResponse{message})
+	c.AbortWithStatusJSON(statusCode, ErrorResponse{message})
 }

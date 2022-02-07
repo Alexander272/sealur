@@ -27,14 +27,11 @@ func (r *StandRepo) GetAll(stand *proto.GetStandsRequest) (stands []*proto.Stand
 
 func (r *StandRepo) Create(stand *proto.CreateStandRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", StandTable)
-	res, err := r.db.Exec(query, stand.Title)
-	if err != nil {
-		return id, fmt.Errorf("failed to execute query. error: %w", err)
-	}
+	row := r.db.QueryRow(query, stand.Title)
 
-	idInt, err := res.LastInsertId()
-	if err != nil {
-		return id, fmt.Errorf("failed to get id. error: %w", err)
+	var idInt int
+	if err = row.Scan(&idInt); err != nil {
+		return id, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
 	return fmt.Sprintf("%d", idInt), nil
