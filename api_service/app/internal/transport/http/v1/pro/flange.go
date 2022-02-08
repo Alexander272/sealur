@@ -1,6 +1,7 @@
 package pro
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -10,12 +11,12 @@ import (
 )
 
 func (h *Handler) initFlangeRoutes(api *gin.RouterGroup) {
-	stand := api.Group("/flanges")
+	flanges := api.Group("/flanges")
 	{
-		stand.GET("/", h.GetFlanges)
-		stand.POST("/", h.notImplemented)
-		stand.PUT("/:id", h.notImplemented)
-		stand.DELETE("/:id", h.notImplemented)
+		flanges.GET("/", h.GetFlanges)
+		flanges.POST("/", h.notImplemented)
+		flanges.PUT("/:id", h.notImplemented)
+		flanges.DELETE("/:id", h.notImplemented)
 	}
 }
 
@@ -48,7 +49,8 @@ func (h *Handler) GetFlanges(c *gin.Context) {
 // @ModuleID createFlange
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.IdResponse
+// @Param data body models.FlangeDTO true "flange info"
+// @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -60,14 +62,18 @@ func (h *Handler) CreateFlange(c *gin.Context) {
 		return
 	}
 
-	id, err := h.proClient.CreateFlange(c, &proto.CreateFlangeRequest{Title: dto.Title, Short: dto.Short})
+	fl, err := h.proClient.CreateFlange(c, &proto.CreateFlangeRequest{Title: dto.Title, Short: dto.Short})
 	if err != nil {
+		if errors.Is(err, models.ErrFlangeAlreadyExists) {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), err.Error())
+			return
+		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
-	c.Header("Location", fmt.Sprintf("/api/v1/sealur-pro/flanges/%s", id.Id))
-	c.JSON(http.StatusCreated, models.IdResponse{Id: id.Id, Message: "Created"})
+	c.Header("Location", fmt.Sprintf("/api/v1/sealur-pro/flanges/%s", fl.Id))
+	c.JSON(http.StatusCreated, models.IdResponse{Id: fl.Id, Message: "Created"})
 }
 
 // @Summary Update Flange
@@ -77,6 +83,8 @@ func (h *Handler) CreateFlange(c *gin.Context) {
 // @ModuleID updateFlange
 // @Accept json
 // @Produce json
+// @Param data body models.FlangeDTO true "flange info"
+// @Param id path string true "flange id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -111,6 +119,7 @@ func (h *Handler) UpdateFlange(c *gin.Context) {
 // @ModuleID deleteFlange
 // @Accept json
 // @Produce json
+// @Param id path string true "flange id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse

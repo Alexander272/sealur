@@ -1,15 +1,83 @@
 basePath: /api/v1
 definitions:
+  models.CreateAdditDTO:
+    properties:
+      graphite:
+        type: string
+      materials:
+        type: string
+      mod:
+        type: string
+      mounting:
+        type: string
+      temperature:
+        type: string
+      typeFl:
+        type: string
+    required:
+    - graphite
+    - materials
+    - mod
+    - mounting
+    - temperature
+    - typeFl
+    type: object
   models.DataResponse:
     properties:
       count:
         type: integer
       data: {}
     type: object
+  models.DeleteSizeDTO:
+    properties:
+      flange:
+        type: string
+      typeFl:
+        type: string
+    required:
+    - flange
+    - typeFl
+    type: object
   models.ErrorResponse:
     properties:
       message:
         type: string
+    type: object
+  models.FlangeDTO:
+    properties:
+      short:
+        type: string
+      title:
+        type: string
+    required:
+    - short
+    - title
+    type: object
+  models.GetSNPDTO:
+    properties:
+      standId:
+        type: string
+      typeFl:
+        type: string
+    required:
+    - standId
+    - typeFl
+    type: object
+  models.GetSizesDTO:
+    properties:
+      flange:
+        type: string
+      standId:
+        type: string
+      typeFl:
+        type: string
+      typePr:
+        type: string
+    required:
+    - flange
+    - standId
+    - typeFl
+    - typePr
     type: object
   models.IdResponse:
     properties:
@@ -18,12 +86,137 @@ definitions:
       message:
         type: string
     type: object
+  models.SNPDTO:
+    properties:
+      fillers:
+        type: string
+      graphite:
+        type: string
+      materials:
+        type: string
+      mod:
+        type: string
+      mounting:
+        type: string
+      standId:
+        type: string
+      temperature:
+        type: string
+      typeFl:
+        type: string
+      typePr:
+        type: string
+    required:
+    - fillers
+    - graphite
+    - materials
+    - mod
+    - mounting
+    - standId
+    - temperature
+    - typeFl
+    - typePr
+    type: object
+  models.SizesDTO:
+    properties:
+      d1:
+        type: integer
+      d2:
+        type: integer
+      d3:
+        type: integer
+      d4:
+        type: integer
+      dn:
+        type: integer
+      flange:
+        type: string
+      h:
+        type: integer
+      pn:
+        type: integer
+      standId:
+        type: string
+      typeFl:
+        type: string
+      typePr:
+        type: string
+    required:
+    - d1
+    - d2
+    - d3
+    - d4
+    - dn
+    - flange
+    - h
+    - pn
+    - standId
+    - typeFl
+    - typePr
+    type: object
   models.StandDTO:
     properties:
       title:
         type: string
     required:
     - title
+    type: object
+  models.UpdateFlDTO:
+    properties:
+      typeFl:
+        type: string
+    required:
+    - typeFl
+    type: object
+  models.UpdateGrapDTO:
+    properties:
+      graphite:
+        type: string
+    required:
+    - graphite
+    type: object
+  models.UpdateMatDTO:
+    properties:
+      materials:
+        type: string
+    required:
+    - materials
+    type: object
+  models.UpdateModDTO:
+    properties:
+      mod:
+        type: string
+    type: object
+  models.UpdateMounDTO:
+    properties:
+      mounting:
+        type: string
+    required:
+    - mounting
+    type: object
+  models.UpdateTempDTO:
+    properties:
+      temperature:
+        type: string
+    required:
+    - temperature
+    type: object
+  proto.Additional:
+    properties:
+      graphite:
+        type: string
+      id:
+        type: string
+      materials:
+        type: string
+      mod:
+        type: string
+      mounting:
+        type: string
+      temperature:
+        type: string
+      typeFl:
+        type: string
     type: object
   proto.Flange:
     properties:
@@ -32,6 +225,52 @@ definitions:
       short:
         type: string
       title:
+        type: string
+    type: object
+  proto.SNP:
+    properties:
+      fillers:
+        type: string
+      graphite:
+        type: string
+      id:
+        type: string
+      materials:
+        type: string
+      mod:
+        type: string
+      mounting:
+        type: string
+      standId:
+        type: string
+      temperature:
+        type: string
+      typeFl:
+        type: string
+      typeP:
+        type: string
+    type: object
+  proto.Size:
+    properties:
+      d1:
+        type: integer
+      d2:
+        type: integer
+      d3:
+        type: integer
+      d4:
+        type: integer
+      dn:
+        type: integer
+      h:
+        type: integer
+      id:
+        type: string
+      pn:
+        type: integer
+      standId:
+        type: string
+      typePr:
         type: string
     type: object
   proto.Stand:
@@ -48,6 +287,356 @@ info:
   title: Sealur
   version: "0.1"
 paths:
+  /sealur-pro/additionals:
+    get:
+      consumes:
+      - application/json
+      description: получение всех дополнительных сведенний (список материалов, креплений
+        и тд)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.Additional'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Addit
+      tags:
+      - Sealur Pro -> additionals
+    post:
+      consumes:
+      - application/json
+      description: создание дополнительных сведенний
+      parameters:
+      - description: addit info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateAdditDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Addit
+      tags:
+      - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/fl:
+    patch:
+      consumes:
+      - application/json
+      description: обновление типа фланца
+      parameters:
+      - description: additional flange info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateFlDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Type Flange
+      tags:
+      - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/grap:
+    patch:
+      consumes:
+      - application/json
+      description: обновление графита
+      parameters:
+      - description: additional graphite info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateGrapDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Grap
+      tags:
+      - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/mat:
+    patch:
+      consumes:
+      - application/json
+      description: обновление материалов
+      parameters:
+      - description: additional materials info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateMatDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Mat
+      tags:
+      - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/mod:
+    patch:
+      consumes:
+      - application/json
+      description: обновление модифицирующего элемента
+      parameters:
+      - description: additional modification info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateModDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Mod
+      tags:
+      - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/moun:
+    patch:
+      consumes:
+      - application/json
+      description: обновление крепления на вертикальном фланце
+      parameters:
+      - description: additional mounting info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateMounDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Moun
+      tags:
+      - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/temp:
+    patch:
+      consumes:
+      - application/json
+      description: обновление температур
+      parameters:
+      - description: additional temperature info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateTempDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Temp
+      tags:
+      - Sealur Pro -> additionals
   /sealur-pro/flanges:
     get:
       consumes:
@@ -92,11 +681,18 @@ paths:
       consumes:
       - application/json
       description: создание стандарта на фланцы
+      parameters:
+      - description: flange info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.FlangeDTO'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/models.IdResponse'
         "400":
@@ -125,6 +721,12 @@ paths:
       consumes:
       - application/json
       description: удаление стандарта на фланцы
+      parameters:
+      - description: flange id
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -157,6 +759,18 @@ paths:
       consumes:
       - application/json
       description: обновление стандарта на фланцы
+      parameters:
+      - description: flange info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.FlangeDTO'
+      - description: flange id
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -185,6 +799,350 @@ paths:
       summary: Update Flange
       tags:
       - Sealur Pro -> flanges
+  /sealur-pro/sizes:
+    get:
+      consumes:
+      - application/json
+      description: получение размеров
+      parameters:
+      - description: info for size
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetSizesDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.Size'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Sizes
+      tags:
+      - Sealur Pro -> sizes
+    post:
+      consumes:
+      - application/json
+      description: создание размеров
+      parameters:
+      - description: size info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.SizesDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Size
+      tags:
+      - Sealur Pro -> sizes
+  /sealur-pro/sizes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: обновление размеров
+      parameters:
+      - description: info for size
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.DeleteSizeDTO'
+      - description: size id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Size
+      tags:
+      - Sealur Pro -> sizes
+    put:
+      consumes:
+      - application/json
+      description: обновление размеров
+      parameters:
+      - description: size info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.SizesDTO'
+      - description: size id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Size
+      tags:
+      - Sealur Pro -> sizes
+  /sealur-pro/snp:
+    get:
+      consumes:
+      - application/json
+      description: получение прокладок снп
+      parameters:
+      - description: info for snp
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetSNPDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.SNP'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get SNP
+      tags:
+      - Sealur Pro -> snp
+    post:
+      consumes:
+      - application/json
+      description: создание прокладки снп
+      parameters:
+      - description: snp info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.SNPDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create SNP
+      tags:
+      - Sealur Pro -> snp
+  /sealur-pro/snp/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление прокладки снп
+      parameters:
+      - description: snp id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete SNP
+      tags:
+      - Sealur Pro -> snp
+    put:
+      consumes:
+      - application/json
+      description: обновление прокладки снп
+      parameters:
+      - description: snp info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.SNPDTO'
+      - description: snp id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update SNP
+      tags:
+      - Sealur Pro -> snp
   /sealur-pro/standards:
     get:
       consumes:
@@ -239,8 +1197,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/models.IdResponse'
         "400":

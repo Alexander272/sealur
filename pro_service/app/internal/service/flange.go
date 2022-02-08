@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 )
@@ -24,6 +25,14 @@ func (s *FlangeService) GetAll() (flanges []*proto.Flange, err error) {
 }
 
 func (s *FlangeService) Create(flange *proto.CreateFlangeRequest) (fl *proto.IdResponse, err error) {
+	candidate, err := s.repo.GetByTitle(flange.Title, flange.Short)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get flange by title. error: %w", err)
+	}
+	if candidate != nil {
+		return nil, models.ErrFlangeAlreadyExists
+	}
+
 	id, err := s.repo.Create(flange)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create flange. error: %w", err)

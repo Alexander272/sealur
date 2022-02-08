@@ -27,22 +27,19 @@ func (r *SizesRepo) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, err er
 }
 
 func (r *SizesRepo) Create(size *proto.CreateSizeRequest) (id string, err error) {
-	query := fmt.Sprintf("INSERT INTO %s_%s (dn, pn, type_p, stand_id, d4, d3, d2, d1, h) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-		size.Flange, size.TypeFl)
+	query := fmt.Sprintf(`INSERT INTO %s_%s (dn, pn, type_p, stand_id, d4, d3, d2, d1, h) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		RETURNING id`, size.Flange, size.TypeFl)
 
 	standId, err := strconv.Atoi(size.StandId)
 	if err != nil {
 		return id, fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	res, err := r.db.Exec(query, size.Dn, size.Pn, size.TypePr, standId, size.D4, size.D3, size.D2, size.D1, size.H)
-	if err != nil {
-		return id, fmt.Errorf("failed to execute query. error: %w", err)
-	}
+	row := r.db.QueryRow(query, size.Dn, size.Pn, size.TypePr, standId, size.D4, size.D3, size.D2, size.D1, size.H)
 
-	idInt, err := res.LastInsertId()
-	if err != nil {
-		return id, fmt.Errorf("failed to get id. error: %w", err)
+	var idInt int
+	if err = row.Scan(&idInt); err != nil {
+		return id, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
 	return fmt.Sprintf("%d", idInt), nil

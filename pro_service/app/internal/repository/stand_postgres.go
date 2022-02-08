@@ -25,6 +25,15 @@ func (r *StandRepo) GetAll(stand *proto.GetStandsRequest) (stands []*proto.Stand
 	return stands, nil
 }
 
+func (r *StandRepo) GetByTitle(title string) (stand *proto.Stand, err error) {
+	query := fmt.Sprintf("SELECT id, title FROM %s WHERE lower(title)=lower($1)", StandTable)
+
+	if err = r.db.Get(&stand, query, title); err != nil {
+		return stand, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return stand, nil
+}
+
 func (r *StandRepo) Create(stand *proto.CreateStandRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", StandTable)
 	row := r.db.QueryRow(query, stand.Title)

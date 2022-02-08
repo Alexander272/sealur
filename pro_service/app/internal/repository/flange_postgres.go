@@ -25,17 +25,23 @@ func (r *FlangeRepo) GetAll() (flanges []*proto.Flange, err error) {
 	return flanges, nil
 }
 
+func (r *FlangeRepo) GetByTitle(title, short string) (flange *proto.Flange, err error) {
+	query := fmt.Sprintf("SELECT id, title, short from %s WHERE lower(title)=lower($1) OR lower(short)=lower($2)", FlangeTable)
+
+	if err := r.db.Get(&flange, query, title, short); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return flange, nil
+}
+
 // TODO дописать создание таблицы с размерами
 func (r *FlangeRepo) Create(fl *proto.CreateFlangeRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title, short) VALUES ($1, $2) RETURNING id", FlangeTable)
-	res, err := r.db.Exec(query, fl.Title, fl.Short)
-	if err != nil {
-		return id, fmt.Errorf("failed to execute query. error: %w", err)
-	}
+	row := r.db.QueryRow(query, fl.Title, fl.Short)
 
-	idInt, err := res.LastInsertId()
-	if err != nil {
-		return id, fmt.Errorf("failed to get id. error: %w", err)
+	var idInt int
+	if err = row.Scan(&idInt); err != nil {
+		return id, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
 	return fmt.Sprintf("%d", idInt), nil

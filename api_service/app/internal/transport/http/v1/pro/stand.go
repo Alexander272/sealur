@@ -1,6 +1,7 @@
 package pro
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -47,7 +48,7 @@ func (h *Handler) GetStands(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param data body models.StandDTO true "standard info"
-// @Success 200 {object} models.IdResponse
+// @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -61,6 +62,10 @@ func (h *Handler) CreateStand(c *gin.Context) {
 
 	id, err := h.proClient.CreateStand(c, &proto.CreateStandRequest{Title: dto.Title})
 	if err != nil {
+		if errors.Is(err, models.ErrStandAlreadyExists) {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), err.Error())
+			return
+		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}

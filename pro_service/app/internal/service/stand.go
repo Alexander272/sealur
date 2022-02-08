@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 )
@@ -24,6 +25,14 @@ func (s *StandService) GetAll(req *proto.GetStandsRequest) (stands []*proto.Stan
 }
 
 func (s *StandService) Create(stand *proto.CreateStandRequest) (st *proto.IdResponse, err error) {
+	candidate, err := s.repo.GetByTitle(stand.Title)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get stand by title. error: %w", err)
+	}
+	if candidate != nil {
+		return nil, models.ErrStandAlreadyExists
+	}
+
 	id, err := s.repo.Create(stand)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create stand. error: %w", err)

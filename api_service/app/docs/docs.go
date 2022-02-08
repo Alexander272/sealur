@@ -16,6 +16,554 @@ const docTemplate_swagger = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/sealur-pro/additionals": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение всех дополнительных сведенний (список материалов, креплений и тд)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Get Addit",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.Additional"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание дополнительных сведенний",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Create Addit",
+                "parameters": [
+                    {
+                        "description": "addit info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateAdditDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/additionals/{id}/fl": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление типа фланца",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update Type Flange",
+                "parameters": [
+                    {
+                        "description": "additional flange info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateFlDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/additionals/{id}/grap": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление графита",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update Grap",
+                "parameters": [
+                    {
+                        "description": "additional graphite info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateGrapDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/additionals/{id}/mat": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление материалов",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update Mat",
+                "parameters": [
+                    {
+                        "description": "additional materials info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateMatDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/additionals/{id}/mod": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление модифицирующего элемента",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update Mod",
+                "parameters": [
+                    {
+                        "description": "additional modification info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateModDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/additionals/{id}/moun": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление крепления на вертикальном фланце",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update Moun",
+                "parameters": [
+                    {
+                        "description": "additional mounting info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateMounDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/additionals/{id}/temp": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление температур",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update Temp",
+                "parameters": [
+                    {
+                        "description": "additional temperature info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateTempDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/sealur-pro/flanges": {
             "get": {
                 "security": [
@@ -99,9 +647,20 @@ const docTemplate_swagger = `{
                     "Sealur Pro -\u003e flanges"
                 ],
                 "summary": "Create Flange",
+                "parameters": [
+                    {
+                        "description": "flange info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.FlangeDTO"
+                        }
+                    }
+                ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/models.IdResponse"
                         }
@@ -151,6 +710,24 @@ const docTemplate_swagger = `{
                     "Sealur Pro -\u003e flanges"
                 ],
                 "summary": "Update Flange",
+                "parameters": [
+                    {
+                        "description": "flange info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.FlangeDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "flange id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -201,6 +778,560 @@ const docTemplate_swagger = `{
                     "Sealur Pro -\u003e flanges"
                 ],
                 "summary": "Delete Flange",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "flange id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/sizes": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение размеров",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e sizes"
+                ],
+                "summary": "Get Sizes",
+                "parameters": [
+                    {
+                        "description": "info for size",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.GetSizesDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.Size"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание размеров",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e sizes"
+                ],
+                "summary": "Create Size",
+                "parameters": [
+                    {
+                        "description": "size info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SizesDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/sizes/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление размеров",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e sizes"
+                ],
+                "summary": "Update Size",
+                "parameters": [
+                    {
+                        "description": "size info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SizesDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "size id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление размеров",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e sizes"
+                ],
+                "summary": "Delete Size",
+                "parameters": [
+                    {
+                        "description": "info for size",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteSizeDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "size id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/snp": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение прокладок снп",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e snp"
+                ],
+                "summary": "Get SNP",
+                "parameters": [
+                    {
+                        "description": "info for snp",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.GetSNPDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.SNP"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание прокладки снп",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e snp"
+                ],
+                "summary": "Create SNP",
+                "parameters": [
+                    {
+                        "description": "snp info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SNPDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/snp/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление прокладки снп",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e snp"
+                ],
+                "summary": "Update SNP",
+                "parameters": [
+                    {
+                        "description": "snp info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SNPDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "snp id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "удаление прокладки снп",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e snp"
+                ],
+                "summary": "Delete SNP",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "snp id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -330,8 +1461,8 @@ const docTemplate_swagger = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/models.IdResponse"
                         }
@@ -494,6 +1625,37 @@ const docTemplate_swagger = `{
         }
     },
     "definitions": {
+        "models.CreateAdditDTO": {
+            "type": "object",
+            "required": [
+                "graphite",
+                "materials",
+                "mod",
+                "mounting",
+                "temperature",
+                "typeFl"
+            ],
+            "properties": {
+                "graphite": {
+                    "type": "string"
+                },
+                "materials": {
+                    "type": "string"
+                },
+                "mod": {
+                    "type": "string"
+                },
+                "mounting": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "string"
+                },
+                "typeFl": {
+                    "type": "string"
+                }
+            }
+        },
         "models.DataResponse": {
             "type": "object",
             "properties": {
@@ -503,10 +1665,78 @@ const docTemplate_swagger = `{
                 "data": {}
             }
         },
+        "models.DeleteSizeDTO": {
+            "type": "object",
+            "required": [
+                "flange",
+                "typeFl"
+            ],
+            "properties": {
+                "flange": {
+                    "type": "string"
+                },
+                "typeFl": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ErrorResponse": {
             "type": "object",
             "properties": {
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.FlangeDTO": {
+            "type": "object",
+            "required": [
+                "short",
+                "title"
+            ],
+            "properties": {
+                "short": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.GetSNPDTO": {
+            "type": "object",
+            "required": [
+                "standId",
+                "typeFl"
+            ],
+            "properties": {
+                "standId": {
+                    "type": "string"
+                },
+                "typeFl": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.GetSizesDTO": {
+            "type": "object",
+            "required": [
+                "flange",
+                "standId",
+                "typeFl",
+                "typePr"
+            ],
+            "properties": {
+                "flange": {
+                    "type": "string"
+                },
+                "standId": {
+                    "type": "string"
+                },
+                "typeFl": {
+                    "type": "string"
+                },
+                "typePr": {
                     "type": "string"
                 }
             }
@@ -522,6 +1752,100 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "models.SNPDTO": {
+            "type": "object",
+            "required": [
+                "fillers",
+                "graphite",
+                "materials",
+                "mod",
+                "mounting",
+                "standId",
+                "temperature",
+                "typeFl",
+                "typePr"
+            ],
+            "properties": {
+                "fillers": {
+                    "type": "string"
+                },
+                "graphite": {
+                    "type": "string"
+                },
+                "materials": {
+                    "type": "string"
+                },
+                "mod": {
+                    "type": "string"
+                },
+                "mounting": {
+                    "type": "string"
+                },
+                "standId": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "string"
+                },
+                "typeFl": {
+                    "type": "string"
+                },
+                "typePr": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SizesDTO": {
+            "type": "object",
+            "required": [
+                "d1",
+                "d2",
+                "d3",
+                "d4",
+                "dn",
+                "flange",
+                "h",
+                "pn",
+                "standId",
+                "typeFl",
+                "typePr"
+            ],
+            "properties": {
+                "d1": {
+                    "type": "integer"
+                },
+                "d2": {
+                    "type": "integer"
+                },
+                "d3": {
+                    "type": "integer"
+                },
+                "d4": {
+                    "type": "integer"
+                },
+                "dn": {
+                    "type": "integer"
+                },
+                "flange": {
+                    "type": "string"
+                },
+                "h": {
+                    "type": "integer"
+                },
+                "pn": {
+                    "type": "integer"
+                },
+                "standId": {
+                    "type": "string"
+                },
+                "typeFl": {
+                    "type": "string"
+                },
+                "typePr": {
+                    "type": "string"
+                }
+            }
+        },
         "models.StandDTO": {
             "type": "object",
             "required": [
@@ -529,6 +1853,95 @@ const docTemplate_swagger = `{
             ],
             "properties": {
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateFlDTO": {
+            "type": "object",
+            "required": [
+                "typeFl"
+            ],
+            "properties": {
+                "typeFl": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateGrapDTO": {
+            "type": "object",
+            "required": [
+                "graphite"
+            ],
+            "properties": {
+                "graphite": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateMatDTO": {
+            "type": "object",
+            "required": [
+                "materials"
+            ],
+            "properties": {
+                "materials": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateModDTO": {
+            "type": "object",
+            "properties": {
+                "mod": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateMounDTO": {
+            "type": "object",
+            "required": [
+                "mounting"
+            ],
+            "properties": {
+                "mounting": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateTempDTO": {
+            "type": "object",
+            "required": [
+                "temperature"
+            ],
+            "properties": {
+                "temperature": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.Additional": {
+            "type": "object",
+            "properties": {
+                "graphite": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "materials": {
+                    "type": "string"
+                },
+                "mod": {
+                    "type": "string"
+                },
+                "mounting": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "string"
+                },
+                "typeFl": {
                     "type": "string"
                 }
             }
@@ -543,6 +1956,76 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.SNP": {
+            "type": "object",
+            "properties": {
+                "fillers": {
+                    "type": "string"
+                },
+                "graphite": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "materials": {
+                    "type": "string"
+                },
+                "mod": {
+                    "type": "string"
+                },
+                "mounting": {
+                    "type": "string"
+                },
+                "standId": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "string"
+                },
+                "typeFl": {
+                    "type": "string"
+                },
+                "typeP": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.Size": {
+            "type": "object",
+            "properties": {
+                "d1": {
+                    "type": "integer"
+                },
+                "d2": {
+                    "type": "integer"
+                },
+                "d3": {
+                    "type": "integer"
+                },
+                "d4": {
+                    "type": "integer"
+                },
+                "dn": {
+                    "type": "integer"
+                },
+                "h": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "pn": {
+                    "type": "integer"
+                },
+                "standId": {
+                    "type": "string"
+                },
+                "typePr": {
                     "type": "string"
                 }
             }

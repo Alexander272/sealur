@@ -7,6 +7,7 @@ import (
 
 type Stand interface {
 	GetAll(stand *proto.GetStandsRequest) ([]*proto.Stand, error)
+	GetByTitle(title string) (*proto.Stand, error)
 	Create(stand *proto.CreateStandRequest) (id string, err error)
 	Update(stand *proto.UpdateStandRequest) error
 	Delete(stand *proto.DeleteStandRequest) error
@@ -14,20 +15,21 @@ type Stand interface {
 
 type Flange interface {
 	GetAll() ([]*proto.Flange, error)
-	Create(fl *proto.CreateFlangeRequest) (id string, err error)
-	Update(fl *proto.UpdateFlangeRequest) error
-	Delete(fl *proto.DeleteFlangeRequest) error
+	GetByTitle(title, short string) (*proto.Flange, error)
+	Create(*proto.CreateFlangeRequest) (id string, err error)
+	Update(*proto.UpdateFlangeRequest) error
+	Delete(*proto.DeleteFlangeRequest) error
 }
 
 type Addit interface {
 	GetAll() ([]*proto.Additional, error)
-	Create(add *proto.CreateAddRequest) error
-	UpdateMat(mat *proto.UpdateAddMatRequest) error
-	UpdateMod(mod *proto.UpdateAddModRequest) error
-	UpdateTemp(temp *proto.UpdateAddTemRequest) error
-	UpdateMoun(moun *proto.UpdateAddMounRequest) error
-	UpdateGrap(grap *proto.UpdateAddGrapRequest) error
-	UpdateTypeFl(typeFl *proto.UpdateAddTypeFlRequest) error
+	Create(*proto.CreateAddRequest) error
+	UpdateMat(*proto.UpdateAddMatRequest) error
+	UpdateMod(*proto.UpdateAddModRequest) error
+	UpdateTemp(*proto.UpdateAddTemRequest) error
+	UpdateMoun(*proto.UpdateAddMounRequest) error
+	UpdateGrap(*proto.UpdateAddGrapRequest) error
+	UpdateTypeFl(*proto.UpdateAddTypeFlRequest) error
 }
 
 type Size interface {

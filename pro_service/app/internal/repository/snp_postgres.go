@@ -35,16 +35,14 @@ func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
 		return id, fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	res, err := r.db.Exec(query, standId, snp.TypeFl, snp.TypeP, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
+	row := r.db.QueryRow(query, standId, snp.TypeFl, snp.TypeP, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
 		snp.Mounting, snp.Graphite, snp.Graphite)
-	if err != nil {
+
+	var idInt int
+	if err = row.Scan(&idInt); err != nil {
 		return id, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	idInt, err := res.LastInsertId()
-	if err != nil {
-		return id, fmt.Errorf("failed to get id. error: %w", err)
-	}
 	return fmt.Sprintf("%d", idInt), nil
 }
 

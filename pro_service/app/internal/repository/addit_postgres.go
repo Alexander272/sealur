@@ -17,9 +17,9 @@ func NewAdditRepo(db *sqlx.DB) *AdditRepo {
 }
 
 func (r *AdditRepo) GetAll() (addit []*proto.Additional, err error) {
-	query := fmt.Sprintf("SELECT materials, mod, temperature, mounting, graphite, type_fl FROM %s", AdditionalTable)
+	query := fmt.Sprintf("SELECT id, materials, mod, temperature, mounting, graphite, type_fl FROM %s LIMIT 1", AdditionalTable)
 
-	if err = r.db.Select(&addit, query); err != nil {
+	if err = r.db.Get(&addit, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return addit, nil
