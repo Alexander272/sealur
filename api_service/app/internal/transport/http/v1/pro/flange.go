@@ -13,10 +13,10 @@ import (
 func (h *Handler) initFlangeRoutes(api *gin.RouterGroup) {
 	flanges := api.Group("/flanges")
 	{
-		flanges.GET("/", h.GetFlanges)
-		flanges.POST("/", h.notImplemented)
-		flanges.PUT("/:id", h.notImplemented)
-		flanges.DELETE("/:id", h.notImplemented)
+		flanges.GET("/", h.getFlanges)
+		flanges.POST("/", h.createFlange)
+		flanges.PUT("/:id", h.updateFlange)
+		flanges.DELETE("/:id", h.deleteFlange)
 	}
 }
 
@@ -32,7 +32,7 @@ func (h *Handler) initFlangeRoutes(api *gin.RouterGroup) {
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/flanges [get]
-func (h *Handler) GetFlanges(c *gin.Context) {
+func (h *Handler) getFlanges(c *gin.Context) {
 	fl, err := h.proClient.GetAllFlanges(c, &proto.GetAllFlangeRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -55,7 +55,7 @@ func (h *Handler) GetFlanges(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/flanges [post]
-func (h *Handler) CreateFlange(c *gin.Context) {
+func (h *Handler) createFlange(c *gin.Context) {
 	var dto models.FlangeDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
@@ -90,7 +90,7 @@ func (h *Handler) CreateFlange(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/flanges/{id} [put]
-func (h *Handler) UpdateFlange(c *gin.Context) {
+func (h *Handler) updateFlange(c *gin.Context) {
 	var dto models.FlangeDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
@@ -125,7 +125,7 @@ func (h *Handler) UpdateFlange(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/flanges/{id} [delete]
-func (h *Handler) DeleteFlange(c *gin.Context) {
+func (h *Handler) deleteFlange(c *gin.Context) {
 	flId := c.Param("id")
 	if flId == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")

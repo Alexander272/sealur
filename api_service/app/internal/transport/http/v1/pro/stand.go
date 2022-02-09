@@ -13,10 +13,10 @@ import (
 func (h *Handler) initStandRoutes(api *gin.RouterGroup) {
 	stand := api.Group("/standards")
 	{
-		stand.GET("/", h.GetStands)
-		stand.POST("/", h.CreateStand)
-		stand.PUT("/:id", h.UpdateStand)
-		stand.DELETE("/:id", h.DeleteStand)
+		stand.GET("/", h.getStands)
+		stand.POST("/", h.createStand)
+		stand.PUT("/:id", h.updateStand)
+		stand.DELETE("/:id", h.deleteStand)
 	}
 }
 
@@ -32,7 +32,7 @@ func (h *Handler) initStandRoutes(api *gin.RouterGroup) {
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/standards [get]
-func (h *Handler) GetStands(c *gin.Context) {
+func (h *Handler) getStands(c *gin.Context) {
 	st, err := h.proClient.GetAllStands(c, &proto.GetStandsRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -53,7 +53,7 @@ func (h *Handler) GetStands(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/standards [post]
-func (h *Handler) CreateStand(c *gin.Context) {
+func (h *Handler) createStand(c *gin.Context) {
 	var dto models.StandDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data sent")
@@ -88,7 +88,7 @@ func (h *Handler) CreateStand(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/standards/{id} [put]
-func (h *Handler) UpdateStand(c *gin.Context) {
+func (h *Handler) updateStand(c *gin.Context) {
 	var dto models.StandDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
@@ -122,7 +122,7 @@ func (h *Handler) UpdateStand(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/standards/{id} [delete]
-func (h *Handler) DeleteStand(c *gin.Context) {
+func (h *Handler) deleteStand(c *gin.Context) {
 	stId := c.Param("id")
 	if stId == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")

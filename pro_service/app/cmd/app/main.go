@@ -48,7 +48,7 @@ func main() {
 
 	repos := repository.NewRepo(db)
 	services := service.NewServices(repos)
-	handlers := handlers.NewHandler(services)
+	handlers := handlers.NewHandler(services, conf.Api)
 
 	//TODO надо посмотреть как это по нормальному пишется
 
@@ -61,6 +61,7 @@ func main() {
 
 	opts := []grpc.ServerOption{
 		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
+		grpc.UnaryInterceptor(handlers.UnaryInterceptor),
 	}
 
 	server := grpc.NewServer(opts...)

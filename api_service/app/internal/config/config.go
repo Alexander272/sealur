@@ -56,7 +56,9 @@ type (
 	}
 
 	ProConfig struct {
-		Url string
+		Url          string
+		AuthName     string
+		AuthPassword string
 	}
 )
 
@@ -108,6 +110,8 @@ func setFromEnv(conf *Config) error {
 		return err
 	}
 	conf.Environment = os.Getenv("APP_ENV")
+	conf.Services.ProService.AuthName = os.Getenv("API_NAME")
+	conf.Services.ProService.AuthPassword = os.Getenv("API_PASSWORD")
 
 	// TODO надо это будет делать через консул (хз пока как)
 	conf.Services.ProService.Url = os.Getenv("PRO_HOST") + ":" + os.Getenv("PRO_PORT")

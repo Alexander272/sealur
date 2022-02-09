@@ -13,6 +13,7 @@ type (
 		Environment string
 		Postgres    PostgresConfig
 		Http        HttpConfig
+		Api         ApiConfig
 	}
 
 	PostgresConfig struct {
@@ -31,6 +32,11 @@ type (
 		ReadTimeout        time.Duration `mapstructure:"readTimeout"`
 		WriteTimeout       time.Duration `mapstructure:"writeTimeout"`
 		MaxHeaderMegabytes int           `mapstructure:"maxHeaderBytes"`
+	}
+
+	ApiConfig struct {
+		Name     string
+		Password string
 	}
 )
 
@@ -75,6 +81,10 @@ func setFromEnv(conf *Config) error {
 	// if err := envconfig.Process("http", &conf.Http); err != nil {
 	// 	return err
 	// }
+	if err := envconfig.Process("api", &conf.Api); err != nil {
+		return err
+	}
+
 	conf.Http.Host = os.Getenv("PRO_HOST")
 	conf.Http.Port = os.Getenv("PRO_PORT")
 	if len(conf.Http.Port) == 0 {

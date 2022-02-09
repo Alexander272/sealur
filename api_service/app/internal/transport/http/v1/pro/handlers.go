@@ -27,8 +27,15 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	if err != nil {
 		logger.Fatalf("failed to load certificate. error: %w", err)
 	}
+
+	auth := models.Authentication{
+		ServiceName: conf.ProService.AuthName,
+		Password:    conf.ProService.AuthPassword,
+	}
+
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(creds),
+		grpc.WithPerRPCCredentials(&auth),
 	}
 
 	connect, err := grpc.Dial(conf.ProService.Url, opts...)
@@ -49,8 +56,6 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		h.initSNPRoutes(pro)
 	}
 }
-
-func (h *Handler) notImplemented(c *gin.Context) {}
 
 func (h *Handler) pingPro(c *gin.Context) {
 	res, err := h.proClient.Ping(c, &proto.PingRequest{})

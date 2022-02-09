@@ -3,17 +3,20 @@ package grpc
 import (
 	"context"
 
+	"github.com/Alexander272/sealur/pro_service/internal/config"
 	"github.com/Alexander272/sealur/pro_service/internal/service"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 )
 
 type Handler struct {
 	service *service.Services
+	conf    config.ApiConfig
 }
 
-func NewHandler(service *service.Services) *Handler {
+func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 	return &Handler{
 		service: service,
+		conf:    conf,
 	}
 }
 
