@@ -27,15 +27,17 @@ func (r *StFlRepo) Get() (st []*proto.StFl, err error) {
 	return st, nil
 }
 
-func (r *StFlRepo) Create(st *proto.CreateStFlRequest) error {
+func (r *StFlRepo) Create(st *proto.CreateStFlRequest) (string, error) {
 	query := fmt.Sprintf("INSERT INTO %s (stand_id, fl_ids) VALUES ($1, $2)", StFLTable)
 
-	_, err := r.db.Exec(query, st.StandId, st.FlangeId)
-	if err != nil {
-		return fmt.Errorf("failed to execute query. error: %w", err)
+	row := r.db.QueryRow(query, st.StandId, st.FlangeId)
+
+	var idInt int
+	if err := row.Scan(&idInt); err != nil {
+		return "", fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	return nil
+	return fmt.Sprintf("%d", idInt), nil
 }
 
 func (r *StFlRepo) Update(st *proto.UpdateStFlRequest) error {

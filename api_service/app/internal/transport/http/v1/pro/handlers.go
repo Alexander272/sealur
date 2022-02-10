@@ -23,21 +23,25 @@ func NewHandler() *Handler {
 func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	//* pro service connect
 	//TODO стоит ли так оставлять сертификат?
+	//* определение сертификата
 	creds, err := credentials.NewClientTLSFromFile("cert/server.crt", "localhost")
 	if err != nil {
 		logger.Fatalf("failed to load certificate. error: %w", err)
 	}
 
+	//* данные для аутентификации
 	auth := models.Authentication{
 		ServiceName: conf.ProService.AuthName,
 		Password:    conf.ProService.AuthPassword,
 	}
 
+	//* опции grpc
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(creds),
 		grpc.WithPerRPCCredentials(&auth),
 	}
 
+	//* подключение к сервису
 	connect, err := grpc.Dial(conf.ProService.Url, opts...)
 	if err != nil {
 		logger.Fatalf("failed connection to pro service. error: %w", err)

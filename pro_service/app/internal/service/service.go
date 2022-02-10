@@ -21,7 +21,7 @@ type Flange interface {
 
 type StFl interface {
 	Get() ([]*proto.StFl, error)
-	Create(*proto.CreateStFlRequest) error
+	Create(*proto.CreateStFlRequest) (*proto.IdResponse, error)
 	Update(*proto.UpdateStFlRequest) error
 	Delete(*proto.DeleteStFlRequest) error
 }

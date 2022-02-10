@@ -23,11 +23,12 @@ func (s *StFlService) Get() (st []*proto.StFl, err error) {
 	return st, nil
 }
 
-func (s *StFlService) Create(st *proto.CreateStFlRequest) error {
-	if err := s.repo.Create(st); err != nil {
-		return fmt.Errorf("failed to create st/fl. error: %w", err)
+func (s *StFlService) Create(st *proto.CreateStFlRequest) (*proto.IdResponse, error) {
+	id, err := s.repo.Create(st)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create st/fl. error: %w", err)
 	}
-	return nil
+	return &proto.IdResponse{Id: id}, nil
 }
 
 func (s *StFlService) Update(st *proto.UpdateStFlRequest) error {

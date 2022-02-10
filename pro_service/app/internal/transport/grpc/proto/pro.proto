@@ -78,7 +78,7 @@ message StFl {
     string flangeId = 3;
 }
 message StFlResponse {
-    repeated TypeFl typeFl = 1;
+    repeated StFl stfl = 1;
 }
 
 // Type Flange Service ----------------------------------------------------------------

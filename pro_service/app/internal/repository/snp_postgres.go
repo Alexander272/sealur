@@ -35,7 +35,7 @@ func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
 		return id, fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	row := r.db.QueryRow(query, standId, snp.TypeFlId, snp.TypeP, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
+	row := r.db.QueryRow(query, standId, snp.TypeFlId, snp.TypePr, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
 		snp.Mounting, snp.Graphite, snp.Graphite)
 
 	var idInt int
@@ -59,7 +59,7 @@ func (r *SNPRepo) Update(snp *proto.UpdateSNPRequest) error {
 		return fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	_, err = r.db.Exec(query, standId, snp.TypeFlId, snp.TypeP, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
+	_, err = r.db.Exec(query, standId, snp.TypeFlId, snp.TypePr, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
 		snp.Mounting, snp.Graphite, id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
