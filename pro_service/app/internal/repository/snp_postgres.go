@@ -17,7 +17,7 @@ func NewSNPRepo(db *sqlx.DB) *SNPRepo {
 }
 
 func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
-	query := fmt.Sprintf(`SELECT id, type_p as typeP, fillers, materials, mod, temperature, mounting, graphite 
+	query := fmt.Sprintf(`SELECT id, type_pr as typePr, fillers, materials, mod, temperature, mounting, graphite 
 		FROM %s WHERE stand_id=$1 AND type_fl_id=$2`, SNPTable)
 
 	if err = r.db.Select(&snp, query); err != nil {
@@ -27,7 +27,7 @@ func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
 }
 
 func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
-	query := fmt.Sprintf(`INSERT INTO %s (stand_id, type_fl_id, type_p, fillers, materials, mod, temperature, mounting, graphite) 
+	query := fmt.Sprintf(`INSERT INTO %s (stand_id, type_fl_id, type_pr, fillers, materials, mod, temperature, mounting, graphite) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, SNPTable)
 
 	standId, err := strconv.Atoi(snp.StandId)
@@ -47,7 +47,7 @@ func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
 }
 
 func (r *SNPRepo) Update(snp *proto.UpdateSNPRequest) error {
-	query := fmt.Sprintf(`UPDATE %s SET stand_id=$1, type_fl_id=$2, type_p=$3, fillers=$4, materials=$5, mod=$6, temperature=$7,
+	query := fmt.Sprintf(`UPDATE %s SET stand_id=$1, type_fl_id=$2, type_pr=$3, fillers=$4, materials=$5, mod=$6, temperature=$7,
 		mounting=$8, graphite=$9 WHERE id=$10`, SNPTable)
 
 	id, err := strconv.Atoi(snp.Id)

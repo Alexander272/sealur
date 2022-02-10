@@ -230,7 +230,7 @@ message GetSNPRequest {
 message CreateSNPRequest {
     string standId = 1;
     string typeFlId = 2;
-    string typeP = 3;
+    string typePr = 3;
     string fillers = 4;
     string materials = 5;
     string mod = 6;
@@ -243,7 +243,7 @@ message UpdateSNPRequest {
     string id = 1;
     string standId = 2;
     string typeFlId = 3;
-    string typeP = 4;
+    string typePr = 4;
     string fillers = 5;
     string materials = 6;
     string mod = 7;
@@ -260,7 +260,7 @@ message SNP {
     string id = 1;
     string standId = 2;
     string typeFlId = 3;
-    string typeP = 4;
+    string typePr = 4;
     string fillers = 5;
     string materials = 6;
     string mod = 7;

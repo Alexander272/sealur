@@ -12,7 +12,7 @@ CREATE TABLE flange (
 CREATE TABLE st_fl (
     "id" serial not null unique,
     "stand_id" int references stand (id) on delete cascade not null,
-    "fl_id" int references flange (id) on delete cascade not null
+    "fl_ids" int references flange (id) on delete cascade not null
 );
 
 CREATE TABLE type_fl (
@@ -35,7 +35,7 @@ CREATE TABLE additional (
 CREATE TABLE snp (
     "id" serial not null unique,
     "stand_id" int references stand (id) on delete cascade not null,
-    "type_p" text,
+    "type_pr" text,
     "type_fl_id" int references type_fl (id) on delete cascade not null,
     "filler" text,
     "materials" text,
