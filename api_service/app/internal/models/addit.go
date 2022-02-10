@@ -6,7 +6,6 @@ type CreateAdditDTO struct {
 	Temperature string `json:"temperature" binding:"required"`
 	Mounting    string `json:"mounting" binding:"required"`
 	Graphite    string `json:"graphite" binding:"required"`
-	TypeFl      string `json:"typeFl" binding:"required"`
 }
 
 type UpdateMatDTO struct {
@@ -27,8 +26,4 @@ type UpdateMounDTO struct {
 
 type UpdateGrapDTO struct {
 	Graphite string `json:"graphite" binding:"required"`
-}
-
-type UpdateFlDTO struct {
-	TypeFl string `json:"typeFl" binding:"required"`
 }

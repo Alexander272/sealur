@@ -28,6 +28,7 @@ type StFl interface {
 
 type TypeFl interface {
 	Get() ([]*proto.TypeFl, error)
+	GetAll() ([]*proto.TypeFl, error)
 	Create(*proto.CreateTypeFlRequest) (*proto.IdResponse, error)
 	Update(*proto.UpdateTypeFlRequest) error
 	Delete(*proto.DeleteTypeFlRequest) error

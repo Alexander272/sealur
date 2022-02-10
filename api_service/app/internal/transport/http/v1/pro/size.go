@@ -40,10 +40,10 @@ func (h *Handler) getSizes(c *gin.Context) {
 	}
 
 	sizes, err := h.proClient.GetSizes(c, &proto.GetSizesRequest{
-		Flange:  dto.Flange,
-		TypeFl:  dto.TypeFl,
-		TypePr:  dto.TypePr,
-		StandId: dto.StandId,
+		Flange:   dto.Flange,
+		TypeFlId: dto.TypeFlId,
+		TypePr:   dto.TypePr,
+		StandId:  dto.StandId,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -74,17 +74,17 @@ func (h *Handler) createSize(c *gin.Context) {
 	}
 
 	size, err := h.proClient.CreateSize(c, &proto.CreateSizeRequest{
-		Flange:  dto.Flange,
-		TypeFl:  dto.TypeFl,
-		Dn:      dto.Dn,
-		Pn:      dto.Pn,
-		TypePr:  dto.TypePr,
-		StandId: dto.StandId,
-		D4:      dto.D4,
-		D3:      dto.D3,
-		D2:      dto.D2,
-		D1:      dto.D1,
-		H:       dto.H,
+		Flange:   dto.Flange,
+		TypeFlId: dto.TypeFlId,
+		Dn:       dto.Dn,
+		Pn:       dto.Pn,
+		TypePr:   dto.TypePr,
+		StandId:  dto.StandId,
+		D4:       dto.D4,
+		D3:       dto.D3,
+		D2:       dto.D2,
+		D1:       dto.D1,
+		H:        dto.H,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -123,18 +123,18 @@ func (h *Handler) updateSize(c *gin.Context) {
 	}
 
 	size, err := h.proClient.UpdateSize(c, &proto.UpdateSizeRequest{
-		Id:      id,
-		Flange:  dto.Flange,
-		TypeFl:  dto.TypeFl,
-		Dn:      dto.Dn,
-		Pn:      dto.Pn,
-		TypePr:  dto.TypePr,
-		StandId: dto.StandId,
-		D4:      dto.D4,
-		D3:      dto.D3,
-		D2:      dto.D2,
-		D1:      dto.D1,
-		H:       dto.H,
+		Id:       id,
+		Flange:   dto.Flange,
+		TypeFlId: dto.TypeFlId,
+		Dn:       dto.Dn,
+		Pn:       dto.Pn,
+		TypePr:   dto.TypePr,
+		StandId:  dto.StandId,
+		D4:       dto.D4,
+		D3:       dto.D3,
+		D2:       dto.D2,
+		D1:       dto.D1,
+		H:        dto.H,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -174,7 +174,6 @@ func (h *Handler) deleteSize(c *gin.Context) {
 	size, err := h.proClient.DeleteSize(c, &proto.DeleteSizeRequest{
 		Id:     id,
 		Flange: dto.Flange,
-		TypeFl: dto.TypeFl,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")

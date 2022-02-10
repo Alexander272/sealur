@@ -17,10 +17,9 @@ func NewSizesRepo(db *sqlx.DB) *SizesRepo {
 }
 
 func (r *SizesRepo) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, err error) {
-	// TODO исправить
-	query := fmt.Sprintf("SELECT id, dn, pn, d4, d3, d2, d1, h FROM %s WHERE type_p=$1 AND stand_id=$1", req.Flange)
+	query := fmt.Sprintf("SELECT id, dn, pn, d4, d3, d2, d1, h FROM %s WHERE type_pr=$1 AND stand_id=$2 AND type_fl_id=$3", req.Flange)
 
-	if err = r.db.Select(&sizes, query); err != nil {
+	if err = r.db.Select(&sizes, query, req.TypePr, req.StandId, req.TypeFlId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
@@ -28,7 +27,7 @@ func (r *SizesRepo) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, err er
 }
 
 func (r *SizesRepo) Create(size *proto.CreateSizeRequest) (id string, err error) {
-	query := fmt.Sprintf(`INSERT INTO %s (dn, pn, type_p, stand_id, d4, d3, d2, d1, h) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+	query := fmt.Sprintf(`INSERT INTO %s (dn, pn, type_fl_id, type_pr, stand_id, d4, d3, d2, d1, h) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 		RETURNING id`, size.Flange)
 
 	standId, err := strconv.Atoi(size.StandId)
@@ -36,7 +35,7 @@ func (r *SizesRepo) Create(size *proto.CreateSizeRequest) (id string, err error)
 		return id, fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	row := r.db.QueryRow(query, size.Dn, size.Pn, size.TypePr, standId, size.D4, size.D3, size.D2, size.D1, size.H)
+	row := r.db.QueryRow(query, size.Dn, size.Pn, size.TypeFlId, size.TypePr, standId, size.D4, size.D3, size.D2, size.D1, size.H)
 
 	var idInt int
 	if err = row.Scan(&idInt); err != nil {
@@ -47,7 +46,7 @@ func (r *SizesRepo) Create(size *proto.CreateSizeRequest) (id string, err error)
 }
 
 func (r *SizesRepo) Update(size *proto.UpdateSizeRequest) error {
-	query := fmt.Sprintf("UPDATE %s SET dn=$1, pn=$2, type_p=$3, stand_id=$4, d4=$5, d3=$6, d2=$7, d1=$8, h=$9 WHERE id=$10",
+	query := fmt.Sprintf("UPDATE %s SET dn=$1, pn=$2, type_pr=$3, stand_id=$4, d4=$5, d3=$6, d2=$7, d1=$8, h=$9, type_fl_id=$10 WHERE id=$11",
 		size.Flange)
 
 	id, err := strconv.Atoi(size.Id)
@@ -60,7 +59,7 @@ func (r *SizesRepo) Update(size *proto.UpdateSizeRequest) error {
 		return fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	_, err = r.db.Exec(query, size.Dn, size.Pn, size.TypePr, standId, size.D4, size.D3, size.D2, size.D1, size.H, id)
+	_, err = r.db.Exec(query, size.Dn, size.Pn, size.TypePr, standId, size.D4, size.D3, size.D2, size.D1, size.H, size.TypeFlId, id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

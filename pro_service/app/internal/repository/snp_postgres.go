@@ -20,7 +20,7 @@ func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
 	query := fmt.Sprintf(`SELECT id, type_pr as typePr, fillers, materials, mod, temperature, mounting, graphite 
 		FROM %s WHERE stand_id=$1 AND type_fl_id=$2`, SNPTable)
 
-	if err = r.db.Select(&snp, query); err != nil {
+	if err = r.db.Select(&snp, query, req.StandId, req.TypeFlId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return snp, nil

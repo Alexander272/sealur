@@ -75,7 +75,9 @@ message DeleteStFlRequest {
 message StFl {
     string id = 1;
     string standId = 2;
-    string flangeId = 3;
+    string stand = 3;
+    string flangeId = 4;
+    string flange = 5;
 }
 message StFlResponse {
     repeated StFl stfl = 1;
@@ -108,7 +110,6 @@ message TypeFl {
     string title = 2;
     string desc = 3;
     string short = 4;
-    string basis = 5;
 }
 message TypeFlResponse {
     repeated TypeFl typeFl = 1;
@@ -209,13 +210,11 @@ message Size {
     string id = 1;
     int32 dn = 2;
     int32 pn = 3;
-    string typePr = 4;
-    string standId = 5;
-    int32 d4 = 6;
-    int32 d3 = 7;
-    int32 d2 = 8;
-    int32 d1 = 9;
-    int32 h = 10; 
+    int32 d4 = 4;
+    int32 d3 = 5;
+    int32 d2 = 6;
+    int32 d1 = 7;
+    int32 h = 8; 
 }
 message SizeResponse {
     repeated Size sizes = 1;
@@ -258,15 +257,13 @@ message DeleteSNPRequest {
 
 message SNP {
     string id = 1;
-    string standId = 2;
-    string typeFlId = 3;
-    string typePr = 4;
-    string fillers = 5;
-    string materials = 6;
-    string mod = 7;
-    string temperature = 8;
-    string mounting = 9;
-    string graphite = 10;
+    string typePr = 2;
+    string fillers = 3;
+    string materials = 4;
+    string mod = 5;
+    string temperature = 6;
+    string mounting = 7;
+    string graphite = 8;
 }
 message SNPResponse {
     repeated SNP snp = 1;
@@ -309,6 +306,7 @@ service ProService {
 
     // Type Flange Service ----------------------------------------------------------------
     rpc GetTypeFl (GetTypeFlRequest) returns (TypeFlResponse);
+    rpc GetAllTypeFl (GetTypeFlRequest) returns (TypeFlResponse);
     rpc CreateTypeFl (CreateTypeFlRequest) returns (IdResponse);
     rpc UpdateTypeFl (UpdateTypeFlRequest) returns (IdResponse);
     rpc DeleteTypeFl (DeleteTypeFlRequest) returns (IdResponse);

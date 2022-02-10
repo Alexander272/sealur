@@ -23,6 +23,14 @@ func (s *TypeFLService) Get() (fl []*proto.TypeFl, err error) {
 	return fl, nil
 }
 
+func (s *TypeFLService) GetAll() (fl []*proto.TypeFl, err error) {
+	fl, err = s.repo.GetAll()
+	if err != nil {
+		return fl, fmt.Errorf("failed to get all types flange. error: %w", err)
+	}
+	return fl, nil
+}
+
 func (s *TypeFLService) Create(fl *proto.CreateTypeFlRequest) (*proto.IdResponse, error) {
 	id, err := s.repo.Create(fl)
 	if err != nil {

@@ -25,6 +25,15 @@ func (r *TypeFlRepo) Get() (fl []*proto.TypeFl, err error) {
 	return fl, nil
 }
 
+func (r *TypeFlRepo) GetAll() (fl []*proto.TypeFl, err error) {
+	query := fmt.Sprintf("SELECT id, title, desc, short FROM %s", TypeFLTable)
+
+	if err = r.db.Select(&fl, query); err != nil {
+		return fl, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return fl, nil
+}
+
 func (r *TypeFlRepo) Create(fl *proto.CreateTypeFlRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title, desc, short, basis) VALUES ($1, $2, $3, $4) RETURNING id", TypeFLTable)
 	row := r.db.QueryRow(query, fl.Title, fl.Desc, fl.Short, fl.Basis)

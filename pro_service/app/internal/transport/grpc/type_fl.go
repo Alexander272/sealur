@@ -15,6 +15,15 @@ func (h *Handler) GetTypeFl(ctx context.Context, dto *proto.GetTypeFlRequest) (*
 	return &proto.TypeFlResponse{TypeFl: fl}, nil
 }
 
+func (h *Handler) GetAllTypeFl(ctx context.Context, dto *proto.GetTypeFlRequest) (*proto.TypeFlResponse, error) {
+	fl, err := h.service.TypeFl.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.TypeFlResponse{TypeFl: fl}, nil
+}
+
 func (h *Handler) CreateTypeFl(ctx context.Context, dto *proto.CreateTypeFlRequest) (*proto.IdResponse, error) {
 	id, err := h.service.TypeFl.Create(dto)
 	if err != nil {

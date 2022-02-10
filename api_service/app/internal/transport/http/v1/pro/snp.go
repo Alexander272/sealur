@@ -40,8 +40,8 @@ func (h *Handler) getSNP(c *gin.Context) {
 	}
 
 	snp, err := h.proClient.GetSNP(c, &proto.GetSNPRequest{
-		StandId: dto.StandId,
-		TypeFl:  dto.TypeFl,
+		StandId:  dto.StandId,
+		TypeFlId: dto.TypeFlId,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -73,8 +73,8 @@ func (h *Handler) createSNP(c *gin.Context) {
 
 	snp, err := h.proClient.CreateSNP(c, &proto.CreateSNPRequest{
 		StandId:     dto.StandId,
-		TypeFl:      dto.TypeFl,
-		TypeP:       dto.TypePr,
+		TypeFlId:    dto.TypeFlId,
+		TypePr:      dto.TypePr,
 		Fillers:     dto.Fillers,
 		Materials:   dto.Materials,
 		Mod:         dto.Mod,
@@ -121,8 +121,8 @@ func (h *Handler) updateSNP(c *gin.Context) {
 	snp, err := h.proClient.UpdateSNP(c, &proto.UpdateSNPRequest{
 		Id:          id,
 		StandId:     dto.StandId,
-		TypeFl:      dto.TypeFl,
-		TypeP:       dto.TypePr,
+		TypeFlId:    dto.TypeFlId,
+		TypePr:      dto.TypePr,
 		Fillers:     dto.Fillers,
 		Materials:   dto.Materials,
 		Mod:         dto.Mod,
