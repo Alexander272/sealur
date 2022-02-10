@@ -2,8 +2,9 @@ package repository
 
 const (
 	StandTable      = "stand"
-	SizeTable       = "size"
 	FlangeTable     = "flange"
+	StFLTable       = "st_fl"
+	TypeFLTable     = "type_fl"
 	AdditionalTable = "additional"
 	SNPTable        = "snp"
 )

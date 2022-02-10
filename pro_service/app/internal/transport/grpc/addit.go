@@ -68,12 +68,3 @@ func (h *Handler) UpdateGrap(ctx context.Context, dto *proto.UpdateAddGrapReques
 
 	return success, nil
 }
-
-func (h *Handler) UpdateTypeFl(ctx context.Context, dto *proto.UpdateAddTypeFlRequest) (*proto.SuccessResponse, error) {
-	success, err := h.service.UpdateTypeFl(dto)
-	if err != nil {
-		return nil, err
-	}
-
-	return success, nil
-}

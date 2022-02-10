@@ -18,7 +18,7 @@ func NewSNPRepo(db *sqlx.DB) *SNPRepo {
 
 func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
 	query := fmt.Sprintf(`SELECT id, type_p as typeP, fillers, materials, mod, temperature, mounting, graphite 
-		FROM %s WHERE stand_id=$1 AND type_fl=$2`, SNPTable)
+		FROM %s WHERE stand_id=$1 AND type_fl_id=$2`, SNPTable)
 
 	if err = r.db.Select(&snp, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -27,7 +27,7 @@ func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
 }
 
 func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
-	query := fmt.Sprintf(`INSERT INTO %s (stand_id, type_fl, type_p, fillers, materials, mod, temperature, mounting, graphite) 
+	query := fmt.Sprintf(`INSERT INTO %s (stand_id, type_fl_id, type_p, fillers, materials, mod, temperature, mounting, graphite) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, SNPTable)
 
 	standId, err := strconv.Atoi(snp.StandId)
@@ -35,7 +35,7 @@ func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
 		return id, fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	row := r.db.QueryRow(query, standId, snp.TypeFl, snp.TypeP, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
+	row := r.db.QueryRow(query, standId, snp.TypeFlId, snp.TypeP, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
 		snp.Mounting, snp.Graphite, snp.Graphite)
 
 	var idInt int
@@ -47,7 +47,7 @@ func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
 }
 
 func (r *SNPRepo) Update(snp *proto.UpdateSNPRequest) error {
-	query := fmt.Sprintf(`UPDATE %s SET stand_id=$1, type_fl=$2, type_p=$3, fillers=$4, materials=$5, mod=$6, temperature=$7,
+	query := fmt.Sprintf(`UPDATE %s SET stand_id=$1, type_fl_id=$2, type_p=$3, fillers=$4, materials=$5, mod=$6, temperature=$7,
 		mounting=$8, graphite=$9 WHERE id=$10`, SNPTable)
 
 	id, err := strconv.Atoi(snp.Id)
@@ -59,7 +59,7 @@ func (r *SNPRepo) Update(snp *proto.UpdateSNPRequest) error {
 		return fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	_, err = r.db.Exec(query, standId, snp.TypeFl, snp.TypeP, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
+	_, err = r.db.Exec(query, standId, snp.TypeFlId, snp.TypeP, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
 		snp.Mounting, snp.Graphite, id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)

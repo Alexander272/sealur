@@ -22,6 +22,8 @@ func (h *Handler) UnaryInterceptor(ctx context.Context, req interface{}, info *g
 	if err != nil {
 		return nil, err
 	}
+	logger.Infof("query: %s, client: %s", info.FullMethod, clientName)
+
 	ctx = context.WithValue(ctx, clientIDKey, clientName)
 	return handler(ctx, req)
 }
@@ -33,7 +35,6 @@ func (h *Handler) authenticateClient(ctx context.Context) (string, error) {
 		if clientLogin != h.conf.Name || clientPassword != h.conf.Password {
 			return "", fmt.Errorf("unknown user %s", clientLogin)
 		}
-		logger.Infof("authenticated client: %s", clientLogin)
 		return clientLogin, nil
 	}
 	return "", fmt.Errorf("missing credentials")

@@ -34,7 +34,6 @@ func (r *FlangeRepo) GetByTitle(title, short string) (flange *proto.Flange, err 
 	return flange, nil
 }
 
-// TODO дописать создание таблицы с размерами
 func (r *FlangeRepo) Create(fl *proto.CreateFlangeRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title, short) VALUES ($1, $2) RETURNING id", FlangeTable)
 	row := r.db.QueryRow(query, fl.Title, fl.Short)
@@ -42,6 +41,24 @@ func (r *FlangeRepo) Create(fl *proto.CreateFlangeRequest) (id string, err error
 	var idInt int
 	if err = row.Scan(&idInt); err != nil {
 		return id, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	createTable := fmt.Sprintf(`CREATE TABLE %s (
+		"id" serial not null unique,
+		"dn" int,
+		"pn" int,
+		"type_fl_id" int references type_fl (id) on delete cascade not null,
+		"stand_id" int references stand (id) on delete cascade not null,
+		"type_p" text,
+		"d4" int,
+		"d3" int,
+		"d2" int,
+		"d1" int,
+		"h" int,
+	);`, fl.Short)
+	_, err = r.db.Exec(createTable)
+	if err != nil {
+		return id, fmt.Errorf("failed to execute query to create table. error: %w", err)
 	}
 
 	return fmt.Sprintf("%d", idInt), nil
@@ -62,18 +79,30 @@ func (r *FlangeRepo) Update(fl *proto.UpdateFlangeRequest) error {
 	return nil
 }
 
-// TODO дописать удаление таблицы с размерами
 func (r *FlangeRepo) Delete(fl *proto.DeleteFlangeRequest) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", FlangeTable)
-
 	id, err := strconv.Atoi(fl.Id)
 	if err != nil {
 		return fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
+	var tableName string
 
-	_, err = r.db.Exec(query, id)
-	if err != nil {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1 RETURNING short", FlangeTable)
+	row := r.db.QueryRow(query, id)
+
+	if err = row.Scan(&tableName); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
+
+	// TODO для дебага
+	if tableName == "" {
+		return fmt.Errorf("table name is empty")
+	}
+
+	dropTable := fmt.Sprintf("DROP TABLE %s", tableName)
+	_, err = r.db.Exec(dropTable)
+	if err != nil {
+		return fmt.Errorf("failed to execute query to drop table. error: %w", err)
+	}
+
 	return nil
 }

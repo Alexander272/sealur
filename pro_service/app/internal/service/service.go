@@ -27,7 +27,6 @@ type Addit interface {
 	UpdateTemp(*proto.UpdateAddTemRequest) (*proto.SuccessResponse, error)
 	UpdateMoun(*proto.UpdateAddMounRequest) (*proto.SuccessResponse, error)
 	UpdateGrap(*proto.UpdateAddGrapRequest) (*proto.SuccessResponse, error)
-	UpdateTypeFl(*proto.UpdateAddTypeFlRequest) (*proto.SuccessResponse, error)
 }
 
 type Size interface {

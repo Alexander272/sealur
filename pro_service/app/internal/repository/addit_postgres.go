@@ -17,7 +17,7 @@ func NewAdditRepo(db *sqlx.DB) *AdditRepo {
 }
 
 func (r *AdditRepo) GetAll() (addit []*proto.Additional, err error) {
-	query := fmt.Sprintf("SELECT id, materials, mod, temperature, mounting, graphite, type_fl FROM %s LIMIT 1", AdditionalTable)
+	query := fmt.Sprintf("SELECT id, materials, mod, temperature, mounting, graphite FROM %s LIMIT 1", AdditionalTable)
 
 	if err = r.db.Get(&addit, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -26,10 +26,10 @@ func (r *AdditRepo) GetAll() (addit []*proto.Additional, err error) {
 }
 
 func (r *AdditRepo) Create(add *proto.CreateAddRequest) error {
-	query := fmt.Sprintf(`INSERT INTO %s (materials, mod, temperature, mounting, graphite, type_fl)
+	query := fmt.Sprintf(`INSERT INTO %s (materials, mod, temperature, mounting, graphite)
 		VALUES ($1, $2, $3, $4, $5, $6)`, AdditionalTable)
 
-	_, err := r.db.Exec(query, add.Materials, add.Mod, add.Temperature, add.Mounting, add.Graphite, add.TypeFl)
+	_, err := r.db.Exec(query, add.Materials, add.Mod, add.Temperature, add.Mounting, add.Graphite)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -105,21 +105,6 @@ func (r *AdditRepo) UpdateGrap(grap *proto.UpdateAddGrapRequest) error {
 	}
 
 	_, err = r.db.Exec(query, grap.Graphite, id)
-	if err != nil {
-		return fmt.Errorf("failed to execute query. error: %w", err)
-	}
-	return nil
-}
-
-func (r *AdditRepo) UpdateTypeFl(typeFl *proto.UpdateAddTypeFlRequest) error {
-	query := fmt.Sprintf("UPDATE %s SET type_fl=$1 WHERE id=$2", AdditionalTable)
-
-	id, err := strconv.Atoi(typeFl.Id)
-	if err != nil {
-		return fmt.Errorf("failed to convert string to int. error: %w", err)
-	}
-
-	_, err = r.db.Exec(query, typeFl.TypeFl, id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

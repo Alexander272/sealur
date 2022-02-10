@@ -25,10 +25,10 @@ func (r *StandRepo) GetAll(stand *proto.GetStandsRequest) (stands []*proto.Stand
 	return stands, nil
 }
 
-func (r *StandRepo) GetByTitle(title string) (stand *proto.Stand, err error) {
-	query := fmt.Sprintf("SELECT id, title FROM %s WHERE lower(title)=lower($1)", StandTable)
+func (r *StandRepo) GetByTitle(title string) (stand []*proto.Stand, err error) {
+	query := fmt.Sprintf("SELECT id, title FROM %s WHERE lower(title)=lower($1) limit 1", StandTable)
 
-	if err = r.db.Get(&stand, query, title); err != nil {
+	if err = r.db.Select(&stand, query, title); err != nil {
 		return stand, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return stand, nil
@@ -62,7 +62,6 @@ func (r *StandRepo) Update(stand *proto.UpdateStandRequest) error {
 	return nil
 }
 
-//TODO добавить удаление из таблиц с размерами
 func (r *StandRepo) Delete(stand *proto.DeleteStandRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", StandTable)
 

@@ -7,7 +7,7 @@ import (
 
 type Stand interface {
 	GetAll(stand *proto.GetStandsRequest) ([]*proto.Stand, error)
-	GetByTitle(title string) (*proto.Stand, error)
+	GetByTitle(title string) ([]*proto.Stand, error)
 	Create(stand *proto.CreateStandRequest) (id string, err error)
 	Update(stand *proto.UpdateStandRequest) error
 	Delete(stand *proto.DeleteStandRequest) error
@@ -21,6 +21,20 @@ type Flange interface {
 	Delete(*proto.DeleteFlangeRequest) error
 }
 
+type StFl interface {
+	Get() ([]*proto.StFl, error)
+	Create(*proto.CreateStFlRequest) error
+	Update(*proto.UpdateStFlRequest) error
+	Delete(*proto.DeleteStFlRequest) error
+}
+
+type TypeFl interface {
+	Get() ([]*proto.TypeFl, error)
+	Create(*proto.CreateTypeFlRequest) (string, error)
+	Update(*proto.UpdateTypeFlRequest) error
+	Delete(*proto.DeleteTypeFlRequest) error
+}
+
 type Addit interface {
 	GetAll() ([]*proto.Additional, error)
 	Create(*proto.CreateAddRequest) error
@@ -29,7 +43,6 @@ type Addit interface {
 	UpdateTemp(*proto.UpdateAddTemRequest) error
 	UpdateMoun(*proto.UpdateAddMounRequest) error
 	UpdateGrap(*proto.UpdateAddGrapRequest) error
-	UpdateTypeFl(*proto.UpdateAddTypeFlRequest) error
 }
 
 type Size interface {
@@ -49,6 +62,8 @@ type SNP interface {
 type Repositories struct {
 	Stand
 	Flange
+	StFl
+	TypeFl
 	Addit
 	Size
 	SNP
@@ -58,6 +73,8 @@ func NewRepo(db *sqlx.DB) *Repositories {
 	return &Repositories{
 		Stand:  NewStandRepo(db),
 		Flange: NewFlangeRepo(db),
+		StFl:   NewStFlRepo(db),
+		TypeFl: NewTypeFlRepo(db),
 		Addit:  NewAdditRepo(db),
 		Size:   NewSizesRepo(db),
 		SNP:    NewSNPRepo(db),
