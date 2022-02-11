@@ -9,7 +9,6 @@ type GetSizesDTO struct {
 
 type DeleteSizeDTO struct {
 	Flange string `json:"flange" binding:"required"`
-	TypeFl string `json:"typeFl" binding:"required"`
 }
 
 type SizesDTO struct {

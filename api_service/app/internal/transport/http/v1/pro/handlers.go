@@ -55,6 +55,8 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 
 		h.initStandRoutes(pro)
 		h.initFlangeRoutes(pro)
+		h.initStFlRoutes(pro)
+		h.initTypeFlRoutes(pro)
 		h.initAdditRoutes(pro)
 		h.initSizeRoutes(pro)
 		h.initSNPRoutes(pro)

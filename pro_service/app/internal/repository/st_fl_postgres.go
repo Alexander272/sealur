@@ -17,7 +17,7 @@ func NewStFlRepo(db *sqlx.DB) *StFlRepo {
 }
 
 func (r *StFlRepo) Get() (st []*proto.StFl, err error) {
-	//TODO дописать join и изменить proto
+	//TODO дописать join
 	query := fmt.Sprintf("SELECT id, stand_id, fl_ids FROM %s", StFLTable)
 
 	if err := r.db.Select(&st, query); err != nil {

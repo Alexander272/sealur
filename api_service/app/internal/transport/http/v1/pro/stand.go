@@ -36,6 +36,7 @@ func (h *Handler) getStands(c *gin.Context) {
 	st, err := h.proClient.GetAllStands(c, &proto.GetStandsRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
 	}
 	c.JSON(http.StatusOK, models.DataResponse{Data: st.Stands})
 }
