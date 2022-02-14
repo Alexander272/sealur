@@ -25,10 +25,10 @@ func (r *FlangeRepo) GetAll() (flanges []*proto.Flange, err error) {
 	return flanges, nil
 }
 
-func (r *FlangeRepo) GetByTitle(title, short string) (flange *proto.Flange, err error) {
+func (r *FlangeRepo) GetByTitle(title, short string) (flange []*proto.Flange, err error) {
 	query := fmt.Sprintf("SELECT id, title, short from %s WHERE lower(title)=lower($1) OR lower(short)=lower($2)", FlangeTable)
 
-	if err := r.db.Get(&flange, query, title, short); err != nil {
+	if err := r.db.Select(&flange, query, title, short); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return flange, nil
@@ -43,7 +43,7 @@ func (r *FlangeRepo) Create(fl *proto.CreateFlangeRequest) (id string, err error
 		return id, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	createTable := fmt.Sprintf(`CREATE TABLE %s (
+	createTable := fmt.Sprintf(`CREATE TABLE size_%s (
 		"id" serial not null unique,
 		"dn" int,
 		"pn" int,
@@ -54,7 +54,7 @@ func (r *FlangeRepo) Create(fl *proto.CreateFlangeRequest) (id string, err error
 		"d3" int,
 		"d2" int,
 		"d1" int,
-		"h" int,
+		"h" int
 	);`, fl.Short)
 	_, err = r.db.Exec(createTable)
 	if err != nil {
@@ -98,7 +98,7 @@ func (r *FlangeRepo) Delete(fl *proto.DeleteFlangeRequest) error {
 		return fmt.Errorf("table name is empty")
 	}
 
-	dropTable := fmt.Sprintf("DROP TABLE %s", tableName)
+	dropTable := fmt.Sprintf("DROP TABLE size_%s", tableName)
 	_, err = r.db.Exec(dropTable)
 	if err != nil {
 		return fmt.Errorf("failed to execute query to drop table. error: %w", err)

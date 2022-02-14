@@ -63,7 +63,7 @@ func (h *Handler) createStFl(c *gin.Context) {
 
 	request := &proto.CreateStFlRequest{
 		StandId:  dto.StandId,
-		FlangeId: dto.FlangeIds,
+		FlangeId: dto.FlangeId,
 	}
 
 	st, err := h.proClient.CreateStFl(c, request)
@@ -105,7 +105,7 @@ func (h *Handler) updateStFl(c *gin.Context) {
 
 	request := &proto.UpdateStFlRequest{
 		StandId:  dto.StandId,
-		FlangeId: dto.FlangeIds,
+		FlangeId: dto.FlangeId,
 	}
 
 	st, err := h.proClient.UpdateStFl(c, request)

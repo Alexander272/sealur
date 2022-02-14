@@ -15,7 +15,7 @@ type Stand interface {
 
 type Flange interface {
 	GetAll() ([]*proto.Flange, error)
-	GetByTitle(title, short string) (*proto.Flange, error)
+	GetByTitle(title, short string) ([]*proto.Flange, error)
 	Create(*proto.CreateFlangeRequest) (id string, err error)
 	Update(*proto.UpdateFlangeRequest) error
 	Delete(*proto.DeleteFlangeRequest) error

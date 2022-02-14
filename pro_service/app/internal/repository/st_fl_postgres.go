@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 	"github.com/jmoiron/sqlx"
 )
@@ -17,20 +18,35 @@ func NewStFlRepo(db *sqlx.DB) *StFlRepo {
 }
 
 func (r *StFlRepo) Get() (st []*proto.StFl, err error) {
-	//TODO дописать join
-	query := fmt.Sprintf("SELECT id, stand_id, fl_ids FROM %s", StFLTable)
+	query := fmt.Sprintf(`SELECT st_fl.id, stand_id, stand.title AS stand, fl_id, flange.title AS flange FROM %s 
+		LEFT JOIN %s ON (stand_id = stand.id) LEFT JOIN %s ON (fl_id = flange.id)`, StFLTable, StandTable, FlangeTable)
 
-	if err := r.db.Select(&st, query); err != nil {
+	var data []models.StFl
+	if err := r.db.Select(&data, query); err != nil {
 		return st, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for _, d := range data {
+		s := proto.StFl(d)
+		st = append(st, &s)
 	}
 
 	return st, nil
 }
 
 func (r *StFlRepo) Create(st *proto.CreateStFlRequest) (string, error) {
-	query := fmt.Sprintf("INSERT INTO %s (stand_id, fl_ids) VALUES ($1, $2)", StFLTable)
+	query := fmt.Sprintf("INSERT INTO %s (stand_id, fl_id) VALUES ($1, $2) RETURNING id", StFLTable)
 
-	row := r.db.QueryRow(query, st.StandId, st.FlangeId)
+	standId, err := strconv.Atoi(st.StandId)
+	if err != nil {
+		return "", fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+	flangeId, err := strconv.Atoi(st.FlangeId)
+	if err != nil {
+		return "", fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+
+	row := r.db.QueryRow(query, standId, flangeId)
 
 	var idInt int
 	if err := row.Scan(&idInt); err != nil {
@@ -41,7 +57,7 @@ func (r *StFlRepo) Create(st *proto.CreateStFlRequest) (string, error) {
 }
 
 func (r *StFlRepo) Update(st *proto.UpdateStFlRequest) error {
-	query := fmt.Sprintf("UPDATE %s SET stand_id=$1, fl_ids=$2 WHERE id=$3", StFLTable)
+	query := fmt.Sprintf("UPDATE %s SET stand_id=$1, fl_id=$2 WHERE id=$3", StFLTable)
 
 	id, err := strconv.Atoi(st.Id)
 	if err != nil {
