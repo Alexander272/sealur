@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 	"github.com/jmoiron/sqlx"
 )
@@ -17,26 +18,33 @@ func NewSNPRepo(db *sqlx.DB) *SNPRepo {
 }
 
 func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
-	query := fmt.Sprintf(`SELECT id, type_pr as typePr, fillers, materials, mod, temperature, mounting, graphite 
-		FROM %s WHERE stand_id=$1 AND type_fl_id=$2`, SNPTable)
+	query := fmt.Sprintf(`SELECT id, type_fl_id, type_pr, filler, materials, mod, temperature, mounting, graphite 
+		FROM %s WHERE stand_id=$1 AND flange_id=$2`, SNPTable)
 
-	if err = r.db.Select(&snp, query, req.StandId, req.TypeFlId); err != nil {
+	var data []models.SNP
+	if err = r.db.Select(&data, query, req.StandId, req.FlangeId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
+
+	for _, d := range data {
+		s := proto.SNP(d)
+		snp = append(snp, &s)
+	}
+
 	return snp, nil
 }
 
 func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
-	query := fmt.Sprintf(`INSERT INTO %s (stand_id, type_fl_id, type_pr, fillers, materials, mod, temperature, mounting, graphite) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, SNPTable)
+	query := fmt.Sprintf(`INSERT INTO %s (stand_id, flange_id, type_fl_id, type_pr, filler, materials, mod, temperature, mounting, graphite) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`, SNPTable)
 
 	standId, err := strconv.Atoi(snp.StandId)
 	if err != nil {
 		return id, fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	row := r.db.QueryRow(query, standId, snp.TypeFlId, snp.TypePr, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
-		snp.Mounting, snp.Graphite, snp.Graphite)
+	row := r.db.QueryRow(query, standId, snp.FlangeId, snp.TypeFlId, snp.TypePr, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
+		snp.Mounting, snp.Graphite)
 
 	var idInt int
 	if err = row.Scan(&idInt); err != nil {
@@ -47,8 +55,8 @@ func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
 }
 
 func (r *SNPRepo) Update(snp *proto.UpdateSNPRequest) error {
-	query := fmt.Sprintf(`UPDATE %s SET stand_id=$1, type_fl_id=$2, type_pr=$3, fillers=$4, materials=$5, mod=$6, temperature=$7,
-		mounting=$8, graphite=$9 WHERE id=$10`, SNPTable)
+	query := fmt.Sprintf(`UPDATE %s SET stand_id=$1, type_fl_id=$2, type_pr=$3, filler=$4, materials=$5, mod=$6, temperature=$7,
+		mounting=$8, graphite=$9, flange_id=$10 WHERE id=$11`, SNPTable)
 
 	id, err := strconv.Atoi(snp.Id)
 	if err != nil {
@@ -60,7 +68,7 @@ func (r *SNPRepo) Update(snp *proto.UpdateSNPRequest) error {
 	}
 
 	_, err = r.db.Exec(query, standId, snp.TypeFlId, snp.TypePr, snp.Fillers, snp.Materials, snp.Mod, snp.Temperature,
-		snp.Mounting, snp.Graphite, id)
+		snp.Mounting, snp.Graphite, snp.FlangeId, id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

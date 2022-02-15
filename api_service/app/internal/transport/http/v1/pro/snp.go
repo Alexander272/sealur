@@ -26,22 +26,28 @@ func (h *Handler) initSNPRoutes(api *gin.RouterGroup) {
 // @ModuleID getSNP
 // @Accept json
 // @Produce json
-// @Param data body models.GetSNPDTO true "info for snp"
+// @Param standId query string true "stand id"
+// @Param flangeId query string true "flange id"
 // @Success 200 {object} models.DataResponse{data=[]proto.SNP}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/snp [get]
 func (h *Handler) getSNP(c *gin.Context) {
-	var dto models.GetSNPDTO
-	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+	standId := c.Query("standId")
+	if standId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty standId param")
+		return
+	}
+	flangeId := c.Query("flangeId")
+	if flangeId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty flangeId param")
 		return
 	}
 
 	snp, err := h.proClient.GetSNP(c, &proto.GetSNPRequest{
-		StandId:  dto.StandId,
-		TypeFlId: dto.TypeFlId,
+		StandId:  standId,
+		FlangeId: flangeId,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")

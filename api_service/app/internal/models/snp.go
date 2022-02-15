@@ -1,12 +1,8 @@
 package models
 
-type GetSNPDTO struct {
-	StandId  string `json:"standId" binding:"required"`
-	TypeFlId string `json:"typeFlId" binding:"required"`
-}
-
 type SNPDTO struct {
 	StandId     string `json:"standId" binding:"required"`
+	FlangeId    string `json:"flangeId" binding:"required"`
 	TypeFlId    string `json:"typeFlId" binding:"required"`
 	TypePr      string `json:"typePr" binding:"required"`
 	Fillers     string `json:"fillers" binding:"required"`

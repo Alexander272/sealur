@@ -88,17 +88,17 @@ message GetTypeFlRequest {}
 
 message CreateTypeFlRequest {
     string title = 1;
-    string desc = 2;
+    string descr = 2;
     string short = 3;
-    string basis = 4;
+    bool basis = 4;
 }
 
 message UpdateTypeFlRequest {
     string id = 1;
     string title = 2;
-    string desc = 3;
+    string descr = 3;
     string short = 4;
-    string basis = 5;
+    bool basis = 5;
 }
 
 message DeleteTypeFlRequest {
@@ -108,7 +108,7 @@ message DeleteTypeFlRequest {
 message TypeFl {
     string id = 1;
     string title = 2;
-    string desc = 3;
+    string descr = 3;
     string short = 4;
 }
 message TypeFlResponse {
@@ -223,24 +223,12 @@ message SizeResponse {
 // SNP Service ----------------------------------------------------------------
 message GetSNPRequest {
     string standId = 1;
-    string typeFlId = 2;
+    string flangeId = 2;
 }
 
 message CreateSNPRequest {
     string standId = 1;
-    string typeFlId = 2;
-    string typePr = 3;
-    string fillers = 4;
-    string materials = 5;
-    string mod = 6;
-    string temperature = 7;
-    string mounting = 8;
-    string graphite = 9;
-}
-
-message UpdateSNPRequest {
-    string id = 1;
-    string standId = 2;
+    string flangeId = 2;
     string typeFlId = 3;
     string typePr = 4;
     string fillers = 5;
@@ -251,19 +239,34 @@ message UpdateSNPRequest {
     string graphite = 10;
 }
 
+message UpdateSNPRequest {
+    string id = 1;
+    string standId = 2;
+    string flangeId = 3;
+    string typeFlId = 4;
+    string typePr = 5;
+    string fillers = 6;
+    string materials = 7;
+    string mod = 8;
+    string temperature = 9;
+    string mounting = 10;
+    string graphite = 11;
+}
+
 message DeleteSNPRequest {
     string id = 1;
 }
 
 message SNP {
     string id = 1;
-    string typePr = 2;
-    string fillers = 3;
-    string materials = 4;
-    string mod = 5;
-    string temperature = 6;
-    string mounting = 7;
-    string graphite = 8;
+    string typeFlId = 2;
+    string typePr = 3;
+    string fillers = 4;
+    string materials = 5;
+    string mod = 6;
+    string temperature = 7;
+    string mounting = 8;
+    string graphite = 9;
 }
 message SNPResponse {
     repeated SNP snp = 1;

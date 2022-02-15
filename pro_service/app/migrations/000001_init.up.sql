@@ -18,7 +18,7 @@ CREATE TABLE st_fl (
 CREATE TABLE type_fl (
     "id" serial not null unique,
     "title" varchar(255) not null,
-    "desc" varchar(255),
+    "descr" varchar(255),
     "short" varchar(255) not null,
     "basis" boolean
 );
@@ -36,6 +36,7 @@ CREATE TABLE snp (
     "id" serial not null unique,
     "stand_id" int references stand (id) on delete cascade not null,
     "type_pr" text,
+    "flange_id" int references flange (id) on delete cascade not null,
     "type_fl_id" int references type_fl (id) on delete cascade not null,
     "filler" text,
     "materials" text,

@@ -17,7 +17,7 @@ func NewTypeFlRepo(db *sqlx.DB) *TypeFlRepo {
 }
 
 func (r *TypeFlRepo) Get() (fl []*proto.TypeFl, err error) {
-	query := fmt.Sprintf("SELECT id, title, desc, short FROM %s WHERE basis=true", TypeFLTable)
+	query := fmt.Sprintf("SELECT id, title, descr, short FROM %s WHERE basis=true", TypeFLTable)
 
 	if err = r.db.Select(&fl, query); err != nil {
 		return fl, fmt.Errorf("failed to execute query. error: %w", err)
@@ -26,7 +26,7 @@ func (r *TypeFlRepo) Get() (fl []*proto.TypeFl, err error) {
 }
 
 func (r *TypeFlRepo) GetAll() (fl []*proto.TypeFl, err error) {
-	query := fmt.Sprintf("SELECT id, title, desc, short FROM %s", TypeFLTable)
+	query := fmt.Sprintf("SELECT id, title, descr, short FROM %s", TypeFLTable)
 
 	if err = r.db.Select(&fl, query); err != nil {
 		return fl, fmt.Errorf("failed to execute query. error: %w", err)
@@ -35,8 +35,8 @@ func (r *TypeFlRepo) GetAll() (fl []*proto.TypeFl, err error) {
 }
 
 func (r *TypeFlRepo) Create(fl *proto.CreateTypeFlRequest) (id string, err error) {
-	query := fmt.Sprintf("INSERT INTO %s (title, desc, short, basis) VALUES ($1, $2, $3, $4) RETURNING id", TypeFLTable)
-	row := r.db.QueryRow(query, fl.Title, fl.Desc, fl.Short, fl.Basis)
+	query := fmt.Sprintf("INSERT INTO %s (title, descr, short, basis) VALUES ($1, $2, $3, $4) RETURNING id", TypeFLTable)
+	row := r.db.QueryRow(query, fl.Title, fl.Descr, fl.Short, fl.Basis)
 
 	var idInt int
 	if err = row.Scan(&idInt); err != nil {
@@ -47,14 +47,14 @@ func (r *TypeFlRepo) Create(fl *proto.CreateTypeFlRequest) (id string, err error
 }
 
 func (r *TypeFlRepo) Update(fl *proto.UpdateTypeFlRequest) error {
-	query := fmt.Sprintf("UPDATE %s SET title=$1, desc=$2, short=$3, basis=$4 WHERE id=$5", TypeFLTable)
+	query := fmt.Sprintf("UPDATE %s SET title=$1, descr=$2, short=$3, basis=$4 WHERE id=$5", TypeFLTable)
 
 	id, err := strconv.Atoi(fl.Id)
 	if err != nil {
 		return fmt.Errorf("failed to covert string to int. error: %w", err)
 	}
 
-	_, err = r.db.Exec(query, fl.Title, fl.Desc, fl.Short, fl.Basis, id)
+	_, err = r.db.Exec(query, fl.Title, fl.Descr, fl.Short, fl.Basis, id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

@@ -84,7 +84,7 @@ func (h *Handler) createTypeFl(c *gin.Context) {
 
 	request := &proto.CreateTypeFlRequest{
 		Title: dto.Title,
-		Desc:  dto.Desc,
+		Descr: dto.Desc,
 		Short: dto.Short,
 		Basis: dto.Basis,
 	}
@@ -129,7 +129,7 @@ func (h *Handler) updateTypeFl(c *gin.Context) {
 	request := &proto.UpdateTypeFlRequest{
 		Id:    id,
 		Title: dto.Title,
-		Desc:  dto.Desc,
+		Descr: dto.Desc,
 		Short: dto.Short,
 		Basis: dto.Basis,
 	}
