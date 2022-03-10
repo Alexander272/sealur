@@ -45,8 +45,8 @@ func (r *FlangeRepo) Create(fl *proto.CreateFlangeRequest) (id string, err error
 
 	createTable := fmt.Sprintf(`CREATE TABLE size_%s (
 		"id" serial not null unique,
-		"dn" int,
-		"pn" int,
+		"dn" text,
+		"pn" text,
 		"type_fl_id" int references type_fl (id) on delete cascade not null,
 		"stand_id" int references stand (id) on delete cascade not null,
 		"type_pr" text,
@@ -54,7 +54,9 @@ func (r *FlangeRepo) Create(fl *proto.CreateFlangeRequest) (id string, err error
 		"d3" int,
 		"d2" int,
 		"d1" int,
-		"h" int
+		"h" text,
+		"s2" text,
+		"s3" text
 	);`, fl.Short)
 	_, err = r.db.Exec(createTable)
 	if err != nil {

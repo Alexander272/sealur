@@ -147,6 +147,10 @@ message UpdateAddGrapRequest {
     string id = 1;
     string graphite = 2;
 }
+message UpdateAddFillersRequest {
+    string id = 1;
+    string fillers = 2;
+}
 
 message Additional {
     string id = 1;
@@ -155,6 +159,7 @@ message Additional {
     string temperature = 4;
     string mounting = 5;
     string graphite = 6;
+    string fillers = 7;
 }
 message AdditionalResponse {
     repeated Additional additionals = 1;
@@ -175,30 +180,34 @@ message GetSizesRequest {
 message CreateSizeRequest {
     string flange = 1;
     string typeFlId = 2;
-    int32 dn = 3;
-    int32 pn = 4;
+    string dn = 3;
+    string pn = 4;
     string typePr = 5;
     string standId = 6;
     int32 d4 = 7;
     int32 d3 = 8;
     int32 d2 = 9;
     int32 d1 = 10;
-    int32 h = 11; 
+    string h = 11;
+    string s2 = 12;
+    string s3 = 13;
 }
 
 message UpdateSizeRequest {
     string flange = 1;
     string typeFlId = 2;
     string id = 3;
-    int32 dn = 4;
-    int32 pn = 5;
+    string dn = 4;
+    string pn = 5;
     string typePr = 6;
     string standId = 7;
     int32 d4 = 8;
     int32 d3 = 9;
     int32 d2 = 10;
     int32 d1 = 11;
-    int32 h = 12; 
+    string h = 12;
+    string s2 = 13;
+    string s3 = 14;
 }
 
 message DeleteSizeRequest {
@@ -208,13 +217,15 @@ message DeleteSizeRequest {
 
 message Size {
     string id = 1;
-    int32 dn = 2;
-    int32 pn = 3;
+    string dn = 2;
+    string pn = 3;
     int32 d4 = 4;
     int32 d3 = 5;
     int32 d2 = 6;
     int32 d1 = 7;
-    int32 h = 8; 
+    string h = 8;
+    string s2 = 9;
+    string s3 = 10;
 }
 message SizeResponse {
     repeated Size sizes = 1;
@@ -233,10 +244,9 @@ message CreateSNPRequest {
     string typePr = 4;
     string fillers = 5;
     string materials = 6;
-    string mod = 7;
-    string temperature = 8;
-    string mounting = 9;
-    string graphite = 10;
+    string defMat = 7;
+    string mounting = 8;
+    string graphite = 9;
 }
 
 message UpdateSNPRequest {
@@ -247,10 +257,9 @@ message UpdateSNPRequest {
     string typePr = 5;
     string fillers = 6;
     string materials = 7;
-    string mod = 8;
-    string temperature = 9;
-    string mounting = 10;
-    string graphite = 11;
+    string defMat = 8;
+    string mounting = 9;
+    string graphite = 10;
 }
 
 message DeleteSNPRequest {
@@ -263,10 +272,9 @@ message SNP {
     string typePr = 3;
     string fillers = 4;
     string materials = 5;
-    string mod = 6;
-    string temperature = 7;
-    string mounting = 8;
-    string graphite = 9;
+    string defMat = 6;
+    string mounting = 7;
+    string graphite = 8;
 }
 message SNPResponse {
     repeated SNP snp = 1;
@@ -307,7 +315,7 @@ service ProService {
     rpc UpdateStFl (UpdateStFlRequest) returns (IdResponse);
     rpc DeleteStFl (DeleteStFlRequest) returns (IdResponse);
 
-    // Type Flange Service ----------------------------------------------------------------
+    // Flange Type Service ----------------------------------------------------------------
     rpc GetTypeFl (GetTypeFlRequest) returns (TypeFlResponse);
     rpc GetAllTypeFl (GetTypeFlRequest) returns (TypeFlResponse);
     rpc CreateTypeFl (CreateTypeFlRequest) returns (IdResponse);
@@ -322,6 +330,7 @@ service ProService {
     rpc UpdateTemp (UpdateAddTemRequest) returns (SuccessResponse);
     rpc UpdateMoun (UpdateAddMounRequest) returns (SuccessResponse);
     rpc UpdateGrap (UpdateAddGrapRequest) returns (SuccessResponse);
+    rpc UpdateFillers (UpdateAddFillersRequest) returns (SuccessResponse);
 
     //Size Service ----------------------------------------------------------------
     rpc GetSizes (GetSizesRequest) returns (SizeResponse);

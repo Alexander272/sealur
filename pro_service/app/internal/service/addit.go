@@ -69,3 +69,10 @@ func (s *AdditService) UpdateGrap(addit *proto.UpdateAddGrapRequest) (*proto.Suc
 	}
 	return &proto.SuccessResponse{Success: true}, nil
 }
+
+func (s *AdditService) UpdateFillers(addit *proto.UpdateAddFillersRequest) (*proto.SuccessResponse, error) {
+	if err := s.repo.UpdateFillers(addit); err != nil {
+		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
+	}
+	return &proto.SuccessResponse{Success: true}, nil
+}

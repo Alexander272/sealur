@@ -68,3 +68,12 @@ func (h *Handler) UpdateGrap(ctx context.Context, dto *proto.UpdateAddGrapReques
 
 	return success, nil
 }
+
+func (h *Handler) UpdateFillers(ctx context.Context, dto *proto.UpdateAddFillersRequest) (*proto.SuccessResponse, error) {
+	success, err := h.service.UpdateFillers(dto)
+	if err != nil {
+		return nil, err
+	}
+
+	return success, nil
+}

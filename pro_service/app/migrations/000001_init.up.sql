@@ -29,7 +29,8 @@ CREATE TABLE additional (
     "mod" text,
     "temperature" text,
     "mounting" text,
-    "graphite" text
+    "graphite" text,
+    "fillers" text
 );
 
 CREATE TABLE snp (
@@ -40,8 +41,7 @@ CREATE TABLE snp (
     "type_fl_id" int references type_fl (id) on delete cascade not null,
     "filler" text,
     "materials" text,
-    "mod" text,
-    "temperature" text,
+    "def_mat" text,
     "mounting" text,
     "graphite" text
 );

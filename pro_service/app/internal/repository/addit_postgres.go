@@ -110,3 +110,18 @@ func (r *AdditRepo) UpdateGrap(grap *proto.UpdateAddGrapRequest) error {
 	}
 	return nil
 }
+
+func (r *AdditRepo) UpdateFillers(fillers *proto.UpdateAddFillersRequest) error {
+	query := fmt.Sprintf("UPDATE %s SET fillers=$1 WHERE id=$2", AdditionalTable)
+
+	id, err := strconv.Atoi(fillers.Id)
+	if err != nil {
+		return fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+
+	_, err = r.db.Exec(query, fillers.Fillers, id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}

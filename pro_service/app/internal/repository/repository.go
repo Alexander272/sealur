@@ -44,6 +44,7 @@ type Addit interface {
 	UpdateTemp(*proto.UpdateAddTemRequest) error
 	UpdateMoun(*proto.UpdateAddMounRequest) error
 	UpdateGrap(*proto.UpdateAddGrapRequest) error
+	UpdateFillers(*proto.UpdateAddFillersRequest) error
 }
 
 type Size interface {
