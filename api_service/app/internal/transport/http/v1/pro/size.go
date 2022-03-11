@@ -26,31 +26,49 @@ func (h *Handler) initSizeRoutes(api *gin.RouterGroup) {
 // @ModuleID getSizes
 // @Accept json
 // @Produce json
-// @Param data body models.GetSizesDTO true "info for size"
+// @Param flange query string true "flange"
+// @Param typeFlId query string true "flange type id"
+// @Param standId query string true "standarts id"
+// @Param typePr query string true "type"
 // @Success 200 {object} models.DataResponse{data=[]proto.Size}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/sizes [get]
 func (h *Handler) getSizes(c *gin.Context) {
-	var dto models.GetSizesDTO
-	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+	flange := c.Query("flange")
+	if flange == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty flange", "empty flange param")
+		return
+	}
+	typeFlId := c.Query("typeFlId")
+	if typeFlId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty flange type id", "empty flange type id param")
+		return
+	}
+	standId := c.Query("standId")
+	if standId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty stand id", "empty standarts id param")
+		return
+	}
+	typePr := c.Query("typePr")
+	if typePr == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty type", "empty type lining")
 		return
 	}
 
 	sizes, err := h.proClient.GetSizes(c, &proto.GetSizesRequest{
-		Flange:   dto.Flange,
-		TypeFlId: dto.TypeFlId,
-		TypePr:   dto.TypePr,
-		StandId:  dto.StandId,
+		Flange:   flange,
+		TypeFlId: typeFlId,
+		TypePr:   typePr,
+		StandId:  standId,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
-	c.JSON(http.StatusOK, models.DataResponse{Data: sizes.Sizes})
+	c.JSON(http.StatusOK, models.DataResponse{Data: sizes.Sizes, Count: len(sizes.Sizes)})
 }
 
 // @Summary Create Size
@@ -85,6 +103,8 @@ func (h *Handler) createSize(c *gin.Context) {
 		D2:       dto.D2,
 		D1:       dto.D1,
 		H:        dto.H,
+		S2:       dto.S2,
+		S3:       dto.S3,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -104,7 +124,7 @@ func (h *Handler) createSize(c *gin.Context) {
 // @Produce json
 // @Param data body models.SizesDTO true "size info"
 // @Param id path string true "size id"
-// @Success 201 {object} models.IdResponse
+// @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -135,6 +155,8 @@ func (h *Handler) updateSize(c *gin.Context) {
 		D2:       dto.D2,
 		D1:       dto.D1,
 		H:        dto.H,
+		S2:       dto.S2,
+		S3:       dto.S3,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -147,13 +169,13 @@ func (h *Handler) updateSize(c *gin.Context) {
 // @Summary Delete Size
 // @Tags Sealur Pro -> sizes
 // @Security ApiKeyAuth
-// @Description обновление размеров
+// @Description удаление размеров
 // @ModuleID deleteSize
 // @Accept json
 // @Produce json
-// @Param data body models.DeleteSizeDTO true "info for size"
 // @Param id path string true "size id"
-// @Success 201 {object} models.IdResponse
+// @Param flange query string true "flange"
+// @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -165,15 +187,15 @@ func (h *Handler) deleteSize(c *gin.Context) {
 		return
 	}
 
-	var dto models.DeleteSizeDTO
-	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+	flange := c.Query("flange")
+	if flange == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty flange", "empty flange param")
 		return
 	}
 
 	size, err := h.proClient.DeleteSize(c, &proto.DeleteSizeRequest{
 		Id:     id,
-		Flange: dto.Flange,
+		Flange: flange,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")

@@ -12,31 +12,18 @@ definitions:
         type: string
       temperature:
         type: string
-      typeFl:
-        type: string
     required:
     - graphite
     - materials
     - mod
     - mounting
     - temperature
-    - typeFl
     type: object
   models.DataResponse:
     properties:
       count:
         type: integer
       data: {}
-    type: object
-  models.DeleteSizeDTO:
-    properties:
-      flange:
-        type: string
-      typeFl:
-        type: string
-    required:
-    - flange
-    - typeFl
     type: object
   models.ErrorResponse:
     properties:
@@ -53,32 +40,6 @@ definitions:
     - short
     - title
     type: object
-  models.GetSNPDTO:
-    properties:
-      standId:
-        type: string
-      typeFl:
-        type: string
-    required:
-    - standId
-    - typeFl
-    type: object
-  models.GetSizesDTO:
-    properties:
-      flange:
-        type: string
-      standId:
-        type: string
-      typeFl:
-        type: string
-      typePr:
-        type: string
-    required:
-    - flange
-    - standId
-    - typeFl
-    - typePr
-    type: object
   models.IdResponse:
     properties:
       id:
@@ -88,33 +49,33 @@ definitions:
     type: object
   models.SNPDTO:
     properties:
+      defMat:
+        type: string
       fillers:
+        type: string
+      flangeId:
         type: string
       graphite:
         type: string
       materials:
         type: string
-      mod:
-        type: string
       mounting:
         type: string
       standId:
         type: string
-      temperature:
-        type: string
-      typeFl:
+      typeFlId:
         type: string
       typePr:
         type: string
     required:
+    - defMat
     - fillers
+    - flangeId
     - graphite
     - materials
-    - mod
     - mounting
     - standId
-    - temperature
-    - typeFl
+    - typeFlId
     - typePr
     type: object
   models.SizesDTO:
@@ -128,31 +89,43 @@ definitions:
       d4:
         type: integer
       dn:
-        type: integer
+        type: string
       flange:
         type: string
       h:
-        type: integer
+        type: string
       pn:
-        type: integer
+        type: string
+      s2:
+        type: string
+      s3:
+        type: string
       standId:
         type: string
-      typeFl:
+      typeFlId:
         type: string
       typePr:
         type: string
     required:
-    - d1
     - d2
     - d3
-    - d4
     - dn
     - flange
     - h
     - pn
     - standId
-    - typeFl
+    - typeFlId
     - typePr
+    type: object
+  models.StFlDTO:
+    properties:
+      flangeId:
+        type: string
+      standId:
+        type: string
+    required:
+    - flangeId
+    - standId
     type: object
   models.StandDTO:
     properties:
@@ -161,12 +134,25 @@ definitions:
     required:
     - title
     type: object
-  models.UpdateFlDTO:
+  models.TypeFlDTO:
     properties:
-      typeFl:
+      basis:
+        type: boolean
+      desc:
+        type: string
+      short:
+        type: string
+      title:
         type: string
     required:
-    - typeFl
+    - title
+    type: object
+  models.UpdateFillersDTO:
+    properties:
+      fillers:
+        type: string
+    required:
+    - fillers
     type: object
   models.UpdateGrapDTO:
     properties:
@@ -203,6 +189,8 @@ definitions:
     type: object
   proto.Additional:
     properties:
+      fillers:
+        type: string
       graphite:
         type: string
       id:
@@ -214,8 +202,6 @@ definitions:
       mounting:
         type: string
       temperature:
-        type: string
-      typeFl:
         type: string
     type: object
   proto.Flange:
@@ -229,6 +215,8 @@ definitions:
     type: object
   proto.SNP:
     properties:
+      defMat:
+        type: string
       fillers:
         type: string
       graphite:
@@ -237,17 +225,11 @@ definitions:
         type: string
       materials:
         type: string
-      mod:
-        type: string
       mounting:
         type: string
-      standId:
+      typeFlId:
         type: string
-      temperature:
-        type: string
-      typeFl:
-        type: string
-      typeP:
+      typePr:
         type: string
     type: object
   proto.Size:
@@ -261,21 +243,45 @@ definitions:
       d4:
         type: integer
       dn:
-        type: integer
+        type: string
       h:
-        type: integer
+        type: string
       id:
         type: string
       pn:
-        type: integer
-      standId:
         type: string
-      typePr:
+      s2:
+        type: string
+      s3:
+        type: string
+    type: object
+  proto.StFl:
+    properties:
+      flange:
+        type: string
+      flangeId:
+        type: string
+      id:
+        type: string
+      stand:
+        type: string
+      standId:
         type: string
     type: object
   proto.Stand:
     properties:
       id:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.TypeFl:
+    properties:
+      descr:
+        type: string
+      id:
+        type: string
+      short:
         type: string
       title:
         type: string
@@ -367,18 +373,18 @@ paths:
       summary: Create Addit
       tags:
       - Sealur Pro -> additionals
-  /sealur-pro/additionals/{id}/fl:
+  /sealur-pro/additionals/{id}/fil:
     patch:
       consumes:
       - application/json
-      description: обновление типа фланца
+      description: обновление наполнителя для снп
       parameters:
-      - description: additional flange info
+      - description: additional fillers info
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/models.UpdateFlDTO'
+          $ref: '#/definitions/models.UpdateFillersDTO'
       - description: addit id
         in: path
         name: id
@@ -409,7 +415,7 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Update Type Flange
+      summary: Update Fillers
       tags:
       - Sealur Pro -> additionals
   /sealur-pro/additionals/{id}/grap:
@@ -637,6 +643,208 @@ paths:
       summary: Update Temp
       tags:
       - Sealur Pro -> additionals
+  /sealur-pro/flange-types:
+    get:
+      consumes:
+      - application/json
+      description: получение базовых типов фланца
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.TypeFl'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Type Flange
+      tags:
+      - Sealur Pro -> flange-types
+    post:
+      consumes:
+      - application/json
+      description: создание типа фланца
+      parameters:
+      - description: type flange info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.TypeFlDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Type Flange
+      tags:
+      - Sealur Pro -> flange-types
+  /sealur-pro/flange-types/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление типа фланца
+      parameters:
+      - description: type flange id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Type Flange
+      tags:
+      - Sealur Pro -> flange-types
+    put:
+      consumes:
+      - application/json
+      description: обновление типа фланца
+      parameters:
+      - description: type flange id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: type flange info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.TypeFlDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Type Flange
+      tags:
+      - Sealur Pro -> flange-types
+  /sealur-pro/flange-types/all:
+    get:
+      consumes:
+      - application/json
+      description: получение всех типов фланца
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.TypeFl'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Type Flange
+      tags:
+      - Sealur Pro -> flange-types
   /sealur-pro/flanges:
     get:
       consumes:
@@ -805,12 +1013,26 @@ paths:
       - application/json
       description: получение размеров
       parameters:
-      - description: info for size
-        in: body
-        name: data
+      - description: flange
+        in: query
+        name: flange
         required: true
-        schema:
-          $ref: '#/definitions/models.GetSizesDTO'
+        type: string
+      - description: flange type id
+        in: query
+        name: typeFlId
+        required: true
+        type: string
+      - description: standarts id
+        in: query
+        name: standId
+        required: true
+        type: string
+      - description: type
+        in: query
+        name: typePr
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -889,24 +1111,23 @@ paths:
     delete:
       consumes:
       - application/json
-      description: обновление размеров
+      description: удаление размеров
       parameters:
-      - description: info for size
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/models.DeleteSizeDTO'
       - description: size id
         in: path
         name: id
         required: true
         type: string
+      - description: flange
+        in: query
+        name: flange
+        required: true
+        type: string
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/models.IdResponse'
         "400":
@@ -949,8 +1170,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/models.IdResponse'
         "400":
@@ -980,12 +1201,16 @@ paths:
       - application/json
       description: получение прокладок снп
       parameters:
-      - description: info for snp
-        in: body
-        name: data
+      - description: stand id
+        in: query
+        name: standId
         required: true
-        schema:
-          $ref: '#/definitions/models.GetSNPDTO'
+        type: string
+      - description: flange id
+        in: query
+        name: flangeId
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -1143,6 +1368,168 @@ paths:
       summary: Update SNP
       tags:
       - Sealur Pro -> snp
+  /sealur-pro/st-fl:
+    get:
+      consumes:
+      - application/json
+      description: получение списка стандартов (только для снп)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.StFl'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Stand/Flange
+      tags:
+      - Sealur Pro -> st-fl
+    post:
+      consumes:
+      - application/json
+      description: создание элемента списка стандартов (только для снп)
+      parameters:
+      - description: st/fl info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.StFlDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Stand/Flange
+      tags:
+      - Sealur Pro -> st-fl
+  /sealur-pro/st-fl/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление элемента списка стандартов (только для снп)
+      parameters:
+      - description: st/fl id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Stand/Flange
+      tags:
+      - Sealur Pro -> st-fl
+    put:
+      consumes:
+      - application/json
+      description: обновление элемента списка стандартов (только для снп)
+      parameters:
+      - description: st/fl id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: st/fl info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.StFlDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Stand/Flange
+      tags:
+      - Sealur Pro -> st-fl
   /sealur-pro/standards:
     get:
       consumes:

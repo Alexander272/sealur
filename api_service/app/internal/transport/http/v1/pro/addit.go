@@ -18,6 +18,7 @@ func (h *Handler) initAdditRoutes(api *gin.RouterGroup) {
 		addit.PATCH("/:id/temp", h.updateTemp)
 		addit.PATCH("/:id/moun", h.updateMoun)
 		addit.PATCH("/:id/grap", h.updateGrap)
+		addit.PATCH("/:id/fil", h.updateFillers)
 	}
 }
 
@@ -69,6 +70,7 @@ func (h *Handler) createAddit(c *gin.Context) {
 		Temperature: dto.Temperature,
 		Mounting:    dto.Mounting,
 		Graphite:    dto.Graphite,
+		Fillers:     dto.Fillers,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -256,4 +258,40 @@ func (h *Handler) updateGrap(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated graphite"})
+}
+
+// @Summary Update Fillers
+// @Tags Sealur Pro -> additionals
+// @Security ApiKeyAuth
+// @Description обновление наполнителя для снп
+// @ModuleID updateFillers
+// @Accept json
+// @Produce json
+// @Param data body models.UpdateFillersDTO true "additional fillers info"
+// @Param id path string true "addit id"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/additionals/{id}/fil [patch]
+func (h *Handler) updateFillers(c *gin.Context) {
+	var dto models.UpdateFillersDTO
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	_, err := h.proClient.UpdateFillers(c, &proto.UpdateAddFillersRequest{Id: id, Fillers: dto.Fillers})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated fillers"})
 }

@@ -7,7 +7,7 @@ import (
 
 type DataResponse struct {
 	Data  interface{} `json:"data"`
-	Count int64       `json:"count,omitempty"`
+	Count int         `json:"count,omitempty"`
 }
 
 type IdResponse struct {

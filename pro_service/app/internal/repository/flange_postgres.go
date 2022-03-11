@@ -45,7 +45,7 @@ func (r *FlangeRepo) Create(fl *proto.CreateFlangeRequest) (id string, err error
 
 	createTable := fmt.Sprintf(`CREATE TABLE size_%s (
 		"id" serial not null unique,
-		"dn" text,
+		"dn" int,
 		"pn" text,
 		"type_fl_id" int references type_fl (id) on delete cascade not null,
 		"stand_id" int references stand (id) on delete cascade not null,

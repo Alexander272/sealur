@@ -10,7 +10,7 @@ import (
 )
 
 func (h *Handler) initTypeFlRoutes(api *gin.RouterGroup) {
-	fl := api.Group("/type-fl")
+	fl := api.Group("/flange-types")
 	{
 		fl.GET("/", h.getTypeFl)
 		fl.GET("/all", h.getAllTypeFl)
@@ -21,7 +21,7 @@ func (h *Handler) initTypeFlRoutes(api *gin.RouterGroup) {
 }
 
 // @Summary Get Type Flange
-// @Tags Sealur Pro -> type-fl
+// @Tags Sealur Pro -> flange-types
 // @Security ApiKeyAuth
 // @Description получение базовых типов фланца
 // @ModuleID getTypeFl
@@ -31,7 +31,7 @@ func (h *Handler) initTypeFlRoutes(api *gin.RouterGroup) {
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-pro/type-fl [get]
+// @Router /sealur-pro/flange-types [get]
 func (h *Handler) getTypeFl(c *gin.Context) {
 	fl, err := h.proClient.GetTypeFl(c, &proto.GetTypeFlRequest{})
 	if err != nil {
@@ -42,7 +42,7 @@ func (h *Handler) getTypeFl(c *gin.Context) {
 }
 
 // @Summary Get All Type Flange
-// @Tags Sealur Pro -> type-fl
+// @Tags Sealur Pro -> flange-types
 // @Security ApiKeyAuth
 // @Description получение всех типов фланца
 // @ModuleID getAllTypeFl
@@ -52,7 +52,7 @@ func (h *Handler) getTypeFl(c *gin.Context) {
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-pro/type-fl/all [get]
+// @Router /sealur-pro/flange-types/all [get]
 func (h *Handler) getAllTypeFl(c *gin.Context) {
 	fl, err := h.proClient.GetAllTypeFl(c, &proto.GetTypeFlRequest{})
 	if err != nil {
@@ -63,7 +63,7 @@ func (h *Handler) getAllTypeFl(c *gin.Context) {
 }
 
 // @Summary Create Type Flange
-// @Tags Sealur Pro -> type-fl
+// @Tags Sealur Pro -> flange-types
 // @Security ApiKeyAuth
 // @Description создание типа фланца
 // @ModuleID createTypeFl
@@ -74,7 +74,7 @@ func (h *Handler) getAllTypeFl(c *gin.Context) {
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-pro/type-fl [post]
+// @Router /sealur-pro/flange-types [post]
 func (h *Handler) createTypeFl(c *gin.Context) {
 	var dto models.TypeFlDTO
 	if err := c.BindJSON(&dto); err != nil {
@@ -100,7 +100,7 @@ func (h *Handler) createTypeFl(c *gin.Context) {
 }
 
 // @Summary Update Type Flange
-// @Tags Sealur Pro -> type-fl
+// @Tags Sealur Pro -> flange-types
 // @Security ApiKeyAuth
 // @Description обновление типа фланца
 // @ModuleID updateTypeFl
@@ -112,7 +112,7 @@ func (h *Handler) createTypeFl(c *gin.Context) {
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-pro/type-fl/{id} [put]
+// @Router /sealur-pro/flange-types/{id} [put]
 func (h *Handler) updateTypeFl(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
@@ -144,7 +144,7 @@ func (h *Handler) updateTypeFl(c *gin.Context) {
 }
 
 // @Summary Delete Type Flange
-// @Tags Sealur Pro -> type-fl
+// @Tags Sealur Pro -> flange-types
 // @Security ApiKeyAuth
 // @Description удаление типа фланца
 // @ModuleID deleteTypeFl
@@ -155,7 +155,7 @@ func (h *Handler) updateTypeFl(c *gin.Context) {
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-pro/type-fl/{id} [delete]
+// @Router /sealur-pro/flange-types/{id} [delete]
 func (h *Handler) deleteTypeFl(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {

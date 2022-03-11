@@ -42,8 +42,16 @@ func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
 	if err != nil {
 		return id, fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
+	flangeId, err := strconv.Atoi(snp.FlangeId)
+	if err != nil {
+		return id, fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+	typeFlId, err := strconv.Atoi(snp.TypeFlId)
+	if err != nil {
+		return id, fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
 
-	row := r.db.QueryRow(query, standId, snp.FlangeId, snp.TypeFlId, snp.TypePr, snp.Fillers, snp.Materials, snp.DefMat,
+	row := r.db.QueryRow(query, standId, flangeId, typeFlId, snp.TypePr, snp.Fillers, snp.Materials, snp.DefMat,
 		snp.Mounting, snp.Graphite)
 
 	var idInt int

@@ -17,7 +17,7 @@ func NewAdditRepo(db *sqlx.DB) *AdditRepo {
 }
 
 func (r *AdditRepo) GetAll() (addit []*proto.Additional, err error) {
-	query := fmt.Sprintf("SELECT id, materials, mod, temperature, mounting, graphite FROM %s LIMIT 1", AdditionalTable)
+	query := fmt.Sprintf("SELECT id, materials, mod, temperature, mounting, graphite, fillers FROM %s LIMIT 1", AdditionalTable)
 
 	if err = r.db.Select(&addit, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -26,10 +26,10 @@ func (r *AdditRepo) GetAll() (addit []*proto.Additional, err error) {
 }
 
 func (r *AdditRepo) Create(add *proto.CreateAddRequest) error {
-	query := fmt.Sprintf(`INSERT INTO %s (materials, mod, temperature, mounting, graphite)
-		VALUES ($1, $2, $3, $4, $5)`, AdditionalTable)
+	query := fmt.Sprintf(`INSERT INTO %s (materials, mod, temperature, mounting, graphite, fillers)
+		VALUES ($1, $2, $3, $4, $5, $6)`, AdditionalTable)
 
-	_, err := r.db.Exec(query, add.Materials, add.Mod, add.Temperature, add.Mounting, add.Graphite)
+	_, err := r.db.Exec(query, add.Materials, add.Mod, add.Temperature, add.Mounting, add.Graphite, add.Fillers)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

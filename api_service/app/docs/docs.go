@@ -144,14 +144,14 @@ const docTemplate_swagger = `{
                 }
             }
         },
-        "/sealur-pro/additionals/{id}/fl": {
+        "/sealur-pro/additionals/{id}/fil": {
             "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "обновление типа фланца",
+                "description": "обновление наполнителя для снп",
                 "consumes": [
                     "application/json"
                 ],
@@ -161,15 +161,15 @@ const docTemplate_swagger = `{
                 "tags": [
                     "Sealur Pro -\u003e additionals"
                 ],
-                "summary": "Update Type Flange",
+                "summary": "Update Fillers",
                 "parameters": [
                     {
-                        "description": "additional flange info",
+                        "description": "additional fillers info",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateFlDTO"
+                            "$ref": "#/definitions/models.UpdateFillersDTO"
                         }
                     },
                     {
@@ -564,6 +564,330 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/sealur-pro/flange-types": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение базовых типов фланца",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e flange-types"
+                ],
+                "summary": "Get Type Flange",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.TypeFl"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание типа фланца",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e flange-types"
+                ],
+                "summary": "Create Type Flange",
+                "parameters": [
+                    {
+                        "description": "type flange info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TypeFlDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/flange-types/all": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение всех типов фланца",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e flange-types"
+                ],
+                "summary": "Get All Type Flange",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.TypeFl"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/flange-types/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление типа фланца",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e flange-types"
+                ],
+                "summary": "Update Type Flange",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "type flange id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "type flange info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TypeFlDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "удаление типа фланца",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e flange-types"
+                ],
+                "summary": "Delete Type Flange",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "type flange id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/sealur-pro/flanges": {
             "get": {
                 "security": [
@@ -841,13 +1165,32 @@ const docTemplate_swagger = `{
                 "summary": "Get Sizes",
                 "parameters": [
                     {
-                        "description": "info for size",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.GetSizesDTO"
-                        }
+                        "type": "string",
+                        "description": "flange",
+                        "name": "flange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "flange type id",
+                        "name": "typeFlId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "standarts id",
+                        "name": "standId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "type",
+                        "name": "typePr",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -997,8 +1340,8 @@ const docTemplate_swagger = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.IdResponse"
                         }
@@ -1035,7 +1378,7 @@ const docTemplate_swagger = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "обновление размеров",
+                "description": "удаление размеров",
                 "consumes": [
                     "application/json"
                 ],
@@ -1048,25 +1391,23 @@ const docTemplate_swagger = `{
                 "summary": "Delete Size",
                 "parameters": [
                     {
-                        "description": "info for size",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.DeleteSizeDTO"
-                        }
-                    },
-                    {
                         "type": "string",
                         "description": "size id",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "flange",
+                        "name": "flange",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.IdResponse"
                         }
@@ -1118,13 +1459,18 @@ const docTemplate_swagger = `{
                 "summary": "Get SNP",
                 "parameters": [
                     {
-                        "description": "info for snp",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.GetSNPDTO"
-                        }
+                        "type": "string",
+                        "description": "stand id",
+                        "name": "standId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "flange id",
+                        "name": "flangeId",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -1335,6 +1681,263 @@ const docTemplate_swagger = `{
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/st-fl": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение списка стандартов (только для снп)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e st-fl"
+                ],
+                "summary": "Get Stand/Flange",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.StFl"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание элемента списка стандартов (только для снп)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e st-fl"
+                ],
+                "summary": "Create Stand/Flange",
+                "parameters": [
+                    {
+                        "description": "st/fl info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.StFlDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/st-fl/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление элемента списка стандартов (только для снп)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e st-fl"
+                ],
+                "summary": "Update Stand/Flange",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "st/fl id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "st/fl info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.StFlDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "удаление элемента списка стандартов (только для снп)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e st-fl"
+                ],
+                "summary": "Delete Stand/Flange",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "st/fl id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/models.IdResponse"
                         }
@@ -1632,8 +2235,7 @@ const docTemplate_swagger = `{
                 "materials",
                 "mod",
                 "mounting",
-                "temperature",
-                "typeFl"
+                "temperature"
             ],
             "properties": {
                 "graphite": {
@@ -1650,9 +2252,6 @@ const docTemplate_swagger = `{
                 },
                 "temperature": {
                     "type": "string"
-                },
-                "typeFl": {
-                    "type": "string"
                 }
             }
         },
@@ -1663,21 +2262,6 @@ const docTemplate_swagger = `{
                     "type": "integer"
                 },
                 "data": {}
-            }
-        },
-        "models.DeleteSizeDTO": {
-            "type": "object",
-            "required": [
-                "flange",
-                "typeFl"
-            ],
-            "properties": {
-                "flange": {
-                    "type": "string"
-                },
-                "typeFl": {
-                    "type": "string"
-                }
             }
         },
         "models.ErrorResponse": {
@@ -1703,44 +2287,6 @@ const docTemplate_swagger = `{
                 }
             }
         },
-        "models.GetSNPDTO": {
-            "type": "object",
-            "required": [
-                "standId",
-                "typeFl"
-            ],
-            "properties": {
-                "standId": {
-                    "type": "string"
-                },
-                "typeFl": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.GetSizesDTO": {
-            "type": "object",
-            "required": [
-                "flange",
-                "standId",
-                "typeFl",
-                "typePr"
-            ],
-            "properties": {
-                "flange": {
-                    "type": "string"
-                },
-                "standId": {
-                    "type": "string"
-                },
-                "typeFl": {
-                    "type": "string"
-                },
-                "typePr": {
-                    "type": "string"
-                }
-            }
-        },
         "models.IdResponse": {
             "type": "object",
             "properties": {
@@ -1755,18 +2301,24 @@ const docTemplate_swagger = `{
         "models.SNPDTO": {
             "type": "object",
             "required": [
+                "defMat",
                 "fillers",
+                "flangeId",
                 "graphite",
                 "materials",
-                "mod",
                 "mounting",
                 "standId",
-                "temperature",
-                "typeFl",
+                "typeFlId",
                 "typePr"
             ],
             "properties": {
+                "defMat": {
+                    "type": "string"
+                },
                 "fillers": {
+                    "type": "string"
+                },
+                "flangeId": {
                     "type": "string"
                 },
                 "graphite": {
@@ -1775,19 +2327,13 @@ const docTemplate_swagger = `{
                 "materials": {
                     "type": "string"
                 },
-                "mod": {
-                    "type": "string"
-                },
                 "mounting": {
                     "type": "string"
                 },
                 "standId": {
                     "type": "string"
                 },
-                "temperature": {
-                    "type": "string"
-                },
-                "typeFl": {
+                "typeFlId": {
                     "type": "string"
                 },
                 "typePr": {
@@ -1798,16 +2344,14 @@ const docTemplate_swagger = `{
         "models.SizesDTO": {
             "type": "object",
             "required": [
-                "d1",
                 "d2",
                 "d3",
-                "d4",
                 "dn",
                 "flange",
                 "h",
                 "pn",
                 "standId",
-                "typeFl",
+                "typeFlId",
                 "typePr"
             ],
             "properties": {
@@ -1824,24 +2368,45 @@ const docTemplate_swagger = `{
                     "type": "integer"
                 },
                 "dn": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "flange": {
                     "type": "string"
                 },
                 "h": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "pn": {
-                    "type": "integer"
+                    "type": "string"
+                },
+                "s2": {
+                    "type": "string"
+                },
+                "s3": {
+                    "type": "string"
                 },
                 "standId": {
                     "type": "string"
                 },
-                "typeFl": {
+                "typeFlId": {
                     "type": "string"
                 },
                 "typePr": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.StFlDTO": {
+            "type": "object",
+            "required": [
+                "flangeId",
+                "standId"
+            ],
+            "properties": {
+                "flangeId": {
+                    "type": "string"
+                },
+                "standId": {
                     "type": "string"
                 }
             }
@@ -1857,13 +2422,33 @@ const docTemplate_swagger = `{
                 }
             }
         },
-        "models.UpdateFlDTO": {
+        "models.TypeFlDTO": {
             "type": "object",
             "required": [
-                "typeFl"
+                "title"
             ],
             "properties": {
-                "typeFl": {
+                "basis": {
+                    "type": "boolean"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateFillersDTO": {
+            "type": "object",
+            "required": [
+                "fillers"
+            ],
+            "properties": {
+                "fillers": {
                     "type": "string"
                 }
             }
@@ -1923,6 +2508,9 @@ const docTemplate_swagger = `{
         "proto.Additional": {
             "type": "object",
             "properties": {
+                "fillers": {
+                    "type": "string"
+                },
                 "graphite": {
                     "type": "string"
                 },
@@ -1939,9 +2527,6 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "temperature": {
-                    "type": "string"
-                },
-                "typeFl": {
                     "type": "string"
                 }
             }
@@ -1963,6 +2548,9 @@ const docTemplate_swagger = `{
         "proto.SNP": {
             "type": "object",
             "properties": {
+                "defMat": {
+                    "type": "string"
+                },
                 "fillers": {
                     "type": "string"
                 },
@@ -1975,22 +2563,13 @@ const docTemplate_swagger = `{
                 "materials": {
                     "type": "string"
                 },
-                "mod": {
-                    "type": "string"
-                },
                 "mounting": {
                     "type": "string"
                 },
-                "standId": {
+                "typeFlId": {
                     "type": "string"
                 },
-                "temperature": {
-                    "type": "string"
-                },
-                "typeFl": {
-                    "type": "string"
-                },
-                "typeP": {
+                "typePr": {
                     "type": "string"
                 }
             }
@@ -2011,21 +2590,41 @@ const docTemplate_swagger = `{
                     "type": "integer"
                 },
                 "dn": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "h": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
                 "pn": {
-                    "type": "integer"
-                },
-                "standId": {
                     "type": "string"
                 },
-                "typePr": {
+                "s2": {
+                    "type": "string"
+                },
+                "s3": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.StFl": {
+            "type": "object",
+            "properties": {
+                "flange": {
+                    "type": "string"
+                },
+                "flangeId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "stand": {
+                    "type": "string"
+                },
+                "standId": {
                     "type": "string"
                 }
             }
@@ -2034,6 +2633,23 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.TypeFl": {
+            "type": "object",
+            "properties": {
+                "descr": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "short": {
                     "type": "string"
                 },
                 "title": {

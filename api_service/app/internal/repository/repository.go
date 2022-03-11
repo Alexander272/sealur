@@ -2,8 +2,6 @@ package repository
 
 import (
 	"context"
-
-	"github.com/go-redis/redis/v8"
 )
 
 type Session interface {
@@ -16,8 +14,9 @@ type Repositories struct {
 	Session
 }
 
-func NewRepo(client redis.Cmdable) *Repositories {
+// func NewRepo(client redis.Cmdable) *Repositories {
+func NewRepo() *Repositories {
 	return &Repositories{
-		Session: NewSessionRepo(client),
+		// Session: NewSessionRepo(client),
 	}
 }

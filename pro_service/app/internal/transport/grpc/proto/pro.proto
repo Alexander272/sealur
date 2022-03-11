@@ -125,6 +125,7 @@ message CreateAddRequest {
     string temperature = 3;
     string mounting = 4;
     string graphite = 5;
+    string fillers = 6;
 }
 
 message UpdateAddMatRequest {

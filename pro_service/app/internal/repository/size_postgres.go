@@ -17,9 +17,10 @@ func NewSizesRepo(db *sqlx.DB) *SizesRepo {
 }
 
 func (r *SizesRepo) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, err error) {
-	query := fmt.Sprintf("SELECT id, dn, pn, d4, d3, d2, d1, h, s2, s3 FROM size_%s WHERE type_pr=$1 AND stand_id=$2 AND type_fl_id=$3", req.Flange)
+	query := fmt.Sprintf(`SELECT id, dn, pn, d4, d3, d2, d1, h, s2, s3 FROM size_%s WHERE LOWER(type_pr) LIKE LOWER('%%%s%%') 
+		AND stand_id=$1 AND type_fl_id=$2 ORDER BY dn`, req.Flange, req.TypePr)
 
-	if err = r.db.Select(&sizes, query, req.TypePr, req.StandId, req.TypeFlId); err != nil {
+	if err = r.db.Select(&sizes, query, req.StandId, req.TypeFlId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
