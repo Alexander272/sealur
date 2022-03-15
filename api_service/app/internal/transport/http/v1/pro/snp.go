@@ -78,15 +78,16 @@ func (h *Handler) createSNP(c *gin.Context) {
 	}
 
 	snp, err := h.proClient.CreateSNP(c, &proto.CreateSNPRequest{
-		StandId:   dto.StandId,
-		FlangeId:  dto.FlangeId,
-		TypeFlId:  dto.TypeFlId,
-		TypePr:    dto.TypePr,
-		Fillers:   dto.Fillers,
-		Materials: dto.Materials,
-		DefMat:    dto.DefMat,
-		Mounting:  dto.Mounting,
-		Graphite:  dto.Graphite,
+		StandId:  dto.StandId,
+		FlangeId: dto.FlangeId,
+		TypeFlId: dto.TypeFlId,
+		TypePr:   dto.TypePr,
+		Fillers:  dto.Fillers,
+		Frame:    dto.Frame,
+		Ir:       dto.Ir,
+		Or:       dto.Or,
+		Mounting: dto.Mounting,
+		Graphite: dto.Graphite,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -125,16 +126,17 @@ func (h *Handler) updateSNP(c *gin.Context) {
 	}
 
 	snp, err := h.proClient.UpdateSNP(c, &proto.UpdateSNPRequest{
-		Id:        id,
-		StandId:   dto.StandId,
-		FlangeId:  dto.FlangeId,
-		TypeFlId:  dto.TypeFlId,
-		TypePr:    dto.TypePr,
-		Fillers:   dto.Fillers,
-		Materials: dto.Materials,
-		DefMat:    dto.DefMat,
-		Mounting:  dto.Mounting,
-		Graphite:  dto.Graphite,
+		Id:       id,
+		StandId:  dto.StandId,
+		FlangeId: dto.FlangeId,
+		TypeFlId: dto.TypeFlId,
+		TypePr:   dto.TypePr,
+		Fillers:  dto.Fillers,
+		Frame:    dto.Frame,
+		Ir:       dto.Ir,
+		Or:       dto.Or,
+		Mounting: dto.Mounting,
+		Graphite: dto.Graphite,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")

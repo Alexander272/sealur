@@ -248,10 +248,11 @@ message CreateSNPRequest {
     string typeFlId = 3;
     string typePr = 4;
     string fillers = 5;
-    string materials = 6;
-    string defMat = 7;
-    string mounting = 8;
-    string graphite = 9;
+    string frame = 6;
+    string ir = 7;
+    string or = 8;
+    string mounting = 9;
+    string graphite = 10;
 }
 
 message UpdateSNPRequest {
@@ -261,10 +262,11 @@ message UpdateSNPRequest {
     string typeFlId = 4;
     string typePr = 5;
     string fillers = 6;
-    string materials = 7;
-    string defMat = 8;
-    string mounting = 9;
-    string graphite = 10;
+    string frame = 7;
+    string ir = 8;
+    string or = 9;
+    string mounting = 10;
+    string graphite = 11;
 }
 
 message DeleteSNPRequest {
@@ -276,10 +278,11 @@ message SNP {
     string typeFlId = 2;
     string typePr = 3;
     string fillers = 4;
-    string materials = 5;
-    string defMat = 6;
-    string mounting = 7;
-    string graphite = 8;
+    string frame = 5;
+    string ir = 6;
+    string or = 7;
+    string mounting = 8;
+    string graphite = 9;
 }
 message SNPResponse {
     repeated SNP snp = 1;

@@ -18,7 +18,7 @@ func NewSNPRepo(db *sqlx.DB) *SNPRepo {
 }
 
 func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
-	query := fmt.Sprintf(`SELECT id, type_fl_id, type_pr, filler, materials, def_mat, mounting, graphite 
+	query := fmt.Sprintf(`SELECT id, type_fl_id, type_pr, filler, frame, in_ring, ou_ring, mounting, graphite 
 		FROM %s WHERE stand_id=$1 AND flange_id=$2`, SNPTable)
 
 	var data []models.SNP
@@ -35,8 +35,8 @@ func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
 }
 
 func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
-	query := fmt.Sprintf(`INSERT INTO %s (stand_id, flange_id, type_fl_id, type_pr, filler, materials, def_mat, mounting, graphite) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, SNPTable)
+	query := fmt.Sprintf(`INSERT INTO %s (stand_id, flange_id, type_fl_id, type_pr, filler, frame, in_ring, ou_ring, mounting, graphite) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`, SNPTable)
 
 	standId, err := strconv.Atoi(snp.StandId)
 	if err != nil {
@@ -51,7 +51,7 @@ func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
 		return id, fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	row := r.db.QueryRow(query, standId, flangeId, typeFlId, snp.TypePr, snp.Fillers, snp.Materials, snp.DefMat,
+	row := r.db.QueryRow(query, standId, flangeId, typeFlId, snp.TypePr, snp.Fillers, snp.Frame, snp.Ir, snp.Or,
 		snp.Mounting, snp.Graphite)
 
 	var idInt int
@@ -63,8 +63,8 @@ func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
 }
 
 func (r *SNPRepo) Update(snp *proto.UpdateSNPRequest) error {
-	query := fmt.Sprintf(`UPDATE %s SET stand_id=$1, type_fl_id=$2, type_pr=$3, filler=$4, materials=$5, def_mat=$6,
-		mounting=$7, graphite=$8, flange_id=$9 WHERE id=$10`, SNPTable)
+	query := fmt.Sprintf(`UPDATE %s SET stand_id=$1, type_fl_id=$2, type_pr=$3, filler=$4, frame=$5, in_ring=$6, ou_ring=$7,
+		mounting=$8, graphite=$9, flange_id=$10 WHERE id=$11`, SNPTable)
 
 	id, err := strconv.Atoi(snp.Id)
 	if err != nil {
@@ -75,7 +75,7 @@ func (r *SNPRepo) Update(snp *proto.UpdateSNPRequest) error {
 		return fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	_, err = r.db.Exec(query, standId, snp.TypeFlId, snp.TypePr, snp.Fillers, snp.Materials, snp.DefMat,
+	_, err = r.db.Exec(query, standId, snp.TypeFlId, snp.TypePr, snp.Fillers, snp.Frame, snp.Ir, snp.Or,
 		snp.Mounting, snp.Graphite, snp.FlangeId, id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)

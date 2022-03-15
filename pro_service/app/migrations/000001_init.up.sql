@@ -40,8 +40,9 @@ CREATE TABLE snp (
     "flange_id" int references flange (id) on delete cascade not null,
     "type_fl_id" int references type_fl (id) on delete cascade not null,
     "filler" text,
-    "materials" text,
-    "def_mat" text,
+    "frame" text,
+    "in_ring" text,
+    "ou_ring" text,
     "mounting" text,
     "graphite" text
 );
