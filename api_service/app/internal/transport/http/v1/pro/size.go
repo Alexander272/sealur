@@ -105,6 +105,7 @@ func (h *Handler) createSize(c *gin.Context) {
 		H:        dto.H,
 		S2:       dto.S2,
 		S3:       dto.S3,
+		Adn:      dto.ADn,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")

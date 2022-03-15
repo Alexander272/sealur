@@ -18,7 +18,7 @@ func NewStFlRepo(db *sqlx.DB) *StFlRepo {
 }
 
 func (r *StFlRepo) Get() (st []*proto.StFl, err error) {
-	query := fmt.Sprintf(`SELECT st_fl.id, stand_id, stand.title AS stand, fl_id, flange.title AS flange FROM %s 
+	query := fmt.Sprintf(`SELECT st_fl.id, stand_id, stand.title AS stand, fl_id, flange.title AS flange, short FROM %s 
 		LEFT JOIN %s ON (stand_id = stand.id) LEFT JOIN %s ON (fl_id = flange.id)`, StFLTable, StandTable, FlangeTable)
 
 	var data []models.StFl

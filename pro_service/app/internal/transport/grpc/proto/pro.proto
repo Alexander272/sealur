@@ -78,6 +78,7 @@ message StFl {
     string stand = 3;
     string flangeId = 4;
     string flange = 5;
+    string short = 6;
 }
 message StFlResponse {
     repeated StFl stfl = 1;
@@ -185,13 +186,14 @@ message CreateSizeRequest {
     string pn = 4;
     string typePr = 5;
     string standId = 6;
-    int32 d4 = 7;
-    int32 d3 = 8;
-    int32 d2 = 9;
-    int32 d1 = 10;
+    float d4 = 7;
+    float d3 = 8;
+    float d2 = 9;
+    float d1 = 10;
     string h = 11;
     string s2 = 12;
     string s3 = 13;
+    string adn = 14;
 }
 
 message UpdateSizeRequest {
@@ -202,13 +204,14 @@ message UpdateSizeRequest {
     string pn = 5;
     string typePr = 6;
     string standId = 7;
-    int32 d4 = 8;
-    int32 d3 = 9;
-    int32 d2 = 10;
-    int32 d1 = 11;
+    float d4 = 8;
+    float d3 = 9;
+    float d2 = 10;
+    float d1 = 11;
     string h = 12;
     string s2 = 13;
     string s3 = 14;
+    string adn = 15;
 }
 
 message DeleteSizeRequest {
@@ -220,13 +223,14 @@ message Size {
     string id = 1;
     string dn = 2;
     string pn = 3;
-    int32 d4 = 4;
-    int32 d3 = 5;
-    int32 d2 = 6;
-    int32 d1 = 7;
+    float d4 = 4;
+    float d3 = 5;
+    float d2 = 6;
+    float d1 = 7;
     string h = 8;
     string s2 = 9;
     string s3 = 10;
+    string typePr = 11;
 }
 message SizeResponse {
     repeated Size sizes = 1;

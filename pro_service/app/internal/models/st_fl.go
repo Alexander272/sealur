@@ -6,4 +6,5 @@ type StFl struct {
 	Stand    string `db:"stand"`
 	FlangeId string `db:"fl_id"`
 	Flange   string `db:"flange"`
+	Short    string `db:"short"`
 }
