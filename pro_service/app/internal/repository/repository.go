@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 	"github.com/jmoiron/sqlx"
 )
@@ -59,6 +60,9 @@ type SNP interface {
 	Create(snp *proto.CreateSNPRequest) (id string, err error)
 	Update(snp *proto.UpdateSNPRequest) error
 	Delete(snp *proto.DeleteSNPRequest) error
+
+	GetByCondition(cond string) ([]models.SNP, error)
+	UpdateAddit(snp *proto.UpdateSNPRequest) error
 }
 
 type Repositories struct {

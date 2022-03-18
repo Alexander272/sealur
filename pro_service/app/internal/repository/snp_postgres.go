@@ -19,7 +19,7 @@ func NewSNPRepo(db *sqlx.DB) *SNPRepo {
 
 func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
 	query := fmt.Sprintf(`SELECT id, type_fl_id, type_pr, filler, frame, in_ring, ou_ring, mounting, graphite 
-		FROM %s WHERE stand_id=$1 AND flange_id=$2`, SNPTable)
+		FROM %s WHERE stand_id=$1 AND flange_id=$2 ORDER BY type_pr DESC`, SNPTable)
 
 	var data []models.SNP
 	if err = r.db.Select(&data, query, req.StandId, req.FlangeId); err != nil {
@@ -92,6 +92,30 @@ func (r *SNPRepo) Delete(snp *proto.DeleteSNPRequest) error {
 	}
 
 	_, err = r.db.Exec(query, id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *SNPRepo) GetByCondition(cond string) (snp []models.SNP, err error) {
+	query := fmt.Sprintf(`SELECT id, filler, frame, in_ring, ou_ring, mounting, graphite FROM %s WHERE %s`, SNPTable, cond)
+
+	if err = r.db.Select(&snp, query); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return snp, nil
+}
+
+func (r *SNPRepo) UpdateAddit(snp *proto.UpdateSNPRequest) error {
+	query := fmt.Sprintf(`UPDATE %s SET filler=$1, frame=$2, in_ring=$3, ou_ring=$4, mounting=$5, graphite=$6 WHERE id=$7`, SNPTable)
+
+	id, err := strconv.Atoi(snp.Id)
+	if err != nil {
+		return fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+
+	_, err = r.db.Exec(query, snp.Fillers, snp.Frame, snp.Ir, snp.Or, snp.Mounting, snp.Graphite, id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

@@ -57,6 +57,16 @@ type SNP interface {
 	Create(*proto.CreateSNPRequest) (*proto.IdResponse, error)
 	Update(*proto.UpdateSNPRequest) error
 	Delete(*proto.DeleteSNPRequest) error
+
+	AddMat(id string) error
+	DeleteMat(id, materials string) error
+	AddMoun(id string) error
+	DeleteMoun(id string) error
+	AddGrap(id string) error
+	DeleteGrap(id string) error
+	DeleteFiller(id string) error
+	DeleteTemp(id string) error
+	DeleteMod(id string) error
 }
 
 type Services struct {

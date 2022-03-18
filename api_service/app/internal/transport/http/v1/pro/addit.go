@@ -107,7 +107,7 @@ func (h *Handler) updateMat(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateMat(c, &proto.UpdateAddMatRequest{Id: id, Materials: dto.Materials})
+	_, err := h.proClient.UpdateMat(c, &proto.UpdateAddMatRequest{Id: id, Materials: dto.Materials, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -143,7 +143,7 @@ func (h *Handler) updateMod(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateMod(c, &proto.UpdateAddModRequest{Id: id, Mod: dto.Mod})
+	_, err := h.proClient.UpdateMod(c, &proto.UpdateAddModRequest{Id: id, Mod: dto.Mod, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -179,7 +179,7 @@ func (h *Handler) updateTemp(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateTemp(c, &proto.UpdateAddTemRequest{Id: id, Temperature: dto.Temperature})
+	_, err := h.proClient.UpdateTemp(c, &proto.UpdateAddTemRequest{Id: id, Temperature: dto.Temperature, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -215,7 +215,7 @@ func (h *Handler) updateMoun(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateMoun(c, &proto.UpdateAddMounRequest{Id: id, Mounting: dto.Mounting})
+	_, err := h.proClient.UpdateMoun(c, &proto.UpdateAddMounRequest{Id: id, Mounting: dto.Mounting, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -251,7 +251,7 @@ func (h *Handler) updateGrap(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateGrap(c, &proto.UpdateAddGrapRequest{Id: id, Graphite: dto.Graphite})
+	_, err := h.proClient.UpdateGrap(c, &proto.UpdateAddGrapRequest{Id: id, Graphite: dto.Graphite, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -287,7 +287,7 @@ func (h *Handler) updateFillers(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateFillers(c, &proto.UpdateAddFillersRequest{Id: id, Fillers: dto.Fillers})
+	_, err := h.proClient.UpdateFillers(c, &proto.UpdateAddFillersRequest{Id: id, Fillers: dto.Fillers, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

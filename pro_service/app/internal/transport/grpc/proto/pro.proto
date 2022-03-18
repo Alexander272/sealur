@@ -132,26 +132,38 @@ message CreateAddRequest {
 message UpdateAddMatRequest {
     string id = 1;
     string materials = 2;
+    string typeCh = 3;
+    string change = 4;
 }
 message UpdateAddModRequest {
     string id = 1;
     string mod = 2;
+    string typeCh = 3;
+    string change = 4;
 }
 message UpdateAddTemRequest {
     string id = 1;
     string temperature = 2;
+    string typeCh = 3;
+    string change = 4;
 }
 message UpdateAddMounRequest {
     string id = 1;
     string mounting = 2;
+    string typeCh = 3;
+    string change = 4;
 }
 message UpdateAddGrapRequest {
     string id = 1;
     string graphite = 2;
+    string typeCh = 3;
+    string change = 4;
 }
 message UpdateAddFillersRequest {
     string id = 1;
     string fillers = 2;
+    string typeCh = 3;
+    string change = 4;
 }
 
 message Additional {

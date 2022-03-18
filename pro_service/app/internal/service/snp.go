@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"strings"
+	"sync"
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
@@ -43,4 +45,448 @@ func (s *SNPService) Delete(snp *proto.DeleteSNPRequest) error {
 		return fmt.Errorf("failed to delete snp. error: %w", err)
 	}
 	return nil
+}
+
+func (s *SNPService) AddMat(id string) error {
+	var wg sync.WaitGroup
+	snp, err := s.repo.GetByCondition(`(NOT(frame = '*') AND NOT(frame = '')) 
+		OR (NOT(in_ring = '*') AND NOT(in_ring = '')) OR (NOT(ou_ring = '*') AND NOT(ou_ring = ''))`)
+	if err != nil {
+		return fmt.Errorf("failed to get snp. error: %w", err)
+	}
+
+	limit := make(chan struct{}, 30)
+	for _, cur := range snp {
+		wg.Add(1)
+		limit <- struct{}{}
+
+		var frame, ir, or string
+
+		parts := strings.Split(cur.Ir, "&")
+		if parts[0] == "*" || parts[0] == "" {
+			ir = cur.Ir
+		} else {
+			ir = fmt.Sprintf("%s;%s&%s", parts[0], id, parts[1])
+		}
+		parts = strings.Split(cur.Or, "&")
+		if parts[0] == "*" || parts[0] == "" {
+			or = cur.Or
+		} else {
+			or = fmt.Sprintf("%s;%s&%s", parts[0], id, parts[1])
+		}
+		parts = strings.Split(cur.Frame, "&")
+		if parts[0] == "*" || parts[0] == "" {
+			frame = cur.Frame
+		} else {
+			frame = fmt.Sprintf("%s;%s&%s", parts[0], id, parts[1])
+		}
+
+		upSnp := proto.UpdateSNPRequest{
+			Id:       cur.Id,
+			Fillers:  cur.Fillers,
+			Mounting: cur.Mounting,
+			Graphite: cur.Graphite,
+			Frame:    frame,
+			Ir:       ir,
+			Or:       or,
+		}
+
+		go s.snpUpdate(&upSnp, &wg, limit)
+	}
+
+	wg.Wait()
+	return nil
+}
+
+func (s *SNPService) DeleteMat(id, materials string) error {
+	var wg sync.WaitGroup
+	snp, err := s.repo.GetByCondition(fmt.Sprintf(`frame like '%%%s%%' OR in_ring like '%%%s%%' OR ou_ring like '%%%s%%'`, id, id, id))
+	if err != nil {
+		return fmt.Errorf("failed to get snp. error: %w", err)
+	}
+
+	limit := make(chan struct{}, 30)
+	for _, cur := range snp {
+		wg.Add(1)
+		limit <- struct{}{}
+
+		var frame, ir, or string
+
+		parts := strings.Split(cur.Ir, "&")
+		if parts[0] == "" {
+			ir = cur.Ir
+		} else {
+			mats := strings.Split(parts[0], ";")
+			mats = filter(mats, id)
+			if parts[1] == id {
+				m := strings.Split(materials, ";")
+				parts[1] = strings.Split(m[0], "@")[0]
+			}
+			if parts[0] == "*" {
+				ir = fmt.Sprintf("%s&%s", parts[0], parts[1])
+			} else {
+				ir = fmt.Sprintf("%s&%s", strings.Join(mats, ";"), parts[1])
+			}
+		}
+
+		parts = strings.Split(cur.Or, "&")
+		if parts[0] == "" {
+			or = cur.Or
+		} else {
+			mats := strings.Split(parts[0], ";")
+			mats = filter(mats, id)
+			if parts[1] == id {
+				m := strings.Split(materials, ";")
+				parts[1] = strings.Split(m[0], "@")[0]
+			}
+			if parts[0] == "*" {
+				or = fmt.Sprintf("%s&%s", parts[0], parts[1])
+			} else {
+				or = fmt.Sprintf("%s&%s", strings.Join(mats, ";"), parts[1])
+			}
+		}
+
+		parts = strings.Split(cur.Frame, "&")
+		if parts[0] == "" {
+			frame = cur.Frame
+		} else {
+			mats := strings.Split(parts[0], ";")
+			mats = filter(mats, id)
+			if parts[1] == id {
+				m := strings.Split(materials, ";")
+				parts[1] = strings.Split(m[0], "@")[0]
+			}
+			if parts[0] == "*" {
+				frame = fmt.Sprintf("%s&%s", parts[0], parts[1])
+			} else {
+				frame = fmt.Sprintf("%s&%s", strings.Join(mats, ";"), parts[1])
+			}
+		}
+
+		upSnp := proto.UpdateSNPRequest{
+			Id:       cur.Id,
+			Fillers:  cur.Fillers,
+			Mounting: cur.Mounting,
+			Graphite: cur.Graphite,
+			Frame:    frame,
+			Ir:       ir,
+			Or:       or,
+		}
+
+		go s.snpUpdate(&upSnp, &wg, limit)
+	}
+
+	wg.Wait()
+	return nil
+}
+
+func (s *SNPService) AddMoun(id string) error {
+	var wg sync.WaitGroup
+	snp, err := s.repo.GetByCondition(`NOT(mounting = '' OR mounting='*')`)
+	if err != nil {
+		return fmt.Errorf("failed to get snp. error: %w", err)
+	}
+
+	limit := make(chan struct{}, 30)
+	for _, cur := range snp {
+		wg.Add(1)
+		limit <- struct{}{}
+
+		var mounting string
+
+		if cur.Mounting == "*" || cur.Mounting == "" {
+			mounting = cur.Mounting
+		} else {
+			mounting = fmt.Sprintf("%s;%s", cur.Mounting, id)
+		}
+
+		upSnp := proto.UpdateSNPRequest{
+			Id:       cur.Id,
+			Fillers:  cur.Fillers,
+			Mounting: mounting,
+			Graphite: cur.Graphite,
+			Frame:    cur.Frame,
+			Ir:       cur.Ir,
+			Or:       cur.Or,
+		}
+
+		go s.snpUpdate(&upSnp, &wg, limit)
+	}
+
+	wg.Wait()
+	return nil
+}
+
+func (s *SNPService) DeleteMoun(id string) error {
+	var wg sync.WaitGroup
+	snp, err := s.repo.GetByCondition(fmt.Sprintf(`mounting like '%%%s%%'`, id))
+	if err != nil {
+		return fmt.Errorf("failed to get snp. error: %w", err)
+	}
+
+	limit := make(chan struct{}, 30)
+	for _, cur := range snp {
+		wg.Add(1)
+		limit <- struct{}{}
+
+		var mounting string
+		if cur.Mounting == "*" || cur.Mounting == "" {
+			mounting = cur.Mounting
+		} else {
+			mouns := strings.Split(cur.Mounting, ";")
+			mouns = filter(mouns, id)
+			mounting = strings.Join(mouns, ";")
+		}
+
+		upSnp := proto.UpdateSNPRequest{
+			Id:       cur.Id,
+			Fillers:  cur.Fillers,
+			Mounting: mounting,
+			Graphite: cur.Graphite,
+			Frame:    cur.Frame,
+			Ir:       cur.Ir,
+			Or:       cur.Or,
+		}
+
+		go s.snpUpdate(&upSnp, &wg, limit)
+	}
+
+	wg.Wait()
+	return nil
+}
+
+func (s *SNPService) AddGrap(id string) error {
+	var wg sync.WaitGroup
+	snp, err := s.repo.GetByCondition(`NOT(mounting = '' OR mounting='*')`)
+	if err != nil {
+		return fmt.Errorf("failed to get snp. error: %w", err)
+	}
+
+	limit := make(chan struct{}, 30)
+	for _, cur := range snp {
+		wg.Add(1)
+		limit <- struct{}{}
+
+		var graphite string
+
+		if cur.Graphite == "*" || cur.Graphite == "" {
+			graphite = cur.Graphite
+		} else {
+			graphite = fmt.Sprintf("%s;%s", cur.Graphite, id)
+		}
+
+		upSnp := proto.UpdateSNPRequest{
+			Id:       cur.Id,
+			Fillers:  cur.Fillers,
+			Mounting: cur.Mounting,
+			Graphite: graphite,
+			Frame:    cur.Frame,
+			Ir:       cur.Ir,
+			Or:       cur.Or,
+		}
+
+		go s.snpUpdate(&upSnp, &wg, limit)
+	}
+
+	wg.Wait()
+	return nil
+}
+
+func (s *SNPService) DeleteGrap(id string) error {
+	var wg sync.WaitGroup
+	snp, err := s.repo.GetByCondition(fmt.Sprintf(`mounting like '%%%s%%'`, id))
+	if err != nil {
+		return fmt.Errorf("failed to get snp. error: %w", err)
+	}
+
+	limit := make(chan struct{}, 30)
+	for _, cur := range snp {
+		wg.Add(1)
+		limit <- struct{}{}
+
+		var graphite string
+		if cur.Graphite == "*" || cur.Graphite == "" {
+			graphite = cur.Graphite
+		} else {
+			graps := strings.Split(cur.Graphite, ";")
+			graps = filter(graps, id)
+			graphite = strings.Join(graps, ";")
+		}
+
+		upSnp := proto.UpdateSNPRequest{
+			Id:       cur.Id,
+			Fillers:  cur.Fillers,
+			Mounting: cur.Mounting,
+			Graphite: graphite,
+			Frame:    cur.Frame,
+			Ir:       cur.Ir,
+			Or:       cur.Or,
+		}
+
+		go s.snpUpdate(&upSnp, &wg, limit)
+	}
+
+	wg.Wait()
+	return nil
+}
+
+func (s *SNPService) DeleteFiller(id string) error {
+	var wg sync.WaitGroup
+	snp, err := s.repo.GetByCondition(fmt.Sprintf(`filler like '%%%s&%%'`, id))
+	if err != nil {
+		return fmt.Errorf("failed to get snp. error: %w", err)
+	}
+
+	limit := make(chan struct{}, 30)
+	for _, cur := range snp {
+		wg.Add(1)
+		limit <- struct{}{}
+
+		var fillers string
+		tmp := strings.Split(cur.Fillers, ";")
+		newFil := make([]string, 0, len(tmp))
+		for _, fil := range tmp {
+			if !strings.Contains(fil, fmt.Sprintf("%s&", id)) {
+				newFil = append(newFil, fil)
+			}
+		}
+		fillers = strings.Join(newFil, ";")
+
+		upSnp := proto.UpdateSNPRequest{
+			Id:       cur.Id,
+			Fillers:  fillers,
+			Mounting: cur.Mounting,
+			Graphite: cur.Graphite,
+			Frame:    cur.Frame,
+			Ir:       cur.Ir,
+			Or:       cur.Or,
+		}
+
+		go s.snpUpdate(&upSnp, &wg, limit)
+	}
+
+	wg.Wait()
+	return nil
+}
+
+func (s *SNPService) DeleteTemp(id string) error {
+	var wg sync.WaitGroup
+	snp, err := s.repo.GetByCondition(fmt.Sprintf(`filler like '%%%s>%%'`, id))
+	if err != nil {
+		return fmt.Errorf("failed to get snp. error: %w", err)
+	}
+
+	limit := make(chan struct{}, 30)
+	for _, cur := range snp {
+		wg.Add(1)
+		limit <- struct{}{}
+
+		var fillers []string
+		tmp := strings.Split(cur.Fillers, ";")
+		for _, fil := range tmp {
+			if strings.Contains(fil, fmt.Sprintf("%s>", id)) {
+				tmp := strings.Split(fil, "&")[0]
+				newFil := make([]string, 0, 10)
+				arr := strings.Split(strings.Split(fil, "&")[1], "@")
+
+				for _, t := range arr {
+					if !strings.Contains(t, fmt.Sprintf("%s>", id)) {
+						newFil = append(newFil, t)
+					}
+				}
+				fillers = append(fillers, fmt.Sprintf("%s&%s", tmp, strings.Join(newFil, "@")))
+			} else {
+				fillers = append(fillers, fil)
+			}
+		}
+
+		upSnp := proto.UpdateSNPRequest{
+			Id:       cur.Id,
+			Fillers:  strings.Join(fillers, ";"),
+			Mounting: cur.Mounting,
+			Graphite: cur.Graphite,
+			Frame:    cur.Frame,
+			Ir:       cur.Ir,
+			Or:       cur.Or,
+		}
+
+		go s.snpUpdate(&upSnp, &wg, limit)
+	}
+
+	wg.Wait()
+	return nil
+}
+
+func (s *SNPService) DeleteMod(id string) error {
+	var wg sync.WaitGroup
+	snp, err := s.repo.GetByCondition(fmt.Sprintf(`filler like '%%>%s%%' OR filler like '%%,%s%%'`, id, id))
+	if err != nil {
+		return fmt.Errorf("failed to get snp. error: %w", err)
+	}
+
+	limit := make(chan struct{}, 30)
+	for _, cur := range snp {
+		wg.Add(1)
+		limit <- struct{}{}
+
+		var fillers []string
+		tmp := strings.Split(cur.Fillers, ";")
+		for _, fil := range tmp {
+			tmp := strings.Split(fil, "&")[0]
+			newFil := make([]string, 0, 10)
+			arr := strings.Split(strings.Split(fil, "&")[1], "@")
+			for _, t := range arr {
+				if strings.Contains(t, fmt.Sprintf(">%s", id)) || strings.Contains(t, fmt.Sprintf(",%s", id)) {
+					tmp := strings.Split(t, ">")[0]
+					newTmp := make([]string, 0, 10)
+					arr := strings.Split(strings.Split(t, ">")[1], ",")
+
+					for _, t := range arr {
+						if t != id {
+							newTmp = append(newTmp, t)
+						}
+					}
+					newFil = append(newFil, fmt.Sprintf("%s>%s", tmp, strings.Join(newTmp, ",")))
+				} else {
+					newFil = append(newFil, t)
+				}
+			}
+			fillers = append(fillers, fmt.Sprintf("%s&%s", tmp, strings.Join(newFil, "@")))
+		}
+
+		upSnp := proto.UpdateSNPRequest{
+			Id:       cur.Id,
+			Fillers:  strings.Join(fillers, ";"),
+			Mounting: cur.Mounting,
+			Graphite: cur.Graphite,
+			Frame:    cur.Frame,
+			Ir:       cur.Ir,
+			Or:       cur.Or,
+		}
+
+		go s.snpUpdate(&upSnp, &wg, limit)
+	}
+
+	wg.Wait()
+	return nil
+}
+
+func (s *SNPService) snpUpdate(snp *proto.UpdateSNPRequest, wg *sync.WaitGroup, limit chan struct{}) error {
+	defer wg.Done()
+	if err := s.repo.UpdateAddit(snp); err != nil {
+		return fmt.Errorf("failed to update snp addit. error: %w", err)
+	}
+
+	<-limit
+	return nil
+}
+
+func filter(arr []string, id string) []string {
+	var res []string
+	for i := range arr {
+		if arr[i] != id {
+			res = append(res, arr[i])
+		}
+	}
+	return res
 }

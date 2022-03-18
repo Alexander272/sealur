@@ -30,6 +30,23 @@ func (h *Handler) UpdateMat(ctx context.Context, dto *proto.UpdateAddMatRequest)
 		return nil, err
 	}
 
+	if dto.TypeCh == "add" {
+		if err := h.service.SNP.AddMat(dto.Change); err != nil {
+			return nil, err
+		}
+	}
+
+	if dto.TypeCh == "delete" {
+		addit, err := h.service.Addit.GetAll()
+		if err != nil {
+			return nil, err
+		}
+
+		if err := h.service.SNP.DeleteMat(dto.Change, addit[0].Materials); err != nil {
+			return nil, err
+		}
+	}
+
 	return success, nil
 }
 
@@ -37,6 +54,12 @@ func (h *Handler) UpdateMod(ctx context.Context, dto *proto.UpdateAddModRequest)
 	success, err := h.service.Addit.UpdateMod(dto)
 	if err != nil {
 		return nil, err
+	}
+
+	if dto.TypeCh == "delete" {
+		if err := h.service.SNP.DeleteMod(dto.Change); err != nil {
+			return nil, err
+		}
 	}
 
 	return success, nil
@@ -48,6 +71,12 @@ func (h *Handler) UpdateTemp(ctx context.Context, dto *proto.UpdateAddTemRequest
 		return nil, err
 	}
 
+	if dto.TypeCh == "delete" {
+		if err := h.service.SNP.DeleteTemp(dto.Change); err != nil {
+			return nil, err
+		}
+	}
+
 	return success, nil
 }
 
@@ -55,6 +84,18 @@ func (h *Handler) UpdateMoun(ctx context.Context, dto *proto.UpdateAddMounReques
 	success, err := h.service.Addit.UpdateMoun(dto)
 	if err != nil {
 		return nil, err
+	}
+
+	if dto.TypeCh == "add" {
+		if err := h.service.SNP.AddMoun(dto.Change); err != nil {
+			return nil, err
+		}
+	}
+
+	if dto.TypeCh == "delete" {
+		if err := h.service.SNP.DeleteMoun(dto.Change); err != nil {
+			return nil, err
+		}
 	}
 
 	return success, nil
@@ -66,6 +107,18 @@ func (h *Handler) UpdateGrap(ctx context.Context, dto *proto.UpdateAddGrapReques
 		return nil, err
 	}
 
+	if dto.TypeCh == "add" {
+		if err := h.service.SNP.AddGrap(dto.Change); err != nil {
+			return nil, err
+		}
+	}
+
+	if dto.TypeCh == "delete" {
+		if err := h.service.SNP.DeleteGrap(dto.Change); err != nil {
+			return nil, err
+		}
+	}
+
 	return success, nil
 }
 
@@ -73,6 +126,12 @@ func (h *Handler) UpdateFillers(ctx context.Context, dto *proto.UpdateAddFillers
 	success, err := h.service.UpdateFillers(dto)
 	if err != nil {
 		return nil, err
+	}
+
+	if dto.TypeCh == "delete" {
+		if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
+			return nil, err
+		}
 	}
 
 	return success, nil
