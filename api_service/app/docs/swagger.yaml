@@ -2,6 +2,8 @@ basePath: /api/v1
 definitions:
   models.CreateAdditDTO:
     properties:
+      fillers:
+        type: string
       graphite:
         type: string
       materials:
@@ -13,6 +15,7 @@ definitions:
       temperature:
         type: string
     required:
+    - fillers
     - graphite
     - materials
     - mod
@@ -49,17 +52,19 @@ definitions:
     type: object
   models.SNPDTO:
     properties:
-      defMat:
-        type: string
       fillers:
         type: string
       flangeId:
         type: string
+      frame:
+        type: string
       graphite:
         type: string
-      materials:
+      ir:
         type: string
       mounting:
+        type: string
+      or:
         type: string
       standId:
         type: string
@@ -68,11 +73,9 @@ definitions:
       typePr:
         type: string
     required:
-    - defMat
     - fillers
     - flangeId
     - graphite
-    - materials
     - mounting
     - standId
     - typeFlId
@@ -80,14 +83,16 @@ definitions:
     type: object
   models.SizesDTO:
     properties:
+      adn:
+        type: string
       d1:
-        type: integer
+        type: number
       d2:
-        type: integer
+        type: number
       d3:
-        type: integer
+        type: number
       d4:
-        type: integer
+        type: number
       dn:
         type: string
       flange:
@@ -113,7 +118,6 @@ definitions:
     - flange
     - h
     - pn
-    - standId
     - typeFlId
     - typePr
     type: object
@@ -149,43 +153,75 @@ definitions:
     type: object
   models.UpdateFillersDTO:
     properties:
+      change:
+        type: string
       fillers:
+        type: string
+      type:
         type: string
     required:
     - fillers
+    - type
     type: object
   models.UpdateGrapDTO:
     properties:
+      change:
+        type: string
       graphite:
+        type: string
+      type:
         type: string
     required:
     - graphite
+    - type
     type: object
   models.UpdateMatDTO:
     properties:
+      change:
+        type: string
       materials:
+        type: string
+      type:
         type: string
     required:
     - materials
+    - type
     type: object
   models.UpdateModDTO:
     properties:
+      change:
+        type: string
       mod:
         type: string
+      type:
+        type: string
+    required:
+    - mod
+    - type
     type: object
   models.UpdateMounDTO:
     properties:
+      change:
+        type: string
       mounting:
+        type: string
+      type:
         type: string
     required:
     - mounting
+    - type
     type: object
   models.UpdateTempDTO:
     properties:
+      change:
+        type: string
       temperature:
+        type: string
+      type:
         type: string
     required:
     - temperature
+    - type
     type: object
   proto.Additional:
     properties:
@@ -215,17 +251,19 @@ definitions:
     type: object
   proto.SNP:
     properties:
-      defMat:
-        type: string
       fillers:
+        type: string
+      frame:
         type: string
       graphite:
         type: string
       id:
         type: string
-      materials:
+      ir:
         type: string
       mounting:
+        type: string
+      or:
         type: string
       typeFlId:
         type: string
@@ -235,13 +273,13 @@ definitions:
   proto.Size:
     properties:
       d1:
-        type: integer
+        type: number
       d2:
-        type: integer
+        type: number
       d3:
-        type: integer
+        type: number
       d4:
-        type: integer
+        type: number
       dn:
         type: string
       h:
@@ -254,6 +292,8 @@ definitions:
         type: string
       s3:
         type: string
+      typePr:
+        type: string
     type: object
   proto.StFl:
     properties:
@@ -262,6 +302,8 @@ definitions:
       flangeId:
         type: string
       id:
+        type: string
+      short:
         type: string
       stand:
         type: string

@@ -50,6 +50,7 @@ type Size interface {
 	Create(*proto.CreateSizeRequest) (*proto.IdResponse, error)
 	Update(*proto.UpdateSizeRequest) error
 	Delete(*proto.DeleteSizeRequest) error
+	DeleteAll(*proto.DeleteAllSizeRequest) error
 }
 
 type SNP interface {

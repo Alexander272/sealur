@@ -231,6 +231,11 @@ message DeleteSizeRequest {
     string id = 2;
 }
 
+message DeleteAllSizeRequest {
+    string flange = 1;
+    string typePr = 2;
+}
+
 message Size {
     string id = 1;
     string dn = 2;
@@ -243,6 +248,8 @@ message Size {
     string s2 = 9;
     string s3 = 10;
     string typePr = 11;
+    string typeFlId = 12;
+    int32 adn = 13;
 }
 message SizeResponse {
     repeated Size sizes = 1;
@@ -357,6 +364,7 @@ service ProService {
     rpc CreateSize (CreateSizeRequest) returns (IdResponse);
     rpc UpdateSize (UpdateSizeRequest) returns (IdResponse);
     rpc DeleteSize (DeleteSizeRequest) returns (IdResponse);
+    rpc DeleteAllSize (DeleteAllSizeRequest) returns (IdResponse);
 
     // SNP Service ----------------------------------------------------------------
     rpc GetSNP (GetSNPRequest) returns (SNPResponse);

@@ -37,3 +37,10 @@ func (h *Handler) DeleteSize(ctx context.Context, dto *proto.DeleteSizeRequest) 
 	}
 	return &proto.IdResponse{Id: dto.Id}, nil
 }
+
+func (h *Handler) DeleteAllSize(ctx context.Context, dto *proto.DeleteAllSizeRequest) (*proto.IdResponse, error) {
+	if err := h.service.Size.DeleteAll(dto); err != nil {
+		return nil, err
+	}
+	return &proto.IdResponse{Id: ""}, nil
+}

@@ -16,6 +16,7 @@ func (h *Handler) initSizeRoutes(api *gin.RouterGroup) {
 		sizes.POST("/", h.createSize)
 		sizes.PUT("/:id", h.updateSize)
 		sizes.DELETE("/:id", h.deleteSize)
+		sizes.DELETE("/all", h.deleteAllSize)
 	}
 }
 
@@ -197,6 +198,45 @@ func (h *Handler) deleteSize(c *gin.Context) {
 	size, err := h.proClient.DeleteSize(c, &proto.DeleteSizeRequest{
 		Id:     id,
 		Flange: flange,
+	})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Id: size.Id, Message: "Deleted"})
+}
+
+// @Summary Delete Size
+// @Tags Sealur Pro -> sizes
+// @Security ApiKeyAuth
+// @Description удаление всех размеров
+// @ModuleID deleteSize
+// @Accept json
+// @Produce json
+// @Param flange query string true "flange"
+// @Param typePr query string true "type pr"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/sizes/all [delete]
+func (h *Handler) deleteAllSize(c *gin.Context) {
+	flange := c.Query("flange")
+	if flange == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty flange", "empty flange param")
+		return
+	}
+
+	typePr := c.Query("typePr")
+	if flange == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty type", "empty type param")
+		return
+	}
+
+	size, err := h.proClient.DeleteAllSize(c, &proto.DeleteAllSizeRequest{
+		Flange: flange,
+		TypePr: typePr,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")

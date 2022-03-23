@@ -44,3 +44,10 @@ func (s *SizeService) Delete(size *proto.DeleteSizeRequest) error {
 	}
 	return nil
 }
+
+func (s *SizeService) DeleteAll(size *proto.DeleteAllSizeRequest) error {
+	if err := s.repo.DeleteAll(size); err != nil {
+		return fmt.Errorf("failed to delete query. error: %w", err)
+	}
+	return nil
+}

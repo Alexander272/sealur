@@ -2231,6 +2231,7 @@ const docTemplate_swagger = `{
         "models.CreateAdditDTO": {
             "type": "object",
             "required": [
+                "fillers",
                 "graphite",
                 "materials",
                 "mod",
@@ -2238,6 +2239,9 @@ const docTemplate_swagger = `{
                 "temperature"
             ],
             "properties": {
+                "fillers": {
+                    "type": "string"
+                },
                 "graphite": {
                     "type": "string"
                 },
@@ -2301,33 +2305,34 @@ const docTemplate_swagger = `{
         "models.SNPDTO": {
             "type": "object",
             "required": [
-                "defMat",
                 "fillers",
                 "flangeId",
                 "graphite",
-                "materials",
                 "mounting",
                 "standId",
                 "typeFlId",
                 "typePr"
             ],
             "properties": {
-                "defMat": {
-                    "type": "string"
-                },
                 "fillers": {
                     "type": "string"
                 },
                 "flangeId": {
                     "type": "string"
                 },
+                "frame": {
+                    "type": "string"
+                },
                 "graphite": {
                     "type": "string"
                 },
-                "materials": {
+                "ir": {
                     "type": "string"
                 },
                 "mounting": {
+                    "type": "string"
+                },
+                "or": {
                     "type": "string"
                 },
                 "standId": {
@@ -2350,22 +2355,24 @@ const docTemplate_swagger = `{
                 "flange",
                 "h",
                 "pn",
-                "standId",
                 "typeFlId",
                 "typePr"
             ],
             "properties": {
+                "adn": {
+                    "type": "string"
+                },
                 "d1": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "d2": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "d3": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "d4": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "dn": {
                     "type": "string"
@@ -2445,10 +2452,17 @@ const docTemplate_swagger = `{
         "models.UpdateFillersDTO": {
             "type": "object",
             "required": [
-                "fillers"
+                "fillers",
+                "type"
             ],
             "properties": {
+                "change": {
+                    "type": "string"
+                },
                 "fillers": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -2456,10 +2470,17 @@ const docTemplate_swagger = `{
         "models.UpdateGrapDTO": {
             "type": "object",
             "required": [
-                "graphite"
+                "graphite",
+                "type"
             ],
             "properties": {
+                "change": {
+                    "type": "string"
+                },
                 "graphite": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -2467,18 +2488,35 @@ const docTemplate_swagger = `{
         "models.UpdateMatDTO": {
             "type": "object",
             "required": [
-                "materials"
+                "materials",
+                "type"
             ],
             "properties": {
+                "change": {
+                    "type": "string"
+                },
                 "materials": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
         },
         "models.UpdateModDTO": {
             "type": "object",
+            "required": [
+                "mod",
+                "type"
+            ],
             "properties": {
+                "change": {
+                    "type": "string"
+                },
                 "mod": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -2486,10 +2524,17 @@ const docTemplate_swagger = `{
         "models.UpdateMounDTO": {
             "type": "object",
             "required": [
-                "mounting"
+                "mounting",
+                "type"
             ],
             "properties": {
+                "change": {
+                    "type": "string"
+                },
                 "mounting": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -2497,10 +2542,17 @@ const docTemplate_swagger = `{
         "models.UpdateTempDTO": {
             "type": "object",
             "required": [
-                "temperature"
+                "temperature",
+                "type"
             ],
             "properties": {
+                "change": {
+                    "type": "string"
+                },
                 "temperature": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -2548,10 +2600,10 @@ const docTemplate_swagger = `{
         "proto.SNP": {
             "type": "object",
             "properties": {
-                "defMat": {
+                "fillers": {
                     "type": "string"
                 },
-                "fillers": {
+                "frame": {
                     "type": "string"
                 },
                 "graphite": {
@@ -2560,10 +2612,13 @@ const docTemplate_swagger = `{
                 "id": {
                     "type": "string"
                 },
-                "materials": {
+                "ir": {
                     "type": "string"
                 },
                 "mounting": {
+                    "type": "string"
+                },
+                "or": {
                     "type": "string"
                 },
                 "typeFlId": {
@@ -2578,16 +2633,16 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "d1": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "d2": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "d3": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "d4": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "dn": {
                     "type": "string"
@@ -2606,6 +2661,9 @@ const docTemplate_swagger = `{
                 },
                 "s3": {
                     "type": "string"
+                },
+                "typePr": {
+                    "type": "string"
                 }
             }
         },
@@ -2619,6 +2677,9 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "short": {
                     "type": "string"
                 },
                 "stand": {
