@@ -1,5 +1,9 @@
 package models
 
+import (
+	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+)
+
 type SNPDTO struct {
 	StandId  string `json:"standId" binding:"required"`
 	FlangeId string `json:"flangeId" binding:"required"`
@@ -11,4 +15,10 @@ type SNPDTO struct {
 	Or       string `json:"or"`
 	Mounting string `json:"mounting" binding:"required"`
 	Graphite string `json:"graphite" binding:"required"`
+}
+
+type DefResponse struct {
+	TypeFl []*proto.TypeFl     `json:"typeFl"`
+	Snp    []*proto.SNP        `json:"snp"`
+	Sizes  *proto.SizeResponse `json:"sizes"`
 }

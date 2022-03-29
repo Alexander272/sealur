@@ -21,5 +21,4 @@ type SizesDTO struct {
 	H        string  `json:"h" binding:"required"`
 	S2       string  `json:"s2"`
 	S3       string  `json:"s3"`
-	ADn      string  `json:"adn"`
 }

@@ -18,10 +18,63 @@ func NewSNPService(repo repository.SNP) *SNPService {
 }
 
 func (s *SNPService) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
-	snp, err = s.repo.Get(req)
+	data, err := s.repo.Get(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get snp. error: %w", err)
 	}
+
+	for _, d := range data {
+		var fillers []*proto.Filler
+		fil := strings.Split(data[0].Fillers, ";")
+
+		for _, v := range fil {
+			id := strings.Split(v, "&")[0]
+			tmp := strings.Split(v, "&")[1]
+
+			var Temps []*proto.Temp
+
+			temps := strings.Split(tmp, "@")
+			for _, t := range temps {
+				id := strings.Split(t, ">")[0]
+				tmp := strings.Split(t, ">")[1]
+
+				mods := strings.Split(tmp, ",")
+				Temps = append(Temps, &proto.Temp{Id: id, Mods: mods})
+			}
+
+			fillers = append(fillers, &proto.Filler{
+				Id: id, Temps: Temps,
+			})
+		}
+
+		tmp := strings.Split(d.Frame, "&")
+		var frame, ir, or = &proto.Materials{}, &proto.Materials{}, &proto.Materials{}
+		if len(tmp) > 1 {
+			frame = &proto.Materials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+		}
+		tmp = strings.Split(d.Ir, "&")
+		if len(tmp) > 1 {
+			ir = &proto.Materials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+		}
+		tmp = strings.Split(d.Or, "&")
+		if len(tmp) > 1 {
+			or = &proto.Materials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+		}
+
+		s := proto.SNP{
+			Id:       d.Id,
+			TypeFlId: d.TypeFlId,
+			TypePr:   d.TypePr,
+			Fillers:  fillers,
+			Frame:    frame,
+			Ir:       ir,
+			Or:       or,
+			Mounting: strings.Split(d.Mounting, ";"),
+			Graphite: strings.Split(d.Graphite, ";"),
+		}
+		snp = append(snp, &s)
+	}
+
 	return snp, nil
 }
 

@@ -120,6 +120,40 @@ message TypeFlResponse {
 // Additional Service ----------------------------------------------------------------
 message GetAllAddRequest {}
 
+message AddMaterials {
+    string short = 1;
+    string title = 2;
+}
+
+message AddTemperature {
+    string id = 1;
+    string title = 2;
+}
+
+message AddMod {
+    string id = 1;
+    string short = 2;
+    string title = 3;
+    string description = 4;
+}
+
+message AddMoun {
+    string id = 1;
+    string title = 2;
+}
+
+message AddGrap {
+    string short = 1;
+    string title = 2;
+    string description = 3;
+}
+
+message AddFiller {
+    string short = 1;
+    string title = 2;
+    string description = 3;
+}
+
 message CreateAddRequest {
     string materials = 1;
     string mod = 2;
@@ -168,12 +202,12 @@ message UpdateAddFillersRequest {
 
 message Additional {
     string id = 1;
-    string materials = 2;
-    string mod = 3;
-    string temperature = 4;
-    string mounting = 5;
-    string graphite = 6;
-    string fillers = 7;
+    repeated AddMaterials materials = 2;
+    repeated AddMod mod = 3;
+    repeated AddTemperature temperature = 4;
+    repeated AddMoun mounting = 5;
+    repeated AddGrap graphite = 6;
+    repeated AddFiller fillers = 7;
 }
 message AdditionalResponse {
     repeated Additional additionals = 1;
@@ -205,7 +239,6 @@ message CreateSizeRequest {
     string h = 11;
     string s2 = 12;
     string s3 = 13;
-    string adn = 14;
 }
 
 message UpdateSizeRequest {
@@ -223,7 +256,6 @@ message UpdateSizeRequest {
     string h = 12;
     string s2 = 13;
     string s3 = 14;
-    string adn = 15;
 }
 
 message DeleteSizeRequest {
@@ -249,13 +281,31 @@ message Size {
     string s3 = 10;
     string typePr = 11;
     string typeFlId = 12;
-    int32 adn = 13;
+}
+message Dn {
+    string dn = 1;
 }
 message SizeResponse {
     repeated Size sizes = 1;
+    repeated Dn dn = 2;
 }
 
 // SNP Service ----------------------------------------------------------------
+message Filler {
+    string id = 1;
+    repeated Temp temps = 2;
+}
+
+message Temp {
+    string id = 1;
+    repeated string mods = 2;
+}
+
+message Materials {
+    repeated string values = 1;
+    string default = 2;
+}
+
 message GetSNPRequest {
     string standId = 1;
     string flangeId = 2;
@@ -296,12 +346,12 @@ message SNP {
     string id = 1;
     string typeFlId = 2;
     string typePr = 3;
-    string fillers = 4;
-    string frame = 5;
-    string ir = 6;
-    string or = 7;
-    string mounting = 8;
-    string graphite = 9;
+    repeated Filler fillers = 4;
+    Materials frame = 5;
+    Materials ir = 6;
+    Materials or = 7;
+    repeated string mounting = 8;
+    repeated string graphite = 9;
 }
 message SNPResponse {
     repeated SNP snp = 1;

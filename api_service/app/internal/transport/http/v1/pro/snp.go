@@ -12,6 +12,7 @@ import (
 func (h *Handler) initSNPRoutes(api *gin.RouterGroup) {
 	snp := api.Group("/snp")
 	{
+		snp.GET("/default", h.getDefault)
 		snp.GET("/", h.getSNP)
 		snp.POST("/", h.createSNP)
 		snp.PUT("/:id", h.updateSNP)
@@ -55,6 +56,49 @@ func (h *Handler) getSNP(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, models.DataResponse{Data: snp.Snp, Count: len(snp.Snp)})
+}
+
+// @Summary Get Default Data
+// @Tags Sealur Pro -> snp
+// @Security ApiKeyAuth
+// @Description получение значений по умолчание (снп, размеров для первого элемента и типов фланца)
+// @ModuleID getDefault
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.DataResponse{data=models.DefResponse}
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/snp/default [get]
+func (h *Handler) getDefault(c *gin.Context) {
+	flangeType, err := h.proClient.GetTypeFl(c, &proto.GetTypeFlRequest{})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	snp, err := h.proClient.GetSNP(c, &proto.GetSNPRequest{
+		StandId:  "1",
+		FlangeId: "1",
+	})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	size, err := h.proClient.GetSizes(c, &proto.GetSizesRequest{Flange: "33259", TypeFlId: flangeType.TypeFl[0].Id, TypePr: snp.Snp[0].TypePr, StandId: "1"})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	data := models.DefResponse{
+		TypeFl: flangeType.TypeFl,
+		Snp:    snp.Snp,
+		Sizes:  size,
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: data})
 }
 
 // @Summary Create SNP

@@ -15,12 +15,24 @@ func NewSizeService(repo repository.Size) *SizeService {
 	return &SizeService{repo: repo}
 }
 
-func (s *SizeService) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, err error) {
+func (s *SizeService) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, dn []*proto.Dn, err error) {
 	sizes, err = s.repo.Get(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get sizes. error: %w", err)
+		return nil, nil, fmt.Errorf("failed to get sizes. error: %w", err)
 	}
-	return sizes, nil
+
+	dn = make([]*proto.Dn, 0, len(sizes))
+	for _, s := range sizes {
+		if len(dn) > 0 {
+			if dn[len(dn)-1].Dn != s.Dn {
+				dn = append(dn, &proto.Dn{Dn: s.Dn})
+			}
+		} else {
+			dn = append(dn, &proto.Dn{Dn: s.Dn})
+		}
+	}
+
+	return sizes, dn, nil
 }
 
 func (s *SizeService) Create(size *proto.CreateSizeRequest) (*proto.IdResponse, error) {

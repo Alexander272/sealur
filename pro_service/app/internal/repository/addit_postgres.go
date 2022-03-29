@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 	"github.com/jmoiron/sqlx"
 )
@@ -16,7 +17,7 @@ func NewAdditRepo(db *sqlx.DB) *AdditRepo {
 	return &AdditRepo{db: db}
 }
 
-func (r *AdditRepo) GetAll() (addit []*proto.Additional, err error) {
+func (r *AdditRepo) GetAll() (addit []models.Addit, err error) {
 	query := fmt.Sprintf("SELECT id, materials, mod, temperature, mounting, graphite, fillers FROM %s LIMIT 1", AdditionalTable)
 
 	if err = r.db.Select(&addit, query); err != nil {

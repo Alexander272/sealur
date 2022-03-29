@@ -37,14 +37,15 @@ func (h *Handler) UpdateMat(ctx context.Context, dto *proto.UpdateAddMatRequest)
 	}
 
 	if dto.TypeCh == "delete" {
-		addit, err := h.service.Addit.GetAll()
-		if err != nil {
-			return nil, err
-		}
+		// addit, err := h.service.Addit.GetAll()
+		// if err != nil {
+		// 	return nil, err
+		// }
 
-		if err := h.service.SNP.DeleteMat(dto.Change, addit[0].Materials); err != nil {
-			return nil, err
-		}
+		//TODO исправить удаление материалов
+		// if err := h.service.SNP.DeleteMat(dto.Change, addit[0].Materials); err != nil {
+		// 	return nil, err
+		// }
 	}
 
 	return success, nil

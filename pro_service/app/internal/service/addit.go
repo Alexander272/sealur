@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
@@ -16,10 +17,83 @@ func NewAdditService(repo repository.Addit) *AdditService {
 }
 
 func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
-	addit, err = s.repo.GetAll()
+	data, err := s.repo.GetAll()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get additional. error: %w", err)
 	}
+
+	for _, d := range data {
+		var mats []*proto.AddMaterials
+		var mods []*proto.AddMod
+		var temps []*proto.AddTemperature
+		var mouns []*proto.AddMoun
+		var graps []*proto.AddGrap
+		var fils []*proto.AddFiller
+
+		tmp := strings.Split(d.Materials, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			mats = append(mats, &proto.AddMaterials{
+				Short: parts[0],
+				Title: parts[1],
+			})
+		}
+		tmp = strings.Split(d.Mod, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			mods = append(mods, &proto.AddMod{
+				Id:          parts[0],
+				Short:       parts[1],
+				Title:       parts[2],
+				Description: parts[3],
+			})
+		}
+		tmp = strings.Split(d.Temperature, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			temps = append(temps, &proto.AddTemperature{
+				Id:    parts[0],
+				Title: parts[1],
+			})
+		}
+		tmp = strings.Split(d.Mounting, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			mouns = append(mouns, &proto.AddMoun{
+				Id:    parts[0],
+				Title: parts[1],
+			})
+		}
+		tmp = strings.Split(d.Graphite, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			graps = append(graps, &proto.AddGrap{
+				Short:       parts[0],
+				Title:       parts[1],
+				Description: parts[2],
+			})
+		}
+		tmp = strings.Split(d.Fillers, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			fils = append(fils, &proto.AddFiller{
+				Short:       parts[0],
+				Title:       parts[1],
+				Description: parts[2],
+			})
+		}
+
+		addit = append(addit, &proto.Additional{
+			Id:          d.Id,
+			Materials:   mats,
+			Mod:         mods,
+			Temperature: temps,
+			Mounting:    mouns,
+			Graphite:    graps,
+			Fillers:     fils,
+		})
+	}
+
 	return addit, nil
 }
 

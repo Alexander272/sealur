@@ -38,7 +38,7 @@ type TypeFl interface {
 }
 
 type Addit interface {
-	GetAll() ([]*proto.Additional, error)
+	GetAll() ([]models.Addit, error)
 	Create(*proto.CreateAddRequest) error
 	UpdateMat(*proto.UpdateAddMatRequest) error
 	UpdateMod(*proto.UpdateAddModRequest) error
@@ -57,7 +57,7 @@ type Size interface {
 }
 
 type SNP interface {
-	Get(req *proto.GetSNPRequest) ([]*proto.SNP, error)
+	Get(req *proto.GetSNPRequest) ([]models.SNP, error)
 	Create(snp *proto.CreateSNPRequest) (id string, err error)
 	Update(snp *proto.UpdateSNPRequest) error
 	Delete(snp *proto.DeleteSNPRequest) error

@@ -31,7 +31,7 @@ func (h *Handler) initSizeRoutes(api *gin.RouterGroup) {
 // @Param typeFlId query string true "flange type id"
 // @Param standId query string true "standarts id"
 // @Param typePr query string true "type"
-// @Success 200 {object} models.DataResponse{data=[]proto.Size}
+// @Success 200 {object} models.DataResponse{data=proto.SizeResponse}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -69,7 +69,7 @@ func (h *Handler) getSizes(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.DataResponse{Data: sizes.Sizes, Count: len(sizes.Sizes)})
+	c.JSON(http.StatusOK, models.DataResponse{Data: sizes, Count: len(sizes.Sizes)})
 }
 
 // @Summary Create Size
@@ -106,7 +106,6 @@ func (h *Handler) createSize(c *gin.Context) {
 		H:        dto.H,
 		S2:       dto.S2,
 		S3:       dto.S3,
-		Adn:      dto.ADn,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")

@@ -13,5 +13,4 @@ type Size struct {
 	S3       string  `db:"s3"`
 	TypePr   string  `db:"type_pr"`
 	TypeFlId string  `db:"type_fl_id"`
-	Adn      int32   `db:"adn"`
 }

@@ -17,18 +17,12 @@ func NewSNPRepo(db *sqlx.DB) *SNPRepo {
 	return &SNPRepo{db: db}
 }
 
-func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
+func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []models.SNP, err error) {
 	query := fmt.Sprintf(`SELECT id, type_fl_id, type_pr, filler, frame, in_ring, ou_ring, mounting, graphite 
 		FROM %s WHERE stand_id=$1 AND flange_id=$2 ORDER BY type_pr DESC`, SNPTable)
 
-	var data []models.SNP
-	if err = r.db.Select(&data, query, req.StandId, req.FlangeId); err != nil {
+	if err = r.db.Select(&snp, query, req.StandId, req.FlangeId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
-	}
-
-	for _, d := range data {
-		s := proto.SNP(d)
-		snp = append(snp, &s)
 	}
 
 	return snp, nil
