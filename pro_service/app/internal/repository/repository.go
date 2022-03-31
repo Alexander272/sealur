@@ -40,12 +40,12 @@ type TypeFl interface {
 type Addit interface {
 	GetAll() ([]models.Addit, error)
 	Create(*proto.CreateAddRequest) error
-	UpdateMat(*proto.UpdateAddMatRequest) error
-	UpdateMod(*proto.UpdateAddModRequest) error
-	UpdateTemp(*proto.UpdateAddTemRequest) error
-	UpdateMoun(*proto.UpdateAddMounRequest) error
-	UpdateGrap(*proto.UpdateAddGrapRequest) error
-	UpdateFillers(*proto.UpdateAddFillersRequest) error
+	UpdateMat(models.UpdateMat) error
+	UpdateMod(models.UpdateMod) error
+	UpdateTemp(models.UpdateTemp) error
+	UpdateMoun(models.UpdateMoun) error
+	UpdateGrap(models.UpdateGrap) error
+	UpdateFillers(models.UpdateFill) error
 }
 
 type Size interface {
@@ -58,12 +58,12 @@ type Size interface {
 
 type SNP interface {
 	Get(req *proto.GetSNPRequest) ([]models.SNP, error)
-	Create(snp *proto.CreateSNPRequest) (id string, err error)
-	Update(snp *proto.UpdateSNPRequest) error
+	Create(snp models.SnpDTO) (id string, err error)
+	Update(snp models.SnpDTO) error
 	Delete(snp *proto.DeleteSNPRequest) error
 
 	GetByCondition(cond string) ([]models.SNP, error)
-	UpdateAddit(snp *proto.UpdateSNPRequest) error
+	UpdateAddit(snp models.UpdateAdditDTO) error
 }
 
 type Repositories struct {

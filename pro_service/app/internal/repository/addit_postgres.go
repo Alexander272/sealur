@@ -37,7 +37,7 @@ func (r *AdditRepo) Create(add *proto.CreateAddRequest) error {
 	return nil
 }
 
-func (r *AdditRepo) UpdateMat(mat *proto.UpdateAddMatRequest) error {
+func (r *AdditRepo) UpdateMat(mat models.UpdateMat) error {
 	query := fmt.Sprintf("UPDATE %s SET materials=$1 WHERE id=$2", AdditionalTable)
 
 	id, err := strconv.Atoi(mat.Id)
@@ -52,7 +52,7 @@ func (r *AdditRepo) UpdateMat(mat *proto.UpdateAddMatRequest) error {
 	return nil
 }
 
-func (r *AdditRepo) UpdateMod(mod *proto.UpdateAddModRequest) error {
+func (r *AdditRepo) UpdateMod(mod models.UpdateMod) error {
 	query := fmt.Sprintf("UPDATE %s SET mod=$1 WHERE id=$2", AdditionalTable)
 
 	id, err := strconv.Atoi(mod.Id)
@@ -67,7 +67,7 @@ func (r *AdditRepo) UpdateMod(mod *proto.UpdateAddModRequest) error {
 	return nil
 }
 
-func (r *AdditRepo) UpdateTemp(temp *proto.UpdateAddTemRequest) error {
+func (r *AdditRepo) UpdateTemp(temp models.UpdateTemp) error {
 	query := fmt.Sprintf("UPDATE %s SET temperature=$1 WHERE id=$2", AdditionalTable)
 
 	id, err := strconv.Atoi(temp.Id)
@@ -82,7 +82,7 @@ func (r *AdditRepo) UpdateTemp(temp *proto.UpdateAddTemRequest) error {
 	return nil
 }
 
-func (r *AdditRepo) UpdateMoun(moun *proto.UpdateAddMounRequest) error {
+func (r *AdditRepo) UpdateMoun(moun models.UpdateMoun) error {
 	query := fmt.Sprintf("UPDATE %s SET mounting=$1 WHERE id=$2", AdditionalTable)
 
 	id, err := strconv.Atoi(moun.Id)
@@ -97,7 +97,7 @@ func (r *AdditRepo) UpdateMoun(moun *proto.UpdateAddMounRequest) error {
 	return nil
 }
 
-func (r *AdditRepo) UpdateGrap(grap *proto.UpdateAddGrapRequest) error {
+func (r *AdditRepo) UpdateGrap(grap models.UpdateGrap) error {
 	query := fmt.Sprintf("UPDATE %s SET graphite=$1 WHERE id=$2", AdditionalTable)
 
 	id, err := strconv.Atoi(grap.Id)
@@ -112,7 +112,7 @@ func (r *AdditRepo) UpdateGrap(grap *proto.UpdateAddGrapRequest) error {
 	return nil
 }
 
-func (r *AdditRepo) UpdateFillers(fillers *proto.UpdateAddFillersRequest) error {
+func (r *AdditRepo) UpdateFillers(fillers models.UpdateFill) error {
 	query := fmt.Sprintf("UPDATE %s SET fillers=$1 WHERE id=$2", AdditionalTable)
 
 	id, err := strconv.Atoi(fillers.Id)

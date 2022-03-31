@@ -28,7 +28,7 @@ func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []models.SNP, err error) {
 	return snp, nil
 }
 
-func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
+func (r *SNPRepo) Create(snp models.SnpDTO) (id string, err error) {
 	query := fmt.Sprintf(`INSERT INTO %s (stand_id, flange_id, type_fl_id, type_pr, filler, frame, in_ring, ou_ring, mounting, graphite) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`, SNPTable)
 
@@ -56,7 +56,7 @@ func (r *SNPRepo) Create(snp *proto.CreateSNPRequest) (id string, err error) {
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *SNPRepo) Update(snp *proto.UpdateSNPRequest) error {
+func (r *SNPRepo) Update(snp models.SnpDTO) error {
 	query := fmt.Sprintf(`UPDATE %s SET stand_id=$1, type_fl_id=$2, type_pr=$3, filler=$4, frame=$5, in_ring=$6, ou_ring=$7,
 		mounting=$8, graphite=$9, flange_id=$10 WHERE id=$11`, SNPTable)
 
@@ -101,7 +101,7 @@ func (r *SNPRepo) GetByCondition(cond string) (snp []models.SNP, err error) {
 	return snp, nil
 }
 
-func (r *SNPRepo) UpdateAddit(snp *proto.UpdateSNPRequest) error {
+func (r *SNPRepo) UpdateAddit(snp models.UpdateAdditDTO) error {
 	query := fmt.Sprintf(`UPDATE %s SET filler=$1, frame=$2, in_ring=$3, ou_ring=$4, mounting=$5, graphite=$6 WHERE id=$7`, SNPTable)
 
 	id, err := strconv.Atoi(snp.Id)

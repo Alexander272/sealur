@@ -45,6 +45,7 @@ func (r *FlangeRepo) Create(fl *proto.CreateFlangeRequest) (id string, err error
 
 	createTable := fmt.Sprintf(`CREATE TABLE size_%s (
 		"id" serial not null unique,
+		"count" int,
 		"dn" int,
 		"pn" text,
 		"type_fl_id" int references type_fl (id) on delete cascade not null,
@@ -93,11 +94,6 @@ func (r *FlangeRepo) Delete(fl *proto.DeleteFlangeRequest) error {
 
 	if err = row.Scan(&tableName); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
-	}
-
-	// TODO для дебага
-	if tableName == "" {
-		return fmt.Errorf("table name is empty")
 	}
 
 	dropTable := fmt.Sprintf("DROP TABLE size_%s", tableName)

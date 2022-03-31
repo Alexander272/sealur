@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 )
@@ -43,8 +44,8 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 			parts := strings.Split(v, "@")
 			mods = append(mods, &proto.AddMod{
 				Id:          parts[0],
-				Short:       parts[1],
-				Title:       parts[2],
+				Short:       parts[2],
+				Title:       parts[1],
 				Description: parts[3],
 			})
 		}
@@ -106,7 +107,19 @@ func (s *AdditService) Create(addit *proto.CreateAddRequest) (*proto.SuccessResp
 }
 
 func (s *AdditService) UpdateMat(addit *proto.UpdateAddMatRequest) (*proto.SuccessResponse, error) {
-	err := s.repo.UpdateMat(addit)
+	var mat string
+	for i, am := range addit.Materials {
+		if i > 0 {
+			mat += ";"
+		}
+		mat += fmt.Sprintf("%s@%s", am.Short, am.Title)
+	}
+
+	dto := models.UpdateMat{
+		Id:        addit.Id,
+		Materials: mat,
+	}
+	err := s.repo.UpdateMat(dto)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update materials. error: %w", err)
 	}
@@ -114,7 +127,19 @@ func (s *AdditService) UpdateMat(addit *proto.UpdateAddMatRequest) (*proto.Succe
 }
 
 func (s *AdditService) UpdateMod(addit *proto.UpdateAddModRequest) (*proto.SuccessResponse, error) {
-	err := s.repo.UpdateMod(addit)
+	var mod string
+	for i, am := range addit.Mod {
+		if i > 0 {
+			mod += ";"
+		}
+		mod += fmt.Sprintf("%s@%s@%s@%s", am.Id, am.Title, am.Short, am.Description)
+	}
+
+	dto := models.UpdateMod{
+		Id:  addit.Id,
+		Mod: mod,
+	}
+	err := s.repo.UpdateMod(dto)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update mod. error: %w", err)
 	}
@@ -122,7 +147,19 @@ func (s *AdditService) UpdateMod(addit *proto.UpdateAddModRequest) (*proto.Succe
 }
 
 func (s *AdditService) UpdateTemp(addit *proto.UpdateAddTemRequest) (*proto.SuccessResponse, error) {
-	err := s.repo.UpdateTemp(addit)
+	var temp string
+	for i, at := range addit.Temperature {
+		if i > 0 {
+			temp += ";"
+		}
+		temp += fmt.Sprintf("%s@%s", at.Id, at.Title)
+	}
+
+	dto := models.UpdateTemp{
+		Id:          addit.Id,
+		Temperature: temp,
+	}
+	err := s.repo.UpdateTemp(dto)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update temperature. error: %w", err)
 	}
@@ -130,7 +167,19 @@ func (s *AdditService) UpdateTemp(addit *proto.UpdateAddTemRequest) (*proto.Succ
 }
 
 func (s *AdditService) UpdateMoun(addit *proto.UpdateAddMounRequest) (*proto.SuccessResponse, error) {
-	err := s.repo.UpdateMoun(addit)
+	var moun string
+	for i, am := range addit.Mounting {
+		if i > 0 {
+			moun += ";"
+		}
+		moun += fmt.Sprintf("%s@%s", am.Id, am.Title)
+	}
+
+	dto := models.UpdateMoun{
+		Id:       addit.Id,
+		Mounting: moun,
+	}
+	err := s.repo.UpdateMoun(dto)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update mounting. error: %w", err)
 	}
@@ -138,14 +187,38 @@ func (s *AdditService) UpdateMoun(addit *proto.UpdateAddMounRequest) (*proto.Suc
 }
 
 func (s *AdditService) UpdateGrap(addit *proto.UpdateAddGrapRequest) (*proto.SuccessResponse, error) {
-	if err := s.repo.UpdateGrap(addit); err != nil {
+	var grap string
+	for i, ag := range addit.Graphite {
+		if i > 0 {
+			grap += ";"
+		}
+		grap += fmt.Sprintf("%s@%s@%s", ag.Short, ag.Title, ag.Description)
+	}
+
+	dto := models.UpdateGrap{
+		Id:       addit.Id,
+		Graphite: grap,
+	}
+	if err := s.repo.UpdateGrap(dto); err != nil {
 		return nil, fmt.Errorf("failed to update graphite. error: %w", err)
 	}
 	return &proto.SuccessResponse{Success: true}, nil
 }
 
 func (s *AdditService) UpdateFillers(addit *proto.UpdateAddFillersRequest) (*proto.SuccessResponse, error) {
-	if err := s.repo.UpdateFillers(addit); err != nil {
+	var fil string
+	for i, af := range addit.Fillers {
+		if i > 0 {
+			fil += ";"
+		}
+		fil += fmt.Sprintf("%s@%s@%s", af.Short, af.Title, af.Description)
+	}
+
+	dto := models.UpdateFill{
+		Id:      addit.Id,
+		Fillers: fil,
+	}
+	if err := s.repo.UpdateFillers(dto); err != nil {
 		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
 	}
 	return &proto.SuccessResponse{Success: true}, nil

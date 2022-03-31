@@ -165,37 +165,37 @@ message CreateAddRequest {
 
 message UpdateAddMatRequest {
     string id = 1;
-    string materials = 2;
+    repeated AddMaterials materials = 2;
     string typeCh = 3;
     string change = 4;
 }
 message UpdateAddModRequest {
     string id = 1;
-    string mod = 2;
+    repeated AddMod mod = 2;
     string typeCh = 3;
     string change = 4;
 }
 message UpdateAddTemRequest {
     string id = 1;
-    string temperature = 2;
+    repeated AddTemperature temperature = 2;
     string typeCh = 3;
     string change = 4;
 }
 message UpdateAddMounRequest {
     string id = 1;
-    string mounting = 2;
+    repeated AddMoun mounting = 2;
     string typeCh = 3;
     string change = 4;
 }
 message UpdateAddGrapRequest {
     string id = 1;
-    string graphite = 2;
+    repeated AddGrap graphite = 2;
     string typeCh = 3;
     string change = 4;
 }
 message UpdateAddFillersRequest {
     string id = 1;
-    string fillers = 2;
+    repeated AddFiller fillers = 2;
     string typeCh = 3;
     string change = 4;
 }
@@ -239,6 +239,7 @@ message CreateSizeRequest {
     string h = 11;
     string s2 = 12;
     string s3 = 13;
+    int32 number = 14;
 }
 
 message UpdateSizeRequest {
@@ -316,12 +317,12 @@ message CreateSNPRequest {
     string flangeId = 2;
     string typeFlId = 3;
     string typePr = 4;
-    string fillers = 5;
-    string frame = 6;
-    string ir = 7;
-    string or = 8;
-    string mounting = 9;
-    string graphite = 10;
+    repeated Filler fillers = 5;
+    Materials frame = 6;
+    Materials ir = 7;
+    Materials or = 8;
+    repeated string mounting = 9;
+    repeated string graphite = 10;
 }
 
 message UpdateSNPRequest {
@@ -330,12 +331,12 @@ message UpdateSNPRequest {
     string flangeId = 3;
     string typeFlId = 4;
     string typePr = 5;
-    string fillers = 6;
-    string frame = 7;
-    string ir = 8;
-    string or = 9;
-    string mounting = 10;
-    string graphite = 11;
+    repeated Filler fillers = 6;
+    Materials frame = 7;
+    Materials ir = 8;
+    Materials or = 9;
+    repeated string mounting = 10;
+    repeated string graphite = 11;
 }
 
 message DeleteSNPRequest {

@@ -19,12 +19,7 @@ func NewSizesRepo(db *sqlx.DB) *SizesRepo {
 
 func (r *SizesRepo) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, err error) {
 	query := fmt.Sprintf(`SELECT id, dn, pn, d4, d3, d2, d1, h, s2, s3, type_pr, type_fl_id FROM size_%s WHERE LOWER(type_pr) LIKE LOWER('%%%s%%') 
-		AND (stand_id=$1 OR stand_id=0) AND type_fl_id=$2 ORDER BY dn, d4, d3, d2, d1`, req.Flange, req.TypePr)
-
-	// if req.Flange == "165" {
-	// 	query = fmt.Sprintf(`SELECT id, dn, pn, d4, d3, d2, d1, h, s2, s3, type_pr, type_fl_id, adn FROM size_%s WHERE LOWER(type_pr) LIKE LOWER('%%%s%%')
-	// 	AND (stand_id=$1 OR stand_id=0) AND type_fl_id=$2 ORDER BY adn, d3`, req.Flange, req.TypePr)
-	// }
+		AND (stand_id=$1 OR stand_id=0) AND type_fl_id=$2 ORDER BY count`, req.Flange, req.TypePr)
 
 	var data []models.Size
 	if err = r.db.Select(&data, query, req.StandId, req.TypeFlId); err != nil {
@@ -40,16 +35,27 @@ func (r *SizesRepo) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, err er
 }
 
 func (r *SizesRepo) Create(size *proto.CreateSizeRequest) (id string, err error) {
-	query := fmt.Sprintf(`INSERT INTO size_%s (dn, pn, type_fl_id, type_pr, stand_id, d4, d3, d2, d1, h, s2, s3) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`, size.Flange)
+	query := fmt.Sprintf(`INSERT INTO size_%s (count, dn, pn, type_fl_id, type_pr, stand_id, d4, d3, d2, d1, h, s2, s3) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, size.Flange)
 
 	standId, err := strconv.Atoi(size.StandId)
 	if err != nil {
 		return id, fmt.Errorf("failed to convert string to int. error: %w", err)
 	}
 
-	row := r.db.QueryRow(query, size.Dn, size.Pn, size.TypeFlId, size.TypePr, standId, size.D4, size.D3, size.D2, size.D1, size.H,
-		size.S2, size.S3)
+	if size.Number == 0 {
+		var max int32
+		query := fmt.Sprintf(`SELECT MAX(count) FROM size_%s WHERE LOWER(type_pr) LIKE LOWER('%%%s%%') 
+		AND (stand_id=$1 OR stand_id=0) AND type_fl_id=$2`, size.Flange, size.TypePr)
+
+		if err := r.db.Get(&max, query, size.StandId, size.TypeFlId); err != nil {
+			return "", fmt.Errorf("failed to get max count query. error: %w", err)
+		}
+		size.Number = max + 1
+	}
+
+	row := r.db.QueryRow(query, size.Number, size.Dn, size.Pn, size.TypeFlId, size.TypePr, standId, size.D4, size.D3, size.D2, size.D1,
+		size.H, size.S2, size.S3)
 
 	var idInt int
 	if err = row.Scan(&idInt); err != nil {

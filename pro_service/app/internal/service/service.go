@@ -60,7 +60,7 @@ type SNP interface {
 	Delete(*proto.DeleteSNPRequest) error
 
 	AddMat(id string) error
-	DeleteMat(id, materials string) error
+	DeleteMat(id string, materials []*proto.AddMaterials) error
 	AddMoun(id string) error
 	DeleteMoun(id string) error
 	AddGrap(id string) error

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 )
@@ -78,7 +79,48 @@ func (s *SNPService) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error)
 	return snp, nil
 }
 
-func (s *SNPService) Create(snp *proto.CreateSNPRequest) (*proto.IdResponse, error) {
+func (s *SNPService) Create(dto *proto.CreateSNPRequest) (*proto.IdResponse, error) {
+	var fillers string
+	for i, f := range dto.Fillers {
+		if i > 0 {
+			fillers += ";"
+		}
+		temps := ""
+		for j, t := range f.Temps {
+			if j > 0 {
+				temps += "@"
+			}
+			temps += fmt.Sprintf("%s>%s", t.Id, strings.Join(t.Mods, ","))
+		}
+		fillers += fmt.Sprintf("%s&%s", f.Id, temps)
+	}
+
+	frame := fmt.Sprintf("%s&%s", strings.Join(dto.Frame.Values, ";"), dto.Frame.Default)
+	if len(dto.Frame.Values) == 0 {
+		frame = ""
+	}
+	ir := fmt.Sprintf("%s&%s", strings.Join(dto.Ir.Values, ";"), dto.Ir.Default)
+	if len(dto.Ir.Values) == 0 {
+		ir = ""
+	}
+	or := fmt.Sprintf("%s&%s", strings.Join(dto.Or.Values, ";"), dto.Or.Default)
+	if len(dto.Or.Values) == 0 {
+		or = ""
+	}
+
+	snp := models.SnpDTO{
+		StandId:  dto.StandId,
+		FlangeId: dto.FlangeId,
+		TypeFlId: dto.TypeFlId,
+		TypePr:   dto.TypePr,
+		Fillers:  fillers,
+		Frame:    frame,
+		Ir:       ir,
+		Or:       or,
+		Mounting: strings.Join(dto.Mounting, ";"),
+		Graphite: strings.Join(dto.Graphite, ";"),
+	}
+
 	id, err := s.repo.Create(snp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create snp. error: %w", err)
@@ -86,7 +128,49 @@ func (s *SNPService) Create(snp *proto.CreateSNPRequest) (*proto.IdResponse, err
 	return &proto.IdResponse{Id: id}, nil
 }
 
-func (s *SNPService) Update(snp *proto.UpdateSNPRequest) error {
+func (s *SNPService) Update(dto *proto.UpdateSNPRequest) error {
+	var fillers string
+	for i, f := range dto.Fillers {
+		if i > 0 {
+			fillers += ";"
+		}
+		temps := ""
+		for j, t := range f.Temps {
+			if j > 0 {
+				temps += "@"
+			}
+			temps += fmt.Sprintf("%s>%s", t.Id, strings.Join(t.Mods, ","))
+		}
+		fillers += fmt.Sprintf("%s&%s", f.Id, temps)
+	}
+
+	frame := fmt.Sprintf("%s&%s", strings.Join(dto.Frame.Values, ";"), dto.Frame.Default)
+	if len(dto.Frame.Values) == 0 {
+		frame = ""
+	}
+	ir := fmt.Sprintf("%s&%s", strings.Join(dto.Ir.Values, ";"), dto.Ir.Default)
+	if len(dto.Ir.Values) == 0 {
+		ir = ""
+	}
+	or := fmt.Sprintf("%s&%s", strings.Join(dto.Or.Values, ";"), dto.Or.Default)
+	if len(dto.Or.Values) == 0 {
+		or = ""
+	}
+
+	snp := models.SnpDTO{
+		Id:       dto.Id,
+		StandId:  dto.StandId,
+		FlangeId: dto.FlangeId,
+		TypeFlId: dto.TypeFlId,
+		TypePr:   dto.TypePr,
+		Fillers:  fillers,
+		Frame:    frame,
+		Ir:       ir,
+		Or:       or,
+		Mounting: strings.Join(dto.Mounting, ";"),
+		Graphite: strings.Join(dto.Graphite, ";"),
+	}
+
 	if err := s.repo.Update(snp); err != nil {
 		return fmt.Errorf("failed to update snp. error: %w", err)
 	}
@@ -134,7 +218,7 @@ func (s *SNPService) AddMat(id string) error {
 			frame = fmt.Sprintf("%s;%s&%s", parts[0], id, parts[1])
 		}
 
-		upSnp := proto.UpdateSNPRequest{
+		upSnp := models.UpdateAdditDTO{
 			Id:       cur.Id,
 			Fillers:  cur.Fillers,
 			Mounting: cur.Mounting,
@@ -144,14 +228,14 @@ func (s *SNPService) AddMat(id string) error {
 			Or:       or,
 		}
 
-		go s.snpUpdate(&upSnp, &wg, limit)
+		go s.snpUpdate(upSnp, &wg, limit)
 	}
 
 	wg.Wait()
 	return nil
 }
 
-func (s *SNPService) DeleteMat(id, materials string) error {
+func (s *SNPService) DeleteMat(id string, materials []*proto.AddMaterials) error {
 	var wg sync.WaitGroup
 	snp, err := s.repo.GetByCondition(fmt.Sprintf(`frame like '%%%s%%' OR in_ring like '%%%s%%' OR ou_ring like '%%%s%%'`, id, id, id))
 	if err != nil {
@@ -172,8 +256,7 @@ func (s *SNPService) DeleteMat(id, materials string) error {
 			mats := strings.Split(parts[0], ";")
 			mats = filter(mats, id)
 			if parts[1] == id {
-				m := strings.Split(materials, ";")
-				parts[1] = strings.Split(m[0], "@")[0]
+				parts[1] = materials[0].Short
 			}
 			if parts[0] == "*" {
 				ir = fmt.Sprintf("%s&%s", parts[0], parts[1])
@@ -189,8 +272,7 @@ func (s *SNPService) DeleteMat(id, materials string) error {
 			mats := strings.Split(parts[0], ";")
 			mats = filter(mats, id)
 			if parts[1] == id {
-				m := strings.Split(materials, ";")
-				parts[1] = strings.Split(m[0], "@")[0]
+				parts[1] = materials[0].Short
 			}
 			if parts[0] == "*" {
 				or = fmt.Sprintf("%s&%s", parts[0], parts[1])
@@ -206,8 +288,7 @@ func (s *SNPService) DeleteMat(id, materials string) error {
 			mats := strings.Split(parts[0], ";")
 			mats = filter(mats, id)
 			if parts[1] == id {
-				m := strings.Split(materials, ";")
-				parts[1] = strings.Split(m[0], "@")[0]
+				parts[1] = materials[0].Short
 			}
 			if parts[0] == "*" {
 				frame = fmt.Sprintf("%s&%s", parts[0], parts[1])
@@ -216,7 +297,7 @@ func (s *SNPService) DeleteMat(id, materials string) error {
 			}
 		}
 
-		upSnp := proto.UpdateSNPRequest{
+		upSnp := models.UpdateAdditDTO{
 			Id:       cur.Id,
 			Fillers:  cur.Fillers,
 			Mounting: cur.Mounting,
@@ -226,7 +307,7 @@ func (s *SNPService) DeleteMat(id, materials string) error {
 			Or:       or,
 		}
 
-		go s.snpUpdate(&upSnp, &wg, limit)
+		go s.snpUpdate(upSnp, &wg, limit)
 	}
 
 	wg.Wait()
@@ -253,7 +334,7 @@ func (s *SNPService) AddMoun(id string) error {
 			mounting = fmt.Sprintf("%s;%s", cur.Mounting, id)
 		}
 
-		upSnp := proto.UpdateSNPRequest{
+		upSnp := models.UpdateAdditDTO{
 			Id:       cur.Id,
 			Fillers:  cur.Fillers,
 			Mounting: mounting,
@@ -263,7 +344,7 @@ func (s *SNPService) AddMoun(id string) error {
 			Or:       cur.Or,
 		}
 
-		go s.snpUpdate(&upSnp, &wg, limit)
+		go s.snpUpdate(upSnp, &wg, limit)
 	}
 
 	wg.Wait()
@@ -291,7 +372,7 @@ func (s *SNPService) DeleteMoun(id string) error {
 			mounting = strings.Join(mouns, ";")
 		}
 
-		upSnp := proto.UpdateSNPRequest{
+		upSnp := models.UpdateAdditDTO{
 			Id:       cur.Id,
 			Fillers:  cur.Fillers,
 			Mounting: mounting,
@@ -301,7 +382,7 @@ func (s *SNPService) DeleteMoun(id string) error {
 			Or:       cur.Or,
 		}
 
-		go s.snpUpdate(&upSnp, &wg, limit)
+		go s.snpUpdate(upSnp, &wg, limit)
 	}
 
 	wg.Wait()
@@ -328,7 +409,7 @@ func (s *SNPService) AddGrap(id string) error {
 			graphite = fmt.Sprintf("%s;%s", cur.Graphite, id)
 		}
 
-		upSnp := proto.UpdateSNPRequest{
+		upSnp := models.UpdateAdditDTO{
 			Id:       cur.Id,
 			Fillers:  cur.Fillers,
 			Mounting: cur.Mounting,
@@ -338,7 +419,7 @@ func (s *SNPService) AddGrap(id string) error {
 			Or:       cur.Or,
 		}
 
-		go s.snpUpdate(&upSnp, &wg, limit)
+		go s.snpUpdate(upSnp, &wg, limit)
 	}
 
 	wg.Wait()
@@ -366,7 +447,7 @@ func (s *SNPService) DeleteGrap(id string) error {
 			graphite = strings.Join(graps, ";")
 		}
 
-		upSnp := proto.UpdateSNPRequest{
+		upSnp := models.UpdateAdditDTO{
 			Id:       cur.Id,
 			Fillers:  cur.Fillers,
 			Mounting: cur.Mounting,
@@ -376,7 +457,7 @@ func (s *SNPService) DeleteGrap(id string) error {
 			Or:       cur.Or,
 		}
 
-		go s.snpUpdate(&upSnp, &wg, limit)
+		go s.snpUpdate(upSnp, &wg, limit)
 	}
 
 	wg.Wait()
@@ -405,7 +486,7 @@ func (s *SNPService) DeleteFiller(id string) error {
 		}
 		fillers = strings.Join(newFil, ";")
 
-		upSnp := proto.UpdateSNPRequest{
+		upSnp := models.UpdateAdditDTO{
 			Id:       cur.Id,
 			Fillers:  fillers,
 			Mounting: cur.Mounting,
@@ -415,7 +496,7 @@ func (s *SNPService) DeleteFiller(id string) error {
 			Or:       cur.Or,
 		}
 
-		go s.snpUpdate(&upSnp, &wg, limit)
+		go s.snpUpdate(upSnp, &wg, limit)
 	}
 
 	wg.Wait()
@@ -453,7 +534,7 @@ func (s *SNPService) DeleteTemp(id string) error {
 			}
 		}
 
-		upSnp := proto.UpdateSNPRequest{
+		upSnp := models.UpdateAdditDTO{
 			Id:       cur.Id,
 			Fillers:  strings.Join(fillers, ";"),
 			Mounting: cur.Mounting,
@@ -463,7 +544,7 @@ func (s *SNPService) DeleteTemp(id string) error {
 			Or:       cur.Or,
 		}
 
-		go s.snpUpdate(&upSnp, &wg, limit)
+		go s.snpUpdate(upSnp, &wg, limit)
 	}
 
 	wg.Wait()
@@ -507,7 +588,7 @@ func (s *SNPService) DeleteMod(id string) error {
 			fillers = append(fillers, fmt.Sprintf("%s&%s", tmp, strings.Join(newFil, "@")))
 		}
 
-		upSnp := proto.UpdateSNPRequest{
+		upSnp := models.UpdateAdditDTO{
 			Id:       cur.Id,
 			Fillers:  strings.Join(fillers, ";"),
 			Mounting: cur.Mounting,
@@ -517,14 +598,14 @@ func (s *SNPService) DeleteMod(id string) error {
 			Or:       cur.Or,
 		}
 
-		go s.snpUpdate(&upSnp, &wg, limit)
+		go s.snpUpdate(upSnp, &wg, limit)
 	}
 
 	wg.Wait()
 	return nil
 }
 
-func (s *SNPService) snpUpdate(snp *proto.UpdateSNPRequest, wg *sync.WaitGroup, limit chan struct{}) error {
+func (s *SNPService) snpUpdate(snp models.UpdateAdditDTO, wg *sync.WaitGroup, limit chan struct{}) error {
 	defer wg.Done()
 	if err := s.repo.UpdateAddit(snp); err != nil {
 		return fmt.Errorf("failed to update snp addit. error: %w", err)
