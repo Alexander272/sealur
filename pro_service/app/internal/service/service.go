@@ -43,6 +43,9 @@ type Addit interface {
 	UpdateMoun(*proto.UpdateAddMounRequest) (*proto.SuccessResponse, error)
 	UpdateGrap(*proto.UpdateAddGrapRequest) (*proto.SuccessResponse, error)
 	UpdateFillers(*proto.UpdateAddFillersRequest) (*proto.SuccessResponse, error)
+	UpdateCoating(*proto.UpdateAddCoatingRequest) (*proto.SuccessResponse, error)
+	UpdateConstruction(*proto.UpdateAddConstructionRequest) (*proto.SuccessResponse, error)
+	UpdateObturator(*proto.UpdateAddObturatorRequest) (*proto.SuccessResponse, error)
 }
 
 type Size interface {

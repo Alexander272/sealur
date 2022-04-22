@@ -137,3 +137,51 @@ func (h *Handler) UpdateFillers(ctx context.Context, dto *proto.UpdateAddFillers
 
 	return success, nil
 }
+
+func (h *Handler) UpdateCoating(ctx context.Context, dto *proto.UpdateAddCoatingRequest) (*proto.SuccessResponse, error) {
+	success, err := h.service.UpdateCoating(dto)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO дописать удаление
+	// if dto.TypeCh == "delete" {
+	// if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
+	// 	return nil, err
+	// }
+	// }
+
+	return success, nil
+}
+
+func (h *Handler) UpdateConstruction(ctx context.Context, dto *proto.UpdateAddConstructionRequest) (*proto.SuccessResponse, error) {
+	success, err := h.service.UpdateConstruction(dto)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO дописать удаление
+	// if dto.TypeCh == "delete" {
+	// if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
+	// 	return nil, err
+	// }
+	// }
+
+	return success, nil
+}
+
+func (h *Handler) UpdateObturator(ctx context.Context, dto *proto.UpdateAddObturatorRequest) (*proto.SuccessResponse, error) {
+	success, err := h.service.UpdateObturator(dto)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO дописать удаление
+	// if dto.TypeCh == "delete" {
+	// if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
+	// 	return nil, err
+	// }
+	// }
+
+	return success, nil
+}

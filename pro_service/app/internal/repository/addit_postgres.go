@@ -18,7 +18,8 @@ func NewAdditRepo(db *sqlx.DB) *AdditRepo {
 }
 
 func (r *AdditRepo) GetAll() (addit []models.Addit, err error) {
-	query := fmt.Sprintf("SELECT id, materials, mod, temperature, mounting, graphite, fillers FROM %s LIMIT 1", AdditionalTable)
+	query := fmt.Sprintf(`SELECT id, materials, mod, temperature, mounting, graphite, fillers, coating, 
+		construction, obturator, basis, sealant FROM %s LIMIT 1`, AdditionalTable)
 
 	if err = r.db.Select(&addit, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -27,10 +28,11 @@ func (r *AdditRepo) GetAll() (addit []models.Addit, err error) {
 }
 
 func (r *AdditRepo) Create(add *proto.CreateAddRequest) error {
-	query := fmt.Sprintf(`INSERT INTO %s (materials, mod, temperature, mounting, graphite, fillers)
-		VALUES ($1, $2, $3, $4, $5, $6)`, AdditionalTable)
+	query := fmt.Sprintf(`INSERT INTO %s (materials, mod, temperature, mounting, graphite, fillers, coating, construction, obturator, basis, sealant)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, AdditionalTable)
 
-	_, err := r.db.Exec(query, add.Materials, add.Mod, add.Temperature, add.Mounting, add.Graphite, add.Fillers)
+	_, err := r.db.Exec(query, add.Materials, add.Mod, add.Temperature, add.Mounting, add.Graphite, add.Fillers, add.Coating, add.Construction,
+		add.Obturator, add.Basis, add.Sealant)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -121,6 +123,51 @@ func (r *AdditRepo) UpdateFillers(fillers models.UpdateFill) error {
 	}
 
 	_, err = r.db.Exec(query, fillers.Fillers, id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *AdditRepo) UpdateCoating(coating models.UpdateCoating) error {
+	query := fmt.Sprintf("UPDATE %s SET coating=$1 WHERE id=$2", AdditionalTable)
+
+	id, err := strconv.Atoi(coating.Id)
+	if err != nil {
+		return fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+
+	_, err = r.db.Exec(query, coating.Coating, id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *AdditRepo) UpdateConstruction(constr models.UpdateConstr) error {
+	query := fmt.Sprintf("UPDATE %s SET construction=$1 WHERE id=$2", AdditionalTable)
+
+	id, err := strconv.Atoi(constr.Id)
+	if err != nil {
+		return fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+
+	_, err = r.db.Exec(query, constr.Construction, id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *AdditRepo) UpdateObturator(obturator models.UpdateObturator) error {
+	query := fmt.Sprintf("UPDATE %s SET obturator=$1 WHERE id=$2", AdditionalTable)
+
+	id, err := strconv.Atoi(obturator.Id)
+	if err != nil {
+		return fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+
+	_, err = r.db.Exec(query, obturator.Obturator, id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

@@ -154,6 +154,26 @@ message AddFiller {
     string description = 3;
 }
 
+message AddCoating {
+    string id = 1;
+    string short = 2;
+    string title = 3;
+    string description = 4;
+}
+
+message AddConstruction {
+    string short = 1;
+    string title = 2;
+    string description = 3;
+    string forDescr = 4;
+}
+
+message AddObturator {
+    string short = 1;
+    string title = 2;
+    string description = 3;
+}
+
 message CreateAddRequest {
     string materials = 1;
     string mod = 2;
@@ -161,6 +181,11 @@ message CreateAddRequest {
     string mounting = 4;
     string graphite = 5;
     string fillers = 6;
+    string coating = 7;
+    string construction = 8;
+    string obturator = 9;
+    string basis = 10;
+    string sealant = 11;
 }
 
 message UpdateAddMatRequest {
@@ -199,6 +224,24 @@ message UpdateAddFillersRequest {
     string typeCh = 3;
     string change = 4;
 }
+message UpdateAddCoatingRequest {
+    string id = 1;
+    repeated AddCoating coating = 2;
+    string typeCh = 3;
+    string change = 4;
+}
+message UpdateAddConstructionRequest {
+    string id = 1;
+    repeated AddConstruction constr = 2;
+    string typeCh = 3;
+    string change = 4;
+}
+message UpdateAddObturatorRequest {
+    string id = 1;
+    repeated AddObturator obturator = 2;
+    string typeCh = 3;
+    string change = 4;
+}
 
 message Additional {
     string id = 1;
@@ -208,6 +251,9 @@ message Additional {
     repeated AddMoun mounting = 5;
     repeated AddGrap graphite = 6;
     repeated AddFiller fillers = 7;
+    repeated AddCoating coating = 8;
+    repeated AddConstruction construction = 9;
+    repeated AddObturator obturator = 10;
 }
 message AdditionalResponse {
     repeated Additional additionals = 1;
@@ -409,6 +455,9 @@ service ProService {
     rpc UpdateMoun (UpdateAddMounRequest) returns (SuccessResponse);
     rpc UpdateGrap (UpdateAddGrapRequest) returns (SuccessResponse);
     rpc UpdateFillers (UpdateAddFillersRequest) returns (SuccessResponse);
+    rpc UpdateCoating (UpdateAddCoatingRequest) returns (SuccessResponse);
+    rpc UpdateConstruction (UpdateAddConstructionRequest) returns (SuccessResponse);
+    rpc UpdateObturator (UpdateAddObturatorRequest) returns (SuccessResponse);
 
     //Size Service ----------------------------------------------------------------
     rpc GetSizes (GetSizesRequest) returns (SizeResponse);

@@ -30,6 +30,9 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 		var mouns []*proto.AddMoun
 		var graps []*proto.AddGrap
 		var fils []*proto.AddFiller
+		var coat []*proto.AddCoating
+		var constr []*proto.AddConstruction
+		var obt []*proto.AddObturator
 
 		tmp := strings.Split(d.Materials, ";")
 		for _, v := range tmp {
@@ -83,15 +86,47 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 				Description: parts[2],
 			})
 		}
+		tmp = strings.Split(d.Coating, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			coat = append(coat, &proto.AddCoating{
+				Id:          parts[0],
+				Short:       parts[1],
+				Title:       parts[2],
+				Description: parts[3],
+			})
+		}
+		tmp = strings.Split(d.Construction, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			constr = append(constr, &proto.AddConstruction{
+				Short:       parts[0],
+				Title:       parts[1],
+				Description: parts[2],
+				ForDescr:    parts[3],
+			})
+		}
+		tmp = strings.Split(d.Obturator, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			obt = append(obt, &proto.AddObturator{
+				Short:       parts[0],
+				Title:       parts[1],
+				Description: parts[2],
+			})
+		}
 
 		addit = append(addit, &proto.Additional{
-			Id:          d.Id,
-			Materials:   mats,
-			Mod:         mods,
-			Temperature: temps,
-			Mounting:    mouns,
-			Graphite:    graps,
-			Fillers:     fils,
+			Id:           d.Id,
+			Materials:    mats,
+			Mod:          mods,
+			Temperature:  temps,
+			Mounting:     mouns,
+			Graphite:     graps,
+			Fillers:      fils,
+			Coating:      coat,
+			Construction: constr,
+			Obturator:    obt,
 		})
 	}
 
@@ -219,6 +254,63 @@ func (s *AdditService) UpdateFillers(addit *proto.UpdateAddFillersRequest) (*pro
 		Fillers: fil,
 	}
 	if err := s.repo.UpdateFillers(dto); err != nil {
+		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
+	}
+	return &proto.SuccessResponse{Success: true}, nil
+}
+
+func (s *AdditService) UpdateCoating(addit *proto.UpdateAddCoatingRequest) (*proto.SuccessResponse, error) {
+	var coat string
+	for i, c := range addit.Coating {
+		if i > 0 {
+			coat += ";"
+		}
+		coat += fmt.Sprintf("%s@%s@%s@%s", c.Id, c.Short, c.Title, c.Description)
+	}
+
+	dto := models.UpdateCoating{
+		Id:      addit.Id,
+		Coating: coat,
+	}
+	if err := s.repo.UpdateCoating(dto); err != nil {
+		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
+	}
+	return &proto.SuccessResponse{Success: true}, nil
+}
+
+func (s *AdditService) UpdateConstruction(addit *proto.UpdateAddConstructionRequest) (*proto.SuccessResponse, error) {
+	var constr string
+	for i, c := range addit.Constr {
+		if i > 0 {
+			constr += ";"
+		}
+		constr += fmt.Sprintf("%s@%s@%s@%s", c.Short, c.Title, c.Description, c.ForDescr)
+	}
+
+	dto := models.UpdateConstr{
+		Id:           addit.Id,
+		Construction: constr,
+	}
+	if err := s.repo.UpdateConstruction(dto); err != nil {
+		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
+	}
+	return &proto.SuccessResponse{Success: true}, nil
+}
+
+func (s *AdditService) UpdateObturator(addit *proto.UpdateAddObturatorRequest) (*proto.SuccessResponse, error) {
+	var obt string
+	for i, o := range addit.Obturator {
+		if i > 0 {
+			obt += ";"
+		}
+		obt += fmt.Sprintf("%s@%s@%s", o.Short, o.Title, o.Description)
+	}
+
+	dto := models.UpdateObturator{
+		Id:        addit.Id,
+		Obturator: obt,
+	}
+	if err := s.repo.UpdateObturator(dto); err != nil {
 		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
 	}
 	return &proto.SuccessResponse{Success: true}, nil

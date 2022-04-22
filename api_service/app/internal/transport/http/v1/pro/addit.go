@@ -19,6 +19,9 @@ func (h *Handler) initAdditRoutes(api *gin.RouterGroup) {
 		addit.PATCH("/:id/moun", h.updateMoun)
 		addit.PATCH("/:id/grap", h.updateGrap)
 		addit.PATCH("/:id/fil", h.updateFillers)
+		addit.PATCH("/:id/coat", h.updateCoating)
+		addit.PATCH("/:id/constr", h.updateConstruction)
+		addit.PATCH("/:id/obt", h.updateObturator)
 	}
 }
 
@@ -65,12 +68,17 @@ func (h *Handler) createAddit(c *gin.Context) {
 	}
 
 	_, err := h.proClient.CreateAdditional(c, &proto.CreateAddRequest{
-		Materials:   dto.Materials,
-		Mod:         dto.Mod,
-		Temperature: dto.Temperature,
-		Mounting:    dto.Mounting,
-		Graphite:    dto.Graphite,
-		Fillers:     dto.Fillers,
+		Materials:    dto.Materials,
+		Mod:          dto.Mod,
+		Temperature:  dto.Temperature,
+		Mounting:     dto.Mounting,
+		Graphite:     dto.Graphite,
+		Fillers:      dto.Fillers,
+		Coating:      dto.Coating,
+		Construction: dto.Construction,
+		Obturator:    dto.Obturator,
+		Basis:        dto.Basis,
+		Sealant:      dto.Sealant,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -288,6 +296,114 @@ func (h *Handler) updateFillers(c *gin.Context) {
 	}
 
 	_, err := h.proClient.UpdateFillers(c, &proto.UpdateAddFillersRequest{Id: id, Fillers: dto.Fillers, TypeCh: dto.TypeCh, Change: dto.Change})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated fillers"})
+}
+
+// @Summary Update Coating
+// @Tags Sealur Pro -> additionals
+// @Security ApiKeyAuth
+// @Description обновление способа исполнения для путг и путгм
+// @ModuleID updateCoating
+// @Accept json
+// @Produce json
+// @Param data body models.UpdateCoatingDTO true "additional coating info"
+// @Param id path string true "addit id"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/additionals/{id}/coat [patch]
+func (h *Handler) updateCoating(c *gin.Context) {
+	var dto models.UpdateCoatingDTO
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	_, err := h.proClient.UpdateCoating(c, &proto.UpdateAddCoatingRequest{Id: id, Coating: dto.Coating, TypeCh: dto.TypeCh, Change: dto.Change})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated coating"})
+}
+
+// @Summary Update Construction
+// @Tags Sealur Pro -> additionals
+// @Security ApiKeyAuth
+// @Description обновление конструкций для путг
+// @ModuleID updateConstruction
+// @Accept json
+// @Produce json
+// @Param data body models.UpdateConstrDTO true "additional construction info"
+// @Param id path string true "addit id"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/additionals/{id}/constr [patch]
+func (h *Handler) updateConstruction(c *gin.Context) {
+	var dto models.UpdateConstrDTO
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	_, err := h.proClient.UpdateConstruction(c, &proto.UpdateAddConstructionRequest{Id: id, Constr: dto.Constr, TypeCh: dto.TypeCh, Change: dto.Change})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated construction"})
+}
+
+// @Summary Update Obturator
+// @Tags Sealur Pro -> additionals
+// @Security ApiKeyAuth
+// @Description обновление обтюраторов для путг
+// @ModuleID updateObturator
+// @Accept json
+// @Produce json
+// @Param data body models.UpdateObturatorDTO true "additional obturation info"
+// @Param id path string true "addit id"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/additionals/{id}/obt [patch]
+func (h *Handler) updateObturator(c *gin.Context) {
+	var dto models.UpdateObturatorDTO
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	_, err := h.proClient.UpdateObturator(c, &proto.UpdateAddObturatorRequest{Id: id, Obturator: dto.Obt, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

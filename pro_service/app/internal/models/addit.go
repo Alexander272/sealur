@@ -1,13 +1,18 @@
 package models
 
 type Addit struct {
-	Id          string `db:"id"`
-	Materials   string `db:"materials"`
-	Mod         string `db:"mod"`
-	Temperature string `db:"temperature"`
-	Mounting    string `db:"mounting"`
-	Graphite    string `db:"graphite"`
-	Fillers     string `db:"fillers"`
+	Id           string `db:"id"`
+	Materials    string `db:"materials"`
+	Mod          string `db:"mod"`
+	Temperature  string `db:"temperature"`
+	Mounting     string `db:"mounting"`
+	Graphite     string `db:"graphite"`
+	Fillers      string `db:"fillers"`
+	Coating      string `db:"coating"`
+	Construction string `db:"construction"`
+	Obturator    string `db:"obturator"`
+	Basis        string `db:"basis"`
+	Sealant      string `db:"sealant"`
 }
 
 type UpdateGrap struct {
@@ -38,6 +43,31 @@ type UpdateMoun struct {
 type UpdateFill struct {
 	Id      string
 	Fillers string
+}
+
+type UpdateCoating struct {
+	Id      string
+	Coating string
+}
+
+type UpdateConstr struct {
+	Id           string
+	Construction string
+}
+
+type UpdateObturator struct {
+	Id        string
+	Obturator string
+}
+
+type UpdateBasis struct {
+	Id    string
+	Basis string
+}
+
+type UpdateSealant struct {
+	Id      string
+	Sealant string
 }
 
 type UpdateAdditDTO struct {

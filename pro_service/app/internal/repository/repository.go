@@ -46,6 +46,9 @@ type Addit interface {
 	UpdateMoun(models.UpdateMoun) error
 	UpdateGrap(models.UpdateGrap) error
 	UpdateFillers(models.UpdateFill) error
+	UpdateCoating(models.UpdateCoating) error
+	UpdateConstruction(models.UpdateConstr) error
+	UpdateObturator(models.UpdateObturator) error
 }
 
 type Size interface {
