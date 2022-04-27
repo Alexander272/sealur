@@ -85,7 +85,7 @@ func (h *Handler) createStFl(c *gin.Context) {
 // @Produce json
 // @Param id path string true "st/fl id"
 // @Param data body models.StFlDTO true "st/fl info"
-// @Success 201 {object} models.IdResponse
+// @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -125,7 +125,7 @@ func (h *Handler) updateStFl(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "st/fl id"
-// @Success 201 {object} models.IdResponse
+// @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse

@@ -404,6 +404,39 @@ message SNPResponse {
     repeated SNP snp = 1;
 }
 
+// PUTG Image Service ----------------------------------------------------------------
+message PutgImage {
+    string id = 1;
+    string form = 2;
+    string gasket = 3;
+    string url = 4;
+}
+
+message GetPutgImageRequest {
+    string form = 1;
+}
+
+message CreatePutgImageRequest {
+    string form = 1;
+    string gasket = 2;
+    string url = 3;
+}
+
+message UpdatePutgImageRequest {
+    string id = 1;
+    string form = 2;
+    string gasket = 3;
+    string url = 4;
+}
+
+message DeletePutgImageRequest {
+    string id = 1;
+}
+
+message PutgImageResponse {
+    repeated PutgImage putgImage = 1;
+}
+
 // commmon ----------------------------------------------------------------
 message IdResponse {
     string id = 1;
@@ -471,4 +504,10 @@ service ProService {
     rpc CreateSNP (CreateSNPRequest) returns (IdResponse);
     rpc UpdateSNP (UpdateSNPRequest) returns (IdResponse);
     rpc DeleteSNP (DeleteSNPRequest) returns (IdResponse);
+
+    // PUTG Image Service ----------------------------------------------------------------
+    rpc GetPutgImage (GetPutgImageRequest) returns (PutgImageResponse);
+    rpc CreatePutgImage (CreatePutgImageRequest) returns (IdResponse);
+    rpc UpdatePutgImage (UpdatePutgImageRequest) returns (IdResponse);
+    rpc DeletePutgImage (DeletePutgImageRequest) returns (IdResponse);
 }

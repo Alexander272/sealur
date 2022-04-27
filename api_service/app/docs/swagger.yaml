@@ -2,6 +2,12 @@ basePath: /api/v1
 definitions:
   models.CreateAdditDTO:
     properties:
+      basis:
+        type: string
+      coating:
+        type: string
+      construction:
+        type: string
       fillers:
         type: string
       graphite:
@@ -12,14 +18,21 @@ definitions:
         type: string
       mounting:
         type: string
+      obturator:
+        type: string
+      sealant:
+        type: string
       temperature:
         type: string
     required:
+    - coating
+    - construction
     - fillers
     - graphite
     - materials
     - mod
     - mounting
+    - obturator
     - temperature
     type: object
   models.DataResponse:
@@ -27,6 +40,19 @@ definitions:
       count:
         type: integer
       data: {}
+    type: object
+  models.DefResponse:
+    properties:
+      sizes:
+        $ref: '#/definitions/proto.SizeResponse'
+      snp:
+        items:
+          $ref: '#/definitions/proto.SNP'
+        type: array
+      typeFl:
+        items:
+          $ref: '#/definitions/proto.TypeFl'
+        type: array
     type: object
   models.ErrorResponse:
     properties:
@@ -50,22 +76,41 @@ definitions:
       message:
         type: string
     type: object
+  models.PutgImageDTO:
+    properties:
+      form:
+        type: string
+      gasket:
+        type: string
+      url:
+        type: string
+    required:
+    - form
+    - gasket
+    - url
+    type: object
   models.SNPDTO:
     properties:
       fillers:
-        type: string
+        items:
+          $ref: '#/definitions/proto.Filler'
+        type: array
       flangeId:
         type: string
       frame:
-        type: string
+        $ref: '#/definitions/proto.Materials'
       graphite:
-        type: string
+        items:
+          type: string
+        type: array
       ir:
-        type: string
+        $ref: '#/definitions/proto.Materials'
       mounting:
-        type: string
+        items:
+          type: string
+        type: array
       or:
-        type: string
+        $ref: '#/definitions/proto.Materials'
       standId:
         type: string
       typeFlId:
@@ -83,22 +128,22 @@ definitions:
     type: object
   models.SizesDTO:
     properties:
-      adn:
-        type: string
       d1:
-        type: number
+        type: string
       d2:
-        type: number
+        type: string
       d3:
-        type: number
+        type: string
       d4:
-        type: number
+        type: string
       dn:
         type: string
       flange:
         type: string
       h:
         type: string
+      number:
+        type: integer
       pn:
         type: string
       s2:
@@ -142,7 +187,7 @@ definitions:
     properties:
       basis:
         type: boolean
-      desc:
+      descr:
         type: string
       short:
         type: string
@@ -151,12 +196,42 @@ definitions:
     required:
     - title
     type: object
+  models.UpdateCoatingDTO:
+    properties:
+      change:
+        type: string
+      coating:
+        items:
+          $ref: '#/definitions/proto.AddCoating'
+        type: array
+      type:
+        type: string
+    required:
+    - coating
+    - type
+    type: object
+  models.UpdateConstrDTO:
+    properties:
+      change:
+        type: string
+      constr:
+        items:
+          $ref: '#/definitions/proto.AddConstruction'
+        type: array
+      type:
+        type: string
+    required:
+    - constr
+    - type
+    type: object
   models.UpdateFillersDTO:
     properties:
       change:
         type: string
       fillers:
-        type: string
+        items:
+          $ref: '#/definitions/proto.AddFiller'
+        type: array
       type:
         type: string
     required:
@@ -168,7 +243,9 @@ definitions:
       change:
         type: string
       graphite:
-        type: string
+        items:
+          $ref: '#/definitions/proto.AddGrap'
+        type: array
       type:
         type: string
     required:
@@ -180,7 +257,9 @@ definitions:
       change:
         type: string
       materials:
-        type: string
+        items:
+          $ref: '#/definitions/proto.AddMaterials'
+        type: array
       type:
         type: string
     required:
@@ -192,7 +271,9 @@ definitions:
       change:
         type: string
       mod:
-        type: string
+        items:
+          $ref: '#/definitions/proto.AddMod'
+        type: array
       type:
         type: string
     required:
@@ -204,11 +285,27 @@ definitions:
       change:
         type: string
       mounting:
-        type: string
+        items:
+          $ref: '#/definitions/proto.AddMoun'
+        type: array
       type:
         type: string
     required:
     - mounting
+    - type
+    type: object
+  models.UpdateObturatorDTO:
+    properties:
+      change:
+        type: string
+      obturator:
+        items:
+          $ref: '#/definitions/proto.AddObturator'
+        type: array
+      type:
+        type: string
+    required:
+    - obturator
     - type
     type: object
   models.UpdateTempDTO:
@@ -216,29 +313,150 @@ definitions:
       change:
         type: string
       temperature:
-        type: string
+        items:
+          $ref: '#/definitions/proto.AddTemperature'
+        type: array
       type:
         type: string
     required:
     - temperature
     - type
     type: object
-  proto.Additional:
+  proto.AddCoating:
     properties:
-      fillers:
-        type: string
-      graphite:
+      description:
         type: string
       id:
         type: string
+      short:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.AddConstruction:
+    properties:
+      description:
+        type: string
+      forDescr:
+        type: string
+      short:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.AddFiller:
+    properties:
+      description:
+        type: string
+      short:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.AddGrap:
+    properties:
+      description:
+        type: string
+      short:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.AddMaterials:
+    properties:
+      short:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.AddMod:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      short:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.AddMoun:
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.AddObturator:
+    properties:
+      description:
+        type: string
+      short:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.AddTemperature:
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.Additional:
+    properties:
+      coating:
+        items:
+          $ref: '#/definitions/proto.AddCoating'
+        type: array
+      construction:
+        items:
+          $ref: '#/definitions/proto.AddConstruction'
+        type: array
+      fillers:
+        items:
+          $ref: '#/definitions/proto.AddFiller'
+        type: array
+      graphite:
+        items:
+          $ref: '#/definitions/proto.AddGrap'
+        type: array
+      id:
+        type: string
       materials:
-        type: string
+        items:
+          $ref: '#/definitions/proto.AddMaterials'
+        type: array
       mod:
-        type: string
+        items:
+          $ref: '#/definitions/proto.AddMod'
+        type: array
       mounting:
-        type: string
+        items:
+          $ref: '#/definitions/proto.AddMoun'
+        type: array
+      obturator:
+        items:
+          $ref: '#/definitions/proto.AddObturator'
+        type: array
       temperature:
+        items:
+          $ref: '#/definitions/proto.AddTemperature'
+        type: array
+    type: object
+  proto.Dn:
+    properties:
+      dn:
         type: string
+    type: object
+  proto.Filler:
+    properties:
+      id:
+        type: string
+      temps:
+        items:
+          $ref: '#/definitions/proto.Temp'
+        type: array
     type: object
   proto.Flange:
     properties:
@@ -249,22 +467,48 @@ definitions:
       title:
         type: string
     type: object
-  proto.SNP:
+  proto.Materials:
     properties:
-      fillers:
+      default:
         type: string
-      frame:
+      values:
+        items:
+          type: string
+        type: array
+    type: object
+  proto.PutgImage:
+    properties:
+      form:
         type: string
-      graphite:
+      gasket:
         type: string
       id:
         type: string
+      url:
+        type: string
+    type: object
+  proto.SNP:
+    properties:
+      fillers:
+        items:
+          $ref: '#/definitions/proto.Filler'
+        type: array
+      frame:
+        $ref: '#/definitions/proto.Materials'
+      graphite:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
       ir:
-        type: string
+        $ref: '#/definitions/proto.Materials'
       mounting:
-        type: string
+        items:
+          type: string
+        type: array
       or:
-        type: string
+        $ref: '#/definitions/proto.Materials'
       typeFlId:
         type: string
       typePr:
@@ -273,13 +517,13 @@ definitions:
   proto.Size:
     properties:
       d1:
-        type: number
+        type: string
       d2:
-        type: number
+        type: string
       d3:
-        type: number
+        type: string
       d4:
-        type: number
+        type: string
       dn:
         type: string
       h:
@@ -292,8 +536,21 @@ definitions:
         type: string
       s3:
         type: string
+      typeFlId:
+        type: string
       typePr:
         type: string
+    type: object
+  proto.SizeResponse:
+    properties:
+      dn:
+        items:
+          $ref: '#/definitions/proto.Dn'
+        type: array
+      sizes:
+        items:
+          $ref: '#/definitions/proto.Size'
+        type: array
     type: object
   proto.StFl:
     properties:
@@ -316,6 +573,15 @@ definitions:
         type: string
       title:
         type: string
+    type: object
+  proto.Temp:
+    properties:
+      id:
+        type: string
+      mods:
+        items:
+          type: string
+        type: array
     type: object
   proto.TypeFl:
     properties:
@@ -413,6 +679,96 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Create Addit
+      tags:
+      - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/coat:
+    patch:
+      consumes:
+      - application/json
+      description: обновление способа исполнения для путг и путгм
+      parameters:
+      - description: additional coating info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateCoatingDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Coating
+      tags:
+      - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/constr:
+    patch:
+      consumes:
+      - application/json
+      description: обновление конструкций для путг
+      parameters:
+      - description: additional construction info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateConstrDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Construction
       tags:
       - Sealur Pro -> additionals
   /sealur-pro/additionals/{id}/fil:
@@ -638,6 +994,51 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update Moun
+      tags:
+      - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/obt:
+    patch:
+      consumes:
+      - application/json
+      description: обновление обтюраторов для путг
+      parameters:
+      - description: additional obturation info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateObturatorDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Obturator
       tags:
       - Sealur Pro -> additionals
   /sealur-pro/additionals/{id}/temp:
@@ -1049,6 +1450,179 @@ paths:
       summary: Update Flange
       tags:
       - Sealur Pro -> flanges
+  /sealur-pro/putg-image:
+    get:
+      consumes:
+      - application/json
+      description: получение списка чертежей для путг
+      parameters:
+      - description: form
+        in: query
+        name: form
+        required: true
+        type: string
+      - description: gasket
+        in: query
+        name: gasket
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.PutgImage'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Putg Image
+      tags:
+      - Sealur Pro -> putg-image
+    post:
+      consumes:
+      - application/json
+      description: создание чертежа путг
+      parameters:
+      - description: putg image info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.PutgImageDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Putg Image
+      tags:
+      - Sealur Pro -> putg-image
+  /sealur-pro/putg-image/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление чертежа путг
+      parameters:
+      - description: st/fl id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Putg Image
+      tags:
+      - Sealur Pro -> putg-image
+    put:
+      consumes:
+      - application/json
+      description: обновление чертежа путг
+      parameters:
+      - description: putg image id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: putg image info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.PutgImageDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Putg Image
+      tags:
+      - Sealur Pro -> putg-image
   /sealur-pro/sizes:
     get:
       consumes:
@@ -1085,9 +1659,7 @@ paths:
             - $ref: '#/definitions/models.DataResponse'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/proto.Size'
-                  type: array
+                  $ref: '#/definitions/proto.SizeResponse'
               type: object
         "400":
           description: Bad Request
@@ -1235,6 +1807,50 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update Size
+      tags:
+      - Sealur Pro -> sizes
+  /sealur-pro/sizes/all:
+    delete:
+      consumes:
+      - application/json
+      description: удаление всех размеров
+      parameters:
+      - description: flange
+        in: query
+        name: flange
+        required: true
+        type: string
+      - description: type pr
+        in: query
+        name: typePr
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Size
       tags:
       - Sealur Pro -> sizes
   /sealur-pro/snp:
@@ -1410,6 +2026,45 @@ paths:
       summary: Update SNP
       tags:
       - Sealur Pro -> snp
+  /sealur-pro/snp/default:
+    get:
+      consumes:
+      - application/json
+      description: получение значений по умолчание (снп, размеров для первого элемента
+        и типов фланца)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.DefResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Default Data
+      tags:
+      - Sealur Pro -> snp
   /sealur-pro/st-fl:
     get:
       consumes:
@@ -1503,8 +2158,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/models.IdResponse'
         "400":
@@ -1547,8 +2202,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/models.IdResponse'
         "400":

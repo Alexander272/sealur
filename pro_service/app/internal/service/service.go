@@ -73,6 +73,13 @@ type SNP interface {
 	DeleteMod(id string) error
 }
 
+type PutgImage interface {
+	Get(req *proto.GetPutgImageRequest) ([]*proto.PutgImage, error)
+	Create(image *proto.CreatePutgImageRequest) (*proto.IdResponse, error)
+	Update(image *proto.UpdatePutgImageRequest) error
+	Delete(image *proto.DeletePutgImageRequest) error
+}
+
 type Services struct {
 	Stand
 	Flange
@@ -81,16 +88,18 @@ type Services struct {
 	Addit
 	Size
 	SNP
+	PutgImage
 }
 
 func NewServices(repos *repository.Repositories) *Services {
 	return &Services{
-		Stand:  NewStandService(repos.Stand),
-		Flange: NewFlangeService(repos.Flange),
-		StFl:   NewStFlService(repos.StFl),
-		TypeFl: NewTypeFlService(repos.TypeFl),
-		Addit:  NewAdditService(repos.Addit),
-		Size:   NewSizeService(repos.Size),
-		SNP:    NewSNPService(repos.SNP),
+		Stand:     NewStandService(repos.Stand),
+		Flange:    NewFlangeService(repos.Flange),
+		StFl:      NewStFlService(repos.StFl),
+		TypeFl:    NewTypeFlService(repos.TypeFl),
+		Addit:     NewAdditService(repos.Addit),
+		Size:      NewSizeService(repos.Size),
+		SNP:       NewSNPService(repos.SNP),
+		PutgImage: NewPutgImageService(repos.PutgImage),
 	}
 }

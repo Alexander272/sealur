@@ -60,6 +60,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		h.initAdditRoutes(pro)
 		h.initSizeRoutes(pro)
 		h.initSNPRoutes(pro)
+		h.initPutgImageRoutes(pro)
 	}
 }
 

@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
@@ -18,8 +19,14 @@ func NewSizesRepo(db *sqlx.DB) *SizesRepo {
 }
 
 func (r *SizesRepo) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, err error) {
-	query := fmt.Sprintf(`SELECT id, dn, pn, d4, d3, d2, d1, h, s2, s3, type_pr, type_fl_id FROM size_%s WHERE LOWER(type_pr) LIKE LOWER('%%%s%%') 
+	var query string
+	if strings.Contains(strings.ToLower(req.TypePr), "путг") {
+		query = fmt.Sprintf(`SELECT id, dn, pn, d4, d3, d2, d1, h, s2, s3, type_pr, type_fl_id FROM size_%s WHERE LOWER(type_pr) = LOWER('%s') 
 		AND (stand_id=$1 OR stand_id=0) AND type_fl_id=$2 ORDER BY count`, req.Flange, req.TypePr)
+	} else {
+		query = fmt.Sprintf(`SELECT id, dn, pn, d4, d3, d2, d1, h, s2, s3, type_pr, type_fl_id FROM size_%s WHERE LOWER(type_pr) LIKE LOWER('%%%s%%') 
+		AND (stand_id=$1 OR stand_id=0) AND type_fl_id=$2 ORDER BY count`, req.Flange, req.TypePr)
+	}
 
 	var data []models.Size
 	if err = r.db.Select(&data, query, req.StandId, req.TypeFlId); err != nil {

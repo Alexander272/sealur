@@ -137,6 +137,146 @@
                 }
             }
         },
+        "/sealur-pro/additionals/{id}/coat": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление способа исполнения для путг и путгм",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update Coating",
+                "parameters": [
+                    {
+                        "description": "additional coating info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateCoatingDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/additionals/{id}/constr": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление конструкций для путг",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update Construction",
+                "parameters": [
+                    {
+                        "description": "additional construction info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateConstrDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/sealur-pro/additionals/{id}/fil": {
             "patch": {
                 "security": [
@@ -443,6 +583,76 @@
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/models.UpdateMounDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/additionals/{id}/obt": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление обтюраторов для путг",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update Obturator",
+                "parameters": [
+                    {
+                        "description": "additional obturation info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateObturatorDTO"
                         }
                     },
                     {
@@ -1138,6 +1348,279 @@
                 }
             }
         },
+        "/sealur-pro/putg-image": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение списка чертежей для путг",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putg-image"
+                ],
+                "summary": "Get Putg Image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "form",
+                        "name": "form",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "gasket",
+                        "name": "gasket",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.PutgImage"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание чертежа путг",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putg-image"
+                ],
+                "summary": "Create Putg Image",
+                "parameters": [
+                    {
+                        "description": "putg image info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PutgImageDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/putg-image/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление чертежа путг",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putg-image"
+                ],
+                "summary": "Update Putg Image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "putg image id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "putg image info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PutgImageDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "удаление чертежа путг",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putg-image"
+                ],
+                "summary": "Delete Putg Image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "st/fl id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/sealur-pro/sizes": {
             "get": {
                 "security": [
@@ -1198,10 +1681,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/proto.Size"
-                                            }
+                                            "$ref": "#/definitions/proto.SizeResponse"
                                         }
                                     }
                                 }
@@ -1265,6 +1745,74 @@
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/sizes/all": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "удаление всех размеров",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e sizes"
+                ],
+                "summary": "Delete Size",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "flange",
+                        "name": "flange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "type pr",
+                        "name": "typePr",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.IdResponse"
                         }
@@ -1547,6 +2095,70 @@
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/snp/default": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение значений по умолчание (снп, размеров для первого элемента и типов фланца)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e snp"
+                ],
+                "summary": "Get Default Data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.DefResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1870,8 +2482,8 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.IdResponse"
                         }
@@ -1929,8 +2541,8 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.IdResponse"
                         }
@@ -2224,14 +2836,26 @@
         "models.CreateAdditDTO": {
             "type": "object",
             "required": [
+                "coating",
+                "construction",
                 "fillers",
                 "graphite",
                 "materials",
                 "mod",
                 "mounting",
+                "obturator",
                 "temperature"
             ],
             "properties": {
+                "basis": {
+                    "type": "string"
+                },
+                "coating": {
+                    "type": "string"
+                },
+                "construction": {
+                    "type": "string"
+                },
                 "fillers": {
                     "type": "string"
                 },
@@ -2247,6 +2871,12 @@
                 "mounting": {
                     "type": "string"
                 },
+                "obturator": {
+                    "type": "string"
+                },
+                "sealant": {
+                    "type": "string"
+                },
                 "temperature": {
                     "type": "string"
                 }
@@ -2259,6 +2889,26 @@
                     "type": "integer"
                 },
                 "data": {}
+            }
+        },
+        "models.DefResponse": {
+            "type": "object",
+            "properties": {
+                "sizes": {
+                    "$ref": "#/definitions/proto.SizeResponse"
+                },
+                "snp": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.SNP"
+                    }
+                },
+                "typeFl": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.TypeFl"
+                    }
+                }
             }
         },
         "models.ErrorResponse": {
@@ -2295,6 +2945,25 @@
                 }
             }
         },
+        "models.PutgImageDTO": {
+            "type": "object",
+            "required": [
+                "form",
+                "gasket",
+                "url"
+            ],
+            "properties": {
+                "form": {
+                    "type": "string"
+                },
+                "gasket": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "models.SNPDTO": {
             "type": "object",
             "required": [
@@ -2308,25 +2977,34 @@
             ],
             "properties": {
                 "fillers": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.Filler"
+                    }
                 },
                 "flangeId": {
                     "type": "string"
                 },
                 "frame": {
-                    "type": "string"
+                    "$ref": "#/definitions/proto.Materials"
                 },
                 "graphite": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "ir": {
-                    "type": "string"
+                    "$ref": "#/definitions/proto.Materials"
                 },
                 "mounting": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "or": {
-                    "type": "string"
+                    "$ref": "#/definitions/proto.Materials"
                 },
                 "standId": {
                     "type": "string"
@@ -2352,20 +3030,17 @@
                 "typePr"
             ],
             "properties": {
-                "adn": {
+                "d1": {
                     "type": "string"
                 },
-                "d1": {
-                    "type": "number"
-                },
                 "d2": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "d3": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "d4": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "dn": {
                     "type": "string"
@@ -2375,6 +3050,9 @@
                 },
                 "h": {
                     "type": "string"
+                },
+                "number": {
+                    "type": "integer"
                 },
                 "pn": {
                     "type": "string"
@@ -2431,13 +3109,55 @@
                 "basis": {
                     "type": "boolean"
                 },
-                "desc": {
+                "descr": {
                     "type": "string"
                 },
                 "short": {
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateCoatingDTO": {
+            "type": "object",
+            "required": [
+                "coating",
+                "type"
+            ],
+            "properties": {
+                "change": {
+                    "type": "string"
+                },
+                "coating": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddCoating"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateConstrDTO": {
+            "type": "object",
+            "required": [
+                "constr",
+                "type"
+            ],
+            "properties": {
+                "change": {
+                    "type": "string"
+                },
+                "constr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddConstruction"
+                    }
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -2453,7 +3173,10 @@
                     "type": "string"
                 },
                 "fillers": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddFiller"
+                    }
                 },
                 "type": {
                     "type": "string"
@@ -2471,7 +3194,10 @@
                     "type": "string"
                 },
                 "graphite": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddGrap"
+                    }
                 },
                 "type": {
                     "type": "string"
@@ -2489,7 +3215,10 @@
                     "type": "string"
                 },
                 "materials": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddMaterials"
+                    }
                 },
                 "type": {
                     "type": "string"
@@ -2507,7 +3236,10 @@
                     "type": "string"
                 },
                 "mod": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddMod"
+                    }
                 },
                 "type": {
                     "type": "string"
@@ -2525,7 +3257,31 @@
                     "type": "string"
                 },
                 "mounting": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddMoun"
+                    }
+                },
+                "type": {
                     "type": "string"
+                }
+            }
+        },
+        "models.UpdateObturatorDTO": {
+            "type": "object",
+            "required": [
+                "obturator",
+                "type"
+            ],
+            "properties": {
+                "change": {
+                    "type": "string"
+                },
+                "obturator": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddObturator"
+                    }
                 },
                 "type": {
                     "type": "string"
@@ -2543,9 +3299,138 @@
                     "type": "string"
                 },
                 "temperature": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddTemperature"
+                    }
                 },
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddCoating": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddConstruction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "forDescr": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddFiller": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddGrap": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddMaterials": {
+            "type": "object",
+            "properties": {
+                "short": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddMod": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddMoun": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddObturator": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddTemperature": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -2553,26 +3438,84 @@
         "proto.Additional": {
             "type": "object",
             "properties": {
+                "coating": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddCoating"
+                    }
+                },
+                "construction": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddConstruction"
+                    }
+                },
                 "fillers": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddFiller"
+                    }
                 },
                 "graphite": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddGrap"
+                    }
                 },
                 "id": {
                     "type": "string"
                 },
                 "materials": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddMaterials"
+                    }
                 },
                 "mod": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddMod"
+                    }
                 },
                 "mounting": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddMoun"
+                    }
+                },
+                "obturator": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddObturator"
+                    }
                 },
                 "temperature": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddTemperature"
+                    }
+                }
+            }
+        },
+        "proto.Dn": {
+            "type": "object",
+            "properties": {
+                "dn": {
                     "type": "string"
+                }
+            }
+        },
+        "proto.Filler": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "temps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.Temp"
+                    }
                 }
             }
         },
@@ -2590,29 +3533,69 @@
                 }
             }
         },
-        "proto.SNP": {
+        "proto.Materials": {
             "type": "object",
             "properties": {
-                "fillers": {
+                "default": {
                     "type": "string"
                 },
-                "frame": {
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "proto.PutgImage": {
+            "type": "object",
+            "properties": {
+                "form": {
                     "type": "string"
                 },
-                "graphite": {
+                "gasket": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "ir": {
+                "url": {
                     "type": "string"
+                }
+            }
+        },
+        "proto.SNP": {
+            "type": "object",
+            "properties": {
+                "fillers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.Filler"
+                    }
+                },
+                "frame": {
+                    "$ref": "#/definitions/proto.Materials"
+                },
+                "graphite": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ir": {
+                    "$ref": "#/definitions/proto.Materials"
                 },
                 "mounting": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "or": {
-                    "type": "string"
+                    "$ref": "#/definitions/proto.Materials"
                 },
                 "typeFlId": {
                     "type": "string"
@@ -2626,16 +3609,16 @@
             "type": "object",
             "properties": {
                 "d1": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "d2": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "d3": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "d4": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "dn": {
                     "type": "string"
@@ -2655,8 +3638,28 @@
                 "s3": {
                     "type": "string"
                 },
+                "typeFlId": {
+                    "type": "string"
+                },
                 "typePr": {
                     "type": "string"
+                }
+            }
+        },
+        "proto.SizeResponse": {
+            "type": "object",
+            "properties": {
+                "dn": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.Dn"
+                    }
+                },
+                "sizes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.Size"
+                    }
                 }
             }
         },
@@ -2691,6 +3694,20 @@
                 },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "proto.Temp": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "mods": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

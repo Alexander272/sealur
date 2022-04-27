@@ -7,4 +7,5 @@ const (
 	TypeFLTable     = "type_fl"
 	AdditionalTable = "additional"
 	SNPTable        = "snp"
+	PUTGImageTable  = "putg_image"
 )

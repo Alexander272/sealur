@@ -69,6 +69,13 @@ type SNP interface {
 	UpdateAddit(snp models.UpdateAdditDTO) error
 }
 
+type PutgImage interface {
+	Get(req *proto.GetPutgImageRequest) ([]*proto.PutgImage, error)
+	Create(image *proto.CreatePutgImageRequest) (id string, err error)
+	Update(image *proto.UpdatePutgImageRequest) error
+	Delete(image *proto.DeletePutgImageRequest) error
+}
+
 type Repositories struct {
 	Stand
 	Flange
@@ -77,16 +84,18 @@ type Repositories struct {
 	Addit
 	Size
 	SNP
+	PutgImage
 }
 
 func NewRepo(db *sqlx.DB) *Repositories {
 	return &Repositories{
-		Stand:  NewStandRepo(db),
-		Flange: NewFlangeRepo(db),
-		StFl:   NewStFlRepo(db),
-		TypeFl: NewTypeFlRepo(db),
-		Addit:  NewAdditRepo(db),
-		Size:   NewSizesRepo(db),
-		SNP:    NewSNPRepo(db),
+		Stand:     NewStandRepo(db),
+		Flange:    NewFlangeRepo(db),
+		StFl:      NewStFlRepo(db),
+		TypeFl:    NewTypeFlRepo(db),
+		Addit:     NewAdditRepo(db),
+		Size:      NewSizesRepo(db),
+		SNP:       NewSNPRepo(db),
+		PutgImage: NewPutgImageRepo(db),
 	}
 }
