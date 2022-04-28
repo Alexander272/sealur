@@ -10,12 +10,12 @@ import (
 )
 
 func (h *Handler) initPutgImageRoutes(api *gin.RouterGroup) {
-	st := api.Group("putg-image")
+	putgImage := api.Group("putg-image")
 	{
-		st.GET("/", h.getPutgImage)
-		st.POST("/", h.createPutgImage)
-		st.PUT("/:id", h.updatePutgImage)
-		st.DELETE("/:id", h.deletePutgImage)
+		putgImage.GET("/", h.getPutgImage)
+		putgImage.POST("/", h.createPutgImage)
+		putgImage.PUT("/:id", h.updatePutgImage)
+		putgImage.DELETE("/:id", h.deletePutgImage)
 	}
 }
 
