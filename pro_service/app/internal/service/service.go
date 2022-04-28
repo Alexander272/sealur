@@ -80,6 +80,13 @@ type PutgImage interface {
 	Delete(image *proto.DeletePutgImageRequest) error
 }
 
+type Putg interface {
+	Get(*proto.GetPutgRequest) ([]*proto.Putg, error)
+	Create(*proto.CreatePutgRequest) (*proto.IdResponse, error)
+	Update(*proto.UpdatePutgRequest) error
+	Delete(*proto.DeletePutgRequest) error
+}
+
 type Services struct {
 	Stand
 	Flange
@@ -89,6 +96,7 @@ type Services struct {
 	Size
 	SNP
 	PutgImage
+	Putg
 }
 
 func NewServices(repos *repository.Repositories) *Services {
@@ -101,5 +109,6 @@ func NewServices(repos *repository.Repositories) *Services {
 		Size:      NewSizeService(repos.Size),
 		SNP:       NewSNPService(repos.SNP),
 		PutgImage: NewPutgImageService(repos.PutgImage),
+		Putg:      NewPutgService(repos.Putg),
 	}
 }

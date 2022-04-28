@@ -76,6 +76,13 @@ type PutgImage interface {
 	Delete(image *proto.DeletePutgImageRequest) error
 }
 
+type Putg interface {
+	Get(req *proto.GetPutgRequest) ([]models.Putg, error)
+	Create(putg models.PutgDTO) (id string, err error)
+	Update(putg models.PutgDTO) error
+	Delete(putg *proto.DeletePutgRequest) error
+}
+
 type Repositories struct {
 	Stand
 	Flange
@@ -85,6 +92,7 @@ type Repositories struct {
 	Size
 	SNP
 	PutgImage
+	Putg
 }
 
 func NewRepo(db *sqlx.DB) *Repositories {
@@ -97,5 +105,6 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		Size:      NewSizesRepo(db),
 		SNP:       NewSNPRepo(db),
 		PutgImage: NewPutgImageRepo(db),
+		Putg:      NewPutgRepo(db),
 	}
 }

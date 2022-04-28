@@ -8,4 +8,5 @@ const (
 	AdditionalTable = "additional"
 	SNPTable        = "snp"
 	PUTGImageTable  = "putg_image"
+	PutgTable       = "putg"
 )

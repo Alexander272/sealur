@@ -437,6 +437,93 @@ message PutgImageResponse {
     repeated PutgImage putgImage = 1;
 }
 
+// PUTG Service ----------------------------------------------------------------
+message PutgTemp {
+    string grap = 1;
+    repeated Temp temps = 2;
+}
+
+message PutgConstructions {
+    string grap = 1;
+    repeated ConTemp temperatures = 2;
+}
+
+message ConTemp {
+    string temp = 1;
+    repeated Constr constructions = 2;
+}
+
+message Constr {
+    string short = 1;
+    repeated PutgObt obturators = 2;
+}
+
+message PutgObt {
+    string short = 1;
+    string imageUrl = 2;
+}
+
+message GetPutgRequest {
+    string form = 1;
+    string flangeId = 2;
+}
+
+message CreatePutgRequest {
+    string flangeId = 1;
+    string typeFlId = 2;
+    string typePr = 3;
+    string form = 4;
+    repeated PutgConstructions construction = 5;
+    repeated PutgTemp temperatures = 6;
+    Materials reinforce = 7;
+    Materials obturator = 8;
+    Materials iLimiter = 9;
+    Materials oLimiter = 10;
+    repeated string coating = 11;
+    repeated string mounting = 12;
+    repeated string graphite = 13;
+}
+
+message UpdatePutgRequest {
+    string id = 1;
+    string typeFlId = 2;
+    string typePr = 3;
+    string form = 4;
+    repeated PutgConstructions construction = 5;
+    repeated PutgTemp temperatures = 6;
+    Materials reinforce = 7;
+    Materials obturator = 8;
+    Materials iLimiter = 9;
+    Materials oLimiter = 10;
+    repeated string coating = 11;
+    repeated string mounting = 12;
+    repeated string graphite = 13;
+    string flangeId = 14;
+}
+
+message DeletePutgRequest {
+    string id = 1;
+}
+
+message Putg {
+    string id = 1;
+    string typeFlId = 2;
+    string typePr = 3;
+    string form = 4;
+    repeated PutgConstructions construction = 5;
+    repeated PutgTemp temperatures = 6;
+    Materials reinforce = 7;
+    Materials obturator = 8;
+    Materials iLimiter = 9;
+    Materials oLimiter = 10;
+    repeated string coating = 11;
+    repeated string mounting = 12;
+    repeated string graphite = 13;
+}
+message PutgResponse {
+    repeated Putg putg = 1;
+}
+
 // commmon ----------------------------------------------------------------
 message IdResponse {
     string id = 1;
@@ -510,4 +597,10 @@ service ProService {
     rpc CreatePutgImage (CreatePutgImageRequest) returns (IdResponse);
     rpc UpdatePutgImage (UpdatePutgImageRequest) returns (IdResponse);
     rpc DeletePutgImage (DeletePutgImageRequest) returns (IdResponse);
+
+    // PUTG Service ----------------------------------------------------------------
+    rpc GetPutg (GetPutgRequest) returns (PutgResponse);
+    rpc CreatePutg (CreatePutgRequest) returns (IdResponse);
+    rpc UpdatePutg (UpdatePutgRequest) returns (IdResponse);
+    rpc DeletePutg (DeletePutgRequest) returns (IdResponse);
 }

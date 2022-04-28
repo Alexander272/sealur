@@ -26,7 +26,7 @@ func (s *SNPService) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error)
 
 	for _, d := range data {
 		var fillers []*proto.Filler
-		fil := strings.Split(data[0].Fillers, ";")
+		fil := strings.Split(d.Fillers, ";")
 
 		for _, v := range fil {
 			id := strings.Split(v, "&")[0]
@@ -48,8 +48,8 @@ func (s *SNPService) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error)
 			})
 		}
 
-		tmp := strings.Split(d.Frame, "&")
 		var frame, ir, or = &proto.Materials{}, &proto.Materials{}, &proto.Materials{}
+		tmp := strings.Split(d.Frame, "&")
 		if len(tmp) > 1 {
 			frame = &proto.Materials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
 		}
