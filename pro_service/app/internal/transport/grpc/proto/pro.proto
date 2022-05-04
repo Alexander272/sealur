@@ -463,6 +463,12 @@ message PutgObt {
     string imageUrl = 2;
 }
 
+message PutgMaterials {
+    repeated string values = 1;
+    string default = 2;
+    repeated string obturators = 3;
+}
+
 message GetPutgRequest {
     string form = 1;
     string flangeId = 2;
@@ -475,10 +481,10 @@ message CreatePutgRequest {
     string form = 4;
     repeated PutgConstructions construction = 5;
     repeated PutgTemp temperatures = 6;
-    Materials reinforce = 7;
-    Materials obturator = 8;
-    Materials iLimiter = 9;
-    Materials oLimiter = 10;
+    PutgMaterials reinforce = 7;
+    PutgMaterials obturator = 8;
+    PutgMaterials iLimiter = 9;
+    PutgMaterials oLimiter = 10;
     repeated string coating = 11;
     repeated string mounting = 12;
     repeated string graphite = 13;
@@ -491,10 +497,10 @@ message UpdatePutgRequest {
     string form = 4;
     repeated PutgConstructions construction = 5;
     repeated PutgTemp temperatures = 6;
-    Materials reinforce = 7;
-    Materials obturator = 8;
-    Materials iLimiter = 9;
-    Materials oLimiter = 10;
+    PutgMaterials reinforce = 7;
+    PutgMaterials obturator = 8;
+    PutgMaterials iLimiter = 9;
+    PutgMaterials oLimiter = 10;
     repeated string coating = 11;
     repeated string mounting = 12;
     repeated string graphite = 13;
@@ -512,10 +518,10 @@ message Putg {
     string form = 4;
     repeated PutgConstructions construction = 5;
     repeated PutgTemp temperatures = 6;
-    Materials reinforce = 7;
-    Materials obturator = 8;
-    Materials iLimiter = 9;
-    Materials oLimiter = 10;
+    PutgMaterials reinforce = 7;
+    PutgMaterials obturator = 8;
+    PutgMaterials iLimiter = 9;
+    PutgMaterials oLimiter = 10;
     repeated string coating = 11;
     repeated string mounting = 12;
     repeated string graphite = 13;

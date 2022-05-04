@@ -85,22 +85,22 @@ func (s *PutgService) Get(req *proto.GetPutgRequest) (putg []*proto.Putg, err er
 			})
 		}
 
-		var reinforce, obturator, iLimiter, oLimiter = &proto.Materials{}, &proto.Materials{}, &proto.Materials{}, &proto.Materials{}
+		var reinforce, obturator, iLimiter, oLimiter = &proto.PutgMaterials{}, &proto.PutgMaterials{}, &proto.PutgMaterials{}, &proto.PutgMaterials{}
 		tmp = strings.Split(d.Reinforce, "&")
 		if len(tmp) > 1 {
-			reinforce = &proto.Materials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+			reinforce = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
 		}
 		tmp = strings.Split(d.Obturator, "&")
 		if len(tmp) > 1 {
-			obturator = &proto.Materials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+			obturator = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
 		}
 		tmp = strings.Split(d.ILimiter, "&")
 		if len(tmp) > 1 {
-			iLimiter = &proto.Materials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+			iLimiter = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
 		}
 		tmp = strings.Split(d.OLimiter, "&")
 		if len(tmp) > 1 {
-			oLimiter = &proto.Materials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+			oLimiter = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
 		}
 
 		p := proto.Putg{
@@ -173,19 +173,19 @@ func (s *PutgService) Create(dto *proto.CreatePutgRequest) (*proto.IdResponse, e
 		temperatures += fmt.Sprintf("%s&%s", t.Grap, temps)
 	}
 
-	reinforce := fmt.Sprintf("%s&%s", strings.Join(dto.Reinforce.Values, ";"), dto.Reinforce.Default)
+	reinforce := fmt.Sprintf("%s&%s&%s", strings.Join(dto.Reinforce.Values, ";"), dto.Reinforce.Default, strings.Join(dto.Reinforce.Obturators, ";"))
 	if len(dto.Reinforce.Values) == 0 {
 		reinforce = ""
 	}
-	obturator := fmt.Sprintf("%s&%s", strings.Join(dto.Obturator.Values, ";"), dto.Obturator.Default)
+	obturator := fmt.Sprintf("%s&%s&%s", strings.Join(dto.Obturator.Values, ";"), dto.Obturator.Default, strings.Join(dto.Obturator.Obturators, ";"))
 	if len(dto.Obturator.Values) == 0 {
 		obturator = ""
 	}
-	iLimiter := fmt.Sprintf("%s&%s", strings.Join(dto.ILimiter.Values, ";"), dto.ILimiter.Default)
+	iLimiter := fmt.Sprintf("%s&%s&%s", strings.Join(dto.ILimiter.Values, ";"), dto.ILimiter.Default, strings.Join(dto.ILimiter.Obturators, ";"))
 	if len(dto.ILimiter.Values) == 0 {
 		iLimiter = ""
 	}
-	oLimiter := fmt.Sprintf("%s&%s", strings.Join(dto.OLimiter.Values, ";"), dto.OLimiter.Default)
+	oLimiter := fmt.Sprintf("%s&%s&%s", strings.Join(dto.OLimiter.Values, ";"), dto.OLimiter.Default, strings.Join(dto.OLimiter.Obturators, ";"))
 	if len(dto.OLimiter.Values) == 0 {
 		oLimiter = ""
 	}
@@ -262,19 +262,19 @@ func (s *PutgService) Update(dto *proto.UpdatePutgRequest) error {
 		temperatures += fmt.Sprintf("%s&%s", t.Grap, temps)
 	}
 
-	reinforce := fmt.Sprintf("%s&%s", strings.Join(dto.Reinforce.Values, ";"), dto.Reinforce.Default)
+	reinforce := fmt.Sprintf("%s&%s&%s", strings.Join(dto.Reinforce.Values, ";"), dto.Reinforce.Default, strings.Join(dto.Reinforce.Obturators, ";"))
 	if len(dto.Reinforce.Values) == 0 {
 		reinforce = ""
 	}
-	obturator := fmt.Sprintf("%s&%s", strings.Join(dto.Obturator.Values, ";"), dto.Obturator.Default)
+	obturator := fmt.Sprintf("%s&%s&%s", strings.Join(dto.Obturator.Values, ";"), dto.Obturator.Default, strings.Join(dto.Obturator.Obturators, ";"))
 	if len(dto.Obturator.Values) == 0 {
 		obturator = ""
 	}
-	iLimiter := fmt.Sprintf("%s&%s", strings.Join(dto.ILimiter.Values, ";"), dto.ILimiter.Default)
+	iLimiter := fmt.Sprintf("%s&%s&%s", strings.Join(dto.ILimiter.Values, ";"), dto.ILimiter.Default, strings.Join(dto.ILimiter.Obturators, ";"))
 	if len(dto.ILimiter.Values) == 0 {
 		iLimiter = ""
 	}
-	oLimiter := fmt.Sprintf("%s&%s", strings.Join(dto.OLimiter.Values, ";"), dto.OLimiter.Default)
+	oLimiter := fmt.Sprintf("%s&%s&%s", strings.Join(dto.OLimiter.Values, ";"), dto.OLimiter.Default, strings.Join(dto.OLimiter.Obturators, ";"))
 	if len(dto.OLimiter.Values) == 0 {
 		oLimiter = ""
 	}

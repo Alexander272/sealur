@@ -9,10 +9,10 @@ type PutgDTO struct {
 	Form         string                     `json:"form" binding:"required"`
 	Construction []*proto.PutgConstructions `json:"construction" binding:"required"`
 	Temperatures []*proto.PutgTemp          `json:"temperatures" binding:"required"`
-	Reinforce    *proto.Materials           `json:"reinforce"`
-	Obturator    *proto.Materials           `json:"obturator"`
-	ILimiter     *proto.Materials           `json:"iLimiter"`
-	OLimiter     *proto.Materials           `json:"oLimiter"`
+	Reinforce    *proto.PutgMaterials       `json:"reinforce"`
+	Obturator    *proto.PutgMaterials       `json:"obturator"`
+	ILimiter     *proto.PutgMaterials       `json:"iLimiter"`
+	OLimiter     *proto.PutgMaterials       `json:"oLimiter"`
 	Coating      []string                   `json:"coating" binding:"required"`
 	Mounting     []string                   `json:"mounting" binding:"required"`
 	Graphite     []string                   `json:"graphite" binding:"required"`

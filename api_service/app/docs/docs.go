@@ -1355,6 +1355,150 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/sealur-pro/putg": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение прокладок путг",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putg"
+                ],
+                "summary": "Get Putg",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "form",
+                        "name": "form",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "flange id",
+                        "name": "flangeId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.Putg"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание прокладки путг",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putg"
+                ],
+                "summary": "Create Putg",
+                "parameters": [
+                    {
+                        "description": "putg info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PutgDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/sealur-pro/putg-image": {
             "get": {
                 "security": [
@@ -1378,13 +1522,6 @@ const docTemplate_swagger = `{
                         "type": "string",
                         "description": "form",
                         "name": "form",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "gasket",
-                        "name": "gasket",
                         "in": "query",
                         "required": true
                     }
@@ -1597,6 +1734,135 @@ const docTemplate_swagger = `{
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/putg/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление прокладки путг",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putg"
+                ],
+                "summary": "Update Putg",
+                "parameters": [
+                    {
+                        "description": "putg info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PutgDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "putg id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "удаление прокладки путг",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putg"
+                ],
+                "summary": "Delete Putg",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "putg id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.IdResponse"
                         }
@@ -2952,6 +3218,76 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "models.PutgDTO": {
+            "type": "object",
+            "required": [
+                "coating",
+                "construction",
+                "flangeId",
+                "form",
+                "graphite",
+                "mounting",
+                "temperatures",
+                "typeFlId",
+                "typePr"
+            ],
+            "properties": {
+                "coating": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "construction": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgConstructions"
+                    }
+                },
+                "flangeId": {
+                    "type": "string"
+                },
+                "form": {
+                    "type": "string"
+                },
+                "graphite": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "iLimiter": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "mounting": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "oLimiter": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "obturator": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "reinforce": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "temperatures": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgTemp"
+                    }
+                },
+                "typeFlId": {
+                    "type": "string"
+                },
+                "typePr": {
+                    "type": "string"
+                }
+            }
+        },
         "models.PutgImageDTO": {
             "type": "object",
             "required": [
@@ -3504,6 +3840,34 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "proto.ConTemp": {
+            "type": "object",
+            "properties": {
+                "constructions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.Constr"
+                    }
+                },
+                "temp": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.Constr": {
+            "type": "object",
+            "properties": {
+                "obturators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgObt"
+                    }
+                },
+                "short": {
+                    "type": "string"
+                }
+            }
+        },
         "proto.Dn": {
             "type": "object",
             "properties": {
@@ -3554,6 +3918,79 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "proto.Putg": {
+            "type": "object",
+            "properties": {
+                "coating": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "construction": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgConstructions"
+                    }
+                },
+                "form": {
+                    "type": "string"
+                },
+                "graphite": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "iLimiter": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "mounting": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "oLimiter": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "obturator": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "reinforce": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "temperatures": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgTemp"
+                    }
+                },
+                "typeFlId": {
+                    "type": "string"
+                },
+                "typePr": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.PutgConstructions": {
+            "type": "object",
+            "properties": {
+                "grap": {
+                    "type": "string"
+                },
+                "temperatures": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ConTemp"
+                    }
+                }
+            }
+        },
         "proto.PutgImage": {
             "type": "object",
             "properties": {
@@ -3568,6 +4005,51 @@ const docTemplate_swagger = `{
                 },
                 "url": {
                     "type": "string"
+                }
+            }
+        },
+        "proto.PutgMaterials": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "type": "string"
+                },
+                "obturators": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "proto.PutgObt": {
+            "type": "object",
+            "properties": {
+                "imageUrl": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.PutgTemp": {
+            "type": "object",
+            "properties": {
+                "grap": {
+                    "type": "string"
+                },
+                "temps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.Temp"
+                    }
                 }
             }
         },
@@ -3747,7 +4229,7 @@ const docTemplate_swagger = `{
 
 // SwaggerInfo_swagger holds exported Swagger Info so clients can modify it
 var SwaggerInfo_swagger = &swag.Spec{
-	Version:          "0.1",
+	Version:          "0.5",
 	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},

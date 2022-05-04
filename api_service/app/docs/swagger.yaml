@@ -76,6 +76,55 @@ definitions:
       message:
         type: string
     type: object
+  models.PutgDTO:
+    properties:
+      coating:
+        items:
+          type: string
+        type: array
+      construction:
+        items:
+          $ref: '#/definitions/proto.PutgConstructions'
+        type: array
+      flangeId:
+        type: string
+      form:
+        type: string
+      graphite:
+        items:
+          type: string
+        type: array
+      iLimiter:
+        $ref: '#/definitions/proto.PutgMaterials'
+      mounting:
+        items:
+          type: string
+        type: array
+      oLimiter:
+        $ref: '#/definitions/proto.PutgMaterials'
+      obturator:
+        $ref: '#/definitions/proto.PutgMaterials'
+      reinforce:
+        $ref: '#/definitions/proto.PutgMaterials'
+      temperatures:
+        items:
+          $ref: '#/definitions/proto.PutgTemp'
+        type: array
+      typeFlId:
+        type: string
+      typePr:
+        type: string
+    required:
+    - coating
+    - construction
+    - flangeId
+    - form
+    - graphite
+    - mounting
+    - temperatures
+    - typeFlId
+    - typePr
+    type: object
   models.PutgImageDTO:
     properties:
       form:
@@ -444,6 +493,24 @@ definitions:
           $ref: '#/definitions/proto.AddTemperature'
         type: array
     type: object
+  proto.ConTemp:
+    properties:
+      constructions:
+        items:
+          $ref: '#/definitions/proto.Constr'
+        type: array
+      temp:
+        type: string
+    type: object
+  proto.Constr:
+    properties:
+      obturators:
+        items:
+          $ref: '#/definitions/proto.PutgObt'
+        type: array
+      short:
+        type: string
+    type: object
   proto.Dn:
     properties:
       dn:
@@ -476,6 +543,54 @@ definitions:
           type: string
         type: array
     type: object
+  proto.Putg:
+    properties:
+      coating:
+        items:
+          type: string
+        type: array
+      construction:
+        items:
+          $ref: '#/definitions/proto.PutgConstructions'
+        type: array
+      form:
+        type: string
+      graphite:
+        items:
+          type: string
+        type: array
+      iLimiter:
+        $ref: '#/definitions/proto.PutgMaterials'
+      id:
+        type: string
+      mounting:
+        items:
+          type: string
+        type: array
+      oLimiter:
+        $ref: '#/definitions/proto.PutgMaterials'
+      obturator:
+        $ref: '#/definitions/proto.PutgMaterials'
+      reinforce:
+        $ref: '#/definitions/proto.PutgMaterials'
+      temperatures:
+        items:
+          $ref: '#/definitions/proto.PutgTemp'
+        type: array
+      typeFlId:
+        type: string
+      typePr:
+        type: string
+    type: object
+  proto.PutgConstructions:
+    properties:
+      grap:
+        type: string
+      temperatures:
+        items:
+          $ref: '#/definitions/proto.ConTemp'
+        type: array
+    type: object
   proto.PutgImage:
     properties:
       form:
@@ -486,6 +601,35 @@ definitions:
         type: string
       url:
         type: string
+    type: object
+  proto.PutgMaterials:
+    properties:
+      default:
+        type: string
+      obturators:
+        items:
+          type: string
+        type: array
+      values:
+        items:
+          type: string
+        type: array
+    type: object
+  proto.PutgObt:
+    properties:
+      imageUrl:
+        type: string
+      short:
+        type: string
+    type: object
+  proto.PutgTemp:
+    properties:
+      grap:
+        type: string
+      temps:
+        items:
+          $ref: '#/definitions/proto.Temp'
+        type: array
     type: object
   proto.SNP:
     properties:
@@ -599,7 +743,7 @@ info:
   contact: {}
   description: API Service for Sealur
   title: Sealur
-  version: "0.1"
+  version: "0.5"
 paths:
   /sealur-pro/additionals:
     get:
@@ -1450,6 +1594,96 @@ paths:
       summary: Update Flange
       tags:
       - Sealur Pro -> flanges
+  /sealur-pro/putg:
+    get:
+      consumes:
+      - application/json
+      description: получение прокладок путг
+      parameters:
+      - description: form
+        in: query
+        name: form
+        required: true
+        type: string
+      - description: flange id
+        in: query
+        name: flangeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.Putg'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Putg
+      tags:
+      - Sealur Pro -> putg
+    post:
+      consumes:
+      - application/json
+      description: создание прокладки путг
+      parameters:
+      - description: putg info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.PutgDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Putg
+      tags:
+      - Sealur Pro -> putg
   /sealur-pro/putg-image:
     get:
       consumes:
@@ -1459,11 +1693,6 @@ paths:
       - description: form
         in: query
         name: form
-        required: true
-        type: string
-      - description: gasket
-        in: query
-        name: gasket
         required: true
         type: string
       produces:
@@ -1623,6 +1852,89 @@ paths:
       summary: Update Putg Image
       tags:
       - Sealur Pro -> putg-image
+  /sealur-pro/putg/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление прокладки путг
+      parameters:
+      - description: putg id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Putg
+      tags:
+      - Sealur Pro -> putg
+    put:
+      consumes:
+      - application/json
+      description: обновление прокладки путг
+      parameters:
+      - description: putg info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.PutgDTO'
+      - description: putg id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Putg
+      tags:
+      - Sealur Pro -> putg
   /sealur-pro/sizes:
     get:
       consumes:
