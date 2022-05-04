@@ -15,6 +15,15 @@ func (h *Handler) GetSizes(ctx context.Context, dto *proto.GetSizesRequest) (*pr
 	return &proto.SizeResponse{Sizes: sizes, Dn: dn}, nil
 }
 
+func (h *Handler) GetAllSizes(ctx context.Context, dto *proto.GetSizesRequest) (*proto.SizeResponse, error) {
+	sizes, dn, err := h.service.Size.GetAll(dto)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.SizeResponse{Sizes: sizes, Dn: dn}, nil
+}
+
 func (h *Handler) CreateSize(ctx context.Context, dto *proto.CreateSizeRequest) (*proto.IdResponse, error) {
 	size, err := h.service.Size.Create(dto)
 	if err != nil {

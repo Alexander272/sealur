@@ -587,6 +587,7 @@ service ProService {
 
     //Size Service ----------------------------------------------------------------
     rpc GetSizes (GetSizesRequest) returns (SizeResponse);
+    rpc GetAllSizes (GetSizesRequest) returns (SizeResponse);
     rpc CreateSize (CreateSizeRequest) returns (IdResponse);
     rpc UpdateSize (UpdateSizeRequest) returns (IdResponse);
     rpc DeleteSize (DeleteSizeRequest) returns (IdResponse);

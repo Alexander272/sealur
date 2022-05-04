@@ -2165,6 +2165,64 @@ paths:
       summary: Delete Size
       tags:
       - Sealur Pro -> sizes
+    get:
+      consumes:
+      - application/json
+      description: получение размеров
+      parameters:
+      - description: flange
+        in: query
+        name: flange
+        required: true
+        type: string
+      - description: flange type id
+        in: query
+        name: typeFlId
+        required: true
+        type: string
+      - description: standarts id
+        in: query
+        name: standId
+        required: true
+        type: string
+      - description: type
+        in: query
+        name: typePr
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/proto.SizeResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Sizes
+      tags:
+      - Sealur Pro -> sizes
   /sealur-pro/snp:
     get:
       consumes:

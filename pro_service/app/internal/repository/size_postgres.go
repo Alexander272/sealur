@@ -41,6 +41,26 @@ func (r *SizesRepo) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, err er
 	return sizes, nil
 }
 
+func (r *SizesRepo) GetAll(req *proto.GetSizesRequest) (sizes []*proto.Size, err error) {
+	var query string
+	if strings.Contains(strings.ToLower(req.TypePr), "путг") {
+		query = fmt.Sprintf(`SELECT id, dn, pn, d4, d3, d2, d1, h, s2, s3, type_pr, type_fl_id FROM size_%s WHERE LOWER(type_pr) like LOWER('%s%%') 
+		AND (stand_id=$1 OR stand_id=0) AND type_fl_id=$2 ORDER BY type_pr, count`, req.Flange, req.TypePr)
+	}
+
+	var data []models.Size
+	if err = r.db.Select(&data, query, req.StandId, req.TypeFlId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for _, d := range data {
+		s := proto.Size(d)
+		sizes = append(sizes, &s)
+	}
+
+	return sizes, nil
+}
+
 func (r *SizesRepo) Create(size *proto.CreateSizeRequest) (id string, err error) {
 	query := fmt.Sprintf(`INSERT INTO size_%s (count, dn, pn, type_fl_id, type_pr, stand_id, d4, d3, d2, d1, h, s2, s3) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, size.Flange)

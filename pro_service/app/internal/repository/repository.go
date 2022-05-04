@@ -53,6 +53,7 @@ type Addit interface {
 
 type Size interface {
 	Get(req *proto.GetSizesRequest) ([]*proto.Size, error)
+	GetAll(req *proto.GetSizesRequest) ([]*proto.Size, error)
 	Create(size *proto.CreateSizeRequest) (id string, err error)
 	Update(size *proto.UpdateSizeRequest) error
 	Delete(size *proto.DeleteSizeRequest) error

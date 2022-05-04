@@ -35,6 +35,17 @@ func (s *SizeService) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, dn [
 	return sizes, dn, nil
 }
 
+func (s *SizeService) GetAll(req *proto.GetSizesRequest) (sizes []*proto.Size, dn []*proto.Dn, err error) {
+	sizes, err = s.repo.GetAll(req)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get sizes. error: %w", err)
+	}
+
+	dn = make([]*proto.Dn, 0, len(sizes))
+
+	return sizes, dn, nil
+}
+
 func (s *SizeService) Create(size *proto.CreateSizeRequest) (*proto.IdResponse, error) {
 	id, err := s.repo.Create(size)
 	if err != nil {

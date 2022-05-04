@@ -13,6 +13,7 @@ func (h *Handler) initSizeRoutes(api *gin.RouterGroup) {
 	sizes := api.Group("/sizes")
 	{
 		sizes.GET("/", h.getSizes)
+		sizes.GET("/all", h.getAllSizes)
 		sizes.POST("/", h.createSize)
 		sizes.PUT("/:id", h.updateSize)
 		sizes.DELETE("/:id", h.deleteSize)
@@ -59,6 +60,58 @@ func (h *Handler) getSizes(c *gin.Context) {
 	}
 
 	sizes, err := h.proClient.GetSizes(c, &proto.GetSizesRequest{
+		Flange:   flange,
+		TypeFlId: typeFlId,
+		TypePr:   typePr,
+		StandId:  standId,
+	})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: sizes, Count: len(sizes.Sizes)})
+}
+
+// @Summary Get All Sizes
+// @Tags Sealur Pro -> sizes
+// @Security ApiKeyAuth
+// @Description получение размеров
+// @ModuleID getSizes
+// @Accept json
+// @Produce json
+// @Param flange query string true "flange"
+// @Param typeFlId query string true "flange type id"
+// @Param standId query string true "standarts id"
+// @Param typePr query string true "type"
+// @Success 200 {object} models.DataResponse{data=proto.SizeResponse}
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/sizes/all [get]
+func (h *Handler) getAllSizes(c *gin.Context) {
+	flange := c.Query("flange")
+	if flange == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty flange", "empty flange param")
+		return
+	}
+	typeFlId := c.Query("typeFlId")
+	if typeFlId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty flange type id", "empty flange type id param")
+		return
+	}
+	standId := c.Query("standId")
+	if standId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty stand id", "empty standarts id param")
+		return
+	}
+	typePr := c.Query("typePr")
+	if typePr == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty type", "empty type lining")
+		return
+	}
+
+	sizes, err := h.proClient.GetAllSizes(c, &proto.GetSizesRequest{
 		Flange:   flange,
 		TypeFlId: typeFlId,
 		TypePr:   typePr,
