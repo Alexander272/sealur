@@ -19,7 +19,7 @@ func NewPutgRepo(db *sqlx.DB) *PutgRepo {
 
 func (r *PutgRepo) Get(req *proto.GetPutgRequest) (putg []models.Putg, err error) {
 	query := fmt.Sprintf(`SELECT id, type_fl_id, type_pr, form, construction, temperatures, reinforce, obturator, i_limiter, o_limiter, 
-		coating, mounting, graphite FROM %s WHERE form=$1 AND flange_id=$2`, PutgTable)
+		coating, mounting, graphite FROM %s WHERE form=$1 AND flange_id=$2 ORDER BY type_fl_id`, PutgTable)
 
 	if err = r.db.Select(&putg, query, req.Form, req.FlangeId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)

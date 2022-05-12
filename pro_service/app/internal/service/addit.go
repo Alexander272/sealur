@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
@@ -99,11 +100,15 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 		tmp = strings.Split(d.Construction, ";")
 		for _, v := range tmp {
 			parts := strings.Split(v, "@")
+			isHaveMaterial, err := strconv.ParseBool(parts[3])
+			if err != nil {
+				isHaveMaterial = false
+			}
 			constr = append(constr, &proto.AddConstruction{
-				Short:       parts[0],
-				Title:       parts[1],
-				Description: parts[2],
-				ForDescr:    parts[3],
+				Short:          parts[0],
+				Title:          parts[1],
+				Description:    parts[2],
+				IsHaveMaterial: isHaveMaterial,
 			})
 		}
 		tmp = strings.Split(d.Obturator, ";")
@@ -284,7 +289,7 @@ func (s *AdditService) UpdateConstruction(addit *proto.UpdateAddConstructionRequ
 		if i > 0 {
 			constr += ";"
 		}
-		constr += fmt.Sprintf("%s@%s@%s@%s", c.Short, c.Title, c.Description, c.ForDescr)
+		constr += fmt.Sprintf("%s@%s@%s@%v", c.Short, c.Title, c.Description, c.IsHaveMaterial)
 	}
 
 	dto := models.UpdateConstr{

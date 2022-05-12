@@ -3767,8 +3767,8 @@ const docTemplate_swagger = `{
                 "description": {
                     "type": "string"
                 },
-                "forDescr": {
-                    "type": "string"
+                "isHaveMaterial": {
+                    "type": "boolean"
                 },
                 "short": {
                     "type": "string"
