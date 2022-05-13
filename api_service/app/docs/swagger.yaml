@@ -440,6 +440,8 @@ definitions:
     properties:
       description:
         type: string
+      forDescr:
+        type: string
       short:
         type: string
       title:

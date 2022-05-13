@@ -6,6 +6,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -18,8 +19,9 @@ func NewStFlRepo(db *sqlx.DB) *StFlRepo {
 }
 
 func (r *StFlRepo) Get() (st []*proto.StFl, err error) {
-	query := fmt.Sprintf(`SELECT st_fl.id, stand_id, stand.title AS stand, fl_id, flange.title AS flange, short FROM %s 
-		LEFT JOIN %s ON (stand_id = stand.id) LEFT JOIN %s ON (fl_id = flange.id)`, StFLTable, StandTable, FlangeTable)
+	query := fmt.Sprintf(`SELECT st_fl.id, stand_id, stand.title AS stand, coalesce(fl_id, 0) as fl_id, coalesce(flange.title, '') AS flange, 
+		coalesce(short, '') as short FROM %s LEFT JOIN %s ON (stand_id = stand.id) LEFT JOIN %s ON (fl_id = flange.id)`,
+		StFLTable, StandTable, FlangeTable)
 
 	var data []models.StFl
 	if err := r.db.Select(&data, query); err != nil {
@@ -27,6 +29,7 @@ func (r *StFlRepo) Get() (st []*proto.StFl, err error) {
 	}
 
 	for _, d := range data {
+		logger.Debug(d)
 		s := proto.StFl(d)
 		st = append(st, &s)
 	}

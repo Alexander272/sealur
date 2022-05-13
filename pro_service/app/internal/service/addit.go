@@ -118,6 +118,7 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 				Short:       parts[0],
 				Title:       parts[1],
 				Description: parts[2],
+				ForDescr:    parts[3],
 			})
 		}
 
@@ -308,7 +309,7 @@ func (s *AdditService) UpdateObturator(addit *proto.UpdateAddObturatorRequest) (
 		if i > 0 {
 			obt += ";"
 		}
-		obt += fmt.Sprintf("%s@%s@%s", o.Short, o.Title, o.Description)
+		obt += fmt.Sprintf("%s@%s@%s@%s", o.Short, o.Title, o.Description, o.ForDescr)
 	}
 
 	dto := models.UpdateObturator{

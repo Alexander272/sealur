@@ -409,5 +409,5 @@ func (h *Handler) updateObturator(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated fillers"})
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated obturators"})
 }

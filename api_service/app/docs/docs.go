@@ -3851,6 +3851,9 @@ const docTemplate_swagger = `{
                 "description": {
                     "type": "string"
                 },
+                "forDescr": {
+                    "type": "string"
+                },
                 "short": {
                     "type": "string"
                 },
