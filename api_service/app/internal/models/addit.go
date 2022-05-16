@@ -69,3 +69,15 @@ type UpdateObturatorDTO struct {
 	TypeCh string                `json:"type" binding:"required"`
 	Change string                `json:"change"`
 }
+
+type UpdateBasisDTO struct {
+	Basis  []*proto.AddBasis `json:"basis" binding:"required"`
+	TypeCh string            `json:"type" binding:"required"`
+	Change string            `json:"change"`
+}
+
+type UpdateSealantDTO struct {
+	Sealant []*proto.AddSealant `json:"sealant" binding:"required"`
+	TypeCh  string              `json:"type" binding:"required"`
+	Change  string              `json:"change"`
+}

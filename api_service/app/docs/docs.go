@@ -144,6 +144,76 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/sealur-pro/additionals/{id}/basis": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление конструкций для путгм",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update Basis",
+                "parameters": [
+                    {
+                        "description": "additional basis info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateBasisDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/sealur-pro/additionals/{id}/coat": {
             "patch": {
                 "security": [
@@ -660,6 +730,76 @@ const docTemplate_swagger = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/models.UpdateObturatorDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/additionals/{id}/seal": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление обтюраторов для путгм",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update Sealant",
+                "parameters": [
+                    {
+                        "description": "additional sealant info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateSealantDTO"
                         }
                     },
                     {
@@ -3555,6 +3695,27 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "models.UpdateBasisDTO": {
+            "type": "object",
+            "required": [
+                "basis",
+                "type"
+            ],
+            "properties": {
+                "basis": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddBasis"
+                    }
+                },
+                "change": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "models.UpdateCoatingDTO": {
             "type": "object",
             "required": [
@@ -3723,6 +3884,27 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "models.UpdateSealantDTO": {
+            "type": "object",
+            "required": [
+                "sealant",
+                "type"
+            ],
+            "properties": {
+                "change": {
+                    "type": "string"
+                },
+                "sealant": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddSealant"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "models.UpdateTempDTO": {
             "type": "object",
             "required": [
@@ -3740,6 +3922,20 @@ const docTemplate_swagger = `{
                     }
                 },
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddBasis": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -3846,6 +4042,23 @@ const docTemplate_swagger = `{
             }
         },
         "proto.AddObturator": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "forDescr": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddSealant": {
             "type": "object",
             "properties": {
                 "description": {

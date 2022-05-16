@@ -46,6 +46,8 @@ type Addit interface {
 	UpdateCoating(*proto.UpdateAddCoatingRequest) (*proto.SuccessResponse, error)
 	UpdateConstruction(*proto.UpdateAddConstructionRequest) (*proto.SuccessResponse, error)
 	UpdateObturator(*proto.UpdateAddObturatorRequest) (*proto.SuccessResponse, error)
+	UpdateBasis(*proto.UpdateAddBasisRequest) (*proto.SuccessResponse, error)
+	UpdateSealant(*proto.UpdateAddSealantRequest) (*proto.SuccessResponse, error)
 }
 
 type Size interface {

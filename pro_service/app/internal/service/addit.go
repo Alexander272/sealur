@@ -34,6 +34,8 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 		var coat []*proto.AddCoating
 		var constr []*proto.AddConstruction
 		var obt []*proto.AddObturator
+		var basis []*proto.AddBasis
+		var seal []*proto.AddSealant
 
 		tmp := strings.Split(d.Materials, ";")
 		for _, v := range tmp {
@@ -121,6 +123,25 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 				ForDescr:    parts[3],
 			})
 		}
+		tmp = strings.Split(d.Basis, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			basis = append(basis, &proto.AddBasis{
+				Short:       parts[0],
+				Title:       parts[1],
+				Description: parts[2],
+			})
+		}
+		tmp = strings.Split(d.Sealant, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			seal = append(seal, &proto.AddSealant{
+				Short:       parts[0],
+				Title:       parts[1],
+				Description: parts[2],
+				ForDescr:    parts[3],
+			})
+		}
 
 		addit = append(addit, &proto.Additional{
 			Id:           d.Id,
@@ -133,6 +154,8 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 			Coating:      coat,
 			Construction: constr,
 			Obturator:    obt,
+			Basis:        basis,
+			Sealant:      seal,
 		})
 	}
 
@@ -317,6 +340,44 @@ func (s *AdditService) UpdateObturator(addit *proto.UpdateAddObturatorRequest) (
 		Obturator: obt,
 	}
 	if err := s.repo.UpdateObturator(dto); err != nil {
+		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
+	}
+	return &proto.SuccessResponse{Success: true}, nil
+}
+
+func (s *AdditService) UpdateBasis(addit *proto.UpdateAddBasisRequest) (*proto.SuccessResponse, error) {
+	var basis string
+	for i, b := range addit.Basis {
+		if i > 0 {
+			basis += ";"
+		}
+		basis += fmt.Sprintf("%s@%s@%s", b.Short, b.Title, b.Description)
+	}
+
+	dto := models.UpdateBasis{
+		Id:    addit.Id,
+		Basis: basis,
+	}
+	if err := s.repo.UpdateBasis(dto); err != nil {
+		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
+	}
+	return &proto.SuccessResponse{Success: true}, nil
+}
+
+func (s *AdditService) UpdateSealant(addit *proto.UpdateAddSealantRequest) (*proto.SuccessResponse, error) {
+	var seal string
+	for i, s := range addit.Sealant {
+		if i > 0 {
+			seal += ";"
+		}
+		seal += fmt.Sprintf("%s@%s@%s@%s", s.Short, s.Title, s.Description, s.ForDescr)
+	}
+
+	dto := models.UpdateSealant{
+		Id:      addit.Id,
+		Sealant: seal,
+	}
+	if err := s.repo.UpdateSealant(dto); err != nil {
 		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
 	}
 	return &proto.SuccessResponse{Success: true}, nil

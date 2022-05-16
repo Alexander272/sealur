@@ -245,6 +245,20 @@ definitions:
     required:
     - title
     type: object
+  models.UpdateBasisDTO:
+    properties:
+      basis:
+        items:
+          $ref: '#/definitions/proto.AddBasis'
+        type: array
+      change:
+        type: string
+      type:
+        type: string
+    required:
+    - basis
+    - type
+    type: object
   models.UpdateCoatingDTO:
     properties:
       change:
@@ -357,6 +371,20 @@ definitions:
     - obturator
     - type
     type: object
+  models.UpdateSealantDTO:
+    properties:
+      change:
+        type: string
+      sealant:
+        items:
+          $ref: '#/definitions/proto.AddSealant'
+        type: array
+      type:
+        type: string
+    required:
+    - sealant
+    - type
+    type: object
   models.UpdateTempDTO:
     properties:
       change:
@@ -370,6 +398,15 @@ definitions:
     required:
     - temperature
     - type
+    type: object
+  proto.AddBasis:
+    properties:
+      description:
+        type: string
+      short:
+        type: string
+      title:
+        type: string
     type: object
   proto.AddCoating:
     properties:
@@ -437,6 +474,17 @@ definitions:
         type: string
     type: object
   proto.AddObturator:
+    properties:
+      description:
+        type: string
+      forDescr:
+        type: string
+      short:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.AddSealant:
     properties:
       description:
         type: string
@@ -827,6 +875,51 @@ paths:
       summary: Create Addit
       tags:
       - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/basis:
+    patch:
+      consumes:
+      - application/json
+      description: обновление конструкций для путгм
+      parameters:
+      - description: additional basis info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateBasisDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Basis
+      tags:
+      - Sealur Pro -> additionals
   /sealur-pro/additionals/{id}/coat:
     patch:
       consumes:
@@ -1185,6 +1278,51 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update Obturator
+      tags:
+      - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/seal:
+    patch:
+      consumes:
+      - application/json
+      description: обновление обтюраторов для путгм
+      parameters:
+      - description: additional sealant info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateSealantDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Sealant
       tags:
       - Sealur Pro -> additionals
   /sealur-pro/additionals/{id}/temp:

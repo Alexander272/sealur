@@ -185,3 +185,35 @@ func (h *Handler) UpdateObturator(ctx context.Context, dto *proto.UpdateAddObtur
 
 	return success, nil
 }
+
+func (h *Handler) UpdateBasis(ctx context.Context, dto *proto.UpdateAddBasisRequest) (*proto.SuccessResponse, error) {
+	success, err := h.service.UpdateBasis(dto)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO дописать удаление
+	// if dto.TypeCh == "delete" {
+	// if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
+	// 	return nil, err
+	// }
+	// }
+
+	return success, nil
+}
+
+func (h *Handler) UpdateSealant(ctx context.Context, dto *proto.UpdateAddSealantRequest) (*proto.SuccessResponse, error) {
+	success, err := h.service.UpdateSealant(dto)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO дописать удаление
+	// if dto.TypeCh == "delete" {
+	// if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
+	// 	return nil, err
+	// }
+	// }
+
+	return success, nil
+}

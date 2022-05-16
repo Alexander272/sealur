@@ -173,3 +173,33 @@ func (r *AdditRepo) UpdateObturator(obturator models.UpdateObturator) error {
 	}
 	return nil
 }
+
+func (r *AdditRepo) UpdateBasis(basis models.UpdateBasis) error {
+	query := fmt.Sprintf("UPDATE %s SET basis=$1 WHERE id=$2", AdditionalTable)
+
+	id, err := strconv.Atoi(basis.Id)
+	if err != nil {
+		return fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+
+	_, err = r.db.Exec(query, basis.Basis, id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *AdditRepo) UpdateSealant(sealant models.UpdateSealant) error {
+	query := fmt.Sprintf("UPDATE %s SET sealant=$1 WHERE id=$2", AdditionalTable)
+
+	id, err := strconv.Atoi(sealant.Id)
+	if err != nil {
+		return fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+
+	_, err = r.db.Exec(query, sealant.Sealant, id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}

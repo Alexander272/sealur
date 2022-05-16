@@ -175,6 +175,19 @@ message AddObturator {
     string forDescr = 4;
 }
 
+message AddBasis {
+    string short = 1;
+    string title = 2;
+    string description = 3;
+}
+
+message AddSealant {
+    string short = 1;
+    string title = 2;
+    string description = 3;
+    string forDescr = 4;
+}
+
 message CreateAddRequest {
     string materials = 1;
     string mod = 2;
@@ -244,6 +257,20 @@ message UpdateAddObturatorRequest {
     string change = 4;
 }
 
+message UpdateAddBasisRequest {
+    string id = 1;
+    repeated AddBasis basis = 2;
+    string typeCh = 3;
+    string change = 4;
+}
+
+message UpdateAddSealantRequest {
+    string id = 1;
+    repeated AddSealant sealant = 2;
+    string typeCh = 3;
+    string change = 4;
+}
+
 message Additional {
     string id = 1;
     repeated AddMaterials materials = 2;
@@ -255,6 +282,8 @@ message Additional {
     repeated AddCoating coating = 8;
     repeated AddConstruction construction = 9;
     repeated AddObturator obturator = 10;
+    repeated AddBasis basis = 11;
+    repeated AddSealant sealant = 12;
 }
 message AdditionalResponse {
     repeated Additional additionals = 1;
@@ -585,6 +614,8 @@ service ProService {
     rpc UpdateCoating (UpdateAddCoatingRequest) returns (SuccessResponse);
     rpc UpdateConstruction (UpdateAddConstructionRequest) returns (SuccessResponse);
     rpc UpdateObturator (UpdateAddObturatorRequest) returns (SuccessResponse);
+    rpc UpdateBasis (UpdateAddBasisRequest) returns (SuccessResponse);
+    rpc UpdateSealant (UpdateAddSealantRequest) returns (SuccessResponse);
 
     //Size Service ----------------------------------------------------------------
     rpc GetSizes (GetSizesRequest) returns (SizeResponse);

@@ -22,6 +22,8 @@ func (h *Handler) initAdditRoutes(api *gin.RouterGroup) {
 		addit.PATCH("/:id/coat", h.updateCoating)
 		addit.PATCH("/:id/constr", h.updateConstruction)
 		addit.PATCH("/:id/obt", h.updateObturator)
+		addit.PATCH("/:id/basis", h.updateBasis)
+		addit.PATCH("/:id/seal", h.updateSealant)
 	}
 }
 
@@ -410,4 +412,76 @@ func (h *Handler) updateObturator(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated obturators"})
+}
+
+// @Summary Update Basis
+// @Tags Sealur Pro -> additionals
+// @Security ApiKeyAuth
+// @Description обновление конструкций для путгм
+// @ModuleID updateBasis
+// @Accept json
+// @Produce json
+// @Param data body models.UpdateBasisDTO true "additional basis info"
+// @Param id path string true "addit id"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/additionals/{id}/basis [patch]
+func (h *Handler) updateBasis(c *gin.Context) {
+	var dto models.UpdateBasisDTO
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	_, err := h.proClient.UpdateBasis(c, &proto.UpdateAddBasisRequest{Id: id, Basis: dto.Basis, TypeCh: dto.TypeCh, Change: dto.Change})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated basis"})
+}
+
+// @Summary Update Sealant
+// @Tags Sealur Pro -> additionals
+// @Security ApiKeyAuth
+// @Description обновление обтюраторов для путгм
+// @ModuleID updateSealant
+// @Accept json
+// @Produce json
+// @Param data body models.UpdateSealantDTO true "additional sealant info"
+// @Param id path string true "addit id"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/additionals/{id}/seal [patch]
+func (h *Handler) updateSealant(c *gin.Context) {
+	var dto models.UpdateSealantDTO
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	_, err := h.proClient.UpdateSealant(c, &proto.UpdateAddSealantRequest{Id: id, Sealant: dto.Sealant, TypeCh: dto.TypeCh, Change: dto.Change})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated sealant"})
 }
