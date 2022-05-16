@@ -12,6 +12,7 @@ type Addit struct {
 	Construction string `db:"construction"`
 	Obturator    string `db:"obturator"`
 	Basis        string `db:"basis"`
+	PObturator   string `db:"p_obturator"`
 	Sealant      string `db:"sealant"`
 }
 
@@ -63,6 +64,11 @@ type UpdateObturator struct {
 type UpdateBasis struct {
 	Id    string
 	Basis string
+}
+
+type UpdatePObturator struct {
+	Id         string
+	PObturator string
 }
 
 type UpdateSealant struct {

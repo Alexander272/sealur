@@ -20,11 +20,14 @@ definitions:
         type: string
       obturator:
         type: string
+      pobturator:
+        type: string
       sealant:
         type: string
       temperature:
         type: string
     required:
+    - basis
     - coating
     - construction
     - fillers
@@ -33,6 +36,8 @@ definitions:
     - mod
     - mounting
     - obturator
+    - pobturator
+    - sealant
     - temperature
     type: object
   models.DataResponse:
@@ -371,6 +376,20 @@ definitions:
     - obturator
     - type
     type: object
+  models.UpdatePObtDTO:
+    properties:
+      change:
+        type: string
+      pobturator:
+        items:
+          $ref: '#/definitions/proto.AddPObturator'
+        type: array
+      type:
+        type: string
+    required:
+    - pobturator
+    - type
+    type: object
   models.UpdateSealantDTO:
     properties:
       change:
@@ -484,11 +503,20 @@ definitions:
       title:
         type: string
     type: object
-  proto.AddSealant:
+  proto.AddPObturator:
     properties:
       description:
         type: string
       forDescr:
+        type: string
+      short:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.AddSealant:
+    properties:
+      description:
         type: string
       short:
         type: string
@@ -504,6 +532,10 @@ definitions:
     type: object
   proto.Additional:
     properties:
+      basis:
+        items:
+          $ref: '#/definitions/proto.AddBasis'
+        type: array
       coating:
         items:
           $ref: '#/definitions/proto.AddCoating'
@@ -537,6 +569,14 @@ definitions:
       obturator:
         items:
           $ref: '#/definitions/proto.AddObturator'
+        type: array
+      pObturator:
+        items:
+          $ref: '#/definitions/proto.AddPObturator'
+        type: array
+      sealant:
+        items:
+          $ref: '#/definitions/proto.AddSealant'
         type: array
       temperature:
         items:
@@ -1280,11 +1320,56 @@ paths:
       summary: Update Obturator
       tags:
       - Sealur Pro -> additionals
-  /sealur-pro/additionals/{id}/seal:
+  /sealur-pro/additionals/{id}/pobt:
     patch:
       consumes:
       - application/json
       description: обновление обтюраторов для путгм
+      parameters:
+      - description: additional p_obturator info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdatePObtDTO'
+      - description: addit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update PObturator
+      tags:
+      - Sealur Pro -> additionals
+  /sealur-pro/additionals/{id}/seal:
+    patch:
+      consumes:
+      - application/json
+      description: обновление уплотнителя для путгм
       parameters:
       - description: additional sealant info
         in: body

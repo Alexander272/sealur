@@ -49,8 +49,9 @@ type Addit interface {
 	UpdateCoating(models.UpdateCoating) error
 	UpdateConstruction(models.UpdateConstr) error
 	UpdateObturator(models.UpdateObturator) error
-	UpdateBasis(basis models.UpdateBasis) error
-	UpdateSealant(sealant models.UpdateSealant) error
+	UpdateBasis(models.UpdateBasis) error
+	UpdatePObturator(models.UpdatePObturator) error
+	UpdateSealant(models.UpdateSealant) error
 }
 
 type Size interface {

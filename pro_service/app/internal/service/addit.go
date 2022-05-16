@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
@@ -35,6 +34,7 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 		var constr []*proto.AddConstruction
 		var obt []*proto.AddObturator
 		var basis []*proto.AddBasis
+		var pObt []*proto.AddPObturator
 		var seal []*proto.AddSealant
 
 		tmp := strings.Split(d.Materials, ";")
@@ -102,15 +102,10 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 		tmp = strings.Split(d.Construction, ";")
 		for _, v := range tmp {
 			parts := strings.Split(v, "@")
-			isHaveMaterial, err := strconv.ParseBool(parts[3])
-			if err != nil {
-				isHaveMaterial = false
-			}
 			constr = append(constr, &proto.AddConstruction{
-				Short:          parts[0],
-				Title:          parts[1],
-				Description:    parts[2],
-				IsHaveMaterial: isHaveMaterial,
+				Short:       parts[0],
+				Title:       parts[1],
+				Description: parts[2],
 			})
 		}
 		tmp = strings.Split(d.Obturator, ";")
@@ -139,6 +134,15 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 				Short:       parts[0],
 				Title:       parts[1],
 				Description: parts[2],
+			})
+		}
+		tmp = strings.Split(d.PObturator, ";")
+		for _, v := range tmp {
+			parts := strings.Split(v, "@")
+			pObt = append(pObt, &proto.AddPObturator{
+				Short:       parts[0],
+				Title:       parts[1],
+				Description: parts[2],
 				ForDescr:    parts[3],
 			})
 		}
@@ -155,6 +159,7 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 			Construction: constr,
 			Obturator:    obt,
 			Basis:        basis,
+			PObturator:   pObt,
 			Sealant:      seal,
 		})
 	}
@@ -302,7 +307,7 @@ func (s *AdditService) UpdateCoating(addit *proto.UpdateAddCoatingRequest) (*pro
 		Coating: coat,
 	}
 	if err := s.repo.UpdateCoating(dto); err != nil {
-		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
+		return nil, fmt.Errorf("failed to update coating. error: %w", err)
 	}
 	return &proto.SuccessResponse{Success: true}, nil
 }
@@ -313,7 +318,7 @@ func (s *AdditService) UpdateConstruction(addit *proto.UpdateAddConstructionRequ
 		if i > 0 {
 			constr += ";"
 		}
-		constr += fmt.Sprintf("%s@%s@%s@%v", c.Short, c.Title, c.Description, c.IsHaveMaterial)
+		constr += fmt.Sprintf("%s@%s@%s", c.Short, c.Title, c.Description)
 	}
 
 	dto := models.UpdateConstr{
@@ -321,7 +326,7 @@ func (s *AdditService) UpdateConstruction(addit *proto.UpdateAddConstructionRequ
 		Construction: constr,
 	}
 	if err := s.repo.UpdateConstruction(dto); err != nil {
-		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
+		return nil, fmt.Errorf("failed to update construction. error: %w", err)
 	}
 	return &proto.SuccessResponse{Success: true}, nil
 }
@@ -340,7 +345,7 @@ func (s *AdditService) UpdateObturator(addit *proto.UpdateAddObturatorRequest) (
 		Obturator: obt,
 	}
 	if err := s.repo.UpdateObturator(dto); err != nil {
-		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
+		return nil, fmt.Errorf("failed to update obturator. error: %w", err)
 	}
 	return &proto.SuccessResponse{Success: true}, nil
 }
@@ -359,7 +364,26 @@ func (s *AdditService) UpdateBasis(addit *proto.UpdateAddBasisRequest) (*proto.S
 		Basis: basis,
 	}
 	if err := s.repo.UpdateBasis(dto); err != nil {
-		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
+		return nil, fmt.Errorf("failed to update basis. error: %w", err)
+	}
+	return &proto.SuccessResponse{Success: true}, nil
+}
+
+func (s *AdditService) UpdatePObturator(addit *proto.UpdateAddPObturatorRequest) (*proto.SuccessResponse, error) {
+	var pObt string
+	for i, p := range addit.PObturator {
+		if i > 0 {
+			pObt += ";"
+		}
+		pObt += fmt.Sprintf("%s@%s@%s@%s", p.Short, p.Title, p.Description, p.ForDescr)
+	}
+
+	dto := models.UpdatePObturator{
+		Id:         addit.Id,
+		PObturator: pObt,
+	}
+	if err := s.repo.UpdatePObturator(dto); err != nil {
+		return nil, fmt.Errorf("failed to update p_obturator. error: %w", err)
 	}
 	return &proto.SuccessResponse{Success: true}, nil
 }
@@ -370,7 +394,7 @@ func (s *AdditService) UpdateSealant(addit *proto.UpdateAddSealantRequest) (*pro
 		if i > 0 {
 			seal += ";"
 		}
-		seal += fmt.Sprintf("%s@%s@%s@%s", s.Short, s.Title, s.Description, s.ForDescr)
+		seal += fmt.Sprintf("%s@%s@%s", s.Short, s.Title, s.Description)
 	}
 
 	dto := models.UpdateSealant{
@@ -378,7 +402,7 @@ func (s *AdditService) UpdateSealant(addit *proto.UpdateAddSealantRequest) (*pro
 		Sealant: seal,
 	}
 	if err := s.repo.UpdateSealant(dto); err != nil {
-		return nil, fmt.Errorf("failed to update fillers. error: %w", err)
+		return nil, fmt.Errorf("failed to update sealant. error: %w", err)
 	}
 	return &proto.SuccessResponse{Success: true}, nil
 }

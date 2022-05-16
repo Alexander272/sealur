@@ -165,7 +165,6 @@ message AddConstruction {
     string short = 1;
     string title = 2;
     string description = 3;
-    bool isHaveMaterial = 4;
 }
 
 message AddObturator {
@@ -181,11 +180,17 @@ message AddBasis {
     string description = 3;
 }
 
-message AddSealant {
+message AddPObturator {
     string short = 1;
     string title = 2;
     string description = 3;
     string forDescr = 4;
+}
+
+message AddSealant {
+    string short = 1;
+    string title = 2;
+    string description = 3;
 }
 
 message CreateAddRequest {
@@ -199,7 +204,8 @@ message CreateAddRequest {
     string construction = 8;
     string obturator = 9;
     string basis = 10;
-    string sealant = 11;
+    string pObturator = 11;
+    string sealant = 12;
 }
 
 message UpdateAddMatRequest {
@@ -264,6 +270,13 @@ message UpdateAddBasisRequest {
     string change = 4;
 }
 
+message UpdateAddPObturatorRequest {
+    string id = 1;
+    repeated AddPObturator pObturator = 2;
+    string typeCh = 3;
+    string change = 4;
+}
+
 message UpdateAddSealantRequest {
     string id = 1;
     repeated AddSealant sealant = 2;
@@ -283,7 +296,8 @@ message Additional {
     repeated AddConstruction construction = 9;
     repeated AddObturator obturator = 10;
     repeated AddBasis basis = 11;
-    repeated AddSealant sealant = 12;
+    repeated AddPObturator pObturator = 12;
+    repeated AddSealant sealant = 13;
 }
 message AdditionalResponse {
     repeated Additional additionals = 1;
@@ -615,6 +629,7 @@ service ProService {
     rpc UpdateConstruction (UpdateAddConstructionRequest) returns (SuccessResponse);
     rpc UpdateObturator (UpdateAddObturatorRequest) returns (SuccessResponse);
     rpc UpdateBasis (UpdateAddBasisRequest) returns (SuccessResponse);
+    rpc UpdatePObturator (UpdateAddPObturatorRequest) returns (SuccessResponse);
     rpc UpdateSealant (UpdateAddSealantRequest) returns (SuccessResponse);
 
     //Size Service ----------------------------------------------------------------

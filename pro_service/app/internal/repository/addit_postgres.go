@@ -19,7 +19,7 @@ func NewAdditRepo(db *sqlx.DB) *AdditRepo {
 
 func (r *AdditRepo) GetAll() (addit []models.Addit, err error) {
 	query := fmt.Sprintf(`SELECT id, materials, mod, temperature, mounting, graphite, fillers, coating, 
-		construction, obturator, basis, sealant FROM %s LIMIT 1`, AdditionalTable)
+		construction, obturator, basis, p_obturator, sealant FROM %s LIMIT 1`, AdditionalTable)
 
 	if err = r.db.Select(&addit, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -28,11 +28,11 @@ func (r *AdditRepo) GetAll() (addit []models.Addit, err error) {
 }
 
 func (r *AdditRepo) Create(add *proto.CreateAddRequest) error {
-	query := fmt.Sprintf(`INSERT INTO %s (materials, mod, temperature, mounting, graphite, fillers, coating, construction, obturator, basis, sealant)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, AdditionalTable)
+	query := fmt.Sprintf(`INSERT INTO %s (materials, mod, temperature, mounting, graphite, fillers, coating, construction, obturator, basis, 
+		p_obturator, sealant) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`, AdditionalTable)
 
 	_, err := r.db.Exec(query, add.Materials, add.Mod, add.Temperature, add.Mounting, add.Graphite, add.Fillers, add.Coating, add.Construction,
-		add.Obturator, add.Basis, add.Sealant)
+		add.Obturator, add.Basis, add.PObturator, add.Sealant)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -183,6 +183,21 @@ func (r *AdditRepo) UpdateBasis(basis models.UpdateBasis) error {
 	}
 
 	_, err = r.db.Exec(query, basis.Basis, id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *AdditRepo) UpdatePObturator(pObt models.UpdatePObturator) error {
+	query := fmt.Sprintf("UPDATE %s SET p_obturator=$1 WHERE id=$2", AdditionalTable)
+
+	id, err := strconv.Atoi(pObt.Id)
+	if err != nil {
+		return fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+
+	_, err = r.db.Exec(query, pObt.PObturator, id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

@@ -12,8 +12,9 @@ type CreateAdditDTO struct {
 	Coating      string `json:"coating" binding:"required"`
 	Construction string `json:"construction" binding:"required"`
 	Obturator    string `json:"obturator" binding:"required"`
-	Basis        string `json:"basis"`
-	Sealant      string `json:"sealant"`
+	Basis        string `json:"basis" binding:"required"`
+	PObt         string `json:"pobturator" binding:"required"`
+	Sealant      string `json:"sealant" binding:"required"`
 }
 
 type UpdateMatDTO struct {
@@ -74,6 +75,12 @@ type UpdateBasisDTO struct {
 	Basis  []*proto.AddBasis `json:"basis" binding:"required"`
 	TypeCh string            `json:"type" binding:"required"`
 	Change string            `json:"change"`
+}
+
+type UpdatePObtDTO struct {
+	Obturator []*proto.AddPObturator `json:"pobturator" binding:"required"`
+	TypeCh    string                 `json:"type" binding:"required"`
+	Change    string                 `json:"change"`
 }
 
 type UpdateSealantDTO struct {

@@ -23,6 +23,7 @@ func (h *Handler) initAdditRoutes(api *gin.RouterGroup) {
 		addit.PATCH("/:id/constr", h.updateConstruction)
 		addit.PATCH("/:id/obt", h.updateObturator)
 		addit.PATCH("/:id/basis", h.updateBasis)
+		addit.PATCH("/:id/pobt", h.updatePObturator)
 		addit.PATCH("/:id/seal", h.updateSealant)
 	}
 }
@@ -81,6 +82,7 @@ func (h *Handler) createAddit(c *gin.Context) {
 		Obturator:    dto.Obturator,
 		Basis:        dto.Basis,
 		Sealant:      dto.Sealant,
+		PObturator:   dto.PObt,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -450,10 +452,46 @@ func (h *Handler) updateBasis(c *gin.Context) {
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated basis"})
 }
 
-// @Summary Update Sealant
+// @Summary Update PObturator
 // @Tags Sealur Pro -> additionals
 // @Security ApiKeyAuth
 // @Description обновление обтюраторов для путгм
+// @ModuleID updatePObturator
+// @Accept json
+// @Produce json
+// @Param data body models.UpdatePObtDTO true "additional p_obturator info"
+// @Param id path string true "addit id"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/additionals/{id}/pobt [patch]
+func (h *Handler) updatePObturator(c *gin.Context) {
+	var dto models.UpdatePObtDTO
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	_, err := h.proClient.UpdatePObturator(c, &proto.UpdateAddPObturatorRequest{Id: id, PObturator: dto.Obturator, TypeCh: dto.TypeCh, Change: dto.Change})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated sealant"})
+}
+
+// @Summary Update Sealant
+// @Tags Sealur Pro -> additionals
+// @Security ApiKeyAuth
+// @Description обновление уплотнителя для путгм
 // @ModuleID updateSealant
 // @Accept json
 // @Produce json

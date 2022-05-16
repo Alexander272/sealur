@@ -774,7 +774,7 @@ const docTemplate_swagger = `{
                 }
             }
         },
-        "/sealur-pro/additionals/{id}/seal": {
+        "/sealur-pro/additionals/{id}/pobt": {
             "patch": {
                 "security": [
                     {
@@ -782,6 +782,76 @@ const docTemplate_swagger = `{
                     }
                 ],
                 "description": "обновление обтюраторов для путгм",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e additionals"
+                ],
+                "summary": "Update PObturator",
+                "parameters": [
+                    {
+                        "description": "additional p_obturator info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdatePObtDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "addit id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/additionals/{id}/seal": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление уплотнителя для путгм",
                 "consumes": [
                     "application/json"
                 ],
@@ -3341,6 +3411,7 @@ const docTemplate_swagger = `{
         "models.CreateAdditDTO": {
             "type": "object",
             "required": [
+                "basis",
                 "coating",
                 "construction",
                 "fillers",
@@ -3349,6 +3420,8 @@ const docTemplate_swagger = `{
                 "mod",
                 "mounting",
                 "obturator",
+                "pobturator",
+                "sealant",
                 "temperature"
             ],
             "properties": {
@@ -3377,6 +3450,9 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "obturator": {
+                    "type": "string"
+                },
+                "pobturator": {
                     "type": "string"
                 },
                 "sealant": {
@@ -3884,6 +3960,27 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "models.UpdatePObtDTO": {
+            "type": "object",
+            "required": [
+                "pobturator",
+                "type"
+            ],
+            "properties": {
+                "change": {
+                    "type": "string"
+                },
+                "pobturator": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddPObturator"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "models.UpdateSealantDTO": {
             "type": "object",
             "required": [
@@ -4058,13 +4155,27 @@ const docTemplate_swagger = `{
                 }
             }
         },
-        "proto.AddSealant": {
+        "proto.AddPObturator": {
             "type": "object",
             "properties": {
                 "description": {
                     "type": "string"
                 },
                 "forDescr": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.AddSealant": {
+            "type": "object",
+            "properties": {
+                "description": {
                     "type": "string"
                 },
                 "short": {
@@ -4089,6 +4200,12 @@ const docTemplate_swagger = `{
         "proto.Additional": {
             "type": "object",
             "properties": {
+                "basis": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddBasis"
+                    }
+                },
                 "coating": {
                     "type": "array",
                     "items": {
@@ -4138,6 +4255,18 @@ const docTemplate_swagger = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.AddObturator"
+                    }
+                },
+                "pObturator": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddPObturator"
+                    }
+                },
+                "sealant": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AddSealant"
                     }
                 },
                 "temperature": {
