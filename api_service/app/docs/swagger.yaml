@@ -143,6 +143,64 @@ definitions:
     - gasket
     - url
     type: object
+  models.PutgmDTO:
+    properties:
+      basis:
+        $ref: '#/definitions/proto.PutgMaterials'
+      coating:
+        items:
+          type: string
+        type: array
+      construction:
+        items:
+          $ref: '#/definitions/proto.PutgmConstructions'
+        type: array
+      flangeId:
+        type: string
+      form:
+        type: string
+      graphite:
+        items:
+          type: string
+        type: array
+      mounting:
+        items:
+          type: string
+        type: array
+      obturator:
+        $ref: '#/definitions/proto.PutgMaterials'
+      temperatures:
+        items:
+          $ref: '#/definitions/proto.PutgTemp'
+        type: array
+      typeFlId:
+        type: string
+      typePr:
+        type: string
+    required:
+    - coating
+    - construction
+    - flangeId
+    - form
+    - graphite
+    - mounting
+    - temperatures
+    - typeFlId
+    - typePr
+    type: object
+  models.PutgmImageDTO:
+    properties:
+      form:
+        type: string
+      gasket:
+        type: string
+      url:
+        type: string
+    required:
+    - form
+    - gasket
+    - url
+    type: object
   models.SNPDTO:
     properties:
       fillers:
@@ -442,8 +500,6 @@ definitions:
     properties:
       description:
         type: string
-      isHaveMaterial:
-        type: boolean
       short:
         type: string
       title:
@@ -517,6 +573,10 @@ definitions:
   proto.AddSealant:
     properties:
       description:
+        type: string
+      forDescr:
+        type: string
+      id:
         type: string
       short:
         type: string
@@ -720,6 +780,86 @@ definitions:
         items:
           $ref: '#/definitions/proto.Temp'
         type: array
+    type: object
+  proto.Putgm:
+    properties:
+      basis:
+        $ref: '#/definitions/proto.PutgMaterials'
+      coating:
+        items:
+          type: string
+        type: array
+      construction:
+        items:
+          $ref: '#/definitions/proto.PutgmConstructions'
+        type: array
+      form:
+        type: string
+      graphite:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      mounting:
+        items:
+          type: string
+        type: array
+      obturator:
+        $ref: '#/definitions/proto.PutgMaterials'
+      temperatures:
+        items:
+          $ref: '#/definitions/proto.PutgTemp'
+        type: array
+      typeFlId:
+        type: string
+      typePr:
+        type: string
+    type: object
+  proto.PutgmConstr:
+    properties:
+      basis:
+        type: string
+      obturator:
+        items:
+          $ref: '#/definitions/proto.PutgmObt'
+        type: array
+    type: object
+  proto.PutgmConstructions:
+    properties:
+      basis:
+        items:
+          $ref: '#/definitions/proto.PutgmConstr'
+        type: array
+      grap:
+        type: string
+    type: object
+  proto.PutgmImage:
+    properties:
+      form:
+        type: string
+      gasket:
+        type: string
+      id:
+        type: string
+      url:
+        type: string
+    type: object
+  proto.PutgmObt:
+    properties:
+      obturator:
+        type: string
+      sealant:
+        items:
+          $ref: '#/definitions/proto.PutgmSeal'
+        type: array
+    type: object
+  proto.PutgmSeal:
+    properties:
+      imageUrl:
+        type: string
+      seal:
+        type: string
     type: object
   proto.SNP:
     properties:
@@ -2000,7 +2140,7 @@ paths:
       - application/json
       description: удаление чертежа путг
       parameters:
-      - description: st/fl id
+      - description: putg image id
         in: path
         name: id
         required: true
@@ -2160,6 +2300,347 @@ paths:
       summary: Update Putg
       tags:
       - Sealur Pro -> putg
+  /sealur-pro/putgm:
+    get:
+      consumes:
+      - application/json
+      description: получение прокладок путгм
+      parameters:
+      - description: form
+        in: query
+        name: form
+        required: true
+        type: string
+      - description: flange id
+        in: query
+        name: flangeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.Putgm'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Putgm
+      tags:
+      - Sealur Pro -> putgm
+    post:
+      consumes:
+      - application/json
+      description: создание прокладки путгм
+      parameters:
+      - description: putgm info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.PutgmDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Putgm
+      tags:
+      - Sealur Pro -> putgm
+  /sealur-pro/putgm-image:
+    get:
+      consumes:
+      - application/json
+      description: получение списка чертежей для путгм
+      parameters:
+      - description: form
+        in: query
+        name: form
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.PutgmImage'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Putgm Image
+      tags:
+      - Sealur Pro -> putgm-image
+    post:
+      consumes:
+      - application/json
+      description: создание чертежа путгм
+      parameters:
+      - description: putgm image info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.PutgmImageDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Putgm Image
+      tags:
+      - Sealur Pro -> putgm-image
+  /sealur-pro/putgm-image/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление чертежа путг
+      parameters:
+      - description: putgm image id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Putgm Image
+      tags:
+      - Sealur Pro -> putgm-image
+    put:
+      consumes:
+      - application/json
+      description: обновление чертежа путгм
+      parameters:
+      - description: putgm image id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: putgm image info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.PutgmImageDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Putgm Image
+      tags:
+      - Sealur Pro -> putgm-image
+  /sealur-pro/putgm/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление прокладки путгм
+      parameters:
+      - description: putgm id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Putgm
+      tags:
+      - Sealur Pro -> putgm
+    put:
+      consumes:
+      - application/json
+      description: обновление прокладки путгм
+      parameters:
+      - description: putgm info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.PutgmDTO'
+      - description: putgm id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Putgm
+      tags:
+      - Sealur Pro -> putgm
   /sealur-pro/sizes:
     get:
       consumes:

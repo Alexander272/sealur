@@ -188,9 +188,11 @@ message AddPObturator {
 }
 
 message AddSealant {
-    string short = 1;
-    string title = 2;
-    string description = 3;
+    string id = 1;
+    string short = 2;
+    string title = 3;
+    string description = 4;
+    string forDescr = 5;
 }
 
 message CreateAddRequest {
@@ -574,6 +576,115 @@ message PutgResponse {
     repeated Putg putg = 1;
 }
 
+// PUTGm Image Service ----------------------------------------------------------------
+message PutgmImage {
+    string id = 1;
+    string form = 2;
+    string gasket = 3;
+    string url = 4;
+}
+
+message GetPutgmImageRequest {
+    string form = 1;
+}
+
+message CreatePutgmImageRequest {
+    string form = 1;
+    string gasket = 2;
+    string url = 3;
+}
+
+message UpdatePutgmImageRequest {
+    string id = 1;
+    string form = 2;
+    string gasket = 3;
+    string url = 4;
+}
+
+message DeletePutgmImageRequest {
+    string id = 1;
+}
+
+message PutgmImageResponse {
+    repeated PutgmImage putgmImage = 1;
+}
+
+// PUTGm Service ----------------------------------------------------------------
+message PutgmConstructions {
+    string grap = 1;
+    repeated PutgmConstr basis = 2;
+}
+
+message PutgmConstr {
+    string basis = 1;
+    repeated PutgmObt obturator = 2;
+}
+
+message PutgmObt {
+    string obturator = 1;
+    repeated PutgmSeal sealant = 2;
+}
+
+message PutgmSeal {
+    string seal = 1;
+    string imageUrl = 2;
+}
+
+message GetPutgmRequest {
+    string form = 1;
+    string flangeId = 2;
+}
+
+message CreatePutgmRequest {
+    string flangeId = 1;
+    string typeFlId = 2;
+    string typePr = 3;
+    string form = 4;
+    repeated PutgmConstructions construction = 5;
+    repeated PutgTemp temperatures = 6;
+    PutgMaterials basis = 7;
+    PutgMaterials obturator = 8;
+    repeated string coating = 9;
+    repeated string mounting = 10;
+    repeated string graphite = 11;
+}
+
+message UpdatePutgmRequest {
+    string id = 1;
+    string typeFlId = 2;
+    string typePr = 3;
+    string form = 4;
+    repeated PutgmConstructions construction = 5;
+    repeated PutgTemp temperatures = 6;
+    PutgMaterials basis = 7;
+    PutgMaterials obturator = 8;
+    repeated string coating = 9;
+    repeated string mounting = 10;
+    repeated string graphite = 11;
+    string flangeId = 12;
+}
+
+message DeletePutgmRequest {
+    string id = 1;
+}
+
+message Putgm {
+    string id = 1;
+    string typeFlId = 2;
+    string typePr = 3;
+    string form = 4;
+    repeated PutgmConstructions construction = 5;
+    repeated PutgTemp temperatures = 6;
+    PutgMaterials basis = 7;
+    PutgMaterials obturator = 8;
+    repeated string coating = 9;
+    repeated string mounting = 10;
+    repeated string graphite = 11;
+}
+message PutgmResponse {
+    repeated Putgm putgm = 1;
+}
+
 // commmon ----------------------------------------------------------------
 message IdResponse {
     string id = 1;
@@ -657,4 +768,16 @@ service ProService {
     rpc CreatePutg (CreatePutgRequest) returns (IdResponse);
     rpc UpdatePutg (UpdatePutgRequest) returns (IdResponse);
     rpc DeletePutg (DeletePutgRequest) returns (IdResponse);
+
+    // PUTGm Image Service ----------------------------------------------------------------
+    rpc GetPutgmImage (GetPutgmImageRequest) returns (PutgmImageResponse);
+    rpc CreatePutgmImage (CreatePutgmImageRequest) returns (IdResponse);
+    rpc UpdatePutgmImage (UpdatePutgmImageRequest) returns (IdResponse);
+    rpc DeletePutgmImage (DeletePutgmImageRequest) returns (IdResponse);
+
+    // PUTGm Service ----------------------------------------------------------------
+    rpc GetPutgm (GetPutgmRequest) returns (PutgmResponse);
+    rpc CreatePutgm (CreatePutgmRequest) returns (IdResponse);
+    rpc UpdatePutgm (UpdatePutgmRequest) returns (IdResponse);
+    rpc DeletePutgm (DeletePutgmRequest) returns (IdResponse);
 }

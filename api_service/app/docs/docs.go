@@ -1935,7 +1935,7 @@ const docTemplate_swagger = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "st/fl id",
+                        "description": "putg image id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2065,6 +2065,545 @@ const docTemplate_swagger = `{
                     {
                         "type": "string",
                         "description": "putg id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/putgm": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение прокладок путгм",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putgm"
+                ],
+                "summary": "Get Putgm",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "form",
+                        "name": "form",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "flange id",
+                        "name": "flangeId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.Putgm"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание прокладки путгм",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putgm"
+                ],
+                "summary": "Create Putgm",
+                "parameters": [
+                    {
+                        "description": "putgm info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PutgmDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/putgm-image": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение списка чертежей для путгм",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putgm-image"
+                ],
+                "summary": "Get Putgm Image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "form",
+                        "name": "form",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.PutgmImage"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание чертежа путгм",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putgm-image"
+                ],
+                "summary": "Create Putgm Image",
+                "parameters": [
+                    {
+                        "description": "putgm image info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PutgmImageDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/putgm-image/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление чертежа путгм",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putgm-image"
+                ],
+                "summary": "Update Putgm Image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "putgm image id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "putgm image info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PutgmImageDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "удаление чертежа путг",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putgm-image"
+                ],
+                "summary": "Delete Putgm Image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "putgm image id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/putgm/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление прокладки путгм",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putgm"
+                ],
+                "summary": "Update Putgm",
+                "parameters": [
+                    {
+                        "description": "putgm info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PutgmDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "putgm id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "удаление прокладки путгм",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e putgm"
+                ],
+                "summary": "Delete Putgm",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "putgm id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -3615,6 +4154,89 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "models.PutgmDTO": {
+            "type": "object",
+            "required": [
+                "coating",
+                "construction",
+                "flangeId",
+                "form",
+                "graphite",
+                "mounting",
+                "temperatures",
+                "typeFlId",
+                "typePr"
+            ],
+            "properties": {
+                "basis": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "coating": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "construction": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgmConstructions"
+                    }
+                },
+                "flangeId": {
+                    "type": "string"
+                },
+                "form": {
+                    "type": "string"
+                },
+                "graphite": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "mounting": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "obturator": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "temperatures": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgTemp"
+                    }
+                },
+                "typeFlId": {
+                    "type": "string"
+                },
+                "typePr": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.PutgmImageDTO": {
+            "type": "object",
+            "required": [
+                "form",
+                "gasket",
+                "url"
+            ],
+            "properties": {
+                "form": {
+                    "type": "string"
+                },
+                "gasket": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "models.SNPDTO": {
             "type": "object",
             "required": [
@@ -4060,9 +4682,6 @@ const docTemplate_swagger = `{
                 "description": {
                     "type": "string"
                 },
-                "isHaveMaterial": {
-                    "type": "boolean"
-                },
                 "short": {
                     "type": "string"
                 },
@@ -4176,6 +4795,12 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "description": {
+                    "type": "string"
+                },
+                "forDescr": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 },
                 "short": {
@@ -4487,6 +5112,129 @@ const docTemplate_swagger = `{
                     "items": {
                         "$ref": "#/definitions/proto.Temp"
                     }
+                }
+            }
+        },
+        "proto.Putgm": {
+            "type": "object",
+            "properties": {
+                "basis": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "coating": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "construction": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgmConstructions"
+                    }
+                },
+                "form": {
+                    "type": "string"
+                },
+                "graphite": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "mounting": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "obturator": {
+                    "$ref": "#/definitions/proto.PutgMaterials"
+                },
+                "temperatures": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgTemp"
+                    }
+                },
+                "typeFlId": {
+                    "type": "string"
+                },
+                "typePr": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.PutgmConstr": {
+            "type": "object",
+            "properties": {
+                "basis": {
+                    "type": "string"
+                },
+                "obturator": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgmObt"
+                    }
+                }
+            }
+        },
+        "proto.PutgmConstructions": {
+            "type": "object",
+            "properties": {
+                "basis": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgmConstr"
+                    }
+                },
+                "grap": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.PutgmImage": {
+            "type": "object",
+            "properties": {
+                "form": {
+                    "type": "string"
+                },
+                "gasket": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.PutgmObt": {
+            "type": "object",
+            "properties": {
+                "obturator": {
+                    "type": "string"
+                },
+                "sealant": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PutgmSeal"
+                    }
+                }
+            }
+        },
+        "proto.PutgmSeal": {
+            "type": "object",
+            "properties": {
+                "imageUrl": {
+                    "type": "string"
+                },
+                "seal": {
+                    "type": "string"
                 }
             }
         },

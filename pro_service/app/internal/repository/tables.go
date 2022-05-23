@@ -9,4 +9,6 @@ const (
 	SNPTable        = "snp"
 	PUTGImageTable  = "putg_image"
 	PutgTable       = "putg"
+	PUTGmImageTable = "putgm_image"
+	PutgmTable      = "putgm"
 )

@@ -131,9 +131,11 @@ func (s *AdditService) GetAll() (addit []*proto.Additional, err error) {
 		for _, v := range tmp {
 			parts := strings.Split(v, "@")
 			seal = append(seal, &proto.AddSealant{
-				Short:       parts[0],
-				Title:       parts[1],
-				Description: parts[2],
+				Id:          parts[0],
+				Short:       parts[1],
+				Title:       parts[2],
+				Description: parts[3],
+				ForDescr:    parts[4],
 			})
 		}
 		tmp = strings.Split(d.PObturator, ";")
@@ -394,7 +396,7 @@ func (s *AdditService) UpdateSealant(addit *proto.UpdateAddSealantRequest) (*pro
 		if i > 0 {
 			seal += ";"
 		}
-		seal += fmt.Sprintf("%s@%s@%s", s.Short, s.Title, s.Description)
+		seal += fmt.Sprintf("%s@%s@%s@%s@%s", s.Id, s.Short, s.Title, s.Description, s.ForDescr)
 	}
 
 	dto := models.UpdateSealant{

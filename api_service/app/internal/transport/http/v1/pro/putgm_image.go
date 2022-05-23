@@ -9,118 +9,118 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) initPutgImageRoutes(api *gin.RouterGroup) {
-	putgImage := api.Group("putg-image")
+func (h *Handler) initPutgmImageRoutes(api *gin.RouterGroup) {
+	putgmImage := api.Group("putgm-image")
 	{
-		putgImage.GET("/", h.getPutgImage)
-		putgImage.POST("/", h.createPutgImage)
-		putgImage.PUT("/:id", h.updatePutgImage)
-		putgImage.DELETE("/:id", h.deletePutgImage)
+		putgmImage.GET("/", h.getPutgmImage)
+		putgmImage.POST("/", h.createPutgmImage)
+		putgmImage.PUT("/:id", h.updatePutgmImage)
+		putgmImage.DELETE("/:id", h.deletePutgmImage)
 	}
 }
 
-// @Summary Get Putg Image
-// @Tags Sealur Pro -> putg-image
+// @Summary Get Putgm Image
+// @Tags Sealur Pro -> putgm-image
 // @Security ApiKeyAuth
-// @Description получение списка чертежей для путг
-// @ModuleID getPutgImage
+// @Description получение списка чертежей для путгм
+// @ModuleID getPutgmImage
 // @Accept json
 // @Produce json
 // @Param form query string true "form"
-// @Success 200 {object} models.DataResponse{data=[]proto.PutgImage}
+// @Success 200 {object} models.DataResponse{data=[]proto.PutgmImage}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-pro/putg-image [get]
-func (h *Handler) getPutgImage(c *gin.Context) {
+// @Router /sealur-pro/putgm-image [get]
+func (h *Handler) getPutgmImage(c *gin.Context) {
 	form := c.Query("form")
 	if form == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty form", "empty form param")
 		return
 	}
 
-	images, err := h.proClient.GetPutgImage(c, &proto.GetPutgImageRequest{Form: form})
+	images, err := h.proClient.GetPutgmImage(c, &proto.GetPutgmImageRequest{Form: form})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
-	c.JSON(http.StatusOK, models.DataResponse{Data: images.PutgImage, Count: len(images.PutgImage)})
+	c.JSON(http.StatusOK, models.DataResponse{Data: images.PutgmImage, Count: len(images.PutgmImage)})
 }
 
-// @Summary Create Putg Image
-// @Tags Sealur Pro -> putg-image
+// @Summary Create Putgm Image
+// @Tags Sealur Pro -> putgm-image
 // @Security ApiKeyAuth
-// @Description создание чертежа путг
-// @ModuleID createPutgImage
+// @Description создание чертежа путгм
+// @ModuleID createPutgmImage
 // @Accept json
 // @Produce json
-// @Param data body models.PutgImageDTO true "putg image info"
+// @Param data body models.PutgmImageDTO true "putgm image info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-pro/putg-image [post]
-func (h *Handler) createPutgImage(c *gin.Context) {
+// @Router /sealur-pro/putgm-image [post]
+func (h *Handler) createPutgmImage(c *gin.Context) {
 	//TODO дописать добавление картинки
 
-	var dto models.PutgImageDTO
+	var dto models.PutgmImageDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	request := &proto.CreatePutgImageRequest{
+	request := &proto.CreatePutgmImageRequest{
 		Form:   dto.Form,
 		Gasket: dto.Gasket,
 		Url:    dto.Url,
 	}
 
-	image, err := h.proClient.CreatePutgImage(c, request)
+	image, err := h.proClient.CreatePutgmImage(c, request)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
-	c.Header("Location", fmt.Sprintf("/api/v1/sealur-pro/putg-image/%s", image.Id))
+	c.Header("Location", fmt.Sprintf("/api/v1/sealur-pro/putgm-image/%s", image.Id))
 	c.JSON(http.StatusCreated, models.IdResponse{Id: image.Id, Message: "Created"})
 }
 
-// @Summary Update Putg Image
-// @Tags Sealur Pro -> putg-image
+// @Summary Update Putgm Image
+// @Tags Sealur Pro -> putgm-image
 // @Security ApiKeyAuth
-// @Description обновление чертежа путг
-// @ModuleID updatePutgImage
+// @Description обновление чертежа путгм
+// @ModuleID updatePutgmImage
 // @Accept json
 // @Produce json
-// @Param id path string true "putg image id"
-// @Param data body models.PutgImageDTO true "putg image info"
+// @Param id path string true "putgm image id"
+// @Param data body models.PutgmImageDTO true "putgm image info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-pro/putg-image/{id} [put]
-func (h *Handler) updatePutgImage(c *gin.Context) {
+// @Router /sealur-pro/putgm-image/{id} [put]
+func (h *Handler) updatePutgmImage(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
 		return
 	}
 
-	var dto models.PutgImageDTO
+	var dto models.PutgmImageDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	request := &proto.UpdatePutgImageRequest{
+	request := &proto.UpdatePutgmImageRequest{
 		Id:     id,
 		Form:   dto.Form,
 		Gasket: dto.Gasket,
 		Url:    dto.Url,
 	}
 
-	image, err := h.proClient.UpdatePutgImage(c, request)
+	image, err := h.proClient.UpdatePutgmImage(c, request)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -129,20 +129,20 @@ func (h *Handler) updatePutgImage(c *gin.Context) {
 	c.JSON(http.StatusOK, models.IdResponse{Id: image.Id, Message: "Updated"})
 }
 
-// @Summary Delete Putg Image
-// @Tags Sealur Pro -> putg-image
+// @Summary Delete Putgm Image
+// @Tags Sealur Pro -> putgm-image
 // @Security ApiKeyAuth
 // @Description удаление чертежа путг
-// @ModuleID deletePutgImage
+// @ModuleID deletePutgmImage
 // @Accept json
 // @Produce json
-// @Param id path string true "putg image id"
+// @Param id path string true "putgm image id"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-pro/putg-image/{id} [delete]
-func (h *Handler) deletePutgImage(c *gin.Context) {
+// @Router /sealur-pro/putgm-image/{id} [delete]
+func (h *Handler) deletePutgmImage(c *gin.Context) {
 	//TODO дописать удаление картинки
 	id := c.Param("id")
 	if id == "" {
@@ -150,7 +150,7 @@ func (h *Handler) deletePutgImage(c *gin.Context) {
 		return
 	}
 
-	image, err := h.proClient.DeletePutgImage(c, &proto.DeletePutgImageRequest{Id: id})
+	image, err := h.proClient.DeletePutgmImage(c, &proto.DeletePutgmImageRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

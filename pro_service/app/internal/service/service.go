@@ -91,6 +91,20 @@ type Putg interface {
 	Delete(*proto.DeletePutgRequest) error
 }
 
+type PutgmImage interface {
+	Get(req *proto.GetPutgmImageRequest) ([]*proto.PutgmImage, error)
+	Create(image *proto.CreatePutgmImageRequest) (*proto.IdResponse, error)
+	Update(image *proto.UpdatePutgmImageRequest) error
+	Delete(image *proto.DeletePutgmImageRequest) error
+}
+
+type Putgm interface {
+	Get(*proto.GetPutgmRequest) ([]*proto.Putgm, error)
+	Create(*proto.CreatePutgmRequest) (*proto.IdResponse, error)
+	Update(*proto.UpdatePutgmRequest) error
+	Delete(*proto.DeletePutgmRequest) error
+}
+
 type Services struct {
 	Stand
 	Flange
@@ -101,18 +115,22 @@ type Services struct {
 	SNP
 	PutgImage
 	Putg
+	PutgmImage
+	Putgm
 }
 
 func NewServices(repos *repository.Repositories) *Services {
 	return &Services{
-		Stand:     NewStandService(repos.Stand),
-		Flange:    NewFlangeService(repos.Flange),
-		StFl:      NewStFlService(repos.StFl),
-		TypeFl:    NewTypeFlService(repos.TypeFl),
-		Addit:     NewAdditService(repos.Addit),
-		Size:      NewSizeService(repos.Size),
-		SNP:       NewSNPService(repos.SNP),
-		PutgImage: NewPutgImageService(repos.PutgImage),
-		Putg:      NewPutgService(repos.Putg),
+		Stand:      NewStandService(repos.Stand),
+		Flange:     NewFlangeService(repos.Flange),
+		StFl:       NewStFlService(repos.StFl),
+		TypeFl:     NewTypeFlService(repos.TypeFl),
+		Addit:      NewAdditService(repos.Addit),
+		Size:       NewSizeService(repos.Size),
+		SNP:        NewSNPService(repos.SNP),
+		PutgImage:  NewPutgImageService(repos.PutgImage),
+		Putg:       NewPutgService(repos.Putg),
+		PutgmImage: NewPutgmImageService(repos.PutgmImage),
+		Putgm:      NewPutgmService(repos.Putgm),
 	}
 }

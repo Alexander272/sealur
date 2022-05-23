@@ -9,56 +9,56 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 )
 
-type PutgService struct {
-	repo repository.Putg
+type PutgmService struct {
+	repo repository.Putgm
 }
 
-func NewPutgService(repo repository.Putg) *PutgService {
-	return &PutgService{repo: repo}
+func NewPutgmService(repo repository.Putgm) *PutgmService {
+	return &PutgmService{repo: repo}
 }
 
-func (s *PutgService) Get(req *proto.GetPutgRequest) (putg []*proto.Putg, err error) {
+func (s *PutgmService) Get(req *proto.GetPutgmRequest) (putgm []*proto.Putgm, err error) {
 	data, err := s.repo.Get(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get putg. error: %w", err)
 	}
 
 	for _, d := range data {
-		var construction []*proto.PutgConstructions
+		var construction []*proto.PutgmConstructions
 		constrs := strings.Split(d.Construction, ";")
 
 		for _, v := range constrs {
 			grap := strings.Split(v, "&")[0]
 			temp := strings.Split(v, "&")[1]
 
-			var Temps []*proto.ConTemp
+			var bas []*proto.PutgmConstr
 			tmp := strings.Split(temp, "@")
 			for _, t := range tmp {
-				temp := strings.Split(t, ">")[0]
+				b := strings.Split(t, ">")[0]
 				constr := strings.Split(t, ">")[1]
 
-				var constrs []*proto.Constr
+				var obts []*proto.PutgmObt
 				tmp := strings.Split(constr, "*")
 				for _, c := range tmp {
 					short := strings.Split(c, "<")[0]
-					obts := strings.Split(c, "<")[1]
+					seals := strings.Split(c, "<")[1]
 
-					var obt []*proto.PutgObt
-					tmp := strings.Split(obts, ",")
+					var seal []*proto.PutgmSeal
+					tmp := strings.Split(seals, ",")
 					for _, o := range tmp {
 						short := strings.Split(o, "=")[0]
 						url := strings.Split(o, "=")[1]
-						obt = append(obt, &proto.PutgObt{Short: short, ImageUrl: url})
+						seal = append(seal, &proto.PutgmSeal{Seal: short, ImageUrl: url})
 					}
 
-					constrs = append(constrs, &proto.Constr{Short: short, Obturators: obt})
+					obts = append(obts, &proto.PutgmObt{Obturator: short, Sealant: seal})
 				}
 
-				Temps = append(Temps, &proto.ConTemp{Temp: temp, Constructions: constrs})
+				bas = append(bas, &proto.PutgmConstr{Basis: b, Obturator: obts})
 			}
 
-			construction = append(construction, &proto.PutgConstructions{
-				Grap: grap, Temperatures: Temps,
+			construction = append(construction, &proto.PutgmConstructions{
+				Grap: grap, Basis: bas,
 			})
 		}
 
@@ -85,77 +85,67 @@ func (s *PutgService) Get(req *proto.GetPutgRequest) (putg []*proto.Putg, err er
 			})
 		}
 
-		var reinforce, obturator, iLimiter, oLimiter = &proto.PutgMaterials{}, &proto.PutgMaterials{}, &proto.PutgMaterials{}, &proto.PutgMaterials{}
-		tmp = strings.Split(d.Reinforce, "&")
+		var basis, obturator = &proto.PutgMaterials{}, &proto.PutgMaterials{}
+		tmp = strings.Split(d.Basis, "&")
 		if len(tmp) > 1 {
-			reinforce = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
+			basis = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
 		}
 		tmp = strings.Split(d.Obturator, "&")
 		if len(tmp) > 1 {
 			obturator = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
 		}
-		tmp = strings.Split(d.ILimiter, "&")
-		if len(tmp) > 1 {
-			iLimiter = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
-		}
-		tmp = strings.Split(d.OLimiter, "&")
-		if len(tmp) > 1 {
-			oLimiter = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
-		}
 
-		p := proto.Putg{
+		p := proto.Putgm{
 			Id:           d.Id,
 			TypeFlId:     d.TypeFlId,
 			TypePr:       d.TypePr,
 			Form:         d.Form,
 			Construction: construction,
 			Temperatures: temperatures,
-			Reinforce:    reinforce,
+			Basis:        basis,
 			Obturator:    obturator,
-			ILimiter:     iLimiter,
-			OLimiter:     oLimiter,
 			Coating:      strings.Split(d.Coating, ";"),
 			Mounting:     strings.Split(d.Mounting, ";"),
 			Graphite:     strings.Split(d.Graphite, ";"),
 		}
-		putg = append(putg, &p)
+		putgm = append(putgm, &p)
 	}
 
-	return putg, nil
+	return putgm, nil
 }
 
-func (s *PutgService) Create(dto *proto.CreatePutgRequest) (*proto.IdResponse, error) {
+func (s *PutgmService) Create(dto *proto.CreatePutgmRequest) (*proto.IdResponse, error) {
 	var constructions string
 	for i, c := range dto.Construction {
 		if i > 0 {
 			constructions += ";"
 		}
-		temps := ""
-		for j, t := range c.Temperatures {
+		bas := ""
+		for j, t := range c.Basis {
 			if j > 0 {
-				temps += "@"
+				bas += "@"
 			}
 			constrs := ""
-			for k, c := range t.Constructions {
+			for k, c := range t.Obturator {
 				if k > 0 {
 					constrs += "*"
 				}
-				obts := ""
-				for l, o := range c.Obturators {
+				seal := ""
+				for l, o := range c.Sealant {
 					if l > 0 {
-						obts += ","
+						seal += ","
 					}
 
-					obts += fmt.Sprintf("%s=%s", o.Short, o.ImageUrl)
+					seal += fmt.Sprintf("%s=%s", o.Seal, o.ImageUrl)
 				}
 
-				constrs += fmt.Sprintf("%s<%s", c.Short, obts)
+				constrs += fmt.Sprintf("%s<%s", c.Obturator, seal)
 			}
 
-			temps += fmt.Sprintf("%s>%s", t.Temp, constrs)
+			bas += fmt.Sprintf("%s>%s", t.Basis, constrs)
 		}
 
-		constructions += fmt.Sprintf("%s&%s", c.Grap, temps)
+		constructions += fmt.Sprintf("%s&%s", c.Grap, bas)
 	}
 
 	var temperatures string
@@ -173,78 +163,68 @@ func (s *PutgService) Create(dto *proto.CreatePutgRequest) (*proto.IdResponse, e
 		temperatures += fmt.Sprintf("%s&%s", t.Grap, temps)
 	}
 
-	reinforce := fmt.Sprintf("%s&%s&%s", strings.Join(dto.Reinforce.Values, ";"), dto.Reinforce.Default, strings.Join(dto.Reinforce.Obturators, ";"))
-	if len(dto.Reinforce.Values) == 0 {
-		reinforce = ""
+	basis := fmt.Sprintf("%s&%s&%s", strings.Join(dto.Basis.Values, ";"), dto.Basis.Default, strings.Join(dto.Basis.Obturators, ";"))
+	if len(dto.Basis.Values) == 0 {
+		basis = ""
 	}
 	obturator := fmt.Sprintf("%s&%s&%s", strings.Join(dto.Obturator.Values, ";"), dto.Obturator.Default, strings.Join(dto.Obturator.Obturators, ";"))
 	if len(dto.Obturator.Values) == 0 {
 		obturator = ""
 	}
-	iLimiter := fmt.Sprintf("%s&%s&%s", strings.Join(dto.ILimiter.Values, ";"), dto.ILimiter.Default, strings.Join(dto.ILimiter.Obturators, ";"))
-	if len(dto.ILimiter.Values) == 0 {
-		iLimiter = ""
-	}
-	oLimiter := fmt.Sprintf("%s&%s&%s", strings.Join(dto.OLimiter.Values, ";"), dto.OLimiter.Default, strings.Join(dto.OLimiter.Obturators, ";"))
-	if len(dto.OLimiter.Values) == 0 {
-		oLimiter = ""
-	}
 
-	putg := models.PutgDTO{
+	putgm := models.PutgmDTO{
 		FlangeId:     dto.FlangeId,
 		TypeFlId:     dto.TypeFlId,
 		TypePr:       dto.TypePr,
 		Form:         dto.Form,
 		Construction: constructions,
 		Temperatures: temperatures,
-		Reinforce:    reinforce,
+		Basis:        basis,
 		Obturator:    obturator,
-		ILimiter:     iLimiter,
-		OLimiter:     oLimiter,
 		Coating:      strings.Join(dto.Coating, ";"),
 		Mounting:     strings.Join(dto.Mounting, ";"),
 		Graphite:     strings.Join(dto.Graphite, ";"),
 	}
 
-	id, err := s.repo.Create(putg)
+	id, err := s.repo.Create(putgm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create putg. error: %w", err)
 	}
 	return &proto.IdResponse{Id: id}, nil
 }
 
-func (s *PutgService) Update(dto *proto.UpdatePutgRequest) error {
+func (s *PutgmService) Update(dto *proto.UpdatePutgmRequest) error {
 	var constructions string
 	for i, c := range dto.Construction {
 		if i > 0 {
 			constructions += ";"
 		}
-		temps := ""
-		for j, t := range c.Temperatures {
+		bas := ""
+		for j, t := range c.Basis {
 			if j > 0 {
-				temps += "@"
+				bas += "@"
 			}
 			constrs := ""
-			for k, c := range t.Constructions {
+			for k, c := range t.Obturator {
 				if k > 0 {
 					constrs += "*"
 				}
-				obts := ""
-				for l, o := range c.Obturators {
+				seal := ""
+				for l, o := range c.Sealant {
 					if l > 0 {
-						obts += ","
+						seal += ","
 					}
 
-					obts += fmt.Sprintf("%s=%s", o.Short, o.ImageUrl)
+					seal += fmt.Sprintf("%s=%s", o.Seal, o.ImageUrl)
 				}
 
-				constrs += fmt.Sprintf("%s<%s", c.Short, obts)
+				constrs += fmt.Sprintf("%s<%s", c.Obturator, seal)
 			}
 
-			temps += fmt.Sprintf("%s>%s", t.Temp, constrs)
+			bas += fmt.Sprintf("%s>%s", t.Basis, constrs)
 		}
 
-		constructions += fmt.Sprintf("%s&%s", c.Grap, temps)
+		constructions += fmt.Sprintf("%s&%s", c.Grap, bas)
 	}
 
 	var temperatures string
@@ -262,24 +242,16 @@ func (s *PutgService) Update(dto *proto.UpdatePutgRequest) error {
 		temperatures += fmt.Sprintf("%s&%s", t.Grap, temps)
 	}
 
-	reinforce := fmt.Sprintf("%s&%s&%s", strings.Join(dto.Reinforce.Values, ";"), dto.Reinforce.Default, strings.Join(dto.Reinforce.Obturators, ";"))
-	if len(dto.Reinforce.Values) == 0 {
-		reinforce = ""
+	basis := fmt.Sprintf("%s&%s&%s", strings.Join(dto.Basis.Values, ";"), dto.Basis.Default, strings.Join(dto.Basis.Obturators, ";"))
+	if len(dto.Basis.Values) == 0 {
+		basis = ""
 	}
 	obturator := fmt.Sprintf("%s&%s&%s", strings.Join(dto.Obturator.Values, ";"), dto.Obturator.Default, strings.Join(dto.Obturator.Obturators, ";"))
 	if len(dto.Obturator.Values) == 0 {
 		obturator = ""
 	}
-	iLimiter := fmt.Sprintf("%s&%s&%s", strings.Join(dto.ILimiter.Values, ";"), dto.ILimiter.Default, strings.Join(dto.ILimiter.Obturators, ";"))
-	if len(dto.ILimiter.Values) == 0 {
-		iLimiter = ""
-	}
-	oLimiter := fmt.Sprintf("%s&%s&%s", strings.Join(dto.OLimiter.Values, ";"), dto.OLimiter.Default, strings.Join(dto.OLimiter.Obturators, ";"))
-	if len(dto.OLimiter.Values) == 0 {
-		oLimiter = ""
-	}
 
-	putg := models.PutgDTO{
+	putgm := models.PutgmDTO{
 		Id:           dto.Id,
 		FlangeId:     dto.FlangeId,
 		TypeFlId:     dto.TypeFlId,
@@ -287,24 +259,22 @@ func (s *PutgService) Update(dto *proto.UpdatePutgRequest) error {
 		Form:         dto.Form,
 		Construction: constructions,
 		Temperatures: temperatures,
-		Reinforce:    reinforce,
+		Basis:        basis,
 		Obturator:    obturator,
-		ILimiter:     iLimiter,
-		OLimiter:     oLimiter,
 		Coating:      strings.Join(dto.Coating, ";"),
 		Mounting:     strings.Join(dto.Mounting, ";"),
 		Graphite:     strings.Join(dto.Graphite, ";"),
 	}
 
-	if err := s.repo.Update(putg); err != nil {
+	if err := s.repo.Update(putgm); err != nil {
 		return fmt.Errorf("failed to update putg. error: %w", err)
 	}
 	return nil
 }
 
-func (s *PutgService) Delete(putg *proto.DeletePutgRequest) error {
-	if err := s.repo.Delete(putg); err != nil {
-		return fmt.Errorf("failed to delete putg. error: %w", err)
+func (s *PutgmService) Delete(putgm *proto.DeletePutgmRequest) error {
+	if err := s.repo.Delete(putgm); err != nil {
+		return fmt.Errorf("failed to delete putgm. error: %w", err)
 	}
 	return nil
 }
