@@ -70,7 +70,7 @@ func (h *Handler) getAllTypeFl(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param data body models.TypeFlDTO true "type flange info"
-// @Success 201 {object} models.IdResponse
+// @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse

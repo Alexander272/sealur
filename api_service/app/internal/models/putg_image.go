@@ -1,7 +1,7 @@
 package models
 
 type PutgImageDTO struct {
-	Form   string `json:"form" binding:"required"`
-	Gasket string `json:"gasket" binding:"required"`
-	Url    string `json:"url" binding:"required"`
+	Form   string `json:"form" form:"form" binding:"required"`
+	Gasket string `json:"gasket" form:"gasket" binding:"required"`
+	Url    string `json:"url" form:"url" binding:"required"`
 }

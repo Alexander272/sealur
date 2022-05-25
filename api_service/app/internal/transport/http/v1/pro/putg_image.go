@@ -3,6 +3,8 @@ package pro
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
@@ -53,6 +55,7 @@ func (h *Handler) getPutgImage(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Description создание чертежа путг
 // @ModuleID createPutgImage
+// @Accept multipart/form-data
 // @Accept json
 // @Produce json
 // @Param data body models.PutgImageDTO true "putg image info"
@@ -62,11 +65,29 @@ func (h *Handler) getPutgImage(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/putg-image [post]
 func (h *Handler) createPutgImage(c *gin.Context) {
-	//TODO дописать добавление картинки
-
 	var dto models.PutgImageDTO
-	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+
+	if c.Request.FormValue("gasket") != "" {
+		dto.Gasket = c.Request.FormValue("gasket")
+		dto.Form = c.Request.FormValue("form")
+		dto.Url = c.Request.FormValue("url")
+	} else {
+		if err := c.BindJSON(&dto); err != nil {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+			return
+		}
+	}
+
+	var folder string
+	if dto.Form == "Round" {
+		folder = "putg/construction"
+	} else {
+		folder = "putg/half"
+	}
+
+	err := h.saveFile(c, folder)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "error while saving file")
 		return
 	}
 
@@ -137,18 +158,25 @@ func (h *Handler) updatePutgImage(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "putg image id"
-// @Success 201 {object} models.IdResponse
+// @Param file query string true "file name"
+// @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/putg-image/{id} [delete]
 func (h *Handler) deletePutgImage(c *gin.Context) {
-	//TODO дописать удаление картинки
 	id := c.Param("id")
 	if id == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
 		return
 	}
+
+	file := c.Query("file")
+	if file == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty file", "empty file param")
+		return
+	}
+	os.Remove(filepath.Join("images", file))
 
 	image, err := h.proClient.DeletePutgImage(c, &proto.DeletePutgImageRequest{Id: id})
 	if err != nil {
