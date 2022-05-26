@@ -3,10 +3,13 @@ package pro
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/xuri/excelize/v2"
 )
 
 func (h *Handler) initSizeRoutes(api *gin.RouterGroup) {
@@ -15,6 +18,7 @@ func (h *Handler) initSizeRoutes(api *gin.RouterGroup) {
 		sizes.GET("/", h.getSizes)
 		sizes.GET("/all", h.getAllSizes)
 		sizes.POST("/", h.createSize)
+		sizes.POST("/file", h.createSizeFromFile)
 		sizes.PUT("/:id", h.updateSize)
 		sizes.DELETE("/:id", h.deleteSize)
 		sizes.DELETE("/all", h.deleteAllSize)
@@ -168,6 +172,103 @@ func (h *Handler) createSize(c *gin.Context) {
 
 	c.Header("Location", fmt.Sprintf("/api/v1/sealur-pro/sizes/%s", size.Id))
 	c.JSON(http.StatusCreated, models.IdResponse{Id: size.Id, Message: "Created"})
+}
+
+// @Summary Create Size From File
+// @Tags Sealur Pro -> sizes
+// @Security ApiKeyAuth
+// @Description создание размеров из файла excel
+// @ModuleID createSizeFromFile
+// @Accept multipart/form-data
+// @Produce json
+// @Success 201 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/sizes/file [post]
+func (h *Handler) createSizeFromFile(c *gin.Context) {
+
+	fileHeader, err := c.FormFile("sizes")
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "error while opening file")
+		return
+	}
+
+	file, err := fileHeader.Open()
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "error while opening file")
+		return
+	}
+	defer file.Close()
+
+	f, err := excelize.OpenReader(file)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "error while reading file")
+		return
+	}
+
+	sheetName := f.GetSheetName(f.GetActiveSheetIndex())
+
+	req := make([]*proto.CreateSizeRequest, 0, 50)
+
+	rows, err := f.Rows(sheetName)
+	if err != nil {
+		logger.Error(err)
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "error while reading file")
+		return
+	}
+	for rows.Next() {
+		row, err := rows.Columns()
+		if err != nil {
+			logger.Error(err)
+		}
+
+		if len(row) == 0 || row[0] == "" || row[0] == "count" {
+			continue
+		}
+
+		count, err := strconv.Atoi(row[0])
+		if err != nil {
+			logger.Error("count empty")
+			count = 0
+		}
+
+		var s2, s3 string
+		if len(row) <= 12 {
+			s2, s3 = "", ""
+		} else {
+			s2 = row[12]
+			s3 = row[13]
+		}
+
+		req = append(req, &proto.CreateSizeRequest{
+			Number:   int32(count),
+			Flange:   row[1],
+			Dn:       row[2],
+			Pn:       row[3],
+			TypePr:   row[4],
+			StandId:  row[5],
+			TypeFlId: row[6],
+			D4:       row[7],
+			D3:       row[8],
+			D2:       row[9],
+			D1:       row[10],
+			H:        row[11],
+			S2:       s2,
+			S3:       s3,
+		})
+	}
+	if err = rows.Close(); err != nil {
+		logger.Error(err)
+	}
+
+	_, err = h.proClient.CreateManySizes(c, &proto.CreateSizesRequest{Sizes: req})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusCreated, models.IdResponse{Message: "Created"})
 }
 
 // @Summary Update Size

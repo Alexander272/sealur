@@ -2,9 +2,11 @@ package service
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 )
 
 type SizeService struct {
@@ -52,6 +54,34 @@ func (s *SizeService) Create(size *proto.CreateSizeRequest) (*proto.IdResponse, 
 		return nil, fmt.Errorf("failed to create size. error: %w", err)
 	}
 	return &proto.IdResponse{Id: id}, nil
+}
+
+func (s *SizeService) CreateLimit(wg *sync.WaitGroup, limit chan struct{}, size *proto.CreateSizeRequest) {
+	defer wg.Done()
+
+	var w sync.WaitGroup
+	w.Add(1)
+	_, err := s.Create(size)
+	if err != nil {
+		logger.Error(err)
+	}
+	w.Done()
+	w.Wait()
+
+	<-limit
+}
+
+func (s *SizeService) CreateMany(sizes *proto.CreateSizesRequest) error {
+	var wg sync.WaitGroup
+	limit := make(chan struct{}, 50)
+	for _, size := range sizes.Sizes {
+		wg.Add(1)
+		limit <- struct{}{}
+		go s.CreateLimit(&wg, limit, size)
+	}
+
+	wg.Wait()
+	return nil
 }
 
 func (s *SizeService) Update(size *proto.UpdateSizeRequest) error {

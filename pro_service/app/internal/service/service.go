@@ -55,6 +55,7 @@ type Size interface {
 	Get(*proto.GetSizesRequest) ([]*proto.Size, []*proto.Dn, error)
 	GetAll(*proto.GetSizesRequest) ([]*proto.Size, []*proto.Dn, error)
 	Create(*proto.CreateSizeRequest) (*proto.IdResponse, error)
+	CreateMany(*proto.CreateSizesRequest) error
 	Update(*proto.UpdateSizeRequest) error
 	Delete(*proto.DeleteSizeRequest) error
 	DeleteAll(*proto.DeleteAllSizeRequest) error

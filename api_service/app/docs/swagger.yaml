@@ -1649,8 +1649,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/models.IdResponse'
         "400":
@@ -2097,6 +2097,7 @@ paths:
       - Sealur Pro -> putg-image
     post:
       consumes:
+      - multipart/form-data
       - application/json
       description: создание чертежа путг
       parameters:
@@ -2145,11 +2146,16 @@ paths:
         name: id
         required: true
         type: string
+      - description: file name
+        in: query
+        name: file
+        required: true
+        type: string
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/models.IdResponse'
         "400":
@@ -2438,6 +2444,7 @@ paths:
       - Sealur Pro -> putgm-image
     post:
       consumes:
+      - multipart/form-data
       - application/json
       description: создание чертежа путгм
       parameters:
@@ -2486,11 +2493,16 @@ paths:
         name: id
         required: true
         type: string
+      - description: file name
+        in: query
+        name: file
+        required: true
+        type: string
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/models.IdResponse'
         "400":
@@ -2927,6 +2939,39 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get All Sizes
+      tags:
+      - Sealur Pro -> sizes
+  /sealur-pro/sizes/file:
+    post:
+      consumes:
+      - multipart/form-data
+      description: создание размеров из файла excel
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Size From File
       tags:
       - Sealur Pro -> sizes
   /sealur-pro/snp:

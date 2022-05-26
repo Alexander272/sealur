@@ -33,6 +33,15 @@ func (h *Handler) CreateSize(ctx context.Context, dto *proto.CreateSizeRequest) 
 	return size, nil
 }
 
+func (h *Handler) CreateManySizes(ctx context.Context, dto *proto.CreateSizesRequest) (*proto.IdResponse, error) {
+	err := h.service.Size.CreateMany(dto)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.IdResponse{Id: ""}, nil
+}
+
 func (h *Handler) UpdateSize(ctx context.Context, dto *proto.UpdateSizeRequest) (*proto.IdResponse, error) {
 	if err := h.service.Size.Update(dto); err != nil {
 		return nil, err

@@ -334,6 +334,10 @@ message CreateSizeRequest {
     int32 number = 14;
 }
 
+message CreateSizesRequest {
+    repeated CreateSizeRequest sizes = 1;
+}
+
 message UpdateSizeRequest {
     string flange = 1;
     string typeFlId = 2;
@@ -747,6 +751,7 @@ service ProService {
     rpc GetSizes (GetSizesRequest) returns (SizeResponse);
     rpc GetAllSizes (GetSizesRequest) returns (SizeResponse);
     rpc CreateSize (CreateSizeRequest) returns (IdResponse);
+    rpc CreateManySizes (CreateSizesRequest) returns (IdResponse);
     rpc UpdateSize (UpdateSizeRequest) returns (IdResponse);
     rpc DeleteSize (DeleteSizeRequest) returns (IdResponse);
     rpc DeleteAllSize (DeleteAllSizeRequest) returns (IdResponse);
