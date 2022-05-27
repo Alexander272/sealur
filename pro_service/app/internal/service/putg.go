@@ -699,7 +699,6 @@ func (s *PutgService) DeleteCon(id string) error {
 	return nil
 }
 
-//TODO дописать удаление обтюратора из конструкции
 func (s *PutgService) DeleteObt(id string) error {
 	var wg sync.WaitGroup
 	putg, err := s.repo.GetByCondition(fmt.Sprintf(`construction like '%%<%s%%' OR obturator like '%%&%s%%' OR i_limiter like '%%&%s%%' 

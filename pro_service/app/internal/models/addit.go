@@ -93,4 +93,8 @@ type UpdateAdditDTO struct {
 	ILimiter     string `db:"i_limiter"`
 	OLimiter     string `db:"o_limiter"`
 	Coating      string `db:"coating"`
+
+	Basis      string `db:"basis"`
+	PObturator string `db:"p_obturator"`
+	Sealant    string `db:"sealant"`
 }

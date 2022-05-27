@@ -86,7 +86,7 @@ func (r *PutgRepo) Delete(putg *proto.DeletePutgRequest) error {
 }
 
 func (r *PutgRepo) GetByCondition(cond string) (putg []models.Putg, err error) {
-	query := fmt.Sprintf(`SELECT id, construction, temperature, obturator, i_limiter, o_limiter, coating, mounting, graphite FROM %s WHERE %s`,
+	query := fmt.Sprintf(`SELECT id, construction, temperatures, obturator, i_limiter, o_limiter, coating, mounting, graphite FROM %s WHERE %s`,
 		PutgTable, cond)
 
 	if err = r.db.Select(&putg, query); err != nil {
@@ -96,8 +96,8 @@ func (r *PutgRepo) GetByCondition(cond string) (putg []models.Putg, err error) {
 }
 
 func (r *PutgRepo) UpdateAddit(putg models.UpdateAdditDTO) error {
-	query := fmt.Sprintf(`UPDATE %s SET construction=$1, temperature=$2, obturator=$3, i_limiter=$4, o_limiter=$5, 
-		coating=$6, mounting=$7, graphite=$8 WHERE id=$9`, SNPTable)
+	query := fmt.Sprintf(`UPDATE %s SET construction=$1, temperatures=$2, obturator=$3, i_limiter=$4, o_limiter=$5, 
+		coating=$6, mounting=$7, graphite=$8 WHERE id=$9`, PutgTable)
 
 	id, err := strconv.Atoi(putg.Id)
 	if err != nil {

@@ -49,6 +49,10 @@ func (h *Handler) UpdateMat(ctx context.Context, dto *proto.UpdateAddMatRequest)
 		if err := h.service.Putg.DeleteMat(dto.Change, addit[0].Materials); err != nil {
 			return nil, err
 		}
+
+		if err := h.service.Putgm.DeleteMat(dto.Change, addit[0].Materials); err != nil {
+			return nil, err
+		}
 	}
 
 	return success, nil
@@ -68,6 +72,10 @@ func (h *Handler) UpdateMod(ctx context.Context, dto *proto.UpdateAddModRequest)
 		if err := h.service.Putg.DeleteMod(dto.Change); err != nil {
 			return nil, err
 		}
+
+		if err := h.service.Putgm.DeleteMod(dto.Change); err != nil {
+			return nil, err
+		}
 	}
 
 	return success, nil
@@ -85,6 +93,10 @@ func (h *Handler) UpdateTemp(ctx context.Context, dto *proto.UpdateAddTemRequest
 		}
 
 		if err := h.service.Putg.DeleteTemp(dto.Change); err != nil {
+			return nil, err
+		}
+
+		if err := h.service.Putgm.DeleteTemp(dto.Change); err != nil {
 			return nil, err
 		}
 	}
@@ -112,6 +124,10 @@ func (h *Handler) UpdateMoun(ctx context.Context, dto *proto.UpdateAddMounReques
 		if err := h.service.Putg.DeleteMoun(dto.Change); err != nil {
 			return nil, err
 		}
+
+		if err := h.service.Putgm.DeleteMoun(dto.Change); err != nil {
+			return nil, err
+		}
 	}
 
 	return success, nil
@@ -135,6 +151,10 @@ func (h *Handler) UpdateGrap(ctx context.Context, dto *proto.UpdateAddGrapReques
 		}
 
 		if err := h.service.Putg.DeleteGrap(dto.Change); err != nil {
+			return nil, err
+		}
+
+		if err := h.service.Putgm.DeleteGrap(dto.Change); err != nil {
 			return nil, err
 		}
 	}
@@ -163,9 +183,12 @@ func (h *Handler) UpdateCoating(ctx context.Context, dto *proto.UpdateAddCoating
 		return nil, err
 	}
 
-	// TODO дописать удаление
 	if dto.TypeCh == "delete" {
 		if err := h.service.Putg.DeleteCoating(dto.Change); err != nil {
+			return nil, err
+		}
+
+		if err := h.service.Putgm.DeleteCoating(dto.Change); err != nil {
 			return nil, err
 		}
 	}
@@ -179,12 +202,11 @@ func (h *Handler) UpdateConstruction(ctx context.Context, dto *proto.UpdateAddCo
 		return nil, err
 	}
 
-	// TODO дописать удаление
-	// if dto.TypeCh == "delete" {
-	// if err := h.service.Putg.Dc(dto.Change); err != nil {
-	// 	return nil, err
-	// }
-	// }
+	if dto.TypeCh == "delete" {
+		if err := h.service.Putg.DeleteCon(dto.Change); err != nil {
+			return nil, err
+		}
+	}
 
 	return success, nil
 }
@@ -195,12 +217,11 @@ func (h *Handler) UpdateObturator(ctx context.Context, dto *proto.UpdateAddObtur
 		return nil, err
 	}
 
-	// TODO дописать удаление
-	// if dto.TypeCh == "delete" {
-	// if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
-	// 	return nil, err
-	// }
-	// }
+	if dto.TypeCh == "delete" {
+		if err := h.service.Putg.DeleteObt(dto.Change); err != nil {
+			return nil, err
+		}
+	}
 
 	return success, nil
 }
@@ -211,12 +232,11 @@ func (h *Handler) UpdateBasis(ctx context.Context, dto *proto.UpdateAddBasisRequ
 		return nil, err
 	}
 
-	// TODO дописать удаление
-	// if dto.TypeCh == "delete" {
-	// if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
-	// 	return nil, err
-	// }
-	// }
+	if dto.TypeCh == "delete" {
+		if err := h.service.Putgm.DeleteCon(dto.Change); err != nil {
+			return nil, err
+		}
+	}
 
 	return success, nil
 }
@@ -227,12 +247,11 @@ func (h *Handler) UpdatePObturator(ctx context.Context, dto *proto.UpdateAddPObt
 		return nil, err
 	}
 
-	// TODO дописать удаление
-	// if dto.TypeCh == "delete" {
-	// if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
-	// 	return nil, err
-	// }
-	// }
+	if dto.TypeCh == "delete" {
+		if err := h.service.Putgm.DeleteObt(dto.Change); err != nil {
+			return nil, err
+		}
+	}
 
 	return success, nil
 }
@@ -243,12 +262,11 @@ func (h *Handler) UpdateSealant(ctx context.Context, dto *proto.UpdateAddSealant
 		return nil, err
 	}
 
-	// TODO дописать удаление
-	// if dto.TypeCh == "delete" {
-	// if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
-	// 	return nil, err
-	// }
-	// }
+	if dto.TypeCh == "delete" {
+		if err := h.service.Putgm.DeleteSeal(dto.Change); err != nil {
+			return nil, err
+		}
+	}
 
 	return success, nil
 }

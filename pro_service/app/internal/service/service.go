@@ -113,6 +113,16 @@ type Putgm interface {
 	Create(*proto.CreatePutgmRequest) (*proto.IdResponse, error)
 	Update(*proto.UpdatePutgmRequest) error
 	Delete(*proto.DeletePutgmRequest) error
+
+	DeleteGrap(id string) error
+	DeleteTemp(id string) error
+	DeleteMod(id string) error
+	DeleteMat(id string, materials []*proto.AddMaterials) error
+	DeleteCon(id string) error
+	DeleteObt(id string) error
+	DeleteSeal(id string) error
+	DeleteMoun(id string) error
+	DeleteCoating(id string) error
 }
 
 type Services struct {

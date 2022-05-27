@@ -102,6 +102,9 @@ type Putgm interface {
 	Create(putg models.PutgmDTO) (id string, err error)
 	Update(putg models.PutgmDTO) error
 	Delete(putg *proto.DeletePutgmRequest) error
+
+	GetByCondition(cond string) ([]models.Putgm, error)
+	UpdateAddit(putgm models.UpdateAdditDTO) error
 }
 
 type Repositories struct {
