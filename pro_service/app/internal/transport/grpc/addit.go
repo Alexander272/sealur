@@ -42,8 +42,11 @@ func (h *Handler) UpdateMat(ctx context.Context, dto *proto.UpdateAddMatRequest)
 			return nil, err
 		}
 
-		//TODO исправить удаление материалов
 		if err := h.service.SNP.DeleteMat(dto.Change, addit[0].Materials); err != nil {
+			return nil, err
+		}
+
+		if err := h.service.Putg.DeleteMat(dto.Change, addit[0].Materials); err != nil {
 			return nil, err
 		}
 	}
@@ -61,6 +64,10 @@ func (h *Handler) UpdateMod(ctx context.Context, dto *proto.UpdateAddModRequest)
 		if err := h.service.SNP.DeleteMod(dto.Change); err != nil {
 			return nil, err
 		}
+
+		if err := h.service.Putg.DeleteMod(dto.Change); err != nil {
+			return nil, err
+		}
 	}
 
 	return success, nil
@@ -74,6 +81,10 @@ func (h *Handler) UpdateTemp(ctx context.Context, dto *proto.UpdateAddTemRequest
 
 	if dto.TypeCh == "delete" {
 		if err := h.service.SNP.DeleteTemp(dto.Change); err != nil {
+			return nil, err
+		}
+
+		if err := h.service.Putg.DeleteTemp(dto.Change); err != nil {
 			return nil, err
 		}
 	}
@@ -97,6 +108,10 @@ func (h *Handler) UpdateMoun(ctx context.Context, dto *proto.UpdateAddMounReques
 		if err := h.service.SNP.DeleteMoun(dto.Change); err != nil {
 			return nil, err
 		}
+
+		if err := h.service.Putg.DeleteMoun(dto.Change); err != nil {
+			return nil, err
+		}
 	}
 
 	return success, nil
@@ -116,6 +131,10 @@ func (h *Handler) UpdateGrap(ctx context.Context, dto *proto.UpdateAddGrapReques
 
 	if dto.TypeCh == "delete" {
 		if err := h.service.SNP.DeleteGrap(dto.Change); err != nil {
+			return nil, err
+		}
+
+		if err := h.service.Putg.DeleteGrap(dto.Change); err != nil {
 			return nil, err
 		}
 	}
@@ -145,11 +164,11 @@ func (h *Handler) UpdateCoating(ctx context.Context, dto *proto.UpdateAddCoating
 	}
 
 	// TODO дописать удаление
-	// if dto.TypeCh == "delete" {
-	// if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
-	// 	return nil, err
-	// }
-	// }
+	if dto.TypeCh == "delete" {
+		if err := h.service.Putg.DeleteCoating(dto.Change); err != nil {
+			return nil, err
+		}
+	}
 
 	return success, nil
 }
@@ -162,7 +181,7 @@ func (h *Handler) UpdateConstruction(ctx context.Context, dto *proto.UpdateAddCo
 
 	// TODO дописать удаление
 	// if dto.TypeCh == "delete" {
-	// if err := h.service.SNP.DeleteFiller(dto.Change); err != nil {
+	// if err := h.service.Putg.Dc(dto.Change); err != nil {
 	// 	return nil, err
 	// }
 	// }

@@ -84,3 +84,30 @@ func (r *PutgRepo) Delete(putg *proto.DeletePutgRequest) error {
 	}
 	return nil
 }
+
+func (r *PutgRepo) GetByCondition(cond string) (putg []models.Putg, err error) {
+	query := fmt.Sprintf(`SELECT id, construction, temperature, obturator, i_limiter, o_limiter, coating, mounting, graphite FROM %s WHERE %s`,
+		PutgTable, cond)
+
+	if err = r.db.Select(&putg, query); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return putg, nil
+}
+
+func (r *PutgRepo) UpdateAddit(putg models.UpdateAdditDTO) error {
+	query := fmt.Sprintf(`UPDATE %s SET construction=$1, temperature=$2, obturator=$3, i_limiter=$4, o_limiter=$5, 
+		coating=$6, mounting=$7, graphite=$8 WHERE id=$9`, SNPTable)
+
+	id, err := strconv.Atoi(putg.Id)
+	if err != nil {
+		return fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+
+	_, err = r.db.Exec(query, putg.Construction, putg.Temperature, putg.Obturator, putg.ILimiter, putg.OLimiter,
+		putg.Coating, putg.Mounting, putg.Graphite, id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}

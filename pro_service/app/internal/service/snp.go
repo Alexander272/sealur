@@ -255,14 +255,20 @@ func (s *SNPService) DeleteMat(id string, materials []*proto.AddMaterials) error
 		} else {
 			mats := strings.Split(parts[0], ";")
 			mats = filter(mats, id)
-			if parts[1] == id {
-				parts[1] = materials[0].Short
-			}
-			if parts[0] == "*" {
-				ir = fmt.Sprintf("%s&%s", parts[0], parts[1])
+
+			if len(mats) == 0 {
+				ir = ""
 			} else {
-				ir = fmt.Sprintf("%s&%s", strings.Join(mats, ";"), parts[1])
+				if parts[1] == id {
+					parts[1] = materials[0].Short
+				}
+				if parts[0] == "*" {
+					ir = fmt.Sprintf("%s&%s", parts[0], parts[1])
+				} else {
+					ir = fmt.Sprintf("%s&%s", strings.Join(mats, ";"), parts[1])
+				}
 			}
+
 		}
 
 		parts = strings.Split(cur.Or, "&")
@@ -271,13 +277,18 @@ func (s *SNPService) DeleteMat(id string, materials []*proto.AddMaterials) error
 		} else {
 			mats := strings.Split(parts[0], ";")
 			mats = filter(mats, id)
-			if parts[1] == id {
-				parts[1] = materials[0].Short
-			}
-			if parts[0] == "*" {
-				or = fmt.Sprintf("%s&%s", parts[0], parts[1])
+
+			if len(mats) == 0 {
+				or = ""
 			} else {
-				or = fmt.Sprintf("%s&%s", strings.Join(mats, ";"), parts[1])
+				if parts[1] == id {
+					parts[1] = materials[0].Short
+				}
+				if parts[0] == "*" {
+					or = fmt.Sprintf("%s&%s", parts[0], parts[1])
+				} else {
+					or = fmt.Sprintf("%s&%s", strings.Join(mats, ";"), parts[1])
+				}
 			}
 		}
 
@@ -287,13 +298,18 @@ func (s *SNPService) DeleteMat(id string, materials []*proto.AddMaterials) error
 		} else {
 			mats := strings.Split(parts[0], ";")
 			mats = filter(mats, id)
-			if parts[1] == id {
-				parts[1] = materials[0].Short
-			}
-			if parts[0] == "*" {
-				frame = fmt.Sprintf("%s&%s", parts[0], parts[1])
+
+			if len(mats) == 0 {
+				frame = ""
 			} else {
-				frame = fmt.Sprintf("%s&%s", strings.Join(mats, ";"), parts[1])
+				if parts[1] == id {
+					parts[1] = materials[0].Short
+				}
+				if parts[0] == "*" {
+					frame = fmt.Sprintf("%s&%s", parts[0], parts[1])
+				} else {
+					frame = fmt.Sprintf("%s&%s", strings.Join(mats, ";"), parts[1])
+				}
 			}
 		}
 
@@ -428,7 +444,7 @@ func (s *SNPService) AddGrap(id string) error {
 
 func (s *SNPService) DeleteGrap(id string) error {
 	var wg sync.WaitGroup
-	snp, err := s.repo.GetByCondition(fmt.Sprintf(`mounting like '%%%s%%'`, id))
+	snp, err := s.repo.GetByCondition(fmt.Sprintf(`graphite like '%%%s%%'`, id))
 	if err != nil {
 		return fmt.Errorf("failed to get snp. error: %w", err)
 	}
@@ -528,6 +544,11 @@ func (s *SNPService) DeleteTemp(id string) error {
 						newFil = append(newFil, t)
 					}
 				}
+
+				if len(newFil) == 0 {
+					continue
+				}
+
 				fillers = append(fillers, fmt.Sprintf("%s&%s", tmp, strings.Join(newFil, "@")))
 			} else {
 				fillers = append(fillers, fil)
@@ -580,11 +601,21 @@ func (s *SNPService) DeleteMod(id string) error {
 							newTmp = append(newTmp, t)
 						}
 					}
+
+					if len(newTmp) == 0 {
+						continue
+					}
+
 					newFil = append(newFil, fmt.Sprintf("%s>%s", tmp, strings.Join(newTmp, ",")))
 				} else {
 					newFil = append(newFil, t)
 				}
 			}
+
+			if len(newFil) == 0 {
+				continue
+			}
+
 			fillers = append(fillers, fmt.Sprintf("%s&%s", tmp, strings.Join(newFil, "@")))
 		}
 

@@ -86,4 +86,11 @@ type UpdateAdditDTO struct {
 	Or       string `db:"ou_ring"`
 	Mounting string `db:"mounting"`
 	Graphite string `db:"graphite"`
+
+	Construction string `db:"construction"`
+	Temperature  string `db:"temperature"`
+	Obturator    string `db:"obturator"`
+	ILimiter     string `db:"i_limiter"`
+	OLimiter     string `db:"o_limiter"`
+	Coating      string `db:"coating"`
 }

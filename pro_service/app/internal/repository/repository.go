@@ -85,6 +85,9 @@ type Putg interface {
 	Create(putg models.PutgDTO) (id string, err error)
 	Update(putg models.PutgDTO) error
 	Delete(putg *proto.DeletePutgRequest) error
+
+	GetByCondition(cond string) ([]models.Putg, error)
+	UpdateAddit(putg models.UpdateAdditDTO) error
 }
 
 type PutgmImage interface {

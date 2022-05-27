@@ -90,6 +90,15 @@ type Putg interface {
 	Create(*proto.CreatePutgRequest) (*proto.IdResponse, error)
 	Update(*proto.UpdatePutgRequest) error
 	Delete(*proto.DeletePutgRequest) error
+
+	DeleteGrap(id string) error
+	DeleteTemp(id string) error
+	DeleteMod(id string) error
+	DeleteMat(id string, materials []*proto.AddMaterials) error
+	DeleteCon(id string) error
+	DeleteObt(id string) error
+	DeleteMoun(id string) error
+	DeleteCoating(id string) error
 }
 
 type PutgmImage interface {
