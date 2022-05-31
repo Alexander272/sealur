@@ -45,7 +45,7 @@ type MetaData struct {
 	Name   string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Type   string `protobuf:"bytes,2,opt,name=type" json:"type,omitempty"`
 	Size   int64  `protobuf:"varint,3,opt,name=size" json:"size,omitempty"`
-	Uuid   string `protobuf:"bytes,4,opt,name=uuid" json:"uuid,omitempty"`
+	Group  string `protobuf:"bytes,4,opt,name=group" json:"group,omitempty"`
 	Backet string `protobuf:"bytes,5,opt,name=backet" json:"backet,omitempty"`
 }
 
@@ -75,9 +75,9 @@ func (m *MetaData) GetSize() int64 {
 	return 0
 }
 
-func (m *MetaData) GetUuid() string {
+func (m *MetaData) GetGroup() string {
 	if m != nil {
-		return m.Uuid
+		return m.Group
 	}
 	return ""
 }
@@ -225,8 +225,10 @@ func _FileUploadRequest_OneofSizer(msg proto.Message) (n int) {
 }
 
 type FileUploadResponse struct {
-	Id   string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
-	Name string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	Id       string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+	Name     string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	OrigName string `protobuf:"bytes,3,opt,name=origName" json:"origName,omitempty"`
+	Url      string `protobuf:"bytes,4,opt,name=url" json:"url,omitempty"`
 }
 
 func (m *FileUploadResponse) Reset()                    { *m = FileUploadResponse{} }
@@ -248,9 +250,25 @@ func (m *FileUploadResponse) GetName() string {
 	return ""
 }
 
+func (m *FileUploadResponse) GetOrigName() string {
+	if m != nil {
+		return m.OrigName
+	}
+	return ""
+}
+
+func (m *FileUploadResponse) GetUrl() string {
+	if m != nil {
+		return m.Url
+	}
+	return ""
+}
+
 type FileDownloadRequest struct {
-	Id   string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
-	Uuid string `protobuf:"bytes,2,opt,name=uuid" json:"uuid,omitempty"`
+	Id     string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+	Backet string `protobuf:"bytes,2,opt,name=backet" json:"backet,omitempty"`
+	Group  string `protobuf:"bytes,3,opt,name=group" json:"group,omitempty"`
+	Name   string `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
 }
 
 func (m *FileDownloadRequest) Reset()                    { *m = FileDownloadRequest{} }
@@ -265,16 +283,32 @@ func (m *FileDownloadRequest) GetId() string {
 	return ""
 }
 
-func (m *FileDownloadRequest) GetUuid() string {
+func (m *FileDownloadRequest) GetBacket() string {
 	if m != nil {
-		return m.Uuid
+		return m.Backet
+	}
+	return ""
+}
+
+func (m *FileDownloadRequest) GetGroup() string {
+	if m != nil {
+		return m.Group
+	}
+	return ""
+}
+
+func (m *FileDownloadRequest) GetName() string {
+	if m != nil {
+		return m.Name
 	}
 	return ""
 }
 
 type FileDownloadResponse struct {
-	Metadata *MetaData `protobuf:"bytes,1,opt,name=metadata" json:"metadata,omitempty"`
-	File     *File     `protobuf:"bytes,2,opt,name=file" json:"file,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//	*FileDownloadResponse_Metadata
+	//	*FileDownloadResponse_File
+	Response isFileDownloadResponse_Response `protobuf_oneof:"response"`
 }
 
 func (m *FileDownloadResponse) Reset()                    { *m = FileDownloadResponse{} }
@@ -282,23 +316,118 @@ func (m *FileDownloadResponse) String() string            { return proto.Compact
 func (*FileDownloadResponse) ProtoMessage()               {}
 func (*FileDownloadResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
-func (m *FileDownloadResponse) GetMetadata() *MetaData {
+type isFileDownloadResponse_Response interface{ isFileDownloadResponse_Response() }
+
+type FileDownloadResponse_Metadata struct {
+	Metadata *MetaData `protobuf:"bytes,1,opt,name=metadata,oneof"`
+}
+type FileDownloadResponse_File struct {
+	File *File `protobuf:"bytes,2,opt,name=file,oneof"`
+}
+
+func (*FileDownloadResponse_Metadata) isFileDownloadResponse_Response() {}
+func (*FileDownloadResponse_File) isFileDownloadResponse_Response()     {}
+
+func (m *FileDownloadResponse) GetResponse() isFileDownloadResponse_Response {
 	if m != nil {
-		return m.Metadata
+		return m.Response
+	}
+	return nil
+}
+
+func (m *FileDownloadResponse) GetMetadata() *MetaData {
+	if x, ok := m.GetResponse().(*FileDownloadResponse_Metadata); ok {
+		return x.Metadata
 	}
 	return nil
 }
 
 func (m *FileDownloadResponse) GetFile() *File {
-	if m != nil {
-		return m.File
+	if x, ok := m.GetResponse().(*FileDownloadResponse_File); ok {
+		return x.File
 	}
 	return nil
 }
 
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*FileDownloadResponse) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _FileDownloadResponse_OneofMarshaler, _FileDownloadResponse_OneofUnmarshaler, _FileDownloadResponse_OneofSizer, []interface{}{
+		(*FileDownloadResponse_Metadata)(nil),
+		(*FileDownloadResponse_File)(nil),
+	}
+}
+
+func _FileDownloadResponse_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*FileDownloadResponse)
+	// response
+	switch x := m.Response.(type) {
+	case *FileDownloadResponse_Metadata:
+		b.EncodeVarint(1<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Metadata); err != nil {
+			return err
+		}
+	case *FileDownloadResponse_File:
+		b.EncodeVarint(2<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.File); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("FileDownloadResponse.Response has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _FileDownloadResponse_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*FileDownloadResponse)
+	switch tag {
+	case 1: // response.metadata
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(MetaData)
+		err := b.DecodeMessage(msg)
+		m.Response = &FileDownloadResponse_Metadata{msg}
+		return true, err
+	case 2: // response.file
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(File)
+		err := b.DecodeMessage(msg)
+		m.Response = &FileDownloadResponse_File{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _FileDownloadResponse_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*FileDownloadResponse)
+	// response
+	switch x := m.Response.(type) {
+	case *FileDownloadResponse_Metadata:
+		s := proto.Size(x.Metadata)
+		n += proto.SizeVarint(1<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *FileDownloadResponse_File:
+		s := proto.Size(x.File)
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
 type FileDeleteRequest struct {
-	Id   string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
-	Uuid string `protobuf:"bytes,2,opt,name=uuid" json:"uuid,omitempty"`
+	Id     string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+	Backet string `protobuf:"bytes,2,opt,name=backet" json:"backet,omitempty"`
+	Group  string `protobuf:"bytes,3,opt,name=group" json:"group,omitempty"`
+	Name   string `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
 }
 
 func (m *FileDeleteRequest) Reset()                    { *m = FileDeleteRequest{} }
@@ -313,9 +442,23 @@ func (m *FileDeleteRequest) GetId() string {
 	return ""
 }
 
-func (m *FileDeleteRequest) GetUuid() string {
+func (m *FileDeleteRequest) GetBacket() string {
 	if m != nil {
-		return m.Uuid
+		return m.Backet
+	}
+	return ""
+}
+
+func (m *FileDeleteRequest) GetGroup() string {
+	if m != nil {
+		return m.Group
+	}
+	return ""
+}
+
+func (m *FileDeleteRequest) GetName() string {
+	if m != nil {
+		return m.Name
 	}
 	return ""
 }
@@ -385,8 +528,9 @@ const _ = grpc.SupportPackageIsVersion4
 
 type FileServiceClient interface {
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
-	// rpc Download (FileDownloadRequest) returns (stream FileDownloadResponse);
+	Download(ctx context.Context, in *FileDownloadRequest, opts ...grpc.CallOption) (FileService_DownloadClient, error)
 	Upload(ctx context.Context, opts ...grpc.CallOption) (FileService_UploadClient, error)
+	Delete(ctx context.Context, in *FileDeleteRequest, opts ...grpc.CallOption) (*FileDeleteResponse, error)
 }
 
 type fileServiceClient struct {
@@ -406,8 +550,40 @@ func (c *fileServiceClient) Ping(ctx context.Context, in *PingRequest, opts ...g
 	return out, nil
 }
 
+func (c *fileServiceClient) Download(ctx context.Context, in *FileDownloadRequest, opts ...grpc.CallOption) (FileService_DownloadClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_FileService_serviceDesc.Streams[0], c.cc, "/proto_file.FileService/Download", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &fileServiceDownloadClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type FileService_DownloadClient interface {
+	Recv() (*FileDownloadResponse, error)
+	grpc.ClientStream
+}
+
+type fileServiceDownloadClient struct {
+	grpc.ClientStream
+}
+
+func (x *fileServiceDownloadClient) Recv() (*FileDownloadResponse, error) {
+	m := new(FileDownloadResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *fileServiceClient) Upload(ctx context.Context, opts ...grpc.CallOption) (FileService_UploadClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_FileService_serviceDesc.Streams[0], c.cc, "/proto_file.FileService/Upload", opts...)
+	stream, err := grpc.NewClientStream(ctx, &_FileService_serviceDesc.Streams[1], c.cc, "/proto_file.FileService/Upload", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -440,12 +616,22 @@ func (x *fileServiceUploadClient) CloseAndRecv() (*FileUploadResponse, error) {
 	return m, nil
 }
 
+func (c *fileServiceClient) Delete(ctx context.Context, in *FileDeleteRequest, opts ...grpc.CallOption) (*FileDeleteResponse, error) {
+	out := new(FileDeleteResponse)
+	err := grpc.Invoke(ctx, "/proto_file.FileService/Delete", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for FileService service
 
 type FileServiceServer interface {
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
-	// rpc Download (FileDownloadRequest) returns (stream FileDownloadResponse);
+	Download(*FileDownloadRequest, FileService_DownloadServer) error
 	Upload(FileService_UploadServer) error
+	Delete(context.Context, *FileDeleteRequest) (*FileDeleteResponse, error)
 }
 
 func RegisterFileServiceServer(s *grpc.Server, srv FileServiceServer) {
@@ -468,6 +654,27 @@ func _FileService_Ping_Handler(srv interface{}, ctx context.Context, dec func(in
 		return srv.(FileServiceServer).Ping(ctx, req.(*PingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
+}
+
+func _FileService_Download_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(FileDownloadRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(FileServiceServer).Download(m, &fileServiceDownloadServer{stream})
+}
+
+type FileService_DownloadServer interface {
+	Send(*FileDownloadResponse) error
+	grpc.ServerStream
+}
+
+type fileServiceDownloadServer struct {
+	grpc.ServerStream
+}
+
+func (x *fileServiceDownloadServer) Send(m *FileDownloadResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _FileService_Upload_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -496,6 +703,24 @@ func (x *fileServiceUploadServer) Recv() (*FileUploadRequest, error) {
 	return m, nil
 }
 
+func _FileService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileDeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileServiceServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto_file.FileService/Delete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileServiceServer).Delete(ctx, req.(*FileDeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _FileService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "proto_file.FileService",
 	HandlerType: (*FileServiceServer)(nil),
@@ -504,8 +729,17 @@ var _FileService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "Ping",
 			Handler:    _FileService_Ping_Handler,
 		},
+		{
+			MethodName: "Delete",
+			Handler:    _FileService_Delete_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Download",
+			Handler:       _FileService_Download_Handler,
+			ServerStreams: true,
+		},
 		{
 			StreamName:    "Upload",
 			Handler:       _FileService_Upload_Handler,
@@ -518,31 +752,35 @@ var _FileService_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("proto/file.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 407 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x52, 0x4b, 0xcf, 0xd2, 0x40,
-	0x14, 0xfd, 0xda, 0xaf, 0xf2, 0xb8, 0x05, 0xc5, 0x91, 0xe8, 0x84, 0x44, 0x43, 0x26, 0xc6, 0xb0,
-	0x2a, 0xa6, 0x2e, 0x94, 0xb8, 0x23, 0xc4, 0xe0, 0xc2, 0xc4, 0xd4, 0xb8, 0x71, 0x63, 0x06, 0x7a,
-	0x25, 0x13, 0xcb, 0xb4, 0xb6, 0x83, 0x46, 0xfe, 0x86, 0x7f, 0xd8, 0xcc, 0xa3, 0xb4, 0x28, 0x2c,
-	0xbe, 0x55, 0xcf, 0x7d, 0x9e, 0x7b, 0x4e, 0x07, 0x46, 0x45, 0x99, 0xab, 0x7c, 0xfe, 0x4d, 0x64,
-	0x18, 0x19, 0x48, 0xc0, 0x7c, 0xbe, 0xea, 0x0c, 0x2b, 0xa1, 0xf7, 0x01, 0x15, 0x5f, 0x71, 0xc5,
-	0x09, 0x81, 0x40, 0xf2, 0x3d, 0x52, 0x6f, 0xea, 0xcd, 0xfa, 0x89, 0xc1, 0x3a, 0xa7, 0x7e, 0x17,
-	0x48, 0x7d, 0x9b, 0xd3, 0x58, 0xe7, 0x2a, 0x71, 0x44, 0x7a, 0x3b, 0xf5, 0x66, 0xb7, 0x89, 0xc1,
-	0x3a, 0x77, 0x38, 0x88, 0x94, 0x06, 0xb6, 0x4f, 0x63, 0xf2, 0x18, 0x3a, 0x1b, 0xbe, 0xfd, 0x8e,
-	0x8a, 0xde, 0x33, 0x59, 0x17, 0xb1, 0x29, 0x04, 0xef, 0x44, 0x86, 0x84, 0x42, 0x77, 0x9b, 0x4b,
-	0x85, 0x52, 0x19, 0xca, 0x41, 0x52, 0x87, 0xec, 0x08, 0x0f, 0x75, 0xc7, 0xe7, 0x22, 0xcb, 0x79,
-	0x9a, 0xe0, 0x8f, 0x03, 0x56, 0x8a, 0xc4, 0xd0, 0xdb, 0xa3, 0xe2, 0x29, 0x57, 0xdc, 0x9c, 0x13,
-	0xc6, 0xe3, 0xa8, 0x51, 0x12, 0xd5, 0x32, 0xd6, 0x37, 0xc9, 0xa9, 0x8f, 0xbc, 0x80, 0x40, 0x17,
-	0xcd, 0xfe, 0x30, 0x1e, 0xb5, 0xfb, 0x35, 0xc1, 0xfa, 0x26, 0x31, 0xf5, 0x65, 0x1f, 0xba, 0xa5,
-	0xa5, 0x61, 0x6f, 0x80, 0xb4, 0xb9, 0xab, 0x22, 0x97, 0x15, 0x92, 0xfb, 0xe0, 0x8b, 0xd4, 0x39,
-	0xe3, 0x8b, 0xf4, 0xe4, 0x95, 0xdf, 0x78, 0xc5, 0x16, 0xf0, 0x48, 0x4f, 0xae, 0xf2, 0x5f, 0xb2,
-	0x7d, 0xf7, 0x85, 0x51, 0x63, 0x95, 0xdf, 0x58, 0xc5, 0x24, 0x8c, 0xcf, 0x47, 0x1d, 0xed, 0xcb,
-	0x96, 0x66, 0xef, 0xba, 0xe6, 0x96, 0xe2, 0xe7, 0x4e, 0xb1, 0x7f, 0x59, 0xb1, 0xd5, 0xcb, 0x5e,
-	0x5b, 0x83, 0x57, 0x98, 0xa1, 0xc2, 0xbb, 0x1c, 0x1a, 0x59, 0x77, 0xea, 0x41, 0x77, 0x26, 0x85,
-	0xee, 0x1e, 0xab, 0x8a, 0xef, 0xea, 0xc7, 0x53, 0x87, 0x6c, 0x08, 0xe1, 0x47, 0x21, 0x77, 0x8e,
-	0x82, 0x31, 0x18, 0xd8, 0xd0, 0x0d, 0x12, 0x08, 0x0a, 0x21, 0x77, 0xf5, 0x93, 0xd3, 0x38, 0xfe,
-	0xe3, 0x41, 0xa8, 0x39, 0x3e, 0x61, 0xf9, 0x53, 0x6c, 0x91, 0x2c, 0x20, 0xd0, 0x33, 0xe4, 0x49,
-	0x5b, 0x4b, 0x6b, 0xe9, 0x84, 0xfe, 0x5f, 0x70, 0xeb, 0xdf, 0x43, 0xc7, 0xfe, 0x47, 0xf2, 0xf4,
-	0x5f, 0x23, 0xce, 0xde, 0xd6, 0xe4, 0xd9, 0xb5, 0xb2, 0x5d, 0x34, 0xf3, 0x96, 0x0f, 0xbe, 0x0c,
-	0xa3, 0xf9, 0xdb, 0xa6, 0x6b, 0xd3, 0x31, 0xf8, 0xd5, 0xdf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xbd,
-	0xc6, 0x6c, 0x59, 0x60, 0x03, 0x00, 0x00,
+	// 476 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x93, 0x4b, 0x6f, 0xd3, 0x40,
+	0x10, 0xc7, 0xeb, 0x47, 0x13, 0x77, 0xd2, 0x42, 0x18, 0x22, 0xb0, 0x22, 0x01, 0xd1, 0x1e, 0x50,
+	0x4e, 0x2e, 0x0a, 0x27, 0xc4, 0xad, 0x8a, 0xa0, 0x1c, 0x78, 0xc8, 0x88, 0x0b, 0x17, 0xb4, 0x4d,
+	0xa6, 0xd6, 0x0a, 0xc7, 0x36, 0xf6, 0x06, 0x44, 0x0f, 0x7c, 0x23, 0xbe, 0x23, 0xda, 0x87, 0xe3,
+	0x8d, 0xa3, 0x0a, 0x71, 0xe0, 0xe4, 0x99, 0xd9, 0xf1, 0xfc, 0x67, 0x7e, 0xb3, 0x0b, 0xe3, 0xaa,
+	0x2e, 0x65, 0x79, 0x7e, 0x2d, 0x72, 0x4a, 0xb4, 0x89, 0xa0, 0x3f, 0x5f, 0x54, 0x84, 0x49, 0x88,
+	0xde, 0x92, 0xe4, 0x4b, 0x2e, 0x39, 0x22, 0x84, 0x05, 0xdf, 0x50, 0xec, 0xcd, 0xbc, 0xf9, 0x49,
+	0xaa, 0x6d, 0x15, 0x93, 0x3f, 0x2b, 0x8a, 0x7d, 0x13, 0x53, 0xb6, 0x8a, 0x35, 0xe2, 0x86, 0xe2,
+	0x60, 0xe6, 0xcd, 0x83, 0x54, 0xdb, 0x38, 0x81, 0xe3, 0xac, 0x2e, 0xb7, 0x55, 0x1c, 0xea, 0x44,
+	0xe3, 0xe0, 0x03, 0x18, 0x5c, 0xf1, 0xd5, 0x57, 0x92, 0xf1, 0xb1, 0x0e, 0x5b, 0x8f, 0xcd, 0x20,
+	0x7c, 0x25, 0x72, 0xc2, 0x18, 0x86, 0xab, 0xb2, 0x90, 0x54, 0x48, 0x2d, 0x7a, 0x9a, 0xb6, 0x2e,
+	0xbb, 0x81, 0x7b, 0x2a, 0xe3, 0x53, 0x95, 0x97, 0x7c, 0x9d, 0xd2, 0xb7, 0x2d, 0x35, 0x12, 0x17,
+	0x10, 0x6d, 0x48, 0xf2, 0x35, 0x97, 0x5c, 0x37, 0x34, 0x5a, 0x4c, 0x92, 0x6e, 0x96, 0xa4, 0x1d,
+	0xe4, 0xf2, 0x28, 0xdd, 0xe5, 0xe1, 0x53, 0x08, 0xd5, 0xa1, 0xae, 0x3f, 0x5a, 0x8c, 0xdd, 0x7c,
+	0x25, 0x70, 0x79, 0x94, 0xea, 0xf3, 0x8b, 0x13, 0x18, 0xd6, 0x46, 0x86, 0x5d, 0x03, 0xba, 0xda,
+	0x4d, 0x55, 0x16, 0x0d, 0xe1, 0x1d, 0xf0, 0xc5, 0xda, 0xb2, 0xf1, 0xc5, 0x7a, 0x47, 0xcb, 0x77,
+	0x68, 0x4d, 0x21, 0x2a, 0x6b, 0x91, 0xbd, 0x53, 0xf1, 0x40, 0xc7, 0x77, 0x3e, 0x8e, 0x21, 0xd8,
+	0xd6, 0xb9, 0xe5, 0xa3, 0x4c, 0x96, 0xc1, 0x7d, 0xa5, 0xb3, 0x2c, 0x7f, 0x14, 0xee, 0x94, 0x7d,
+	0xa1, 0x0e, 0xa2, 0xef, 0x42, 0xec, 0x90, 0x07, 0x2e, 0xf2, 0xb6, 0xad, 0xb0, 0x6b, 0x8b, 0xfd,
+	0x82, 0xc9, 0xbe, 0x90, 0x1d, 0xc9, 0xe5, 0xe9, 0xfd, 0x23, 0x4f, 0xff, 0x2f, 0x3c, 0x01, 0xa2,
+	0xda, 0xea, 0x30, 0x32, 0xcb, 0x5c, 0x52, 0x4e, 0x92, 0xfe, 0xdf, 0x98, 0x89, 0xd9, 0x5b, 0x2b,
+	0x63, 0x87, 0x8c, 0x61, 0xb8, 0xa1, 0xa6, 0xe1, 0x59, 0x7b, 0xb1, 0x5b, 0x97, 0x9d, 0xc1, 0xe8,
+	0x83, 0x28, 0x32, 0xdb, 0x10, 0x63, 0x70, 0x6a, 0x5c, 0xfb, 0x23, 0x42, 0x58, 0x89, 0x22, 0x6b,
+	0x9f, 0x83, 0xb2, 0x17, 0xbf, 0x7d, 0x18, 0x29, 0x8d, 0x8f, 0x54, 0x7f, 0x17, 0x2b, 0xc2, 0x17,
+	0x10, 0xaa, 0x7f, 0xf0, 0xa1, 0xcb, 0xc1, 0x29, 0x3a, 0x8d, 0x0f, 0x0f, 0x6c, 0xf9, 0xf7, 0x10,
+	0xb5, 0x0b, 0xc1, 0x27, 0x7d, 0x8c, 0xbd, 0x3b, 0x31, 0x9d, 0xdd, 0x9e, 0x60, 0xca, 0x3d, 0xf3,
+	0xf0, 0x0d, 0x0c, 0xcc, 0x95, 0xc5, 0x47, 0xfd, 0xec, 0xbd, 0x67, 0x34, 0x7d, 0x7c, 0xdb, 0xb1,
+	0x29, 0x35, 0xf7, 0xf0, 0x35, 0x0c, 0x0c, 0xc5, 0xc3, 0x52, 0x7b, 0x4b, 0x3c, 0x2c, 0xb5, 0x0f,
+	0xff, 0xe2, 0xee, 0xe7, 0xb3, 0xe4, 0xfc, 0x65, 0x97, 0x73, 0x35, 0xd0, 0xf6, 0xf3, 0x3f, 0x01,
+	0x00, 0x00, 0xff, 0xff, 0xd2, 0x0b, 0x74, 0x0e, 0x96, 0x04, 0x00, 0x00,
 }

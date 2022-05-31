@@ -2,6 +2,7 @@ package file
 
 import (
 	"bufio"
+	"bytes"
 	"io"
 	"net/http"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_file"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
@@ -20,8 +22,95 @@ func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
 
 	drawing := api.Group("/drawings")
 	{
+		drawing.GET("/:name", h.getDrawing)
 		drawing.POST("/", h.createDrawing)
+		drawing.DELETE("/:name", h.deleteDrawing)
 	}
+}
+
+// @Summary Get Drawing
+// @Tags Files -> drawing
+// @Security ApiKeyAuth
+// @Description создание чертежа
+// @ModuleID getDrawing
+// @Accept json
+// @Produce multipart/form-data
+// @Param name path string true "drawing name"
+// @Param id query string true "drawing id"
+// @Param group query string true "drawing group"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /files/drawings/{name} [get]
+func (h *Handler) getDrawing(c *gin.Context) {
+	name := c.Param("name")
+	if name == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty name", "empty name param")
+		return
+	}
+
+	id := c.Query("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	group := c.Query("group")
+	if group == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty group", "empty group param")
+		return
+	}
+
+	stream, err := h.fileClient.Download(c, &proto_file.FileDownloadRequest{
+		Id:     id,
+		Name:   name,
+		Backet: "pro",
+		Group:  group,
+	})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	req, err := stream.Recv()
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	meta := req.GetMetadata()
+	imageData := bytes.Buffer{}
+
+	logger.Debug(meta)
+
+	for {
+		logger.Debug("waiting to receive more data")
+
+		req, err := stream.Recv()
+		if err == io.EOF {
+			logger.Debug("no more data")
+			break
+		}
+
+		if err != nil {
+			models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+			return
+		}
+
+		chunk := req.GetFile().Content
+
+		_, err = imageData.Write(chunk)
+		if err != nil {
+			models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+			return
+		}
+	}
+
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Disposition", "attachment; filename="+meta.Name)
+	c.Data(http.StatusOK, meta.Type, imageData.Bytes())
 }
 
 // @Summary Create Drawing
@@ -31,11 +120,12 @@ func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
 // @ModuleID createDrawing
 // @Accept multipart/form-data
 // @Produce json
-// @Success 201 {object} models.IdResponse
+// @Param group body string false "group image"
+// @Success 201 {object} models.FileResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /files/drawing [post]
+// @Router /files/drawings [post]
 func (h *Handler) createDrawing(c *gin.Context) {
 	file, err := c.FormFile("drawing")
 	if err != nil {
@@ -50,7 +140,15 @@ func (h *Handler) createDrawing(c *gin.Context) {
 	}
 	defer f.Close()
 
-	testUUID := "a053dc2e-dfd3-11ec-9d64-0242ac120002"
+	group := c.Request.FormValue("group")
+	if group == "" {
+		gUuid, err := uuid.NewUUID()
+		if err != nil {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "failed to generate group id")
+			return
+		}
+		group = gUuid.String()
+	}
 
 	fileType := file.Header.Get("Content-Type")
 
@@ -60,14 +158,11 @@ func (h *Handler) createDrawing(c *gin.Context) {
 				Name:   file.Filename,
 				Type:   fileType,
 				Size:   file.Size,
-				Uuid:   testUUID,
+				Group:  group,
 				Backet: "pro",
 			},
 		},
 	}
-	// reqFile := &proto_file.FileUploadRequest{
-	// 	Request: &proto_file.FileUploadRequest_File{},
-	// }
 
 	stream, err := h.fileClient.Upload(c)
 	if err != nil {
@@ -119,8 +214,59 @@ func (h *Handler) createDrawing(c *gin.Context) {
 		return
 	}
 
-	logger.Debug(res)
-	logger.Debug(*res)
+	c.JSON(http.StatusCreated, models.FileResponse{
+		Id:       res.Id,
+		Name:     res.Name,
+		OrigName: res.OrigName,
+		Link:     res.Url,
+		Group:    group,
+	})
+}
 
-	c.JSON(http.StatusCreated, models.IdResponse{Message: "Created"})
+// @Summary Delete Drawing
+// @Tags Files -> drawing
+// @Security ApiKeyAuth
+// @Description удаление чертежа
+// @ModuleID deleteDrawing
+// @Accept json
+// @Produce json
+// @Param name path string true "drawing name"
+// @Param id query string true "drawing id"
+// @Param group query string true "drawing group"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /files/drawings/{name} [delete]
+func (h *Handler) deleteDrawing(c *gin.Context) {
+	name := c.Param("name")
+	if name == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty name", "empty name param")
+		return
+	}
+
+	id := c.Query("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	group := c.Query("group")
+	if group == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty group", "empty group param")
+		return
+	}
+
+	_, err := h.fileClient.Delete(c, &proto_file.FileDeleteRequest{
+		Id:     id,
+		Name:   name,
+		Backet: "pro",
+		Group:  group,
+	})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Deleted"})
 }

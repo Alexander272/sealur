@@ -8,7 +8,7 @@ import (
 )
 
 type Store interface {
-	GetFile(ctx context.Context, bucketName, fileId string) (*models.File, error)
+	GetFile(ctx context.Context, bucketName, fileName string) (*models.File, error)
 	GetFilesByOrderUUID(ctx context.Context, bucketName string) ([]*models.File, error)
 	CreateFile(ctx context.Context, backet string, file *models.File) error
 	DeleteFile(ctx context.Context, backet, fileName string) error

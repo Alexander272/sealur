@@ -7,7 +7,7 @@ message MetaData {
     string name = 1;
     string type = 2;
     int64 size = 3;
-    string uuid = 4;
+    string group = 4;
     string backet = 5;
 }
 
@@ -25,21 +25,29 @@ message FileUploadRequest {
 message FileUploadResponse {
     string id = 1;
     string name = 2;
+    string origName = 3;
+    string url = 4;
 }
 
 message FileDownloadRequest {
     string id = 1;
-    string uuid = 2;
+    string backet = 2;
+    string group = 3;
+    string name = 4;
 }
 
 message FileDownloadResponse {
-    MetaData metadata = 1;
-    File file = 2;
+    oneof response {
+        MetaData metadata = 1;
+        File file = 2;
+    }
 }
 
 message FileDeleteRequest {
     string id = 1;
-    string uuid = 2;
+    string backet = 2;
+    string group = 3;
+    string name = 4;
 }
 
 message FileDeleteResponse {
@@ -53,7 +61,7 @@ message PingResponse {
 
 service FileService {
     rpc Ping (PingRequest) returns (PingResponse);
-    // rpc Download (FileDownloadRequest) returns (stream FileDownloadResponse);
+    rpc Download (FileDownloadRequest) returns (stream FileDownloadResponse);
     rpc Upload (stream FileUploadRequest) returns (FileUploadResponse);
-    // rpc Delete (FileDeleteRequest) returns (FileDeleteResponse);
+    rpc Delete (FileDeleteRequest) returns (FileDeleteResponse);
 }

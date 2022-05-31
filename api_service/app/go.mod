@@ -68,6 +68,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/google/uuid v1.3.0
 	github.com/subosito/gotenv v1.2.0
 	github.com/swaggo/gin-swagger v1.4.0
 	github.com/xuri/excelize/v2 v2.6.0

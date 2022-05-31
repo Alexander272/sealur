@@ -64,6 +64,19 @@ definitions:
       message:
         type: string
     type: object
+  models.FileResponse:
+    properties:
+      group:
+        type: string
+      id:
+        type: string
+      link:
+        type: string
+      name:
+        type: string
+      origName:
+        type: string
+    type: object
   models.FlangeDTO:
     properties:
       short:
@@ -975,6 +988,142 @@ info:
   title: Sealur
   version: "0.5"
 paths:
+  /files/drawings:
+    post:
+      consumes:
+      - multipart/form-data
+      description: создание чертежа
+      parameters:
+      - description: group image
+        in: body
+        name: group
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.FileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Drawing
+      tags:
+      - Files -> drawing
+  /files/drawings/{name}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление чертежа
+      parameters:
+      - description: drawing name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: drawing id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: drawing group
+        in: query
+        name: group
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Drawing
+      tags:
+      - Files -> drawing
+    get:
+      consumes:
+      - application/json
+      description: создание чертежа
+      parameters:
+      - description: drawing name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: drawing id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: drawing group
+        in: query
+        name: group
+        required: true
+        type: string
+      produces:
+      - multipart/form-data
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Drawing
+      tags:
+      - Files -> drawing
   /sealur-pro/additionals:
     get:
       consumes:
@@ -1959,6 +2108,39 @@ paths:
       summary: Update Flange
       tags:
       - Sealur Pro -> flanges
+  /sealur-pro/order/drawing:
+    post:
+      consumes:
+      - multipart/form-data
+      description: создание чертежа
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Drawing
+      tags:
+      - Sealur Pro -> order
   /sealur-pro/putg:
     get:
       consumes:

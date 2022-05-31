@@ -15,6 +15,14 @@ type IdResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
+type FileResponse struct {
+	Id       string `json:"id,omitempty"`
+	Name     string `json:"name"`
+	OrigName string `json:"origName"`
+	Link     string `json:"link"`
+	Group    string `json:"group"`
+}
+
 type ErrorResponse struct {
 	Message string `json:"message"`
 }

@@ -30,10 +30,7 @@ func NewClient(conf config.MinIOConfig) (*MinioStorage, error) {
 }
 
 func (c *MinioStorage) GetFile(ctx context.Context, bucketName, fileId string) (*minio.Object, error) {
-	reqCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	obj, err := c.Client.GetObject(reqCtx, bucketName, fileId, minio.GetObjectOptions{})
+	obj, err := c.Client.GetObject(ctx, bucketName, fileId, minio.GetObjectOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get file with id: %s from minio bucket %s. err: %w", fileId, bucketName, err)
 	}
@@ -93,8 +90,8 @@ func (c *MinioStorage) UploadFile(ctx context.Context, fileId, fileName, contetn
 	return nil
 }
 
-func (c *MinioStorage) DeleteFile(ctx context.Context, noteUUID, fileName string) error {
-	err := c.Client.RemoveObject(ctx, noteUUID, fileName, minio.RemoveObjectOptions{})
+func (c *MinioStorage) DeleteFile(ctx context.Context, backet, fileId string) error {
+	err := c.Client.RemoveObject(ctx, backet, fileId, minio.RemoveObjectOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to delete file. err: %w", err)
 	}

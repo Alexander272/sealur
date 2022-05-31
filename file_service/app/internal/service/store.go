@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Alexander272/sealur/file_service/internal/models"
 	"github.com/Alexander272/sealur/file_service/internal/repository"
@@ -15,16 +16,16 @@ func NewStoreService(repo *repository.Repo) *StoreService {
 	return &StoreService{repo: repo}
 }
 
-func (s *StoreService) GetFile(ctx context.Context, orderUUID, fileId string) (f *models.File, err error) {
-	f, err = s.repo.GetFile(ctx, orderUUID, fileId)
+func (s *StoreService) GetFile(ctx context.Context, backet, group, id, name string) (f *models.File, err error) {
+	f, err = s.repo.GetFile(ctx, backet, fmt.Sprintf("%s/%s_%s", group, id, name))
 	if err != nil {
 		return f, err
 	}
 	return f, nil
 }
 
-func (s *StoreService) GetFilesByOrderUUID(ctx context.Context, orderUUID string) ([]*models.File, error) {
-	files, err := s.repo.GetFilesByOrderUUID(ctx, orderUUID)
+func (s *StoreService) GetFilesByOrderUUID(ctx context.Context, backet string) ([]*models.File, error) {
+	files, err := s.repo.GetFilesByOrderUUID(ctx, backet)
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +45,8 @@ func (s *StoreService) Create(ctx context.Context, backet string, dto models.Cre
 	return file.ID, nil
 }
 
-func (s *StoreService) Delete(ctx context.Context, backet, fileName string) error {
-	err := s.repo.DeleteFile(ctx, backet, fileName)
+func (s *StoreService) Delete(ctx context.Context, backet, group, id, name string) error {
+	err := s.repo.DeleteFile(ctx, backet, fmt.Sprintf("%s/%s_%s", group, id, name))
 	if err != nil {
 		return err
 	}
