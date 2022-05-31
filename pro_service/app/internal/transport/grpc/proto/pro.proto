@@ -694,13 +694,10 @@ message IdResponse {
     string id = 1;
 }
 
-message PingRequest {
-    
-}
+message PingRequest {}
 message PingResponse {
     string ping = 1;
 }
-
 
 service ProService {
     // common -----------------------------------------------------------------------

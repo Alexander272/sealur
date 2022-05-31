@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package proto_file;
+option go_package = "./;proto_file";
+
+message MetaData {
+    string name = 1;
+    string type = 2;
+    int64 size = 3;
+    string uuid = 4;
+    string backet = 5;
+}
+
+message File {
+    bytes content = 1;
+}
+
+message FileUploadRequest {
+    oneof request {
+        MetaData metadata = 2;
+        File file = 1;
+    }
+}
+
+message FileUploadResponse {
+    string id = 1;
+    string name = 2;
+}
+
+message FileDownloadRequest {
+    string id = 1;
+    string uuid = 2;
+}
+
+message FileDownloadResponse {
+    MetaData metadata = 1;
+    File file = 2;
+}
+
+message FileDeleteRequest {
+    string id = 1;
+    string uuid = 2;
+}
+
+message FileDeleteResponse {
+    string message = 1;
+}
+
+message PingRequest {}
+message PingResponse {
+    string ping = 1;
+}
+
+service FileService {
+    rpc Ping (PingRequest) returns (PingResponse);
+    // rpc Download (FileDownloadRequest) returns (stream FileDownloadResponse);
+    rpc Upload (stream FileUploadRequest) returns (FileUploadResponse);
+    // rpc Delete (FileDeleteRequest) returns (FileDeleteResponse);
+}

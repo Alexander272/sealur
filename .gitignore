@@ -4,3 +4,6 @@
 *.data
 
 .prettierignore
+
+/storage
+/build

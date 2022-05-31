@@ -1,11 +1,11 @@
-package pro
+package file
 
 import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_file"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -13,7 +13,7 @@ import (
 )
 
 type Handler struct {
-	proClient proto.ProServiceClient
+	fileClient proto_file.FileServiceClient
 }
 
 func NewHandler() *Handler {
@@ -21,7 +21,7 @@ func NewHandler() *Handler {
 }
 
 func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
-	//* pro service connect
+	//* file service connect
 	//TODO стоит ли так оставлять сертификат?
 	//* определение сертификата
 	creds, err := credentials.NewClientTLSFromFile("cert/server.crt", "localhost")
@@ -42,35 +42,24 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	}
 
 	//* подключение к сервису
-	connect, err := grpc.Dial(conf.ProService.Url, opts...)
+	connect, err := grpc.Dial(conf.FileService.Url, opts...)
 	if err != nil {
 		logger.Fatalf("failed connection to pro service. error: %w", err)
 	}
-	proClient := proto.NewProServiceClient(connect)
-	h.proClient = proClient
 
-	pro := api.Group("/sealur-pro")
+	fileClient := proto_file.NewFileServiceClient(connect)
+	h.fileClient = fileClient
+
+	files := api.Group("/files")
 	{
-		pro.GET("/ping", h.pingPro)
+		files.GET("/ping", h.pingPro)
 
-		h.initStandRoutes(pro)
-		h.initFlangeRoutes(pro)
-		h.initStFlRoutes(pro)
-		h.initTypeFlRoutes(pro)
-		h.initAdditRoutes(pro)
-		h.initSizeRoutes(pro)
-		h.initSNPRoutes(pro)
-		h.initPutgImageRoutes(pro)
-		h.initPutgRoutes(pro)
-		h.initPutgmImageRoutes(pro)
-		h.initPutgmRoutes(pro)
-
-		h.initOrderRoutes(pro)
+		h.initFilesRoutes(files)
 	}
 }
 
 func (h *Handler) pingPro(c *gin.Context) {
-	res, err := h.proClient.Ping(c, &proto.PingRequest{})
+	res, err := h.fileClient.Ping(c, &proto_file.PingRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

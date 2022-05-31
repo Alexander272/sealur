@@ -52,7 +52,8 @@ type (
 	}
 
 	ServicesConfig struct {
-		ProService ProConfig
+		ProService  ProConfig
+		FileService ProConfig
 	}
 
 	ProConfig struct {
@@ -109,12 +110,13 @@ func setFromEnv(conf *Config) error {
 	if err := envconfig.Process("jwt", &conf.Auth.JWT); err != nil {
 		return err
 	}
+
 	conf.Environment = os.Getenv("APP_ENV")
 	conf.Services.ProService.AuthName = os.Getenv("API_NAME")
 	conf.Services.ProService.AuthPassword = os.Getenv("API_PASSWORD")
 
-	// TODO надо это будет делать через консул (хз пока как)
 	conf.Services.ProService.Url = os.Getenv("PRO_HOST") + ":" + os.Getenv("PRO_PORT")
+	conf.Services.FileService.Url = os.Getenv("FILE_HOST") + ":" + os.Getenv("FILE_PORT")
 
 	return nil
 }
