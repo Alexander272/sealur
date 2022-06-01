@@ -1,17 +1,23 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
+	"errors"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/Alexander272/sealur/file_service/internal/config"
 	"github.com/Alexander272/sealur/file_service/internal/repository"
+	"github.com/Alexander272/sealur/file_service/internal/server"
 	"github.com/Alexander272/sealur/file_service/internal/service"
 	transport "github.com/Alexander272/sealur/file_service/internal/transport/grpc"
 	proto_file "github.com/Alexander272/sealur/file_service/internal/transport/grpc/proto"
+	transport_http "github.com/Alexander272/sealur/file_service/internal/transport/http"
 	"github.com/Alexander272/sealur/file_service/pkg/logger"
 	"github.com/Alexander272/sealur/file_service/pkg/storage"
 	"google.golang.org/grpc"
@@ -53,17 +59,29 @@ func main() {
 		grpc.UnaryInterceptor(handlers.UnaryInterceptor),
 	}
 
-	server := grpc.NewServer(opts...)
-	proto_file.RegisterFileServiceServer(server, handlers)
+	grpcServer := grpc.NewServer(opts...)
+	proto_file.RegisterFileServiceServer(grpcServer, handlers)
 
-	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
+	listener, err := net.Listen("tcp", ":"+conf.Tcp.Port)
 	if err != nil {
 		logger.Fatalf("failed to create grpc listener:", err)
 	}
 
 	go func() {
-		if err = server.Serve(listener); err != nil {
+		if err = grpcServer.Serve(listener); err != nil {
 			logger.Fatalf("failed to start server:", err)
+		}
+	}()
+	logger.Infof("Application tcp started on port: %s", conf.Tcp.Port)
+
+	//* API Handlers
+	handler := transport_http.NewHandler(services)
+
+	//* HTTP Server
+	srv := server.NewServer(conf, handler.Init(conf))
+	go func() {
+		if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
+			logger.Fatalf("error occurred while running http server: %s\n", err.Error())
 		}
 	}()
 	logger.Infof("Application started on port: %s", conf.Http.Port)
@@ -73,5 +91,14 @@ func main() {
 
 	<-quit
 
-	server.GracefulStop()
+	grpcServer.GracefulStop()
+
+	const timeout = 5 * time.Second
+
+	ctx, shutdown := context.WithTimeout(context.Background(), timeout)
+	defer shutdown()
+
+	if err := srv.Stop(ctx); err != nil {
+		logger.Errorf("failed to stop server: %v", err)
+	}
 }

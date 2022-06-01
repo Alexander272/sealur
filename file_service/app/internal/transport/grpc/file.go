@@ -113,7 +113,7 @@ func (h *Handler) Upload(stream proto_file.FileService_UploadServer) error {
 		Id:       id,
 		OrigName: meta.Name,
 		Name:     fmt.Sprintf("%s_%s", id, meta.Name),
-		Url:      "",
+		Url:      fmt.Sprintf("/files/%s/%s/%s/%s", meta.Backet, meta.Group, id, meta.Name),
 	})
 }
 

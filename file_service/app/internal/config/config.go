@@ -12,8 +12,13 @@ type (
 	Config struct {
 		Environment string
 		Http        HttpConfig
+		Tcp         TcpConfig
 		Api         ApiConfig
 		MinIO       MinIOConfig
+	}
+
+	TcpConfig struct {
+		Port string `mapstructure:"port"`
 	}
 
 	HttpConfig struct {
@@ -62,6 +67,9 @@ func parseConfigFile(folder string) error {
 }
 
 func unmarhal(conf *Config) error {
+	if err := viper.UnmarshalKey("tcp", &conf.Tcp); err != nil {
+		return err
+	}
 	if err := viper.UnmarshalKey("http", &conf.Http); err != nil {
 		return err
 	}
@@ -77,6 +85,9 @@ func unmarhal(conf *Config) error {
 }
 
 func setFromEnv(conf *Config) error {
+	if err := envconfig.Process("tcp", &conf.Tcp); err != nil {
+		return err
+	}
 	if err := envconfig.Process("http", &conf.Http); err != nil {
 		return err
 	}

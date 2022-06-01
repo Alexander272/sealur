@@ -24,13 +24,13 @@ func (s *StoreService) GetFile(ctx context.Context, backet, group, id, name stri
 	return f, nil
 }
 
-func (s *StoreService) GetFilesByOrderUUID(ctx context.Context, backet string) ([]*models.File, error) {
-	files, err := s.repo.GetFilesByOrderUUID(ctx, backet)
-	if err != nil {
-		return nil, err
-	}
-	return files, nil
-}
+// func (s *StoreService) GetFilesByOrderUUID(ctx context.Context, backet string) ([]*models.File, error) {
+// 	files, err := s.repo.GetFilesByOrderUUID(ctx, backet)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return files, nil
+// }
 
 func (s *StoreService) Create(ctx context.Context, backet string, dto models.CreateFileDTO) (string, error) {
 	dto.NormalizeName()

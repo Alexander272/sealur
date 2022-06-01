@@ -1,9 +1,24 @@
 version: '3.4'
 
 services:
+    nginx_service:
+        restart: on-failure:5
+        image: nginx_service:0.60-dev
+        container_name: dev-nginx_service
+        volumes:
+            - ./build:/usr/app
+        ports:
+            - 5000:80
+        depends_on:
+            - api_service
+            - file_service
+        links:
+            - api_service
+            - file_service
+
     api_service:
         restart: on-failure:5
-        image: api_service:0.83
+        image: api_service:0.84
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images
@@ -28,118 +43,36 @@ services:
         env_file:
             - .env
 
-    # file_service:
-    #     restart: on-failure:5
-    #     image: file_service:0.10
-    #     container_name: dev-file_service
-    #     env_file:
-    #         - .env
-    #     depends_on:
-    #         - minio_service
-    #         - nginx_file_service
-    #     links:
-    #         - minio_service
-    #         - nginx_file_service
-
-    # minio_service:
-    #     image: minio/minio:RELEASE.2022-05-26T05-48-41Z
-    #     container_name: dev-minio_service
-    #     # command: server --console-address ":10002" /data/
-    #     # command: server http:/minio_service/data/
-    #     command: server --console-address ":9001" /data/
-    #     expose:
-    #         - "9000"
-    #     # ports:
-    #     #     - "9000:9000"
-    #     #     - "9001:9001"
-    #     volumes:
-    #         - ./storage:/data
-    #     env_file:
-    #         - .env
-    #     healthcheck:
-    #         test:
-    #             [
-    #                 "CMD",
-    #                 "curl",
-    #                 "-f",
-    #                 "http://localhost:9000/minio/health/live"
-    #             ]
-    #         interval: 30s
-    #         timeout: 20s
-    #         retries: 3
-
-    # nginx_file_service:
-    #     restart: on-failure:5
-    #     image: nginx_file_service:0.10
-    #     container_name: dev-nginx_service
-    #     ports:
-    #         - 9090:9090
-    #     depends_on:
-    #         - minio_service
-    #     links:
-    #         - minio_service
-
-    minio1:
-        image: minio/minio:RELEASE.2021-04-06T23-11-00Z
-        container_name: dev-minio_service1
-        volumes:
-            - ./storage/1/data1:/data1
-            - ./storage/1/data2:/data2
-        expose:
-            - "9000"
-        env_file:
-            - .env
-        command: server http://minio{1...2}/data{1...2}
-        healthcheck:
-            test:
-                [
-                    "CMD",
-                    "curl",
-                    "-f",
-                    "http://localhost:9000/minio/health/live"
-                ]
-            interval: 30s
-            timeout: 20s
-            retries: 3
-    minio2:
-        image: minio/minio:RELEASE.2021-04-06T23-11-00Z
-        container_name: dev-minio_service2
-        volumes:
-            - ./storage/2/data1:/data1
-            - ./storage/2/data2:/data2
-        expose:
-            - "9000"
-        env_file:
-            - .env
-        command: server http://minio{1...2}/data{1...2}
-        healthcheck:
-            test:
-                [
-                    "CMD",
-                    "curl",
-                    "-f",
-                    "http://localhost:9000/minio/health/live"
-                ]
-            interval: 30s
-            timeout: 20s
-            retries: 3
-
-    nginx_file_service:
-        image: nginx_file_service:0.10
-        container_name: dev-nginx_file_service
-        ports:
-            - "9000:9000"
-        depends_on:
-            - minio1
-            - minio2
-
     file_service:
         restart: on-failure:5
-        image: file_service:0.20
+        image: file_service:0.42
         container_name: dev-file_service
         env_file:
             - .env
         depends_on:
-            - nginx_file_service
+            - minio_service
+        links:
+            - minio_service
+
+    minio_service:
+        image: minio/minio:RELEASE.2022-01-08T03-11-54Z
+        container_name: dev-minio_service
+        command: server --console-address ":9001" /data/
         ports:
-            - 10002:10002
+            - "9000:9000"
+            - "9001:9001"
+        volumes:
+            - ./storage:/data
+        env_file:
+            - .env
+        healthcheck:
+            test:
+                [
+                    "CMD",
+                    "curl",
+                    "-f",
+                    "http://localhost:9000/minio/health/live"
+                ]
+            interval: 30s
+            timeout: 20s
+            retries: 3

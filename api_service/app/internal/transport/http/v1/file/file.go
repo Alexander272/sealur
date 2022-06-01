@@ -109,7 +109,7 @@ func (h *Handler) getDrawing(c *gin.Context) {
 
 	c.Header("Content-Description", "File Transfer")
 	c.Header("Content-Transfer-Encoding", "binary")
-	c.Header("Content-Disposition", "attachment; filename="+meta.Name)
+	c.Header("Content-Disposition", "attachment; filename="+name)
 	c.Data(http.StatusOK, meta.Type, imageData.Bytes())
 }
 
