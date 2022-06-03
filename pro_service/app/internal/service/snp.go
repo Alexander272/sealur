@@ -48,18 +48,18 @@ func (s *SNPService) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error)
 			})
 		}
 
-		var frame, ir, or = &proto.Materials{}, &proto.Materials{}, &proto.Materials{}
+		var frame, ir, or = &proto.SnpMaterials{}, &proto.SnpMaterials{}, &proto.SnpMaterials{}
 		tmp := strings.Split(d.Frame, "&")
 		if len(tmp) > 1 {
-			frame = &proto.Materials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+			frame = &proto.SnpMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
 		}
 		tmp = strings.Split(d.Ir, "&")
 		if len(tmp) > 1 {
-			ir = &proto.Materials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+			ir = &proto.SnpMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
 		}
 		tmp = strings.Split(d.Or, "&")
 		if len(tmp) > 1 {
-			or = &proto.Materials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+			or = &proto.SnpMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
 		}
 
 		s := proto.SNP{

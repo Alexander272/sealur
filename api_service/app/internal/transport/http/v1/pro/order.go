@@ -8,30 +8,30 @@ import (
 )
 
 func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
-	order := api.Group("/order")
+	order := api.Group("/orders")
 	{
 		// order.GET("/", h.getPutg)
 		// order.POST("/", h.createPutg)
 		// order.PUT("/:id", h.updatePutg)
 		// order.DELETE("/:id", h.deletePutg)
 
-		order.POST("/drawing", h.createDrawing)
+		order.POST("/", h.createOrder)
 	}
 }
 
-// @Summary Create Drawing
-// @Tags Sealur Pro -> order
+// @Summary Create Order
+// @Tags Sealur Pro -> orders
 // @Security ApiKeyAuth
-// @Description создание чертежа
-// @ModuleID createDrawing
-// @Accept multipart/form-data
+// @Description создание заказа
+// @ModuleID createOrder
+// @Accept json
 // @Produce json
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-pro/order/drawing [post]
-func (h *Handler) createDrawing(c *gin.Context) {
+// @Router /sealur-pro/orders/ [post]
+func (h *Handler) createOrder(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, models.IdResponse{Message: "Created"})
 }

@@ -5,16 +5,16 @@ import (
 )
 
 type SNPDTO struct {
-	StandId  string           `json:"standId" binding:"required"`
-	FlangeId string           `json:"flangeId" binding:"required"`
-	TypeFlId string           `json:"typeFlId" binding:"required"`
-	TypePr   string           `json:"typePr" binding:"required"`
-	Fillers  []*proto.Filler  `json:"fillers" binding:"required"`
-	Frame    *proto.Materials `json:"frame"`
-	Ir       *proto.Materials `json:"ir"`
-	Or       *proto.Materials `json:"or"`
-	Mounting []string         `json:"mounting" binding:"required"`
-	Graphite []string         `json:"graphite" binding:"required"`
+	StandId  string              `json:"standId" binding:"required"`
+	FlangeId string              `json:"flangeId" binding:"required"`
+	TypeFlId string              `json:"typeFlId" binding:"required"`
+	TypePr   string              `json:"typePr" binding:"required"`
+	Fillers  []*proto.Filler     `json:"fillers" binding:"required"`
+	Frame    *proto.SnpMaterials `json:"frame"`
+	Ir       *proto.SnpMaterials `json:"ir"`
+	Or       *proto.SnpMaterials `json:"or"`
+	Mounting []string            `json:"mounting" binding:"required"`
+	Graphite []string            `json:"graphite" binding:"required"`
 }
 
 type DefResponse struct {

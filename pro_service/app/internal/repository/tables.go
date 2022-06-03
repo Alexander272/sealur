@@ -11,4 +11,7 @@ const (
 	PutgTable       = "putg"
 	PUTGmImageTable = "putgm_image"
 	PutgmTable      = "putgm"
+	MaterialsTable  = "materials"
+	BoltsTable      = "bolt_materials"
+	SizeIntrTable   = "size_interview"
 )

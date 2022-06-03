@@ -64,6 +64,9 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		h.initPutgRoutes(pro)
 		h.initPutgmImageRoutes(pro)
 		h.initPutgmRoutes(pro)
+		h.initMaterialsRoutes(pro)
+		h.initBoltMaterialsRoutes(pro)
+		h.initSizeIntRoutes(pro)
 
 		h.initOrderRoutes(pro)
 	}

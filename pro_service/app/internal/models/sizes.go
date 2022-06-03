@@ -14,3 +14,16 @@ type Size struct {
 	TypePr   string `db:"type_pr"`
 	TypeFlId string `db:"type_fl_id"`
 }
+
+type SizeInterview struct {
+	Id    string `db:"id"`
+	Dy    string `db:"dy"`
+	Py    string `db:"py"`
+	D1    string `db:"d1"`
+	D2    string `db:"d2"`
+	D     string `db:"d"`
+	H1    string `db:"h1"`
+	H2    string `db:"h2"`
+	Bolt  string `db:"bolt"`
+	Count int32  `db:"count_bolt"`
+}

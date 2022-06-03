@@ -14,17 +14,11 @@ import (
 )
 
 func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
-
-	// order.GET("/", h.getPutg)
-	// order.POST("/", h.createPutg)
-	// order.PUT("/:id", h.updatePutg)
-	// order.DELETE("/:id", h.deletePutg)
-
 	drawing := api.Group("/drawings")
 	{
-		drawing.GET("/:name", h.getDrawing)
 		drawing.POST("/", h.createDrawing)
-		drawing.DELETE("/:name", h.deleteDrawing)
+		drawing.GET("/:backet/:group/:id/:name", h.getDrawing)
+		drawing.DELETE("/:backet/:group/:id/:name", h.deleteDrawing)
 	}
 }
 
@@ -42,22 +36,29 @@ func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /files/drawings/{name} [get]
+// @Router /files/drawings/{backet}/{group}/{id}/{name} [get]
 func (h *Handler) getDrawing(c *gin.Context) {
+	// TODO исправить (убрать backet лучше брать его из пути. данные из query параметров можно тоже запихать в путь)
 	name := c.Param("name")
 	if name == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty name", "empty name param")
 		return
 	}
 
-	id := c.Query("id")
+	id := c.Param("id")
 	if id == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
 		return
 	}
 
-	group := c.Query("group")
+	group := c.Param("group")
 	if group == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty group", "empty group param")
+		return
+	}
+
+	backet := c.Param("backet")
+	if backet == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty group", "empty group param")
 		return
 	}
@@ -65,7 +66,7 @@ func (h *Handler) getDrawing(c *gin.Context) {
 	stream, err := h.fileClient.Download(c, &proto_file.FileDownloadRequest{
 		Id:     id,
 		Name:   name,
-		Backet: "pro",
+		Backet: backet,
 		Group:  group,
 	})
 	if err != nil {
@@ -237,7 +238,7 @@ func (h *Handler) createDrawing(c *gin.Context) {
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /files/drawings/{name} [delete]
+// @Router /files/drawings/{backet}/{group}/{id}/{name} [delete]
 func (h *Handler) deleteDrawing(c *gin.Context) {
 	name := c.Param("name")
 	if name == "" {
@@ -245,14 +246,20 @@ func (h *Handler) deleteDrawing(c *gin.Context) {
 		return
 	}
 
-	id := c.Query("id")
+	id := c.Param("id")
 	if id == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
 		return
 	}
 
-	group := c.Query("group")
+	group := c.Param("group")
 	if group == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty group", "empty group param")
+		return
+	}
+
+	backet := c.Param("backet")
+	if backet == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty group", "empty group param")
 		return
 	}
@@ -260,7 +267,7 @@ func (h *Handler) deleteDrawing(c *gin.Context) {
 	_, err := h.fileClient.Delete(c, &proto_file.FileDeleteRequest{
 		Id:     id,
 		Name:   name,
-		Backet: "pro",
+		Backet: backet,
 		Group:  group,
 	})
 	if err != nil {

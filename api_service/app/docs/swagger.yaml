@@ -1,5 +1,15 @@
 basePath: /api/v1
 definitions:
+  models.BoltMaterialsDTO:
+    properties:
+      flangeId:
+        type: string
+      title:
+        type: string
+    required:
+    - flangeId
+    - title
+    type: object
   models.CreateAdditDTO:
     properties:
       basis:
@@ -93,6 +103,16 @@ definitions:
         type: string
       message:
         type: string
+    type: object
+  models.MaterialsDTO:
+    properties:
+      title:
+        type: string
+      typeMat:
+        type: string
+    required:
+    - title
+    - typeMat
     type: object
   models.PutgDTO:
     properties:
@@ -223,19 +243,19 @@ definitions:
       flangeId:
         type: string
       frame:
-        $ref: '#/definitions/proto.Materials'
+        $ref: '#/definitions/proto.SnpMaterials'
       graphite:
         items:
           type: string
         type: array
       ir:
-        $ref: '#/definitions/proto.Materials'
+        $ref: '#/definitions/proto.SnpMaterials'
       mounting:
         items:
           type: string
         type: array
       or:
-        $ref: '#/definitions/proto.Materials'
+        $ref: '#/definitions/proto.SnpMaterials'
       standId:
         type: string
       typeFlId:
@@ -250,6 +270,40 @@ definitions:
     - standId
     - typeFlId
     - typePr
+    type: object
+  models.SizeIntDTO:
+    properties:
+      boltId:
+        type: string
+      count:
+        type: integer
+      countBolt:
+        type: integer
+      d:
+        type: string
+      d1:
+        type: string
+      d2:
+        type: string
+      dy:
+        type: string
+      flange:
+        type: string
+      h1:
+        type: string
+      h2:
+        type: string
+      py:
+        type: string
+      typeFlId:
+        type: string
+    required:
+    - boltId
+    - countBolt
+    - dy
+    - flange
+    - py
+    - typeFlId
     type: object
   models.SizesDTO:
     properties:
@@ -656,6 +710,13 @@ definitions:
           $ref: '#/definitions/proto.AddTemperature'
         type: array
     type: object
+  proto.BoltMaterials:
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+    type: object
   proto.ConTemp:
     properties:
       constructions:
@@ -699,12 +760,12 @@ definitions:
     type: object
   proto.Materials:
     properties:
-      default:
+      id:
         type: string
-      values:
-        items:
-          type: string
-        type: array
+      title:
+        type: string
+      typeMat:
+        type: string
     type: object
   proto.Putg:
     properties:
@@ -881,7 +942,7 @@ definitions:
           $ref: '#/definitions/proto.Filler'
         type: array
       frame:
-        $ref: '#/definitions/proto.Materials'
+        $ref: '#/definitions/proto.SnpMaterials'
       graphite:
         items:
           type: string
@@ -889,13 +950,13 @@ definitions:
       id:
         type: string
       ir:
-        $ref: '#/definitions/proto.Materials'
+        $ref: '#/definitions/proto.SnpMaterials'
       mounting:
         items:
           type: string
         type: array
       or:
-        $ref: '#/definitions/proto.Materials'
+        $ref: '#/definitions/proto.SnpMaterials'
       typeFlId:
         type: string
       typePr:
@@ -928,6 +989,36 @@ definitions:
       typePr:
         type: string
     type: object
+  proto.SizeInt:
+    properties:
+      BoltId:
+        type: string
+      CountBolt:
+        type: integer
+      D:
+        type: string
+      D1:
+        type: string
+      D2:
+        type: string
+      Dy:
+        type: string
+      H1:
+        type: string
+      H2:
+        type: string
+      Py:
+        type: string
+      id:
+        type: string
+    type: object
+  proto.SizeIntResponse:
+    properties:
+      sizes:
+        items:
+          $ref: '#/definitions/proto.SizeInt'
+        type: array
+    type: object
   proto.SizeResponse:
     properties:
       dn:
@@ -937,6 +1028,15 @@ definitions:
       sizes:
         items:
           $ref: '#/definitions/proto.Size'
+        type: array
+    type: object
+  proto.SnpMaterials:
+    properties:
+      default:
+        type: string
+      values:
+        items:
+          type: string
         type: array
     type: object
   proto.StFl:
@@ -1027,7 +1127,7 @@ paths:
       summary: Create Drawing
       tags:
       - Files -> drawing
-  /files/drawings/{name}:
+  /files/drawings/{backet}/{group}/{id}/{name}:
     delete:
       consumes:
       - application/json
@@ -1744,6 +1844,168 @@ paths:
       summary: Update Temp
       tags:
       - Sealur Pro -> additionals
+  /sealur-pro/bolt-materials:
+    get:
+      consumes:
+      - application/json
+      description: получение материалов болтов/шпилек (для опроса)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.BoltMaterials'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Bolt Materials
+      tags:
+      - Sealur Pro -> bolt materials
+    post:
+      consumes:
+      - application/json
+      description: создание материала болтов/шпилек (для опроса)
+      parameters:
+      - description: bolt materials info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.BoltMaterialsDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Bolt Materials
+      tags:
+      - Sealur Pro -> bolt materials
+  /sealur-pro/bolt-materials/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление материала болтов/шпилек (для опроса)
+      parameters:
+      - description: bolt material id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Bolt Materials
+      tags:
+      - Sealur Pro -> bolt materials
+    put:
+      consumes:
+      - application/json
+      description: обновление материала болтов/шпилек (для опроса)
+      parameters:
+      - description: bolt material info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.BoltMaterialsDTO'
+      - description: bolt material id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Bolt Materials
+      tags:
+      - Sealur Pro -> bolt materials
   /sealur-pro/flange-types:
     get:
       consumes:
@@ -2108,11 +2370,57 @@ paths:
       summary: Update Flange
       tags:
       - Sealur Pro -> flanges
-  /sealur-pro/order/drawing:
+  /sealur-pro/materials:
+    get:
+      consumes:
+      - application/json
+      description: получение материалов (для опроса)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto.Materials'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Materials
+      tags:
+      - Sealur Pro -> materials
     post:
       consumes:
-      - multipart/form-data
-      description: создание чертежа
+      - application/json
+      description: создание материала (для опроса)
+      parameters:
+      - description: materials info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.MaterialsDTO'
       produces:
       - application/json
       responses:
@@ -2138,9 +2446,125 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Create Drawing
+      summary: Create Materials
       tags:
-      - Sealur Pro -> order
+      - Sealur Pro -> materials
+  /sealur-pro/materials/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление материала (для опроса)
+      parameters:
+      - description: material id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Materials
+      tags:
+      - Sealur Pro -> materials
+    put:
+      consumes:
+      - application/json
+      description: обновление материала (для опроса)
+      parameters:
+      - description: material info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.MaterialsDTO'
+      - description: material id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Materials
+      tags:
+      - Sealur Pro -> materials
+  /sealur-pro/orders/:
+    post:
+      consumes:
+      - application/json
+      description: создание заказа
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Order
+      tags:
+      - Sealur Pro -> orders
   /sealur-pro/putg:
     get:
       consumes:
@@ -2933,6 +3357,177 @@ paths:
       summary: Create Size
       tags:
       - Sealur Pro -> sizes
+  /sealur-pro/sizes-interview:
+    get:
+      consumes:
+      - application/json
+      description: получение размеров (для опроса)
+      parameters:
+      - description: flange
+        in: query
+        name: flange
+        required: true
+        type: string
+      - description: flange type id
+        in: query
+        name: typeFlId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/proto.SizeIntResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Sizes Int
+      tags:
+      - Sealur Pro -> sizes-interview
+    post:
+      consumes:
+      - application/json
+      description: создание размеров (для опроса)
+      parameters:
+      - description: size int info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.SizeIntDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Size Int
+      tags:
+      - Sealur Pro -> sizes-interview
+  /sealur-pro/sizes-interview/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление размеров (для опроса)
+      parameters:
+      - description: size id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Size Int
+      tags:
+      - Sealur Pro -> sizes-interview
+    put:
+      consumes:
+      - application/json
+      description: обновление размеров (для опроса)
+      parameters:
+      - description: size int info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.SizeIntDTO'
+      - description: size int id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Size Int
+      tags:
+      - Sealur Pro -> sizes-interview
   /sealur-pro/sizes/{id}:
     delete:
       consumes:

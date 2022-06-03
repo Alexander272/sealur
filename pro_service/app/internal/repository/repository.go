@@ -107,6 +107,27 @@ type Putgm interface {
 	UpdateAddit(putgm models.UpdateAdditDTO) error
 }
 
+type Materials interface {
+	GetAll(*proto.GetMaterialsRequest) ([]models.Materials, error)
+	Create(*proto.CreateMaterialsRequest) (string, error)
+	Update(*proto.UpdateMaterialsRequest) error
+	Delete(*proto.DeleteMaterialsRequest) error
+}
+
+type BoltMaterials interface {
+	GetAll(*proto.GetBoltMaterialsRequest) ([]models.BoltMaterials, error)
+	Create(*proto.CreateBoltMaterialsRequest) (string, error)
+	Update(*proto.UpdateBoltMaterialsRequest) error
+	Delete(*proto.DeleteBoltMaterialsRequest) error
+}
+
+type SizeInt interface {
+	Get(*proto.GetSizesIntRequest) ([]models.SizeInterview, error)
+	Create(*proto.CreateSizeIntRequest) (id string, err error)
+	Update(*proto.UpdateSizeIntRequest) error
+	Delete(*proto.DeleteSizeIntRequest) error
+}
+
 type Repositories struct {
 	Stand
 	Flange
@@ -119,20 +140,26 @@ type Repositories struct {
 	Putg
 	PutgmImage
 	Putgm
+	Materials
+	BoltMaterials
+	SizeInt
 }
 
 func NewRepo(db *sqlx.DB) *Repositories {
 	return &Repositories{
-		Stand:      NewStandRepo(db),
-		Flange:     NewFlangeRepo(db),
-		StFl:       NewStFlRepo(db),
-		TypeFl:     NewTypeFlRepo(db),
-		Addit:      NewAdditRepo(db),
-		Size:       NewSizesRepo(db),
-		SNP:        NewSNPRepo(db),
-		PutgImage:  NewPutgImageRepo(db),
-		Putg:       NewPutgRepo(db),
-		PutgmImage: NewPutgmImageRepo(db),
-		Putgm:      NewPutgmRepo(db),
+		Stand:         NewStandRepo(db),
+		Flange:        NewFlangeRepo(db),
+		StFl:          NewStFlRepo(db),
+		TypeFl:        NewTypeFlRepo(db),
+		Addit:         NewAdditRepo(db),
+		Size:          NewSizesRepo(db),
+		SNP:           NewSNPRepo(db),
+		PutgImage:     NewPutgImageRepo(db),
+		Putg:          NewPutgRepo(db),
+		PutgmImage:    NewPutgmImageRepo(db),
+		Putgm:         NewPutgmRepo(db),
+		Materials:     NewMatRepo(db),
+		BoltMaterials: NewBoltMatRepo(db),
+		SizeInt:       NewSizeIntRepo(db),
 	}
 }

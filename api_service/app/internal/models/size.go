@@ -23,3 +23,18 @@ type SizesDTO struct {
 	S3       string `json:"s3"`
 	Number   int32  `json:"number"`
 }
+
+type SizeIntDTO struct {
+	Flange    string `json:"flange" binding:"required"`
+	TypeFlId  string `json:"typeFlId" binding:"required"`
+	Dy        string `json:"dy" binding:"required"`
+	Py        string `json:"py" binding:"required"`
+	D1        string `json:"d1"`
+	D2        string `json:"d2"`
+	D         string `json:"d"`
+	H1        string `json:"h1"`
+	H2        string `json:"h2"`
+	BoltId    string `json:"boltId" binding:"required"`
+	CountBolt int32  `json:"countBolt" binding:"required"`
+	Count     int32  `json:"count"`
+}

@@ -78,7 +78,7 @@ const docTemplate_swagger = `{
                 }
             }
         },
-        "/files/drawings/{name}": {
+        "/files/drawings/{backet}/{group}/{id}/{name}": {
             "get": {
                 "security": [
                     {
@@ -1194,6 +1194,263 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/sealur-pro/bolt-materials": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение материалов болтов/шпилек (для опроса)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e bolt materials"
+                ],
+                "summary": "Get Bolt Materials",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.BoltMaterials"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание материала болтов/шпилек (для опроса)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e bolt materials"
+                ],
+                "summary": "Create Bolt Materials",
+                "parameters": [
+                    {
+                        "description": "bolt materials info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BoltMaterialsDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/bolt-materials/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление материала болтов/шпилек (для опроса)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e bolt materials"
+                ],
+                "summary": "Update Bolt Materials",
+                "parameters": [
+                    {
+                        "description": "bolt material info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BoltMaterialsDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "bolt material id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "удаление материала болтов/шпилек (для опроса)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e bolt materials"
+                ],
+                "summary": "Delete Bolt Materials",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bolt material id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/sealur-pro/flange-types": {
             "get": {
                 "security": [
@@ -1775,24 +2032,281 @@ const docTemplate_swagger = `{
                 }
             }
         },
-        "/sealur-pro/order/drawing": {
+        "/sealur-pro/materials": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение материалов (для опроса)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e materials"
+                ],
+                "summary": "Get Materials",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/proto.Materials"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "создание чертежа",
+                "description": "создание материала (для опроса)",
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Sealur Pro -\u003e order"
+                    "Sealur Pro -\u003e materials"
                 ],
-                "summary": "Create Drawing",
+                "summary": "Create Materials",
+                "parameters": [
+                    {
+                        "description": "materials info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MaterialsDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/materials/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление материала (для опроса)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e materials"
+                ],
+                "summary": "Update Materials",
+                "parameters": [
+                    {
+                        "description": "material info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MaterialsDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "material id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "удаление материала (для опроса)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e materials"
+                ],
+                "summary": "Delete Materials",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "material id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/orders/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание заказа",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e orders"
+                ],
+                "summary": "Create Order",
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -3076,6 +3590,276 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/sealur-pro/sizes-interview": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "получение размеров (для опроса)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e sizes-interview"
+                ],
+                "summary": "Get Sizes Int",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "flange",
+                        "name": "flange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "flange type id",
+                        "name": "typeFlId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/proto.SizeIntResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "создание размеров (для опроса)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e sizes-interview"
+                ],
+                "summary": "Create Size Int",
+                "parameters": [
+                    {
+                        "description": "size int info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SizeIntDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/sizes-interview/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "обновление размеров (для опроса)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e sizes-interview"
+                ],
+                "summary": "Update Size Int",
+                "parameters": [
+                    {
+                        "description": "size int info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SizeIntDTO"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "size int id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "удаление размеров (для опроса)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e sizes-interview"
+                ],
+                "summary": "Delete Size Int",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "size id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/sealur-pro/sizes/all": {
             "get": {
                 "security": [
@@ -4277,6 +5061,21 @@ const docTemplate_swagger = `{
         }
     },
     "definitions": {
+        "models.BoltMaterialsDTO": {
+            "type": "object",
+            "required": [
+                "flangeId",
+                "title"
+            ],
+            "properties": {
+                "flangeId": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "models.CreateAdditDTO": {
             "type": "object",
             "required": [
@@ -4411,6 +5210,21 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.MaterialsDTO": {
+            "type": "object",
+            "required": [
+                "title",
+                "typeMat"
+            ],
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "typeMat": {
                     "type": "string"
                 }
             }
@@ -4609,7 +5423,7 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "frame": {
-                    "$ref": "#/definitions/proto.Materials"
+                    "$ref": "#/definitions/proto.SnpMaterials"
                 },
                 "graphite": {
                     "type": "array",
@@ -4618,7 +5432,7 @@ const docTemplate_swagger = `{
                     }
                 },
                 "ir": {
-                    "$ref": "#/definitions/proto.Materials"
+                    "$ref": "#/definitions/proto.SnpMaterials"
                 },
                 "mounting": {
                     "type": "array",
@@ -4627,7 +5441,7 @@ const docTemplate_swagger = `{
                     }
                 },
                 "or": {
-                    "$ref": "#/definitions/proto.Materials"
+                    "$ref": "#/definitions/proto.SnpMaterials"
                 },
                 "standId": {
                     "type": "string"
@@ -4636,6 +5450,55 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "typePr": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SizeIntDTO": {
+            "type": "object",
+            "required": [
+                "boltId",
+                "countBolt",
+                "dy",
+                "flange",
+                "py",
+                "typeFlId"
+            ],
+            "properties": {
+                "boltId": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "countBolt": {
+                    "type": "integer"
+                },
+                "d": {
+                    "type": "string"
+                },
+                "d1": {
+                    "type": "string"
+                },
+                "d2": {
+                    "type": "string"
+                },
+                "dy": {
+                    "type": "string"
+                },
+                "flange": {
+                    "type": "string"
+                },
+                "h1": {
+                    "type": "string"
+                },
+                "h2": {
+                    "type": "string"
+                },
+                "py": {
+                    "type": "string"
+                },
+                "typeFlId": {
                     "type": "string"
                 }
             }
@@ -5252,6 +6115,17 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "proto.BoltMaterials": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "proto.ConTemp": {
             "type": "object",
             "properties": {
@@ -5319,14 +6193,14 @@ const docTemplate_swagger = `{
         "proto.Materials": {
             "type": "object",
             "properties": {
-                "default": {
+                "id": {
                     "type": "string"
                 },
-                "values": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
+                "title": {
+                    "type": "string"
+                },
+                "typeMat": {
+                    "type": "string"
                 }
             }
         },
@@ -5598,7 +6472,7 @@ const docTemplate_swagger = `{
                     }
                 },
                 "frame": {
-                    "$ref": "#/definitions/proto.Materials"
+                    "$ref": "#/definitions/proto.SnpMaterials"
                 },
                 "graphite": {
                     "type": "array",
@@ -5610,7 +6484,7 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "ir": {
-                    "$ref": "#/definitions/proto.Materials"
+                    "$ref": "#/definitions/proto.SnpMaterials"
                 },
                 "mounting": {
                     "type": "array",
@@ -5619,7 +6493,7 @@ const docTemplate_swagger = `{
                     }
                 },
                 "or": {
-                    "$ref": "#/definitions/proto.Materials"
+                    "$ref": "#/definitions/proto.SnpMaterials"
                 },
                 "typeFlId": {
                     "type": "string"
@@ -5670,6 +6544,52 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "proto.SizeInt": {
+            "type": "object",
+            "properties": {
+                "BoltId": {
+                    "type": "string"
+                },
+                "CountBolt": {
+                    "type": "integer"
+                },
+                "D": {
+                    "type": "string"
+                },
+                "D1": {
+                    "type": "string"
+                },
+                "D2": {
+                    "type": "string"
+                },
+                "Dy": {
+                    "type": "string"
+                },
+                "H1": {
+                    "type": "string"
+                },
+                "H2": {
+                    "type": "string"
+                },
+                "Py": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.SizeIntResponse": {
+            "type": "object",
+            "properties": {
+                "sizes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.SizeInt"
+                    }
+                }
+            }
+        },
         "proto.SizeResponse": {
             "type": "object",
             "properties": {
@@ -5683,6 +6603,20 @@ const docTemplate_swagger = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.Size"
+                    }
+                }
+            }
+        },
+        "proto.SnpMaterials": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "type": "string"
+                },
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
                     }
                 }
             }

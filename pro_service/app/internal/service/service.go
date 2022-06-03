@@ -125,6 +125,27 @@ type Putgm interface {
 	DeleteCoating(id string) error
 }
 
+type Materials interface {
+	GetAll(*proto.GetMaterialsRequest) ([]*proto.Materials, error)
+	Create(*proto.CreateMaterialsRequest) (*proto.IdResponse, error)
+	Update(*proto.UpdateMaterialsRequest) error
+	Delete(*proto.DeleteMaterialsRequest) error
+}
+
+type BoltMaterials interface {
+	GetAll(*proto.GetBoltMaterialsRequest) ([]*proto.BoltMaterials, error)
+	Create(*proto.CreateBoltMaterialsRequest) (*proto.IdResponse, error)
+	Update(*proto.UpdateBoltMaterialsRequest) error
+	Delete(*proto.DeleteBoltMaterialsRequest) error
+}
+
+type SizeInt interface {
+	Get(*proto.GetSizesIntRequest) ([]*proto.SizeInt, error)
+	Create(*proto.CreateSizeIntRequest) (*proto.IdResponse, error)
+	Update(*proto.UpdateSizeIntRequest) error
+	Delete(*proto.DeleteSizeIntRequest) error
+}
+
 type Services struct {
 	Stand
 	Flange
@@ -137,20 +158,26 @@ type Services struct {
 	Putg
 	PutgmImage
 	Putgm
+	Materials
+	BoltMaterials
+	SizeInt
 }
 
 func NewServices(repos *repository.Repositories) *Services {
 	return &Services{
-		Stand:      NewStandService(repos.Stand),
-		Flange:     NewFlangeService(repos.Flange),
-		StFl:       NewStFlService(repos.StFl),
-		TypeFl:     NewTypeFlService(repos.TypeFl),
-		Addit:      NewAdditService(repos.Addit),
-		Size:       NewSizeService(repos.Size),
-		SNP:        NewSNPService(repos.SNP),
-		PutgImage:  NewPutgImageService(repos.PutgImage),
-		Putg:       NewPutgService(repos.Putg),
-		PutgmImage: NewPutgmImageService(repos.PutgmImage),
-		Putgm:      NewPutgmService(repos.Putgm),
+		Stand:         NewStandService(repos.Stand),
+		Flange:        NewFlangeService(repos.Flange),
+		StFl:          NewStFlService(repos.StFl),
+		TypeFl:        NewTypeFlService(repos.TypeFl),
+		Addit:         NewAdditService(repos.Addit),
+		Size:          NewSizeService(repos.Size),
+		SNP:           NewSNPService(repos.SNP),
+		PutgImage:     NewPutgImageService(repos.PutgImage),
+		Putg:          NewPutgService(repos.Putg),
+		PutgmImage:    NewPutgmImageService(repos.PutgmImage),
+		Putgm:         NewPutgmService(repos.Putgm),
+		Materials:     NewMatService(repos.Materials),
+		BoltMaterials: NewBoltMatRepo(repos.BoltMaterials),
+		SizeInt:       NewSizeIntService(repos.SizeInt),
 	}
 }

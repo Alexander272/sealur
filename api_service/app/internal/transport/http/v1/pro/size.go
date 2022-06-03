@@ -187,7 +187,6 @@ func (h *Handler) createSize(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/sizes/file [post]
 func (h *Handler) createSizeFromFile(c *gin.Context) {
-
 	fileHeader, err := c.FormFile("sizes")
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "error while opening file")

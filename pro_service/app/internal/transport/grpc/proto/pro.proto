@@ -398,7 +398,7 @@ message Temp {
     repeated string mods = 2;
 }
 
-message Materials {
+message SnpMaterials {
     repeated string values = 1;
     string default = 2;
 }
@@ -414,9 +414,9 @@ message CreateSNPRequest {
     string typeFlId = 3;
     string typePr = 4;
     repeated Filler fillers = 5;
-    Materials frame = 6;
-    Materials ir = 7;
-    Materials or = 8;
+    SnpMaterials frame = 6;
+    SnpMaterials ir = 7;
+    SnpMaterials or = 8;
     repeated string mounting = 9;
     repeated string graphite = 10;
 }
@@ -428,9 +428,9 @@ message UpdateSNPRequest {
     string typeFlId = 4;
     string typePr = 5;
     repeated Filler fillers = 6;
-    Materials frame = 7;
-    Materials ir = 8;
-    Materials or = 9;
+    SnpMaterials frame = 7;
+    SnpMaterials ir = 8;
+    SnpMaterials or = 9;
     repeated string mounting = 10;
     repeated string graphite = 11;
 }
@@ -444,9 +444,9 @@ message SNP {
     string typeFlId = 2;
     string typePr = 3;
     repeated Filler fillers = 4;
-    Materials frame = 5;
-    Materials ir = 6;
-    Materials or = 7;
+    SnpMaterials frame = 5;
+    SnpMaterials ir = 6;
+    SnpMaterials or = 7;
     repeated string mounting = 8;
     repeated string graphite = 9;
 }
@@ -689,6 +689,122 @@ message PutgmResponse {
     repeated Putgm putgm = 1;
 }
 
+// Interview Service ----------------------------------------------------------------
+
+// Materials
+message GetMaterialsRequest {}
+
+message CreateMaterialsRequest {
+    string title = 1;
+    string typeMat = 2;
+}
+
+message UpdateMaterialsRequest {
+    string id = 1;
+    string title = 2;
+    string typeMat = 3;
+}
+
+message DeleteMaterialsRequest {
+    string id = 1;
+}
+
+message Materials {
+    string id = 1;
+    string title = 2;
+    string typeMat = 3;
+}
+
+message MaterialsResponse {
+    repeated Materials materials = 1;
+}
+
+// Bolt Materials
+message GetBoltMaterialsRequest {
+    string flangeId = 1;
+}
+
+message CreateBoltMaterialsRequest {
+    string title = 1;
+    string flangeId = 2;
+}
+
+message UpdateBoltMaterialsRequest {
+    string id = 1;
+    string title = 2;
+    string flangeId = 3;
+}
+
+message DeleteBoltMaterialsRequest {
+    string id = 1;
+}
+
+message BoltMaterials {
+    string id = 1;
+    string title = 2;
+}
+
+message BoltMaterialsResponse {
+    repeated BoltMaterials materials = 1;
+}
+
+// Size
+message GetSizesIntRequest {
+    string flangeId = 1;
+    string typeFl = 2;
+}
+
+message CreateSizeIntRequest {
+    string flangeId = 1;
+    string typeFl = 2;
+    string Dy = 3;
+    string Py = 4;
+    string D1 = 5;
+    string D2 = 6;
+    string D = 7;
+    string H1 = 8;
+    string H2 = 9;
+    string BoltId = 10;
+    int32 CountBolt = 11;
+    int32 number = 12;
+}
+
+message UpdateSizeIntRequest {
+    string id = 1;
+    string flangeId = 2;
+    string typeFl = 3;
+    string Dy = 4;
+    string Py = 5;
+    string D1 = 6;
+    string D2 = 7;
+    string D = 8;
+    string H1 = 9;
+    string H2 = 10;
+    string BoltId = 11;
+    int32 CountBolt = 12;
+}
+
+message DeleteSizeIntRequest {
+    string id = 1;
+}
+
+message SizeInt {
+    string id = 1;
+    string Dy = 2;
+    string Py = 3;
+    string D1 = 4;
+    string D2 = 5;
+    string D = 6;
+    string H1 = 7;
+    string H2 = 8;
+    string BoltId = 9;
+    int32 CountBolt = 10;
+}
+
+message SizeIntResponse {
+    repeated SizeInt sizes = 1;
+}
+
 // commmon ----------------------------------------------------------------
 message IdResponse {
     string id = 1;
@@ -782,4 +898,23 @@ service ProService {
     rpc CreatePutgm (CreatePutgmRequest) returns (IdResponse);
     rpc UpdatePutgm (UpdatePutgmRequest) returns (IdResponse);
     rpc DeletePutgm (DeletePutgmRequest) returns (IdResponse);
+
+    // Interview Service ----------------------------------------------------------------
+    // Materials
+    rpc GetMaterials (GetMaterialsRequest) returns (MaterialsResponse); 
+    rpc CreateMaterials (CreateMaterialsRequest) returns (IdResponse);
+    rpc UpdateMaterials (UpdateMaterialsRequest) returns (IdResponse);
+    rpc DeleteMaterials (DeleteMaterialsRequest) returns (IdResponse);
+
+    //Bolt Materials
+    rpc GetBoltMaterials (GetBoltMaterialsRequest) returns (BoltMaterialsResponse);
+    rpc CreateBoltMaterials (CreateBoltMaterialsRequest) returns (IdResponse);
+    rpc UpdateBoltMaterials (UpdateBoltMaterialsRequest) returns (IdResponse);
+    rpc DeleteBoltMaterials (DeleteBoltMaterialsRequest) returns (IdResponse);
+
+    //Size
+    rpc GetSizeInt (GetSizesIntRequest) returns (SizeIntResponse);
+    rpc CreateSizeInt (CreateSizeIntRequest) returns (IdResponse);
+    rpc UpdateSizeInt (UpdateSizeIntRequest) returns (IdResponse);
+    rpc DeleteSizeInt (DeleteSizeIntRequest) returns (IdResponse);
 }

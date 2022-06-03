@@ -14,7 +14,6 @@ type MinioStorage struct {
 }
 
 func NewClient(conf config.MinIOConfig) (*MinioStorage, error) {
-	logger.Debug(conf.Endpoint, " ", conf.AccessKey, " ", conf.SecretKey)
 	// minioClient, err := minio.New(conf.Endpoint, &minio.Options{
 	// 	Creds:  credentials.NewStaticV4(conf.AccessKey, conf.SecretKey, ""),
 	// 	Secure: ,
