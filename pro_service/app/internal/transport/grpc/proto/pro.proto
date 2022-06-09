@@ -752,6 +752,7 @@ message BoltMaterialsResponse {
 message GetSizesIntRequest {
     string flangeId = 1;
     string typeFl = 2;
+    int32 row = 3;
 }
 
 message CreateSizeIntRequest {
@@ -762,11 +763,13 @@ message CreateSizeIntRequest {
     string D1 = 5;
     string D2 = 6;
     string D = 7;
-    string H1 = 8;
-    string H2 = 9;
-    string BoltId = 10;
-    int32 CountBolt = 11;
-    int32 number = 12;
+    string dUp = 8;
+    string H1 = 9;
+    string H2 = 10;
+    string bolt = 11;
+    int32 countBolt = 12;
+    int32 number = 13;
+    int32 row = 14;
 }
 
 message UpdateSizeIntRequest {
@@ -777,11 +780,13 @@ message UpdateSizeIntRequest {
     string Py = 5;
     string D1 = 6;
     string D2 = 7;
-    string D = 8;
-    string H1 = 9;
-    string H2 = 10;
-    string BoltId = 11;
-    int32 CountBolt = 12;
+    string dUp = 8;
+    string D = 9;
+    string H1 = 10;
+    string H2 = 11;
+    string bolt = 12;
+    int32 countBolt = 13;
+    int32 row = 14;
 }
 
 message DeleteSizeIntRequest {
@@ -792,13 +797,14 @@ message SizeInt {
     string id = 1;
     string Dy = 2;
     string Py = 3;
-    string D1 = 4;
-    string D2 = 5;
-    string D = 6;
-    string H1 = 7;
-    string H2 = 8;
-    string BoltId = 9;
-    int32 CountBolt = 10;
+    string dUp = 4;
+    string D1 = 5;
+    string D2 = 6;
+    string D = 7;
+    string H1 = 8;
+    string H2 = 9;
+    string bolt = 10;
+    int32 countBolt = 11;
 }
 
 message SizeIntResponse {

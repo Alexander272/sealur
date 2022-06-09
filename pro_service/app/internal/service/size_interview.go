@@ -30,10 +30,11 @@ func (s *SizeIntService) Get(req *proto.GetSizesIntRequest) (sizes []*proto.Size
 			Py:        d.Py,
 			D1:        d.D1,
 			D2:        d.D2,
+			DUp:       d.DUp,
 			D:         d.D,
 			H1:        d.H1,
 			H2:        d.H2,
-			BoltId:    d.Bolt,
+			Bolt:      d.Bolt,
 			CountBolt: d.Count,
 		}
 		sizes = append(sizes, &s)

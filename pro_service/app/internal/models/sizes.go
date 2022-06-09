@@ -21,6 +21,7 @@ type SizeInterview struct {
 	Py    string `db:"py"`
 	D1    string `db:"d1"`
 	D2    string `db:"d2"`
+	DUp   string `db:"d_up"`
 	D     string `db:"d"`
 	H1    string `db:"h1"`
 	H2    string `db:"h2"`

@@ -18,23 +18,20 @@ func NewSizeIntRepo(db *sqlx.DB) *SizeIntRepo {
 }
 
 func (r *SizeIntRepo) Get(req *proto.GetSizesIntRequest) (sizes []models.SizeInterview, err error) {
-	// TODO дописать join и сделать запрос
-	// var query string
+	query := fmt.Sprintf(`SELECT id, dy, py, d_up, d1, d2, d, h1, h2, bolt, count_bolt FROM %s
+		WHERE flange_id=$1 AND type_fl_id=$2 AND row=$3 ORDER BY count`, SizeIntrTable)
 
-	// query = fmt.Sprintf(`SELECT id, dy, py, d1, d2, d, h1, h2, bolt, count_bolt FROM %s
-	// 	WHERE stand_id=$1 AND type_fl_id=$2 ORDER BY count`, req.FlangeId, req.TypeFl)
-
-	// var data []models.Size
-	// if err = r.db.Select(&data, query, req.StandId, req.TypeFlId); err != nil {
-	// 	return nil, fmt.Errorf("failed to execute query. error: %w", err)
-	// }
+	var data []models.Size
+	if err = r.db.Select(&data, query, req.FlangeId, req.TypeFl, req.Row); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
 
 	return sizes, nil
 }
 
 func (r *SizeIntRepo) Create(size *proto.CreateSizeIntRequest) (id string, err error) {
-	query := fmt.Sprintf(`INSERT INTO %s (count, type_fl_id, flange_id, dy, py, d1, d2, d, h1, h2, bolt, count_bolt) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`, SizeIntrTable)
+	query := fmt.Sprintf(`INSERT INTO %s (count, type_fl_id, flange_id, dy, py, d_up, d1, d2, d, h1, h2, bolt, count_bolt, row_count) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`, SizeIntrTable)
 
 	// flangeId, err := strconv.Atoi(size.FlangeId)
 	// if err != nil {
@@ -51,8 +48,8 @@ func (r *SizeIntRepo) Create(size *proto.CreateSizeIntRequest) (id string, err e
 		size.Number = max + 1
 	}
 
-	row := r.db.QueryRow(query, size.Number, size.TypeFl, size.FlangeId, size.Dy, size.Py, size.D1, size.D2, size.D, size.H1,
-		size.H2, size.BoltId, size.CountBolt)
+	row := r.db.QueryRow(query, size.Number, size.TypeFl, size.FlangeId, size.Dy, size.Py, size.DUp, size.D1, size.D2, size.D, size.H1,
+		size.H2, size.Bolt, size.CountBolt, size.Row)
 
 	var idInt int
 	if err = row.Scan(&idInt); err != nil {
@@ -63,8 +60,8 @@ func (r *SizeIntRepo) Create(size *proto.CreateSizeIntRequest) (id string, err e
 }
 
 func (r *SizeIntRepo) Update(size *proto.UpdateSizeIntRequest) error {
-	query := fmt.Sprintf(`UPDATE %s SET dy=$1, py=$2, flange_id=$3, type_fl_id=$4, d1=$5, d2=$6, d=$7, h1=$8, h2=$9, bolt_id=$10,
-		count_bolt=$11 WHERE id=$12`, SizeIntrTable)
+	query := fmt.Sprintf(`UPDATE %s SET dy=$1, py=$2, flange_id=$3, type_fl_id=$4, d_up=$5, d1=$6, d2=$7, d=$8, h1=$9, h2=$10, bolt=$11,
+		count_bolt=$12, row=$13 WHERE id=$14`, SizeIntrTable)
 
 	id, err := strconv.Atoi(size.Id)
 	if err != nil {
@@ -76,8 +73,8 @@ func (r *SizeIntRepo) Update(size *proto.UpdateSizeIntRequest) error {
 	// 	return fmt.Errorf("failed to convert string to int. error: %w", err)
 	// }
 
-	_, err = r.db.Exec(query, size.Dy, size.Py, size.FlangeId, size.TypeFl, size.D1, size.D2, size.D, size.H1, size.H2, size.BoltId,
-		size.CountBolt, id)
+	_, err = r.db.Exec(query, size.Dy, size.Py, size.FlangeId, size.TypeFl, size.DUp, size.D1, size.D2, size.D, size.H1, size.H2, size.Bolt,
+		size.CountBolt, size.Row, id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

@@ -29,12 +29,14 @@ type SizeIntDTO struct {
 	TypeFlId  string `json:"typeFlId" binding:"required"`
 	Dy        string `json:"dy" binding:"required"`
 	Py        string `json:"py" binding:"required"`
+	DUp       string `json:"dUp"`
 	D1        string `json:"d1"`
 	D2        string `json:"d2"`
 	D         string `json:"d"`
 	H1        string `json:"h1"`
 	H2        string `json:"h2"`
-	BoltId    string `json:"boltId" binding:"required"`
+	Bolt      string `json:"bolt" binding:"required"`
 	CountBolt int32  `json:"countBolt" binding:"required"`
 	Count     int32  `json:"count"`
+	Row       int32  `json:"row"`
 }

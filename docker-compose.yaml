@@ -18,7 +18,7 @@ services:
 
     api_service:
         restart: on-failure:5
-        image: api_service:0.90
+        image: api_service:0.91
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images
@@ -38,7 +38,7 @@ services:
 
     pro_service:
         restart: on-failure:5
-        image: pro_service:0.80
+        image: pro_service:0.81
         container_name: dev-pro_service
         env_file:
             - .env

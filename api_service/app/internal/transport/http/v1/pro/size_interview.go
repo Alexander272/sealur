@@ -84,12 +84,14 @@ func (h *Handler) createSizeInt(c *gin.Context) {
 		Py:        dto.Py,
 		D1:        dto.D1,
 		D2:        dto.D2,
+		DUp:       dto.DUp,
 		D:         dto.D,
 		H1:        dto.H1,
 		H2:        dto.H2,
-		BoltId:    dto.BoltId,
+		Bolt:      dto.Bolt,
 		CountBolt: dto.CountBolt,
 		Number:    dto.Count,
+		Row:       dto.Row,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -135,11 +137,13 @@ func (h *Handler) updateSizeInt(c *gin.Context) {
 		Py:        dto.Py,
 		D1:        dto.D1,
 		D2:        dto.D2,
+		DUp:       dto.DUp,
 		D:         dto.D,
 		H1:        dto.H1,
 		H2:        dto.H2,
-		BoltId:    dto.BoltId,
+		Bolt:      dto.Bolt,
 		CountBolt: dto.CountBolt,
+		Row:       dto.Row,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
