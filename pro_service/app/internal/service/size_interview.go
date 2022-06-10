@@ -3,7 +3,6 @@ package service
 import (
 	"fmt"
 
-	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 )
@@ -17,14 +16,13 @@ func NewSizeIntService(repo repository.SizeInt) *SizeIntService {
 }
 
 func (s *SizeIntService) Get(req *proto.GetSizesIntRequest) (sizes []*proto.SizeInt, dn []*proto.Dn, err error) {
-	var data []models.SizeInterview
-	data, err = s.repo.Get(req)
+	data, err := s.repo.Get(req)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get sizes interview. error: %w", err)
 	}
 
 	for _, d := range data {
-		s := proto.SizeInt{
+		s := &proto.SizeInt{
 			Id:        d.Id,
 			Dy:        d.Dy,
 			Py:        d.Py,
@@ -37,7 +35,7 @@ func (s *SizeIntService) Get(req *proto.GetSizesIntRequest) (sizes []*proto.Size
 			Bolt:      d.Bolt,
 			CountBolt: d.Count,
 		}
-		sizes = append(sizes, &s)
+		sizes = append(sizes, s)
 	}
 
 	dn = make([]*proto.Dn, 0, len(sizes))
