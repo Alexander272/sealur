@@ -7,12 +7,12 @@ import (
 )
 
 func (h *Handler) GetSizeInt(ctx context.Context, req *proto.GetSizesIntRequest) (*proto.SizeIntResponse, error) {
-	sizes, err := h.service.SizeInt.Get(req)
+	sizes, dn, err := h.service.SizeInt.Get(req)
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.SizeIntResponse{Sizes: sizes}, nil
+	return &proto.SizeIntResponse{Sizes: sizes, Dn: dn}, nil
 }
 
 func (h *Handler) CreateSizeInt(ctx context.Context, size *proto.CreateSizeIntRequest) (*proto.IdResponse, error) {

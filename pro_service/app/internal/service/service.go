@@ -140,7 +140,7 @@ type BoltMaterials interface {
 }
 
 type SizeInt interface {
-	Get(*proto.GetSizesIntRequest) ([]*proto.SizeInt, error)
+	Get(*proto.GetSizesIntRequest) ([]*proto.SizeInt, []*proto.Dn, error)
 	Create(*proto.CreateSizeIntRequest) (*proto.IdResponse, error)
 	Update(*proto.UpdateSizeIntRequest) error
 	Delete(*proto.DeleteSizeIntRequest) error

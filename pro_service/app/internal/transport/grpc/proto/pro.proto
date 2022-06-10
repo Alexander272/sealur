@@ -809,6 +809,7 @@ message SizeInt {
 
 message SizeIntResponse {
     repeated SizeInt sizes = 1;
+    repeated Dn dn = 2;
 }
 
 // commmon ----------------------------------------------------------------

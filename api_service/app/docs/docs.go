@@ -3622,6 +3622,13 @@ const docTemplate_swagger = `{
                         "name": "typeFlId",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "row",
+                        "name": "row",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -5457,7 +5464,7 @@ const docTemplate_swagger = `{
         "models.SizeIntDTO": {
             "type": "object",
             "required": [
-                "boltId",
+                "bolt",
                 "countBolt",
                 "dy",
                 "flange",
@@ -5465,7 +5472,7 @@ const docTemplate_swagger = `{
                 "typeFlId"
             ],
             "properties": {
-                "boltId": {
+                "bolt": {
                     "type": "string"
                 },
                 "count": {
@@ -5483,6 +5490,9 @@ const docTemplate_swagger = `{
                 "d2": {
                     "type": "string"
                 },
+                "dUp": {
+                    "type": "string"
+                },
                 "dy": {
                     "type": "string"
                 },
@@ -5497,6 +5507,9 @@ const docTemplate_swagger = `{
                 },
                 "py": {
                     "type": "string"
+                },
+                "row": {
+                    "type": "integer"
                 },
                 "typeFlId": {
                     "type": "string"
@@ -6547,12 +6560,6 @@ const docTemplate_swagger = `{
         "proto.SizeInt": {
             "type": "object",
             "properties": {
-                "BoltId": {
-                    "type": "string"
-                },
-                "CountBolt": {
-                    "type": "integer"
-                },
                 "D": {
                     "type": "string"
                 },
@@ -6574,6 +6581,15 @@ const docTemplate_swagger = `{
                 "Py": {
                     "type": "string"
                 },
+                "bolt": {
+                    "type": "string"
+                },
+                "countBolt": {
+                    "type": "integer"
+                },
+                "dUp": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 }
@@ -6582,6 +6598,12 @@ const docTemplate_swagger = `{
         "proto.SizeIntResponse": {
             "type": "object",
             "properties": {
+                "dn": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.Dn"
+                    }
+                },
                 "sizes": {
                     "type": "array",
                     "items": {

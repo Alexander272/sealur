@@ -3615,6 +3615,13 @@
                         "name": "typeFlId",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "row",
+                        "name": "row",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -5450,7 +5457,7 @@
         "models.SizeIntDTO": {
             "type": "object",
             "required": [
-                "boltId",
+                "bolt",
                 "countBolt",
                 "dy",
                 "flange",
@@ -5458,7 +5465,7 @@
                 "typeFlId"
             ],
             "properties": {
-                "boltId": {
+                "bolt": {
                     "type": "string"
                 },
                 "count": {
@@ -5476,6 +5483,9 @@
                 "d2": {
                     "type": "string"
                 },
+                "dUp": {
+                    "type": "string"
+                },
                 "dy": {
                     "type": "string"
                 },
@@ -5490,6 +5500,9 @@
                 },
                 "py": {
                     "type": "string"
+                },
+                "row": {
+                    "type": "integer"
                 },
                 "typeFlId": {
                     "type": "string"
@@ -6540,12 +6553,6 @@
         "proto.SizeInt": {
             "type": "object",
             "properties": {
-                "BoltId": {
-                    "type": "string"
-                },
-                "CountBolt": {
-                    "type": "integer"
-                },
                 "D": {
                     "type": "string"
                 },
@@ -6567,6 +6574,15 @@
                 "Py": {
                     "type": "string"
                 },
+                "bolt": {
+                    "type": "string"
+                },
+                "countBolt": {
+                    "type": "integer"
+                },
+                "dUp": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 }
@@ -6575,6 +6591,12 @@
         "proto.SizeIntResponse": {
             "type": "object",
             "properties": {
+                "dn": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.Dn"
+                    }
+                },
                 "sizes": {
                     "type": "array",
                     "items": {

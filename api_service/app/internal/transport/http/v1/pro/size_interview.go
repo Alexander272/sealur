@@ -3,6 +3,7 @@ package pro
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
@@ -28,6 +29,7 @@ func (h *Handler) initSizeIntRoutes(api *gin.RouterGroup) {
 // @Produce json
 // @Param flange query string true "flange"
 // @Param typeFlId query string true "flange type id"
+// @Param row query string true "row"
 // @Success 200 {object} models.DataResponse{data=proto.SizeIntResponse}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -44,10 +46,21 @@ func (h *Handler) getSizesInt(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty flange type id", "empty flange type id param")
 		return
 	}
+	rowStr := c.Query("row")
+	if rowStr == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty row", "empty row")
+		return
+	}
+	row, err := strconv.Atoi(rowStr)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty row", "empty row")
+		return
+	}
 
 	sizes, err := h.proClient.GetSizeInt(c, &proto.GetSizesIntRequest{
 		FlangeId: flange,
 		TypeFl:   typeFlId,
+		Row:      int32(row),
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
