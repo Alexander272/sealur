@@ -16,7 +16,7 @@ const docTemplate_swagger = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/files/drawings": {
+        "/files/drawings/{backet}": {
             "post": {
                 "security": [
                     {
@@ -35,6 +35,13 @@ const docTemplate_swagger = `{
                 ],
                 "summary": "Create Drawing",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "backet",
+                        "name": "backet",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "description": "group image",
                         "name": "group",
@@ -108,14 +115,21 @@ const docTemplate_swagger = `{
                         "type": "string",
                         "description": "drawing id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "drawing group",
                         "name": "group",
-                        "in": "query",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "backet",
+                        "name": "backet",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -181,14 +195,21 @@ const docTemplate_swagger = `{
                         "type": "string",
                         "description": "drawing id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "drawing group",
                         "name": "group",
-                        "in": "query",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "backet",
+                        "name": "backet",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -6560,37 +6581,37 @@ const docTemplate_swagger = `{
         "proto.SizeInt": {
             "type": "object",
             "properties": {
-                "D": {
-                    "type": "string"
-                },
-                "D1": {
-                    "type": "string"
-                },
-                "D2": {
-                    "type": "string"
-                },
-                "Dy": {
-                    "type": "string"
-                },
-                "H1": {
-                    "type": "string"
-                },
-                "H2": {
-                    "type": "string"
-                },
-                "Py": {
-                    "type": "string"
-                },
                 "bolt": {
                     "type": "string"
                 },
                 "countBolt": {
                     "type": "integer"
                 },
+                "d": {
+                    "type": "string"
+                },
+                "d1": {
+                    "type": "string"
+                },
+                "d2": {
+                    "type": "string"
+                },
                 "dUp": {
                     "type": "string"
                 },
+                "dy": {
+                    "type": "string"
+                },
+                "h1": {
+                    "type": "string"
+                },
+                "h2": {
+                    "type": "string"
+                },
                 "id": {
+                    "type": "string"
+                },
+                "py": {
                     "type": "string"
                 }
             }

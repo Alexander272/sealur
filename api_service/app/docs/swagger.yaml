@@ -995,27 +995,27 @@ definitions:
     type: object
   proto.SizeInt:
     properties:
-      D:
-        type: string
-      D1:
-        type: string
-      D2:
-        type: string
-      Dy:
-        type: string
-      H1:
-        type: string
-      H2:
-        type: string
-      Py:
-        type: string
       bolt:
         type: string
       countBolt:
         type: integer
+      d:
+        type: string
+      d1:
+        type: string
+      d2:
+        type: string
       dUp:
         type: string
+      dy:
+        type: string
+      h1:
+        type: string
+      h2:
+        type: string
       id:
+        type: string
+      py:
         type: string
     type: object
   proto.SizeIntResponse:
@@ -1098,12 +1098,17 @@ info:
   title: Sealur
   version: "0.5"
 paths:
-  /files/drawings:
+  /files/drawings/{backet}:
     post:
       consumes:
       - multipart/form-data
       description: создание чертежа
       parameters:
+      - description: backet
+        in: path
+        name: backet
+        required: true
+        type: string
       - description: group image
         in: body
         name: group
@@ -1149,13 +1154,18 @@ paths:
         required: true
         type: string
       - description: drawing id
-        in: query
+        in: path
         name: id
         required: true
         type: string
       - description: drawing group
-        in: query
+        in: path
         name: group
+        required: true
+        type: string
+      - description: backet
+        in: path
+        name: backet
         required: true
         type: string
       produces:
@@ -1197,13 +1207,18 @@ paths:
         required: true
         type: string
       - description: drawing id
-        in: query
+        in: path
         name: id
         required: true
         type: string
       - description: drawing group
-        in: query
+        in: path
         name: group
+        required: true
+        type: string
+      - description: backet
+        in: path
+        name: backet
         required: true
         type: string
       produces:

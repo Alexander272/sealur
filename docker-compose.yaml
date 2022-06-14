@@ -18,7 +18,7 @@ services:
 
     api_service:
         restart: on-failure:5
-        image: api_service:0.92
+        image: api_service:0.93
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images

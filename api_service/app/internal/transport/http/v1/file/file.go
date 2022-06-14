@@ -16,7 +16,7 @@ import (
 func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
 	drawing := api.Group("/drawings")
 	{
-		drawing.POST("/", h.createDrawing)
+		drawing.POST("/:backet", h.createDrawing)
 		drawing.GET("/:backet/:group/:id/:name", h.getDrawing)
 		drawing.DELETE("/:backet/:group/:id/:name", h.deleteDrawing)
 	}
@@ -30,15 +30,15 @@ func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
 // @Accept json
 // @Produce multipart/form-data
 // @Param name path string true "drawing name"
-// @Param id query string true "drawing id"
-// @Param group query string true "drawing group"
+// @Param id path string true "drawing id"
+// @Param group path string true "drawing group"
+// @Param backet path string true "backet"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /files/drawings/{backet}/{group}/{id}/{name} [get]
 func (h *Handler) getDrawing(c *gin.Context) {
-	// TODO исправить (убрать backet лучше брать его из пути. данные из query параметров можно тоже запихать в путь)
 	name := c.Param("name")
 	if name == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty name", "empty name param")
@@ -59,7 +59,7 @@ func (h *Handler) getDrawing(c *gin.Context) {
 
 	backet := c.Param("backet")
 	if backet == "" {
-		models.NewErrorResponse(c, http.StatusBadRequest, "empty group", "empty group param")
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty backet", "empty backet param")
 		return
 	}
 
@@ -121,13 +121,20 @@ func (h *Handler) getDrawing(c *gin.Context) {
 // @ModuleID createDrawing
 // @Accept multipart/form-data
 // @Produce json
+// @Param backet path string true "backet"
 // @Param group body string false "group image"
 // @Success 201 {object} models.FileResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /files/drawings [post]
+// @Router /files/drawings/{backet} [post]
 func (h *Handler) createDrawing(c *gin.Context) {
+	backet := c.Param("backet")
+	if backet == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty backet", "empty backet param")
+		return
+	}
+
 	file, err := c.FormFile("drawing")
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "error getting file")
@@ -160,7 +167,7 @@ func (h *Handler) createDrawing(c *gin.Context) {
 				Type:   fileType,
 				Size:   file.Size,
 				Group:  group,
-				Backet: "pro",
+				Backet: backet,
 			},
 		},
 	}
@@ -232,8 +239,9 @@ func (h *Handler) createDrawing(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param name path string true "drawing name"
-// @Param id query string true "drawing id"
-// @Param group query string true "drawing group"
+// @Param id path string true "drawing id"
+// @Param group path string true "drawing group"
+// @Param backet path string true "backet"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -260,7 +268,7 @@ func (h *Handler) deleteDrawing(c *gin.Context) {
 
 	backet := c.Param("backet")
 	if backet == "" {
-		models.NewErrorResponse(c, http.StatusBadRequest, "empty group", "empty group param")
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty backet", "empty backet param")
 		return
 	}
 

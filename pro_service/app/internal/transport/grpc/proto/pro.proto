@@ -758,14 +758,14 @@ message GetSizesIntRequest {
 message CreateSizeIntRequest {
     string flangeId = 1;
     string typeFl = 2;
-    string Dy = 3;
-    string Py = 4;
-    string D1 = 5;
-    string D2 = 6;
-    string D = 7;
+    string dy = 3;
+    string py = 4;
+    string d1 = 5;
+    string d2 = 6;
+    string d = 7;
     string dUp = 8;
-    string H1 = 9;
-    string H2 = 10;
+    string h1 = 9;
+    string h2 = 10;
     string bolt = 11;
     int32 countBolt = 12;
     int32 number = 13;
@@ -776,14 +776,14 @@ message UpdateSizeIntRequest {
     string id = 1;
     string flangeId = 2;
     string typeFl = 3;
-    string Dy = 4;
-    string Py = 5;
-    string D1 = 6;
-    string D2 = 7;
+    string dy = 4;
+    string py = 5;
+    string d1 = 6;
+    string d2 = 7;
     string dUp = 8;
-    string D = 9;
-    string H1 = 10;
-    string H2 = 11;
+    string d = 9;
+    string h1 = 10;
+    string h2 = 11;
     string bolt = 12;
     int32 countBolt = 13;
     int32 row = 14;
@@ -795,14 +795,14 @@ message DeleteSizeIntRequest {
 
 message SizeInt {
     string id = 1;
-    string Dy = 2;
-    string Py = 3;
+    string dy = 2;
+    string py = 3;
     string dUp = 4;
-    string D1 = 5;
-    string D2 = 6;
-    string D = 7;
-    string H1 = 8;
-    string H2 = 9;
+    string d1 = 5;
+    string d2 = 6;
+    string d = 7;
+    string h1 = 8;
+    string h2 = 9;
     string bolt = 10;
     int32 countBolt = 11;
 }
