@@ -69,6 +69,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		h.initSizeIntRoutes(pro)
 
 		h.initOrderRoutes(pro)
+		h.initInterviewRoutes(pro)
 	}
 }
 

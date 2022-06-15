@@ -812,6 +812,77 @@ message SizeIntResponse {
     repeated Dn dn = 2;
 }
 
+// Interview
+message SendInterviewRequest {
+    string organization = 1;
+	string name = 2;
+	string email = 3;
+	string city = 4;
+	string position = 5;
+	string phone = 6;
+	string techprocess = 7;
+	string equipment = 8;
+	string seal = 9;
+	string consumer = 10;
+	string factory = 11;
+	string developer = 12;
+	string flange = 13;
+	string typeFl = 14;
+	string type = 15;
+	string diffFrom = 16;
+	string diffTo = 17;
+	string presWork = 18;
+	string presTest = 19;
+	string pressure = 20;
+	string environ = 21;
+	string tempWorkPipe = 22;
+	string presWorkPipe = 23;
+	string environPipe = 24;
+	string tempWorkAnn = 25;
+	string presWorkAnn = 26;
+	string environAnn = 27;
+	string material = 28;
+	string boltMaterial = 29;
+	bool lubricant = 30;
+	string along = 31;
+	string across = 32;
+	string nonFlatness = 33;
+	bool mounting = 34;
+    string condition = 35;
+    string period = 36;
+    bool abrasive = 37;
+    bool crystallized = 38;
+    bool penetrating = 39;
+	string drawingNumber = 40;
+	string info = 41;    
+	Drawing drawing = 42;
+	SizesInt sizes = 43;
+}
+
+message Drawing {
+    string id = 1;
+	string name = 2;
+	string origName = 3;
+	string group = 4;
+	string link = 5;
+}
+
+message SizesInt {
+    string dy = 1;
+	string py = 2;
+	string dUp = 3;
+	string d1 = 4;
+	string d2 = 5;
+	string d = 6;
+	string h1 = 7;
+	string h2 = 8;
+	string bolt = 9;
+	int32 countBolt = 10;
+	string dIn = 11;
+	string dOut = 12;
+	string h = 13;
+}
+
 // commmon ----------------------------------------------------------------
 message IdResponse {
     string id = 1;
@@ -924,4 +995,7 @@ service ProService {
     rpc CreateSizeInt (CreateSizeIntRequest) returns (IdResponse);
     rpc UpdateSizeInt (UpdateSizeIntRequest) returns (IdResponse);
     rpc DeleteSizeInt (DeleteSizeIntRequest) returns (IdResponse);
+
+    //Interview
+    rpc SendInterview (SendInterviewRequest) returns (SuccessResponse);
 }

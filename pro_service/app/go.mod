@@ -6,6 +6,7 @@ require github.com/spf13/viper v1.10.1
 
 require (
 	github.com/bramvdbogaerde/go-scp v1.2.0 // indirect
+	github.com/lukasjarosch/go-docx v0.4.4 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 )
 

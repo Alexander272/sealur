@@ -146,6 +146,10 @@ type SizeInt interface {
 	Delete(*proto.DeleteSizeIntRequest) error
 }
 
+type Interview interface {
+	SendInterview(req *proto.SendInterviewRequest) error
+}
+
 type Services struct {
 	Stand
 	Flange
@@ -161,6 +165,7 @@ type Services struct {
 	Materials
 	BoltMaterials
 	SizeInt
+	Interview
 }
 
 func NewServices(repos *repository.Repositories) *Services {
@@ -179,5 +184,6 @@ func NewServices(repos *repository.Repositories) *Services {
 		Materials:     NewMatService(repos.Materials),
 		BoltMaterials: NewBoltMatRepo(repos.BoltMaterials),
 		SizeInt:       NewSizeIntService(repos.SizeInt),
+		Interview:     NewInterviewService(),
 	}
 }
