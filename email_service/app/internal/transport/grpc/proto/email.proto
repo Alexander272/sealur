@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package proto_email;
+option go_package = "./;proto_email";
+
+message IdResponse {
+    string id = 1;
+}
+message SuccessResponse {
+    bool success = 1;
+}
+
+message PingRequest {}
+message PingResponse {
+    string ping = 1;
+}
+
+// Interview --------------------------------------------------
+message File {
+    bytes content = 1;
+}
+
+message FileData {
+    string name = 1;
+    string type = 2;
+    int64 size = 3;
+}
+
+message User {
+    string organization = 1;
+	string name = 2;
+	string email = 3;
+	string city = 4;
+	string position = 5;
+	string phone = 6;
+}
+
+message InterviewData {
+    User user = 1;
+    FileData file = 2;
+}
+
+message SendInterviewRequest {
+    oneof request {
+        InterviewData data = 2;
+        File file = 1;
+    }
+}
+
+service EmailService {
+    rpc Ping (PingRequest) returns (PingResponse);
+
+    // Interview --------------------------------------------------
+    rpc SendInterview (stream SendInterviewRequest) returns (SuccessResponse);
+}
