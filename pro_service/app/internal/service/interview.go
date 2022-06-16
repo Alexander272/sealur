@@ -1,23 +1,35 @@
 package service
 
 import (
+	"bufio"
+	"context"
 	"fmt"
+	"io"
+	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	proto_email "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/email"
+	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/file"
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	docx "github.com/lukasjarosch/go-docx"
 )
 
 type InterviewService struct {
+	email proto_email.EmailServiceClient
+	file  proto_file.FileServiceClient
 }
 
-func NewInterviewService() *InterviewService {
-	return &InterviewService{}
+func NewInterviewService(email proto_email.EmailServiceClient, file proto_file.FileServiceClient) *InterviewService {
+	return &InterviewService{
+		email: email,
+		file:  file,
+	}
 }
 
-func (s *InterviewService) SendInterview(req *proto.SendInterviewRequest) error {
+func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInterviewRequest) error {
 	var mounting, lubricant string
 	if req.Mounting {
 		mounting = "Да"
@@ -121,10 +133,89 @@ func (s *InterviewService) SendInterview(req *proto.SendInterviewRequest) error 
 	}
 
 	// write out a new file
-	err = doc.WriteToFile("опрос.docx")
+	err = doc.WriteToFile(path.Join("template", "Опрос.docx"))
 	if err != nil {
 		logger.Error(err)
 		return fmt.Errorf("failed to save new docx file. err: %s", err)
+	}
+
+	stat, err := os.Stat(path.Join("template", "Опрос.docx"))
+	if err != nil {
+		logger.Error(err)
+		return fmt.Errorf("failed to get stat docx file. err: %s", err)
+	}
+
+	ext := filepath.Ext(path.Join("template", "Опрос.docx"))
+
+	data := &proto_email.SendInterviewRequest{
+		Request: &proto_email.SendInterviewRequest_Data{
+			Data: &proto_email.InterviewData{
+				User: &proto_email.User{
+					Organization: req.Organization,
+					Name:         req.Name,
+					Email:        req.Email,
+					Phone:        req.Phone,
+					Position:     req.Position,
+					City:         req.City,
+				},
+				File: &proto_email.FileData{
+					Name: stat.Name(),
+					Type: ext,
+					Size: stat.Size(),
+				},
+			},
+		},
+	}
+
+	stream, err := s.email.SendInterview(ctx)
+	if err != nil {
+		return fmt.Errorf("error while connect wuth service. err: %w", err)
+	}
+
+	err = stream.Send(data)
+	if err != nil {
+		logger.Errorf("cannot send image info to server: %w %w", err, stream.RecvMsg(nil))
+		return fmt.Errorf("cannot send image info to server. err: %w", err)
+	}
+
+	file, err := os.Open(path.Join("template", "Опрос.docx"))
+	if err != nil {
+		logger.Error(err)
+		return fmt.Errorf("failed to read docx file. err: %s", err)
+	}
+
+	reader := bufio.NewReader(file)
+	buffer := make([]byte, 1024)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logger.Errorf("cannot read chunk to buffer: %w", err)
+			return fmt.Errorf("cannot read chunk to buffer: %w", err)
+		}
+
+		reqChunk := &proto_email.SendInterviewRequest{
+			Request: &proto_email.SendInterviewRequest_File{
+				File: &proto_email.File{
+					Content: buffer[:n],
+				},
+			},
+		}
+
+		err = stream.Send(reqChunk)
+		if err != nil {
+			logger.Errorf("cannot send chunk to server: %w", err)
+			return fmt.Errorf("cannot send chunk to server: %w", err)
+		}
+	}
+
+	_, err = stream.CloseAndRecv()
+	if err != nil {
+		logger.Errorf("cannot receive response: %w", err)
+		return fmt.Errorf("cannot receive response: %w", err)
 	}
 
 	return nil

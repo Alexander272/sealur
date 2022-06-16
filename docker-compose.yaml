@@ -38,8 +38,18 @@ services:
 
     pro_service:
         restart: on-failure:5
-        image: pro_service:0.84
+        image: pro_service:0.86
         container_name: dev-pro_service
+        env_file:
+            - .env
+        links:
+            - email_service
+            - file_service
+
+    email_service:
+        restart: on-failure:5
+        image: email_service:0.10
+        container_name: dev-email_service
         env_file:
             - .env
 

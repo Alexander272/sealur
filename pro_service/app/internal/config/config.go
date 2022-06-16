@@ -14,6 +14,7 @@ type (
 		Postgres    PostgresConfig
 		Http        HttpConfig
 		Api         ApiConfig
+		Services    ServicesConfig
 	}
 
 	PostgresConfig struct {
@@ -37,6 +38,17 @@ type (
 	ApiConfig struct {
 		Name     string
 		Password string
+	}
+
+	ServicesConfig struct {
+		EmailService ServiceConfig
+		FileService  ServiceConfig
+	}
+
+	ServiceConfig struct {
+		Url          string
+		AuthName     string
+		AuthPassword string
 	}
 )
 
@@ -92,6 +104,14 @@ func setFromEnv(conf *Config) error {
 	}
 	conf.Postgres.Password = os.Getenv("PRO_DB_PASSWORD")
 	conf.Environment = os.Getenv("APP_ENV")
+
+	conf.Services.EmailService.AuthName = os.Getenv("API_NAME")
+	conf.Services.EmailService.AuthPassword = os.Getenv("API_PASSWORD")
+	conf.Services.FileService.AuthName = os.Getenv("API_NAME")
+	conf.Services.FileService.AuthPassword = os.Getenv("API_PASSWORD")
+
+	conf.Services.EmailService.Url = os.Getenv("EMAIL_HOST") + ":" + os.Getenv("EMAIL_PORT")
+	conf.Services.FileService.Url = os.Getenv("FILE_HOST") + ":" + os.Getenv("FILE_PORT")
 
 	return nil
 }

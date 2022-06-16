@@ -7,8 +7,7 @@ import (
 )
 
 func (h *Handler) SendInterview(ctx context.Context, req *proto.SendInterviewRequest) (*proto.SuccessResponse, error) {
-	// TODO надо подключаться к фаловому и почтовому сервисам
-	if err := h.service.Interview.SendInterview(req); err != nil {
+	if err := h.service.Interview.SendInterview(ctx, req); err != nil {
 		return nil, err
 	}
 	return &proto.SuccessResponse{Success: true}, nil

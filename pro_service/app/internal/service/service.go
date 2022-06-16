@@ -1,8 +1,12 @@
 package service
 
 import (
+	"context"
+
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	proto_email "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/email"
+	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/file"
 )
 
 type Stand interface {
@@ -147,7 +151,7 @@ type SizeInt interface {
 }
 
 type Interview interface {
-	SendInterview(req *proto.SendInterviewRequest) error
+	SendInterview(context.Context, *proto.SendInterviewRequest) error
 }
 
 type Services struct {
@@ -168,7 +172,7 @@ type Services struct {
 	Interview
 }
 
-func NewServices(repos *repository.Repositories) *Services {
+func NewServices(repos *repository.Repositories, email proto_email.EmailServiceClient, file proto_file.FileServiceClient) *Services {
 	return &Services{
 		Stand:         NewStandService(repos.Stand),
 		Flange:        NewFlangeService(repos.Flange),
@@ -184,6 +188,6 @@ func NewServices(repos *repository.Repositories) *Services {
 		Materials:     NewMatService(repos.Materials),
 		BoltMaterials: NewBoltMatRepo(repos.BoltMaterials),
 		SizeInt:       NewSizeIntService(repos.SizeInt),
-		Interview:     NewInterviewService(),
+		Interview:     NewInterviewService(email, file),
 	}
 }
