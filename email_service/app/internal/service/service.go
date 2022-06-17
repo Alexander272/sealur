@@ -9,7 +9,7 @@ import (
 )
 
 type Interview interface {
-	SendInterview(*proto_email.InterviewData, bytes.Buffer) error
+	SendInterview(*proto_email.InterviewData, *bytes.Buffer) error
 }
 
 type Services struct {

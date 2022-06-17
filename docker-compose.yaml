@@ -38,7 +38,7 @@ services:
 
     pro_service:
         restart: on-failure:5
-        image: pro_service:0.86
+        image: pro_service:0.87
         container_name: dev-pro_service
         env_file:
             - .env
@@ -48,8 +48,10 @@ services:
 
     email_service:
         restart: on-failure:5
-        image: email_service:0.10
+        image: email_service:0.13
         container_name: dev-email_service
+        volumes:
+            - ./email_service/app/template:/template
         env_file:
             - .env
 

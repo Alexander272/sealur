@@ -77,7 +77,7 @@ func (h *Handler) sendInterview(c *gin.Context) {
 		Penetrating:   dto.Penetrating,
 		DrawingNumber: dto.DrawingNumber,
 		Info:          dto.Info,
-		Drawing:       (*proto.Drawing)(&dto.Drawing),
+		Drawing:       (*proto.Drawing)(dto.Drawing),
 		Sizes:         (*proto.SizesInt)(&dto.Sizes),
 	})
 	if err != nil {

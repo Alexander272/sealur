@@ -1,7 +1,9 @@
 package service
 
 import (
+	"archive/zip"
 	"bufio"
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -100,8 +102,10 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInt
 		"_medium_":       strings.Join(medium, ", "),
 		"_condition_":    req.Condition,
 		"_period_":       req.Period,
-		"_drawing_":      "",
+		"_drawing_":      req.DrawingNumber,
 		"_info_":         req.Info,
+		// "_drawingNumber_": req.DrawingNumber,
+		// "_drawing_":       req.Drawing.OrigName,
 	}
 
 	if req.Type == "stand" {
@@ -146,6 +150,89 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInt
 	}
 
 	ext := filepath.Ext(path.Join("template", "Опрос.docx"))
+	names := make([]string, 0, 2)
+	names = append(names, stat.Name())
+	size := stat.Size()
+	buf := new(bytes.Buffer)
+
+	if req.Drawing != nil {
+		stream, err := s.file.Download(ctx, &proto_file.FileDownloadRequest{
+			Id:     req.Drawing.Id,
+			Backet: "pro", Group: req.Drawing.Group,
+			Name: req.Drawing.OrigName,
+		})
+		if err != nil {
+			logger.Errorf("failed to download drawing. err :%w", err)
+			return fmt.Errorf("failed to download drawing. err :%w", err)
+		}
+
+		_, err = stream.Recv()
+		if err != nil {
+			return fmt.Errorf("failed to get data. err: %w", err)
+		}
+
+		imageData := bytes.Buffer{}
+
+		for {
+			logger.Debug("waiting to receive more data")
+
+			req, err := stream.Recv()
+			if err == io.EOF {
+				logger.Debug("no more data")
+				break
+			}
+
+			if err != nil {
+				return fmt.Errorf("failed to get chunk. err %w", err)
+			}
+
+			chunk := req.GetFile().Content
+
+			_, err = imageData.Write(chunk)
+			if err != nil {
+				return fmt.Errorf("failed to write chunk. err %w", err)
+			}
+		}
+
+		names = append(names, req.Drawing.OrigName)
+
+		w := zip.NewWriter(buf)
+		f, err := w.Create(names[0])
+		if err != nil {
+			logger.Errorf("failed to create docx in zip. err %w", err)
+			return fmt.Errorf("failed to create docx in zip. err %w", err)
+		}
+
+		doc, err := os.ReadFile(path.Join("template", "Опрос.docx"))
+		if err != nil {
+			logger.Error(err)
+			return fmt.Errorf("failed to read docx file. err: %s", err)
+		}
+
+		_, err = f.Write(doc)
+		if err != nil {
+			logger.Errorf("failed to write docx in zip. err %w", err)
+			return fmt.Errorf("failed to write docx in zip. err %w", err)
+		}
+
+		f, err = w.Create(names[1])
+		if err != nil {
+			logger.Errorf("failed to create image in zip. err %w", err)
+			return fmt.Errorf("failed to create image in zip. err %w", err)
+		}
+
+		_, err = f.Write(imageData.Bytes())
+		if err != nil {
+			logger.Errorf("failed to write image in zip. err %w", err)
+			return fmt.Errorf("failed to write image in zip. err %w", err)
+		}
+
+		if err := w.Close(); err != nil {
+			return fmt.Errorf("failed to close writer. err %w", err)
+		}
+
+		size = int64(buf.Cap())
+	}
 
 	data := &proto_email.SendInterviewRequest{
 		Request: &proto_email.SendInterviewRequest_Data{
@@ -159,9 +246,9 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInt
 					City:         req.City,
 				},
 				File: &proto_email.FileData{
-					Name: stat.Name(),
+					Name: names,
 					Type: ext,
-					Size: stat.Size(),
+					Size: size,
 				},
 			},
 		},
@@ -174,10 +261,24 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInt
 
 	err = stream.Send(data)
 	if err != nil {
-		logger.Errorf("cannot send image info to server: %w %w", err, stream.RecvMsg(nil))
-		return fmt.Errorf("cannot send image info to server. err: %w", err)
+		logger.Errorf("cannot send docx info to server: %w %w", err, stream.RecvMsg(nil))
+		return fmt.Errorf("cannot send docx info to server. err: %w", err)
 	}
 
+	if req.Drawing != nil {
+		if err := s.sendZip(stream, buf); err != nil {
+			return err
+		}
+	} else {
+		if err := s.sendDoc(stream); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *InterviewService) sendDoc(stream proto_email.EmailService_SendInterviewClient) error {
 	file, err := os.Open(path.Join("template", "Опрос.docx"))
 	if err != nil {
 		logger.Error(err)
@@ -213,6 +314,44 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInt
 	}
 
 	_, err = stream.CloseAndRecv()
+	if err != nil {
+		logger.Errorf("cannot receive response: %w", err)
+		return fmt.Errorf("cannot receive response: %w", err)
+	}
+
+	return nil
+}
+
+func (s *InterviewService) sendZip(stream proto_email.EmailService_SendInterviewClient, buf *bytes.Buffer) error {
+	reader := bufio.NewReader(buf)
+	buffer := make([]byte, 1024)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logger.Errorf("cannot read chunk to buffer: %w", err)
+			return fmt.Errorf("cannot read chunk to buffer: %w", err)
+		}
+
+		reqChunk := &proto_email.SendInterviewRequest{
+			Request: &proto_email.SendInterviewRequest_File{
+				File: &proto_email.File{
+					Content: buffer[:n],
+				},
+			},
+		}
+
+		err = stream.Send(reqChunk)
+		if err != nil {
+			logger.Errorf("cannot send chunk to server: %w", err)
+			return fmt.Errorf("cannot send chunk to server: %w", err)
+		}
+	}
+
+	_, err := stream.CloseAndRecv()
 	if err != nil {
 		logger.Errorf("cannot receive response: %w", err)
 		return fmt.Errorf("cannot receive response: %w", err)

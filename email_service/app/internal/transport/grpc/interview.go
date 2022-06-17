@@ -39,9 +39,7 @@ func (h *Handler) SendInterview(stream proto_email.EmailService_SendInterviewSer
 		}
 	}
 
-	logger.Debug(data.File.Type)
-
-	if err := h.service.Interview.SendInterview(data, file); err != nil {
+	if err := h.service.Interview.SendInterview(data, &file); err != nil {
 		return fmt.Errorf("failed to send email. err: %w", err)
 	}
 
