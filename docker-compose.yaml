@@ -3,12 +3,13 @@ version: '3.4'
 services:
     nginx_service:
         restart: on-failure:5
-        image: nginx_service:0.60-dev
+        image: nginx_service:0.70b
         container_name: dev-nginx_service
         volumes:
             - ./build:/usr/app
         ports:
             - 5000:80
+            - 5001:443
         depends_on:
             - api_service
             - file_service
@@ -48,7 +49,7 @@ services:
 
     email_service:
         restart: on-failure:5
-        image: email_service:0.13
+        image: email_service:0.15
         container_name: dev-email_service
         volumes:
             - ./email_service/app/template:/template

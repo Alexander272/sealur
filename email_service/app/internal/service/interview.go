@@ -25,7 +25,7 @@ func NewInterviewService(sender email.Sender, conf config.RecipientsConfig) *Int
 
 func (s *InterviewService) SendInterview(data *proto_email.InterviewData, file *bytes.Buffer) error {
 	input := email.SendEmailInput{
-		Subject: "Опросный лист",
+		Subject: "Опросный лист Sealur Pro",
 		To:      []string{s.conf.Interview},
 	}
 

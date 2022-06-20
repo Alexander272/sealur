@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package proto_user;
+option go_package = "./;proto_user";
+
+message IdResponse {
+    string id = 1;
+}
+message SuccessResponse {
+    bool success = 1;
+}
+
+message PingRequest {}
+message PingResponse {
+    string ping = 1;
+}
+
+// User Service ----------------------------------------------------------------------
+message GetUserRequest {
+    string login = 1;
+    string id = 2;
+    string password = 3;
+}
+
+message GetAllUserRequest {}
+message GetNewUserRequest {}
+
+message CreateUserRequest {
+    string organization = 1;
+    string name = 2;
+    string email = 3;
+    string city = 4;
+    string position = 5;
+    string phone = 6;
+}
+
+message UpdateUserRequest {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+    string position = 4;
+    string phone = 5;
+}
+
+message DeleteUserRequest {
+    string id = 1;
+}
+
+message ConfirmUserRequest {
+    string id = 1;
+    string login = 2;
+    string password = 3;
+    repeated Role roles = 4;
+}
+
+message User {
+    string id = 1;
+    string organization = 2;
+    string name = 3;
+    string email = 4;
+    string city = 5;
+    string position = 6;
+    string phone = 7;
+    repeated Role roles = 8;
+}
+
+message UserResponse {
+    User user = 1;
+}
+message UsersResponse {
+    repeated User user = 1;
+}
+
+// Role Service ----------------------------------------------------------------------
+message GetRolesRequest {
+    string userId = 1;
+}
+
+message GetAllRolesRequest {}
+
+message CreateRoleRequest {
+    string userId = 1;
+    string service = 2;
+    string role = 3;
+}
+
+message UpdateRoleRequest {
+    string id = 1;
+    string service = 2;
+    string role = 3;
+}
+
+message DeleteRoleRequest {
+    string id = 1;
+}
+
+message Role {
+    string id = 1;
+    string service = 2;
+    string role = 3;
+}
+
+message RoleResponse {
+    repeated Role role = 1;
+}
+
+service UserService {
+    rpc Ping (PingRequest) returns (PingResponse);
+
+    // User Service ----------------------------------------------------------------------
+    rpc GetUser (GetUserRequest) returns (UserResponse);
+    rpc GetAllUsers (GetAllUserRequest) returns (UsersResponse);
+    rpc GetNewUsers (GetNewUserRequest) returns (UsersResponse);
+    rpc CreateUser (CreateUserRequest) returns (SuccessResponse);
+    rpc UpdateUser (UpdateUserRequest) returns (IdResponse);
+    rpc DeleteUser (DeleteUserRequest) returns (IdResponse);
+    rpc ConfirmUser (ConfirmUserRequest) returns (SuccessResponse);
+}
