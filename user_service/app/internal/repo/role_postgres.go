@@ -31,7 +31,7 @@ func (r *RoleRepo) Get(ctx context.Context, req *proto_user.GetRolesRequest) (ro
 }
 
 func (r *RoleRepo) GetAll(ctx context.Context, req *proto_user.GetAllRolesRequest) (roles []models.Role, err error) {
-	query := fmt.Sprintf("SELECT id, service, role FROM %s ORDER BY user_id", r.tableName)
+	query := fmt.Sprintf("SELECT id, user_id, service, role FROM %s ORDER BY user_id", r.tableName)
 
 	if err := r.db.Select(&roles, query); err != nil {
 		return roles, fmt.Errorf("failed to execute query. error: %w", err)

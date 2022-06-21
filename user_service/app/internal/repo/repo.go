@@ -13,7 +13,7 @@ type Users interface {
 	GetAll(context.Context, *proto_user.GetAllUserRequest) ([]models.User, error)
 	GetNew(context.Context, *proto_user.GetNewUserRequest) ([]models.User, error)
 	Create(context.Context, *proto_user.CreateUserRequest) error
-	Confirm(context.Context, *proto_user.ConfirmUserRequest) error
+	Confirm(context.Context, *proto_user.ConfirmUserRequest) (string, error)
 	Update(context.Context, *proto_user.UpdateUserRequest) error
 	Delete(context.Context, *proto_user.DeleteUserRequest) error
 }

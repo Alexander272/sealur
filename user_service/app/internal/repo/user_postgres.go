@@ -63,15 +63,20 @@ func (r *UserRepo) Create(ctx context.Context, user *proto_user.CreateUserReques
 	return nil
 }
 
-func (r *UserRepo) Confirm(ctx context.Context, user *proto_user.ConfirmUserRequest) error {
-	query := fmt.Sprintf("UPDATE %s SET login=$1, password=$2 WHERE id=$3", r.tableName)
+func (r *UserRepo) Confirm(ctx context.Context, user *proto_user.ConfirmUserRequest) (string, error) {
+	query := fmt.Sprintf("UPDATE %s SET login=$1, password=$2 WHERE id=$3 RETURNING email", r.tableName)
+	row := r.db.QueryRow(query, user.Login, user.Password, user.Id)
 
-	_, err := r.db.Exec(query, user.Login, user.Password, user.Id)
-	if err != nil {
-		return fmt.Errorf("failed to execute query. error: %w", err)
+	var email string
+	if err := row.Scan(&email); err != nil {
+		return "", fmt.Errorf("failed to execute query. error: %w", err)
 	}
+	// _, err := r.db.Exec(query, user.Login, user.Password, user.Id)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to execute query. error: %w", err)
+	// }
 
-	return nil
+	return email, nil
 }
 
 func (r *UserRepo) Update(ctx context.Context, user *proto_user.UpdateUserRequest) error {
