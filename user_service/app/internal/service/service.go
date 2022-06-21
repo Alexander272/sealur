@@ -12,7 +12,7 @@ import (
 type User interface {
 	Get(context.Context, *proto_user.GetUserRequest) (*proto_user.User, error)
 	GetAll(context.Context, *proto_user.GetAllUserRequest) ([]*proto_user.User, error)
-	GetNewUsers(context.Context, *proto_user.GetNewUserRequest) ([]*proto_user.User, error)
+	GetNew(context.Context, *proto_user.GetNewUserRequest) ([]*proto_user.User, error)
 	Create(context.Context, *proto_user.CreateUserRequest) (*proto_user.SuccessResponse, error)
 	Confirm(context.Context, *proto_user.ConfirmUserRequest) (*proto_user.SuccessResponse, error)
 	Update(context.Context, *proto_user.UpdateUserRequest) error

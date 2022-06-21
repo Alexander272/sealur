@@ -68,7 +68,7 @@ message UserResponse {
     User user = 1;
 }
 message UsersResponse {
-    repeated User user = 1;
+    repeated User users = 1;
 }
 
 // Role Service ----------------------------------------------------------------------
@@ -100,8 +100,8 @@ message Role {
     string role = 3;
 }
 
-message RoleResponse {
-    repeated Role role = 1;
+message RolesResponse {
+    repeated Role roles = 1;
 }
 
 service UserService {
@@ -112,7 +112,13 @@ service UserService {
     rpc GetAllUsers (GetAllUserRequest) returns (UsersResponse);
     rpc GetNewUsers (GetNewUserRequest) returns (UsersResponse);
     rpc CreateUser (CreateUserRequest) returns (SuccessResponse);
+    rpc ConfirmUser (ConfirmUserRequest) returns (SuccessResponse);
     rpc UpdateUser (UpdateUserRequest) returns (IdResponse);
     rpc DeleteUser (DeleteUserRequest) returns (IdResponse);
-    rpc ConfirmUser (ConfirmUserRequest) returns (SuccessResponse);
+
+    // Role Service ----------------------------------------------------------------------
+    rpc GetRoles (GetRolesRequest) returns (RolesResponse);
+    rpc CreateRole (CreateRoleRequest) returns (SuccessResponse);
+    rpc UpdateRole (UpdateRoleRequest) returns (IdResponse);
+    rpc DeleteRole (DeleteRoleRequest) returns (IdResponse);
 }

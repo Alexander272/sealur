@@ -122,7 +122,7 @@ func (s *UserService) GetAll(ctx context.Context, req *proto_user.GetAllUserRequ
 	return u, nil
 }
 
-func (s *UserService) GetNewUsers(ctx context.Context, req *proto_user.GetNewUserRequest) ([]*proto_user.User, error) {
+func (s *UserService) GetNew(ctx context.Context, req *proto_user.GetNewUserRequest) ([]*proto_user.User, error) {
 	users, err := s.userRepo.GetNew(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get new users. error: %w", err)
