@@ -54,6 +54,7 @@ type (
 	ServicesConfig struct {
 		ProService  ProConfig
 		FileService ProConfig
+		UserService ProConfig
 	}
 
 	ProConfig struct {
@@ -114,9 +115,15 @@ func setFromEnv(conf *Config) error {
 	conf.Environment = os.Getenv("APP_ENV")
 	conf.Services.ProService.AuthName = os.Getenv("API_NAME")
 	conf.Services.ProService.AuthPassword = os.Getenv("API_PASSWORD")
-
 	conf.Services.ProService.Url = os.Getenv("PRO_HOST") + ":" + os.Getenv("PRO_PORT")
+
+	conf.Services.FileService.AuthName = os.Getenv("API_NAME")
+	conf.Services.FileService.AuthPassword = os.Getenv("API_PASSWORD")
 	conf.Services.FileService.Url = os.Getenv("FILE_HOST") + ":" + os.Getenv("FILE_PORT")
+
+	conf.Services.UserService.AuthName = os.Getenv("API_NAME")
+	conf.Services.UserService.AuthPassword = os.Getenv("API_PASSWORD")
+	conf.Services.UserService.Url = os.Getenv("USER_HOST") + ":" + os.Getenv("FILE_PORT")
 
 	return nil
 }

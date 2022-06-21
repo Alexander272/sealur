@@ -1,11 +1,11 @@
-package file
+package user
 
 import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_file"
+	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -13,7 +13,7 @@ import (
 )
 
 type Handler struct {
-	fileClient proto_file.FileServiceClient
+	userClient proto_user.UserServiceClient
 }
 
 func NewHandler() *Handler {
@@ -21,8 +21,8 @@ func NewHandler() *Handler {
 }
 
 func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
-	//* file service connect
-	//TODO стоит ли так оставлять сертификат?
+	//* user service connect
+
 	//* определение сертификата
 	creds, err := credentials.NewClientTLSFromFile("cert/server.crt", "localhost")
 	if err != nil {
@@ -31,8 +31,8 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 
 	//* данные для аутентификации
 	auth := models.Authentication{
-		ServiceName: conf.FileService.AuthName,
-		Password:    conf.FileService.AuthPassword,
+		ServiceName: conf.UserService.AuthName,
+		Password:    conf.UserService.AuthPassword,
 	}
 
 	//* опции grpc
@@ -42,24 +42,24 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	}
 
 	//* подключение к сервису
-	connect, err := grpc.Dial(conf.FileService.Url, opts...)
+	connect, err := grpc.Dial(conf.UserService.Url, opts...)
 	if err != nil {
 		logger.Fatalf("failed connection to pro service. error: %w", err)
 	}
 
-	fileClient := proto_file.NewFileServiceClient(connect)
-	h.fileClient = fileClient
+	userClient := proto_user.NewUserServiceClient(connect)
+	h.userClient = userClient
 
-	files := api.Group("/files")
+	files := api.Group("/")
 	{
-		files.GET("/ping", h.pingPro)
+		files.GET("/users/ping", h.pingUsers)
 
-		h.initFilesRoutes(files)
+		h.initUserRoutes(files)
 	}
 }
 
-func (h *Handler) pingPro(c *gin.Context) {
-	res, err := h.fileClient.Ping(c, &proto_file.PingRequest{})
+func (h *Handler) pingUsers(c *gin.Context) {
+	res, err := h.userClient.Ping(c, &proto_user.PingRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

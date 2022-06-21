@@ -39,7 +39,7 @@ type Deps struct {
 
 func NewServices(deps Deps) *Services {
 	return &Services{
-		User: NewUserService(deps.Repos.Users, deps.Repos.Role, deps.Hasher),
+		User: NewUserService(deps.Repos.Users, deps.Repos.Role, deps.Hasher, deps.Email),
 		Role: NewRoleService(deps.Repos.Role),
 	}
 }

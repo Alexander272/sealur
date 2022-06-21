@@ -8,6 +8,7 @@ import (
 	"github.com/Alexander272/sealur/user_service/internal/models"
 	"github.com/Alexander272/sealur/user_service/internal/repo"
 	proto_user "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto"
+	proto_email "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto/email"
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
 	"github.com/Alexander272/sealur/user_service/pkg/logger"
 )
@@ -16,13 +17,15 @@ type UserService struct {
 	hasher   hasher.PasswordHasher
 	userRepo repo.Users
 	roleRepo repo.Role
+	email    proto_email.EmailServiceClient
 }
 
-func NewUserService(user repo.Users, role repo.Role, hasher hasher.PasswordHasher) *UserService {
+func NewUserService(user repo.Users, role repo.Role, hasher hasher.PasswordHasher, email proto_email.EmailServiceClient) *UserService {
 	return &UserService{
 		userRepo: user,
 		roleRepo: role,
 		hasher:   hasher,
+		email:    email,
 	}
 }
 

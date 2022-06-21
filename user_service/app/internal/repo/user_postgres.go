@@ -21,7 +21,7 @@ func NewUserRepo(db *sqlx.DB, tableName string) *UserRepo {
 func (r *UserRepo) Get(ctx context.Context, req *proto_user.GetUserRequest) (user models.User, err error) {
 	var query, param string
 	if req.Login != "" {
-		query = fmt.Sprintf("SELECT id, email, password FROM %s WHERE login = $1", r.tableName)
+		query = fmt.Sprintf("SELECT id, email, password FROM %s WHERE login = $1 AND confirmed=true", r.tableName)
 		param = req.Login
 	} else {
 		query = fmt.Sprintf("SELECT id, organization, name, email, city, position, phone FROM %s WHERE id = $1", r.tableName)
@@ -80,6 +80,7 @@ func (r *UserRepo) Confirm(ctx context.Context, user *proto_user.ConfirmUserRequ
 }
 
 func (r *UserRepo) Update(ctx context.Context, user *proto_user.UpdateUserRequest) error {
+	//TODO исправить обновление (если придут не все параметры)
 	query := fmt.Sprintf("UPDATE %s SET name=$1, email=$2, position=$3, phone=$4 WHERE id=$5", r.tableName)
 
 	_, err := r.db.Exec(query, user.Name, user.Email, user.Position, user.Phone, user.Id)
