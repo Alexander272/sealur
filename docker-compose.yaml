@@ -19,7 +19,7 @@ services:
 
     api_service:
         restart: on-failure:5
-        image: api_service:0.94
+        image: api_service:0.12.5
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images
@@ -28,11 +28,13 @@ services:
         depends_on:
             - pro_service
             - file_service
+            - user_service
         env_file:
             - .env
         links:
             - pro_service
             - file_service
+            - user_service
         environment:
             - PRO_HOST=pro_service
             - FILE_HOST=file_service
@@ -46,6 +48,15 @@ services:
         links:
             - email_service
             - file_service
+
+    user_service:
+        restart: on-failure:5
+        image: user_service:0.1.8
+        container_name: dev-user_service
+        env_file:
+            - .env
+        links:
+            - email_service
 
     email_service:
         restart: on-failure:5

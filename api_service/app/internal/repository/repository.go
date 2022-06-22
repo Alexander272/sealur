@@ -2,21 +2,23 @@ package repository
 
 import (
 	"context"
+
+	"github.com/go-redis/redis/v8"
 )
 
 type Session interface {
-	CreateSession(ctx context.Context, token string, data SessionData) error
-	GetDelSession(ctx context.Context, token string) (SessionData, error)
-	RemoveSession(ctx context.Context, token string) error
+	Create(ctx context.Context, sessionName string, data SessionData) error
+	Get(ctx context.Context, sessionName string) (SessionData, error)
+	GetDel(ctx context.Context, sessionName string) (SessionData, error)
+	Remove(ctx context.Context, sessionName string) error
 }
 
 type Repositories struct {
 	Session
 }
 
-// func NewRepo(client redis.Cmdable) *Repositories {
-func NewRepo() *Repositories {
+func NewRepo(client redis.Cmdable) *Repositories {
 	return &Repositories{
-		// Session: NewSessionRepo(client),
+		Session: NewSessionRepo(client),
 	}
 }

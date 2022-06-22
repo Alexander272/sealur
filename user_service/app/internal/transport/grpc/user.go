@@ -2,13 +2,19 @@ package grpc
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
+	"github.com/Alexander272/sealur/user_service/internal/models"
 	proto_user "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto"
 )
 
 func (h *Handler) GetUser(ctx context.Context, req *proto_user.GetUserRequest) (*proto_user.UserResponse, error) {
 	user, err := h.service.User.Get(ctx, req)
 	if err != nil {
+		if errors.Is(err, models.ErrPassword) || errors.Is(err, sql.ErrNoRows) {
+			return &proto_user.UserResponse{User: nil}, nil
+		}
 		return nil, err
 	}
 

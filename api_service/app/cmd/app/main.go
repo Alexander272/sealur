@@ -15,6 +15,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/service"
 	transport "github.com/Alexander272/sealur/api_service/internal/transport/http"
 	"github.com/Alexander272/sealur/api_service/pkg/auth"
+	"github.com/Alexander272/sealur/api_service/pkg/database/redis"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 )
 
@@ -40,31 +41,29 @@ func main() {
 
 	//* Dependencies
 
-	// client, err := redis.NewRedisClient(redis.Config{
-	// 	Host:     conf.Redis.Host,
-	// 	Port:     conf.Redis.Port,
-	// 	DB:       conf.Redis.DB,
-	// 	Password: conf.Redis.Password,
-	// })
-	// if err != nil {
-	// 	logger.Fatalf("failed to initialize redis %s", err.Error())
-	// }
+	client, err := redis.NewRedisClient(redis.Config{
+		Host:     conf.Redis.Host,
+		Port:     conf.Redis.Port,
+		DB:       conf.Redis.DB,
+		Password: conf.Redis.Password,
+	})
+	if err != nil {
+		logger.Fatalf("failed to initialize redis %s", err.Error())
+	}
 
-	tokenManager, err := auth.NewManager(conf.Auth.JWT.Key)
+	tokenManager, err := auth.NewManager(conf.Auth.Key)
 	if err != nil {
 		logger.Fatalf("failed to initialize token manager: %s", err.Error())
 	}
 
 	//* Services, Repos & API Handlers
 
-	repos := repository.NewRepo()
-	// repos := repository.NewRepo(client)
+	repos := repository.NewRepo(client)
 	services := service.NewServices(service.Deps{
 		Repos:           repos,
 		TokenManager:    tokenManager,
-		AccessTokenTTL:  conf.Auth.JWT.AccessTokenTTL,
-		RefreshTokenTTL: conf.Auth.JWT.RefreshTokenTTL,
-		Domain:          conf.Http.Domain,
+		AccessTokenTTL:  conf.Auth.AccessTokenTTL,
+		RefreshTokenTTL: conf.Auth.RefreshTokenTTL,
 	})
 	handlers := transport.NewHandler(services)
 

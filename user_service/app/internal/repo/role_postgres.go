@@ -40,11 +40,6 @@ func (r *RoleRepo) GetAll(ctx context.Context, req *proto_user.GetAllRolesReques
 }
 
 func (r *RoleRepo) Create(ctx context.Context, roles []*proto_user.CreateRoleRequest) error {
-	// tx, err := r.db.Begin()
-	// if err != nil {
-	// 	return fmt.Errorf("failed to open transaction. error: %w", err)
-	// }
-
 	query := fmt.Sprintf("INSERT INTO %s (user_id, service, role) VALUES ($1, $2, $3)", r.tableName)
 	args := make([]interface{}, 0)
 	args = append(args, roles[0].UserId, roles[0].Service, roles[0].Role)
@@ -61,8 +56,6 @@ func (r *RoleRepo) Create(ctx context.Context, roles []*proto_user.CreateRoleReq
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	// _, err = tx.Exec
-	// return tx.Commit()
 	return nil
 }
 

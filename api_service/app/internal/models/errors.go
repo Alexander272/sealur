@@ -5,4 +5,7 @@ import "errors"
 var (
 	ErrStandAlreadyExists  = errors.New("stand with such title already exists")
 	ErrFlangeAlreadyExists = errors.New("flange with such title or short already exists")
+
+	ErrSessionEmpty = errors.New("user session not found")
+	ErrToken        = errors.New("tokens do not match")
 )

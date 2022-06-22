@@ -5,6 +5,8 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
+	"github.com/Alexander272/sealur/api_service/internal/service"
+	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -14,10 +16,19 @@ import (
 
 type Handler struct {
 	userClient proto_user.UserServiceClient
+	auth       config.AuthConfig
+	services   *service.Services
+	middleware *middleware.Middleware
+	cookieName string
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(auth config.AuthConfig, services *service.Services, middleware *middleware.Middleware, cookieName string) *Handler {
+	return &Handler{
+		auth:       auth,
+		services:   services,
+		middleware: middleware,
+		cookieName: cookieName,
+	}
 }
 
 func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {

@@ -17,6 +17,7 @@ import (
 	"github.com/Alexander272/sealur/user_service/pkg/database/postgres"
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
 	"github.com/Alexander272/sealur/user_service/pkg/logger"
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

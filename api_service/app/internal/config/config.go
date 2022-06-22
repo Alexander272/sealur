@@ -27,17 +27,14 @@ type (
 	}
 
 	AuthConfig struct {
-		JWT JWTConfig
-	}
-
-	JWTConfig struct {
 		AccessTokenTTL  time.Duration `mapstructure:"accessTokenTTL"`
 		RefreshTokenTTL time.Duration `mapstructure:"refreshTokenTTL"`
+		Secure          bool          `mapstructure:"secure"`
+		Domain          string        `mapstructure:"domain"`
 		Key             string
 	}
 
 	HttpConfig struct {
-		Domain             string        `mapstructure:"domain"`
 		Host               string        `mapstructure:"host"`
 		Port               string        `mapstructure:"port"`
 		ReadTimeout        time.Duration `mapstructure:"readTimeout"`
@@ -97,7 +94,7 @@ func unmarhal(conf *Config) error {
 	if err := viper.UnmarshalKey("limiter", &conf.Limiter); err != nil {
 		return err
 	}
-	if err := viper.UnmarshalKey("auth", &conf.Auth.JWT); err != nil {
+	if err := viper.UnmarshalKey("auth", &conf.Auth); err != nil {
 		return err
 	}
 
@@ -108,7 +105,10 @@ func setFromEnv(conf *Config) error {
 	if err := envconfig.Process("http", &conf.Http); err != nil {
 		return err
 	}
-	if err := envconfig.Process("jwt", &conf.Auth.JWT); err != nil {
+	if err := envconfig.Process("jwt", &conf.Auth); err != nil {
+		return err
+	}
+	if err := envconfig.Process("redis", &conf.Redis); err != nil {
 		return err
 	}
 
@@ -123,7 +123,7 @@ func setFromEnv(conf *Config) error {
 
 	conf.Services.UserService.AuthName = os.Getenv("API_NAME")
 	conf.Services.UserService.AuthPassword = os.Getenv("API_PASSWORD")
-	conf.Services.UserService.Url = os.Getenv("USER_HOST") + ":" + os.Getenv("FILE_PORT")
+	conf.Services.UserService.Url = os.Getenv("USER_HOST") + ":" + os.Getenv("USER_PORT")
 
 	return nil
 }

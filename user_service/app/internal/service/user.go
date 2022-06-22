@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -32,11 +34,10 @@ func NewUserService(user repo.Users, role repo.Role, hasher hasher.PasswordHashe
 func (s *UserService) Get(ctx context.Context, req *proto_user.GetUserRequest) (u *proto_user.User, err error) {
 	user, err := s.userRepo.Get(ctx, req)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
 		return nil, fmt.Errorf("failed to get user. error: %w", err)
-	}
-
-	if (user == models.User{}) {
-		return nil, models.ErrUserNotFound
 	}
 
 	if req.Login != "" {
@@ -98,7 +99,7 @@ func (s *UserService) GetAll(ctx context.Context, req *proto_user.GetAllUserRequ
 	var u []*proto_user.User
 	for i, item := range users {
 		var userRoles []*proto_user.Role
-		for j := i; j < len(roles)-1; j++ {
+		for j := i; j < len(roles); j++ {
 			if roles[j].UserId == item.Id {
 				ur := proto_user.Role{
 					Id:      roles[j].Id,
@@ -154,6 +155,7 @@ func (s *UserService) GetNew(ctx context.Context, req *proto_user.GetNewUserRequ
 
 func (s *UserService) Create(ctx context.Context, user *proto_user.CreateUserRequest) (*proto_user.SuccessResponse, error) {
 	//TODO надо отправлять уведомление на почту (кому-то)
+
 	if err := s.userRepo.Create(ctx, user); err != nil {
 		return nil, fmt.Errorf("failed to create user. error: %w", err)
 	}
@@ -163,6 +165,13 @@ func (s *UserService) Create(ctx context.Context, user *proto_user.CreateUserReq
 
 func (s *UserService) Confirm(ctx context.Context, user *proto_user.ConfirmUserRequest) (*proto_user.SuccessResponse, error) {
 	//TODO надо отправлять уведомление на почту пользователю
+	candidate, err := s.userRepo.Get(ctx, &proto_user.GetUserRequest{Login: user.Login})
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, fmt.Errorf("failed to get user. error: %w", err)
+	}
+	if (candidate != models.User{}) {
+		return nil, models.ErrUserExist
+	}
 
 	salt, err := s.hasher.GenerateSalt()
 	if err != nil {

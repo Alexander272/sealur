@@ -8,9 +8,10 @@ func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
 		auth.POST("/sign-in", h.signIn)
 		auth.POST("/sign-up", h.singUp)
 		auth.POST("/sign-out", h.signOut)
+		auth.POST("/refresh", h.refresh)
 	}
 
-	users := api.Group("/users")
+	users := api.Group("/users", h.middleware.UserIdentity)
 	{
 		users.GET("/all", h.getAllUsers)
 		users.GET("/new", h.getNewUsers)

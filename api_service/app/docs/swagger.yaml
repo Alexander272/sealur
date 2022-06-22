@@ -10,6 +10,24 @@ definitions:
     - flangeId
     - title
     type: object
+  models.ConfirmUser:
+    properties:
+      id:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/models.UserRole'
+        type: array
+    required:
+    - id
+    - login
+    - password
+    - roles
+    type: object
   models.CreateAdditDTO:
     properties:
       basis:
@@ -69,6 +87,19 @@ definitions:
           $ref: '#/definitions/proto.TypeFl'
         type: array
     type: object
+  models.Drawing:
+    properties:
+      group:
+        type: string
+      id:
+        type: string
+      link:
+        type: string
+      name:
+        type: string
+      origName:
+        type: string
+    type: object
   models.ErrorResponse:
     properties:
       message:
@@ -102,6 +133,95 @@ definitions:
       id:
         type: string
       message:
+        type: string
+    type: object
+  models.Interview:
+    properties:
+      abrasize:
+        type: boolean
+      across:
+        type: string
+      along:
+        type: string
+      boltMaterial:
+        type: string
+      city:
+        type: string
+      condition:
+        type: string
+      consumer:
+        type: string
+      crystallized:
+        type: boolean
+      developer:
+        type: string
+      diffFrom:
+        type: string
+      diffTo:
+        type: string
+      drawing:
+        $ref: '#/definitions/models.Drawing'
+      drawingNumber:
+        type: string
+      email:
+        type: string
+      environ:
+        type: string
+      environAnn:
+        type: string
+      environPipe:
+        type: string
+      equipment:
+        type: string
+      factory:
+        type: string
+      flange:
+        type: string
+      info:
+        type: string
+      lubricant:
+        type: boolean
+      material:
+        type: string
+      mounting:
+        type: boolean
+      name:
+        type: string
+      nonFlatness:
+        type: string
+      organization:
+        type: string
+      penetrating:
+        type: boolean
+      period:
+        type: string
+      phone:
+        type: string
+      position:
+        type: string
+      presTest:
+        type: string
+      presWork:
+        type: string
+      presWorkAnn:
+        type: string
+      presWorkPipe:
+        type: string
+      pressure:
+        type: string
+      seal:
+        type: string
+      size:
+        $ref: '#/definitions/models.Size'
+      techprocess:
+        type: string
+      tempWorkAnn:
+        type: string
+      tempWorkPipe:
+        type: string
+      type:
+        type: string
+      typeFl:
         type: string
     type: object
   models.MaterialsDTO:
@@ -270,6 +390,64 @@ definitions:
     - standId
     - typeFlId
     - typePr
+    type: object
+  models.SignIn:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  models.SignUp:
+    properties:
+      city:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      organization:
+        type: string
+      phone:
+        type: string
+      position:
+        type: string
+    required:
+    - email
+    - name
+    - organization
+    type: object
+  models.Size:
+    properties:
+      bolt:
+        type: string
+      countBolt:
+        type: integer
+      d:
+        type: string
+      d1:
+        type: string
+      d2:
+        type: string
+      dIn:
+        type: string
+      dOut:
+        type: string
+      dUp:
+        type: string
+      dy:
+        type: string
+      h:
+        type: string
+      h1:
+        type: string
+      h2:
+        type: string
+      py:
+        type: string
     type: object
   models.SizeIntDTO:
     properties:
@@ -546,6 +724,33 @@ definitions:
     required:
     - temperature
     - type
+    type: object
+  models.UpdateUser:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      position:
+        type: string
+    required:
+    - id
+    type: object
+  models.UserRole:
+    properties:
+      role:
+        type: string
+      service:
+        type: string
+      userId:
+        type: string
+    required:
+    - role
+    - service
     type: object
   proto.AddBasis:
     properties:
@@ -1091,6 +1296,36 @@ definitions:
       title:
         type: string
     type: object
+  proto_user.Role:
+    properties:
+      id:
+        type: string
+      role:
+        type: string
+      service:
+        type: string
+    type: object
+  proto_user.User:
+    properties:
+      city:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      organization:
+        type: string
+      phone:
+        type: string
+      position:
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/proto_user.Role'
+        type: array
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -1098,6 +1333,113 @@ info:
   title: Sealur
   version: "0.5"
 paths:
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: вход в систему
+      parameters:
+      - description: credentials
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: SignIn
+      tags:
+      - auth
+  /auth/sign-out:
+    post:
+      consumes:
+      - application/json
+      description: выход из аккаунта
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: SignOut
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: регистрация
+      parameters:
+      - description: user info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUp'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: SignUp
+      tags:
+      - auth
   /files/drawings/{backet}:
     post:
       consumes:
@@ -2395,6 +2737,46 @@ paths:
       summary: Update Flange
       tags:
       - Sealur Pro -> flanges
+  /sealur-pro/interview:
+    post:
+      consumes:
+      - application/json
+      description: отправление данных опроса
+      parameters:
+      - description: interview info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.Interview'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Send Interview
+      tags:
+      - Sealur Pro -> interview
   /sealur-pro/materials:
     get:
       consumes:
@@ -4317,6 +4699,375 @@ paths:
       summary: Update Stand
       tags:
       - Sealur Pro -> standards
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление пользователя
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete User
+      tags:
+      - Sealur Pro -> users
+    get:
+      consumes:
+      - application/json
+      description: получение данных пользователя
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/proto_user.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get User
+      tags:
+      - Sealur Pro -> users
+    patch:
+      consumes:
+      - application/json
+      description: обновление данных пользователя
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: user info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update User
+      tags:
+      - Sealur Pro -> users
+  /users/all:
+    get:
+      consumes:
+      - application/json
+      description: получение всех пользователей
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto_user.User'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Users
+      tags:
+      - Sealur Pro -> users
+  /users/confirm:
+    post:
+      consumes:
+      - application/json
+      description: потверждение пользователя
+      parameters:
+      - description: user info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConfirmUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Confirm User
+      tags:
+      - Sealur Pro -> users
+  /users/new:
+    get:
+      consumes:
+      - application/json
+      description: получение новых пользователей
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/proto_user.User'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get New Users
+      tags:
+      - Sealur Pro -> users
+  /users/roles:
+    post:
+      consumes:
+      - application/json
+      description: добавление роли для пользователя
+      parameters:
+      - description: role info
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserRole'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Role
+      tags:
+      - Sealur Pro -> users
+  /users/roles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление роли пользователя
+      parameters:
+      - description: role id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Role
+      tags:
+      - Sealur Pro -> users
+    put:
+      consumes:
+      - application/json
+      description: обновление роли пользователя
+      parameters:
+      - description: role id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: role info
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Role
+      tags:
+      - Sealur Pro -> users
 securityDefinitions:
   ApiKeyAuth:
     in: header

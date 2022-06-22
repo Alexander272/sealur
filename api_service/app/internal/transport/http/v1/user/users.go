@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
@@ -121,7 +122,13 @@ func (h *Handler) confirmUser(c *gin.Context) {
 
 	_, err := h.userClient.ConfirmUser(c, &req)
 	if err != nil {
+		if strings.Contains(err.Error(), "user already exists") {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "User with this login already exists")
+			return
+		}
+
 		//TODO надо отдельно обрабатывать ошибку отправки email
+
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
@@ -189,6 +196,11 @@ func (h *Handler) deleteUser(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	if err := h.services.Session.SingOut(c, id); err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "failed to close session")
 		return
 	}
 

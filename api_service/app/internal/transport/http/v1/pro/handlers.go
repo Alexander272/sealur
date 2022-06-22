@@ -5,6 +5,7 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
+	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -13,11 +14,12 @@ import (
 )
 
 type Handler struct {
-	proClient proto.ProServiceClient
+	proClient  proto.ProServiceClient
+	middleware *middleware.Middleware
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(middleware *middleware.Middleware) *Handler {
+	return &Handler{middleware: middleware}
 }
 
 func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {

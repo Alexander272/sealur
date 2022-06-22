@@ -8,6 +8,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/docs"
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/service"
+	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	httpV1 "github.com/Alexander272/sealur/api_service/internal/transport/http/v1"
 	"github.com/Alexander272/sealur/api_service/pkg/limiter"
 	"github.com/gin-contrib/cors"
@@ -57,15 +58,15 @@ func (h *Handler) Init(conf *config.Config) *gin.Engine {
 		c.String(http.StatusOK, "pong")
 	})
 
-	h.initAPI(conf.Services, router)
+	h.initAPI(conf.Services, conf.Auth, router)
 
 	return router
 }
 
-func (h *Handler) initAPI(conf config.ServicesConfig, router *gin.Engine) {
-	handlerV1 := httpV1.NewHandler(h.services)
+func (h *Handler) initAPI(conf config.ServicesConfig, auth config.AuthConfig, router *gin.Engine) {
+	handlerV1 := httpV1.NewHandler(h.services, middleware.NewMiddleware(h.services, auth))
 	api := router.Group("/api")
 	{
-		handlerV1.Init(conf, api)
+		handlerV1.Init(conf, auth, api)
 	}
 }

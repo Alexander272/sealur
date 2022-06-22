@@ -7,11 +7,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
 	"github.com/golang-jwt/jwt"
 )
 
 type TokenManager interface {
-	NewJWT(userId, role string, ttl time.Duration) (time.Time, string, error)
+	NewJWT(userId, email string, roles []*proto_user.Role, ttl time.Duration) (time.Time, string, error)
 	Parse(token string) (jwt.MapClaims, error)
 	NewRefreshToken() (string, error)
 }
@@ -27,13 +28,14 @@ func NewManager(jwtKey string) (*Manager, error) {
 	return &Manager{jwtKey}, nil
 }
 
-func (m *Manager) NewJWT(userId, role string, ttl time.Duration) (iat time.Time, token string, err error) {
+func (m *Manager) NewJWT(userId, email string, roles []*proto_user.Role, ttl time.Duration) (iat time.Time, token string, err error) {
 	iat = time.Now()
 	newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":    iat.Add(ttl).Unix(),
+		// "exp":    iat.Add(ttl).Unix(),
 		"iat":    iat.Unix(),
 		"userId": userId,
-		"role":   role,
+		"email":  email,
+		"roles":  roles,
 	})
 	token, err = newToken.SignedString([]byte(m.jwtKey))
 	if err != nil {

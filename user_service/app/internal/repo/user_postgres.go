@@ -2,10 +2,14 @@ package repo
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/Alexander272/sealur/user_service/internal/models"
 	proto_user "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -29,6 +33,9 @@ func (r *UserRepo) Get(ctx context.Context, req *proto_user.GetUserRequest) (use
 	}
 
 	if err := r.db.Get(&user, query, param); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return user, err
+		}
 		return user, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return user, nil
@@ -53,9 +60,10 @@ func (r *UserRepo) GetNew(ctx context.Context, req *proto_user.GetNewUserRequest
 }
 
 func (r *UserRepo) Create(ctx context.Context, user *proto_user.CreateUserRequest) error {
-	query := fmt.Sprintf(`INSERT INTO %s (organization, name, email, city, "position", phone) VALUES ($1, $2, $3, $4, $5, $6)`, r.tableName)
+	query := fmt.Sprintf(`INSERT INTO %s (id, organization, name, email, city, "position", phone) VALUES ($1, $2, $3, $4, $5, $6, $7)`, r.tableName)
+	id := uuid.New()
 
-	_, err := r.db.Exec(query, user.Organization, user.Name, user.Email, user.City, user.Position, user.Phone)
+	_, err := r.db.Exec(query, id, user.Organization, user.Name, user.Email, user.City, user.Position, user.Phone)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -64,26 +72,48 @@ func (r *UserRepo) Create(ctx context.Context, user *proto_user.CreateUserReques
 }
 
 func (r *UserRepo) Confirm(ctx context.Context, user *proto_user.ConfirmUserRequest) (string, error) {
-	query := fmt.Sprintf("UPDATE %s SET login=$1, password=$2 WHERE id=$3 RETURNING email", r.tableName)
+	query := fmt.Sprintf("UPDATE %s SET login=$1, password=$2, confirmed=true WHERE id=$3 RETURNING email", r.tableName)
 	row := r.db.QueryRow(query, user.Login, user.Password, user.Id)
 
 	var email string
 	if err := row.Scan(&email); err != nil {
 		return "", fmt.Errorf("failed to execute query. error: %w", err)
 	}
-	// _, err := r.db.Exec(query, user.Login, user.Password, user.Id)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to execute query. error: %w", err)
-	// }
 
 	return email, nil
 }
 
 func (r *UserRepo) Update(ctx context.Context, user *proto_user.UpdateUserRequest) error {
-	//TODO исправить обновление (если придут не все параметры)
-	query := fmt.Sprintf("UPDATE %s SET name=$1, email=$2, position=$3, phone=$4 WHERE id=$5", r.tableName)
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
 
-	_, err := r.db.Exec(query, user.Name, user.Email, user.Position, user.Phone, user.Id)
+	if user.Name != "" {
+		setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
+		args = append(args, user.Name)
+		argId++
+	}
+	if user.Email != "" {
+		setValues = append(setValues, fmt.Sprintf("email=$%d", argId))
+		args = append(args, user.Email)
+		argId++
+	}
+	if user.Position != "" {
+		setValues = append(setValues, fmt.Sprintf("position=$%d", argId))
+		args = append(args, user.Position)
+		argId++
+	}
+	if user.Phone != "" {
+		setValues = append(setValues, fmt.Sprintf("phone=$%d", argId))
+		args = append(args, user.Phone)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", r.tableName, setQuery, argId)
+
+	args = append(args, user.Id)
+	_, err := r.db.Exec(query, args...)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

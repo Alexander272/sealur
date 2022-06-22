@@ -3,7 +3,7 @@ package models
 type SignUp struct {
 	Organization string `json:"organization" binding:"required"`
 	Name         string `json:"name" binding:"required"`
-	Email        string `json:"email" binding:"required"`
+	Email        string `json:"email" binding:"email,required"`
 	City         string `json:"city"`
 	Position     string `json:"position"`
 	Phone        string `json:"phone"`
@@ -28,9 +28,8 @@ type UserRole struct {
 }
 
 type UpdateUser struct {
-	Id       string `json:"id" binding:"required"`
 	Name     string `json:"name"`
-	Email    string `json:"email"`
+	Email    string `json:"email" binding:"email"`
 	Position string `json:"position"`
 	Phone    string `json:"phone"`
 }
