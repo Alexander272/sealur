@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +24,6 @@ func (m *Middleware) UserIdentity(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error(), "user is not authorized")
 		return
 	}
-	logger.Debug("user: ", user)
 
 	isRefresh, err := m.services.Session.CheckSession(c, user, token)
 	if err != nil {
@@ -33,7 +31,6 @@ func (m *Middleware) UserIdentity(c *gin.Context) {
 		return
 	}
 
-	logger.Debug("isRefresh ", isRefresh)
 	if isRefresh {
 		token, err := m.services.Session.SignIn(c, user)
 		if err != nil {

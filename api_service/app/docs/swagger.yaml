@@ -729,16 +729,12 @@ definitions:
     properties:
       email:
         type: string
-      id:
-        type: string
       name:
         type: string
       phone:
         type: string
       position:
         type: string
-    required:
-    - id
     type: object
   models.UserRole:
     properties:
@@ -1222,6 +1218,8 @@ definitions:
         type: string
       py:
         type: string
+      row:
+        type: integer
     type: object
   proto.SizeIntResponse:
     properties:
@@ -1326,6 +1324,11 @@ definitions:
           $ref: '#/definitions/proto_user.Role'
         type: array
     type: object
+  proto_user.UserResponse:
+    properties:
+      user:
+        $ref: '#/definitions/proto_user.User'
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -1333,6 +1336,42 @@ info:
   title: Sealur
   version: "0.5"
 paths:
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: вход в систему (при обновлении страницы)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/proto_user.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Refresh
+      tags:
+      - auth
   /auth/sign-in:
     post:
       consumes:
@@ -1351,7 +1390,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.IdResponse'
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/proto_user.User'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -3938,6 +3982,88 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update Size Int
+      tags:
+      - Sealur Pro -> sizes-interview
+  /sealur-pro/sizes-interview/all:
+    delete:
+      consumes:
+      - application/json
+      description: удаление размеров (для опроса)
+      parameters:
+      - description: flange
+        in: query
+        name: flange
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete All Size Int
+      tags:
+      - Sealur Pro -> sizes-interview
+    get:
+      consumes:
+      - application/json
+      description: получение размеров (для опроса)
+      parameters:
+      - description: flange
+        in: query
+        name: flange
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/proto.SizeIntResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Sizes Int
       tags:
       - Sealur Pro -> sizes-interview
   /sealur-pro/sizes/{id}:

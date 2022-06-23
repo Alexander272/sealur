@@ -37,6 +37,26 @@ func (r *SizeIntRepo) Get(req *proto.GetSizesIntRequest) (sizes []models.SizeInt
 	return sizes, nil
 }
 
+func (r *SizeIntRepo) GetAll(req *proto.GetAllSizeIntRequest) (sizes []models.SizeInterview, err error) {
+	query := fmt.Sprintf(`SELECT id, dy, py, d_up, d1, d2, d, h1, h2, bolt, count_bolt, row_count FROM %s
+		WHERE flange_id=$1 AND type_fl_id=$2 ORDER BY count`, SizeIntrTable)
+
+	flangeId, err := strconv.Atoi(req.FlangeId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+	typeFl, err := strconv.Atoi(req.TypeFl)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert string to int. error: %w", err)
+	}
+
+	if err = r.db.Select(&sizes, query, flangeId, typeFl); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	return sizes, nil
+}
+
 func (r *SizeIntRepo) Create(size *proto.CreateSizeIntRequest) (id string, err error) {
 	query := fmt.Sprintf(`INSERT INTO %s (count, type_fl_id, flange_id, dy, py, d_up, d1, d2, d, h1, h2, bolt, count_bolt, row_count) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`, SizeIntrTable)
@@ -104,12 +124,12 @@ func (r *SizeIntRepo) Delete(size *proto.DeleteSizeIntRequest) error {
 	return nil
 }
 
-// func (r *SizeIntRepo) DeleteAll(size *proto.DeleteAllSizeIntRequest) error {
-// 	query := fmt.Sprintf("DELETE FROM %s WHERE ", SizeIntrTable)
+func (r *SizeIntRepo) DeleteAll(size *proto.DeleteAllSizeIntRequest) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE flange_id=$1", SizeIntrTable)
 
-// 	_, err := r.db.Exec(query)
-// 	if err != nil {
-// 		return fmt.Errorf("failed to execute query. error: %w", err)
-// 	}
-// 	return nil
-// }
+	_, err := r.db.Exec(query, size.FlangeId)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}

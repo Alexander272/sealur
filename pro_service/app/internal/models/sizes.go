@@ -27,4 +27,5 @@ type SizeInterview struct {
 	H2    string `db:"h2"`
 	Bolt  string `db:"bolt"`
 	Count int32  `db:"count_bolt"`
+	Row   int32  `db:"row_count"`
 }

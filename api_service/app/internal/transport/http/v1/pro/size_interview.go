@@ -7,16 +7,21 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/xuri/excelize/v2"
 )
 
 func (h *Handler) initSizeIntRoutes(api *gin.RouterGroup) {
 	size := api.Group("/size-interview")
 	{
 		size.GET("/", h.getSizesInt)
+		size.GET("/all", h.getAllSizesInt)
 		size.POST("/", h.createSizeInt)
+		size.POST("/file", h.createSizeIntFromFile)
 		size.PUT("/:id", h.updateSizeInt)
 		size.DELETE("/:id", h.deleteSizeInt)
+		size.DELETE("/all", h.deleteAllSizeInt)
 	}
 }
 
@@ -70,6 +75,44 @@ func (h *Handler) getSizesInt(c *gin.Context) {
 	c.JSON(http.StatusOK, models.DataResponse{Data: sizes, Count: len(sizes.Sizes)})
 }
 
+// @Summary Get All Sizes Int
+// @Tags Sealur Pro -> sizes-interview
+// @Security ApiKeyAuth
+// @Description получение размеров (для опроса)
+// @ModuleID getAllSizesInt
+// @Accept json
+// @Produce json
+// @Param flange query string true "flange"
+// @Param typeFlId query string true "flange type id"
+// @Success 200 {object} models.DataResponse{data=proto.SizeIntResponse}
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/sizes-interview/all [get]
+func (h *Handler) getAllSizesInt(c *gin.Context) {
+	flange := c.Query("flange")
+	if flange == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty flange", "empty flange param")
+		return
+	}
+	typeFlId := c.Query("typeFlId")
+	if typeFlId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty flange type id", "empty flange type id param")
+		return
+	}
+
+	sizes, err := h.proClient.GetAllSizeInt(c, &proto.GetAllSizeIntRequest{
+		FlangeId: flange,
+		TypeFl:   typeFlId,
+	})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: sizes, Count: len(sizes.Sizes)})
+}
+
 // @Summary Create Size Int
 // @Tags Sealur Pro -> sizes-interview
 // @Security ApiKeyAuth
@@ -113,6 +156,104 @@ func (h *Handler) createSizeInt(c *gin.Context) {
 
 	c.Header("Location", fmt.Sprintf("/api/v1/sealur-pro/sizes-interview/%s", size.Id))
 	c.JSON(http.StatusCreated, models.IdResponse{Id: size.Id, Message: "Created"})
+}
+
+// @Summary Create Size Int From File
+// @Tags Sealur Pro -> sizes-interview
+// @Security ApiKeyAuth
+// @Description создание размеров (для опроса) из файла excel
+// @ModuleID createSizeFromFile
+// @Accept multipart/form-data
+// @Produce json
+// @Success 201 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/sizes/file [post]
+func (h *Handler) createSizeIntFromFile(c *gin.Context) {
+	fileHeader, err := c.FormFile("sizes")
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "error while opening file")
+		return
+	}
+
+	file, err := fileHeader.Open()
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "error while opening file")
+		return
+	}
+	defer file.Close()
+
+	f, err := excelize.OpenReader(file)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "error while reading file")
+		return
+	}
+
+	sheetName := f.GetSheetName(f.GetActiveSheetIndex())
+
+	req := make([]*proto.CreateSizeIntRequest, 0, 50)
+
+	rows, err := f.Rows(sheetName)
+	if err != nil {
+		logger.Error(err)
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "error while reading file")
+		return
+	}
+	for rows.Next() {
+		row, err := rows.Columns()
+		if err != nil {
+			logger.Error(err)
+		}
+
+		if len(row) == 0 || row[0] == "" || row[0] == "count" {
+			continue
+		}
+
+		count, err := strconv.Atoi(row[0])
+		if err != nil {
+			logger.Error("count empty")
+			count = 0
+		}
+		countBolt, err := strconv.Atoi(row[12])
+		if err != nil {
+			logger.Error("count empty")
+			countBolt = 0
+		}
+		rowCount, err := strconv.Atoi(row[13])
+		if err != nil {
+			logger.Error("count empty")
+			rowCount = 0
+		}
+
+		req = append(req, &proto.CreateSizeIntRequest{
+			Number:    int32(count),
+			FlangeId:  row[1],
+			Dy:        row[2],
+			Py:        row[3],
+			TypeFl:    row[4],
+			DUp:       row[5],
+			D1:        row[6],
+			D2:        row[7],
+			D:         row[8],
+			H1:        row[9],
+			H2:        row[10],
+			Bolt:      row[11],
+			CountBolt: int32(countBolt),
+			Row:       int32(rowCount),
+		})
+	}
+	if err = rows.Close(); err != nil {
+		logger.Error(err)
+	}
+
+	_, err = h.proClient.CreateManySizesInt(c, &proto.CreateSizesIntRequest{Sizes: req})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusCreated, models.IdResponse{Message: "Created"})
 }
 
 // @Summary Update Size Int
@@ -193,4 +334,33 @@ func (h *Handler) deleteSizeInt(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, models.IdResponse{Id: size.Id, Message: "Deleted"})
+}
+
+// @Summary Delete All Size Int
+// @Tags Sealur Pro -> sizes-interview
+// @Security ApiKeyAuth
+// @Description удаление размеров (для опроса)
+// @ModuleID deleteAllSizeInt
+// @Accept json
+// @Produce json
+// @Param flange query string true "flange"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/sizes-interview/all [delete]
+func (h *Handler) deleteAllSizeInt(c *gin.Context) {
+	flange := c.Query("flange")
+	if flange == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty flange", "empty flange param")
+		return
+	}
+
+	_, err := h.proClient.DeleteAllSizeInt(c, &proto.DeleteAllSizeIntRequest{FlangeId: flange})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Deleted"})
 }

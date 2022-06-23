@@ -755,6 +755,11 @@ message GetSizesIntRequest {
     int32 row = 3;
 }
 
+message GetAllSizeIntRequest {
+    string flangeId = 1;
+    string typeFl = 2;
+}
+
 message CreateSizeIntRequest {
     string flangeId = 1;
     string typeFl = 2;
@@ -770,6 +775,10 @@ message CreateSizeIntRequest {
     int32 countBolt = 12;
     int32 number = 13;
     int32 row = 14;
+}
+
+message CreateSizesIntRequest {
+    repeated CreateSizeIntRequest sizes = 1;
 }
 
 message UpdateSizeIntRequest {
@@ -793,6 +802,10 @@ message DeleteSizeIntRequest {
     string id = 1;
 }
 
+message DeleteAllSizeIntRequest {
+    string flangeId = 1;
+}
+
 message SizeInt {
     string id = 1;
     string dy = 2;
@@ -805,6 +818,7 @@ message SizeInt {
     string h2 = 9;
     string bolt = 10;
     int32 countBolt = 11;
+    int32 row = 12;
 }
 
 message SizeIntResponse {
@@ -992,9 +1006,12 @@ service ProService {
 
     //Size
     rpc GetSizeInt (GetSizesIntRequest) returns (SizeIntResponse);
+    rpc GetAllSizeInt (GetAllSizeIntRequest) returns (SizeIntResponse);
     rpc CreateSizeInt (CreateSizeIntRequest) returns (IdResponse);
+    rpc CreateManySizesInt (CreateSizesIntRequest) returns (IdResponse);
     rpc UpdateSizeInt (UpdateSizeIntRequest) returns (IdResponse);
     rpc DeleteSizeInt (DeleteSizeIntRequest) returns (IdResponse);
+    rpc DeleteAllSizeInt (DeleteAllSizeIntRequest) returns (SuccessResponse);
 
     //Interview
     rpc SendInterview (SendInterviewRequest) returns (SuccessResponse);

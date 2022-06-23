@@ -123,9 +123,11 @@ type BoltMaterials interface {
 
 type SizeInt interface {
 	Get(*proto.GetSizesIntRequest) ([]models.SizeInterview, error)
+	GetAll(*proto.GetAllSizeIntRequest) ([]models.SizeInterview, error)
 	Create(*proto.CreateSizeIntRequest) (id string, err error)
 	Update(*proto.UpdateSizeIntRequest) error
 	Delete(*proto.DeleteSizeIntRequest) error
+	DeleteAll(*proto.DeleteAllSizeIntRequest) error
 }
 
 type Repositories struct {

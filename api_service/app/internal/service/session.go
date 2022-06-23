@@ -121,7 +121,7 @@ func (s *SessionService) CheckSession(ctx context.Context, u *proto_user.User, t
 		return false, fmt.Errorf("failed to get session (refresh). error: %w", err)
 	}
 
-	if user.AccessToken != token || refreshUser.AccessToken != token {
+	if user.AccessToken != token && refreshUser.AccessToken != token {
 		return false, models.ErrToken
 	}
 

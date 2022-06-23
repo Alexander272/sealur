@@ -18,7 +18,7 @@ func NewBoltMatRepo(db *sqlx.DB) *BoltMatRepo {
 }
 
 func (r *BoltMatRepo) GetAll(*proto.GetBoltMaterialsRequest) (mats []models.BoltMaterials, err error) {
-	query := fmt.Sprintf("SELECT id, title FROM %s", BoltsTable)
+	query := fmt.Sprintf("SELECT id, title FROM %s ORDER BY id", BoltsTable)
 
 	if err = r.db.Select(&mats, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)

@@ -102,6 +102,7 @@ func (h *Handler) updateBoltMaterials(c *gin.Context) {
 	}
 
 	mat, err := h.proClient.UpdateBoltMaterials(c, &proto.UpdateBoltMaterialsRequest{
+		Id:       matId,
 		Title:    dto.Title,
 		FlangeId: dto.FlangeId,
 	})

@@ -18,7 +18,7 @@ func NewMatRepo(db *sqlx.DB) *MatRepo {
 }
 
 func (r *MatRepo) GetAll(*proto.GetMaterialsRequest) (mats []models.Materials, err error) {
-	query := fmt.Sprintf("SELECT id, title, type_mat FROM %s", MaterialsTable)
+	query := fmt.Sprintf("SELECT id, title, type_mat FROM %s ORDER BY id", MaterialsTable)
 
 	if err = r.db.Select(&mats, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
