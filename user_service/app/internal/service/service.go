@@ -17,6 +17,7 @@ type User interface {
 	Confirm(context.Context, *proto_user.ConfirmUserRequest) (*proto_user.SuccessResponse, error)
 	Update(context.Context, *proto_user.UpdateUserRequest) error
 	Delete(context.Context, *proto_user.DeleteUserRequest) error
+	Reject(ctx context.Context, user *proto_user.DeleteUserRequest) error
 }
 
 type Role interface {
@@ -26,9 +27,14 @@ type Role interface {
 	Delete(context.Context, *proto_user.DeleteRoleRequest) error
 }
 
+type IP interface {
+	Add(ctx context.Context, ip *proto_user.AddIpRequest) error
+}
+
 type Services struct {
 	User
 	Role
+	IP
 }
 
 type Deps struct {
@@ -39,7 +45,8 @@ type Deps struct {
 
 func NewServices(deps Deps) *Services {
 	return &Services{
-		User: NewUserService(deps.Repos.Users, deps.Repos.Role, deps.Hasher, deps.Email),
+		User: NewUserService(deps.Repos.Users, deps.Repos.Role, deps.Repos.IP, deps.Hasher, deps.Email),
 		Role: NewRoleService(deps.Repos.Role),
+		IP:   NewIpService(deps.Repos.IP),
 	}
 }

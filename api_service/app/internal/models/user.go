@@ -29,7 +29,9 @@ type UserRole struct {
 
 type UpdateUser struct {
 	Name     string `json:"name"`
-	Email    string `json:"email" binding:"email"`
+	Email    string `json:"email"`
 	Position string `json:"position"`
 	Phone    string `json:"phone"`
+	Login    string `json:"login"`
+	Password string `json:"password"`
 }

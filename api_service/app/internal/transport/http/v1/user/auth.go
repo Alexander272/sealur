@@ -5,11 +5,12 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
+	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 // @Summary SignIn
-// @Tags auth
+// @Tags Auth
 // @Description вход в систему
 // @ModuleID signIn
 // @Accept json
@@ -45,12 +46,20 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
+	_, err = h.userClient.AddIp(c, &proto_user.AddIpRequest{
+		UserId: user.User.Id,
+		Ip:     c.ClientIP(),
+	})
+	if err != nil {
+		logger.Error(err)
+	}
+
 	c.SetCookie(h.cookieName, token, int(h.auth.RefreshTokenTTL.Seconds()), "/", h.auth.Domain, h.auth.Secure, true)
 	c.JSON(http.StatusOK, models.DataResponse{Data: user.User})
 }
 
 // @Summary SignUp
-// @Tags auth
+// @Tags Auth
 // @Description регистрация
 // @ModuleID singUp
 // @Accept json
@@ -91,7 +100,7 @@ func (h *Handler) singUp(c *gin.Context) {
 }
 
 // @Summary SignOut
-// @Tags auth
+// @Tags Auth
 // @Description выход из аккаунта
 // @ModuleID signOut
 // @Accept json
@@ -124,7 +133,7 @@ func (h *Handler) signOut(c *gin.Context) {
 }
 
 // @Summary Refresh
-// @Tags auth
+// @Tags Auth
 // @Description вход в систему (при обновлении страницы)
 // @ModuleID refresh
 // @Accept json

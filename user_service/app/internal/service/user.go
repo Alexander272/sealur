@@ -19,13 +19,15 @@ type UserService struct {
 	hasher   hasher.PasswordHasher
 	userRepo repo.Users
 	roleRepo repo.Role
+	ipRepo   repo.IP
 	email    proto_email.EmailServiceClient
 }
 
-func NewUserService(user repo.Users, role repo.Role, hasher hasher.PasswordHasher, email proto_email.EmailServiceClient) *UserService {
+func NewUserService(user repo.Users, role repo.Role, ip repo.IP, hasher hasher.PasswordHasher, email proto_email.EmailServiceClient) *UserService {
 	return &UserService{
 		userRepo: user,
 		roleRepo: role,
+		ipRepo:   ip,
 		hasher:   hasher,
 		email:    email,
 	}
@@ -96,6 +98,11 @@ func (s *UserService) GetAll(ctx context.Context, req *proto_user.GetAllUserRequ
 		return nil, fmt.Errorf("failed to get all roles. error: %w", err)
 	}
 
+	ips, err := s.ipRepo.GetAll(ctx, &proto_user.GetAllIpRequest{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all ip. error: %w", err)
+	}
+
 	var u []*proto_user.User
 	for i, item := range users {
 		var userRoles []*proto_user.Role
@@ -110,6 +117,17 @@ func (s *UserService) GetAll(ctx context.Context, req *proto_user.GetAllUserRequ
 			}
 		}
 
+		var userIp []*proto_user.Ip
+		for j := 0; j < len(ips); j++ {
+			if ips[j].UserId == item.Id {
+				ip := proto_user.Ip{
+					Ip:   ips[j].Ip,
+					Date: ips[j].Date,
+				}
+				userIp = append(userIp, &ip)
+			}
+		}
+
 		user := proto_user.User{
 			Id:           item.Id,
 			Organization: item.Organization,
@@ -118,7 +136,9 @@ func (s *UserService) GetAll(ctx context.Context, req *proto_user.GetAllUserRequ
 			City:         item.City,
 			Position:     item.Position,
 			Phone:        item.Phone,
+			Login:        item.Login,
 			Roles:        userRoles,
+			Ip:           userIp,
 		}
 		u = append(u, &user)
 	}
@@ -208,6 +228,18 @@ func (s *UserService) Confirm(ctx context.Context, user *proto_user.ConfirmUserR
 }
 
 func (s *UserService) Update(ctx context.Context, user *proto_user.UpdateUserRequest) error {
+	if user.Password != "" {
+		salt, err := s.hasher.GenerateSalt()
+		if err != nil {
+			return fmt.Errorf("failed to create salt. error: %w", err)
+		}
+		pass, err := s.hasher.Hash(user.Password, salt)
+		if err != nil {
+			return fmt.Errorf("failed to hash password. error: %w", err)
+		}
+		user.Password = fmt.Sprintf("%s.%s", pass, salt)
+	}
+
 	if err := s.userRepo.Update(ctx, user); err != nil {
 		return fmt.Errorf("failed to update user. error: %w", err)
 	}
@@ -216,9 +248,22 @@ func (s *UserService) Update(ctx context.Context, user *proto_user.UpdateUserReq
 }
 
 func (s *UserService) Delete(ctx context.Context, user *proto_user.DeleteUserRequest) error {
-	if err := s.userRepo.Delete(ctx, user); err != nil {
+	if _, err := s.userRepo.Delete(ctx, user); err != nil {
 		return fmt.Errorf("failed to delete user. error: %w", err)
 	}
+
+	return nil
+}
+
+func (s *UserService) Reject(ctx context.Context, user *proto_user.DeleteUserRequest) error {
+	//TODO отправлять уведомление пользователю об отклонении заявки на регистрацию
+
+	email, err := s.userRepo.Delete(ctx, user)
+	if err != nil {
+		return fmt.Errorf("failed to delete user. error: %w", err)
+	}
+
+	logger.Debug(email)
 
 	return nil
 }

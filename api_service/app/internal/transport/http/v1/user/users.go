@@ -11,7 +11,7 @@ import (
 )
 
 // @Summary Get All Users
-// @Tags Sealur Pro -> users
+// @Tags Users
 // @Security ApiKeyAuth
 // @Description получение всех пользователей
 // @ModuleID getAllUser
@@ -34,7 +34,7 @@ func (h *Handler) getAllUsers(c *gin.Context) {
 }
 
 // @Summary Get New Users
-// @Tags Sealur Pro -> users
+// @Tags Users
 // @Security ApiKeyAuth
 // @Description получение новых пользователей
 // @ModuleID getNewUsers
@@ -57,7 +57,7 @@ func (h *Handler) getNewUsers(c *gin.Context) {
 }
 
 // @Summary Get User
-// @Tags Sealur Pro -> users
+// @Tags Users
 // @Security ApiKeyAuth
 // @Description получение данных пользователя
 // @ModuleID getUser
@@ -82,11 +82,11 @@ func (h *Handler) getUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.DataResponse{Data: user})
+	c.JSON(http.StatusOK, models.DataResponse{Data: user.User})
 }
 
 // @Summary Confirm User
-// @Tags Sealur Pro -> users
+// @Tags Users
 // @Security ApiKeyAuth
 // @Description потверждение пользователя
 // @ModuleID confirmUser
@@ -136,8 +136,42 @@ func (h *Handler) confirmUser(c *gin.Context) {
 	c.JSON(http.StatusOK, models.IdResponse{Message: "User successfully verified"})
 }
 
+// @Summary Reject User
+// @Tags Users
+// @Security ApiKeyAuth
+// @Description оклонение пользователя
+// @ModuleID rejectUser
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /users/reject/{id} [delete]
+func (h *Handler) rejectUser(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	req := proto_user.DeleteUserRequest{
+		Id: id,
+	}
+
+	_, err := h.userClient.RejectUser(c, &req)
+	if err != nil {
+		//TODO надо отдельно обрабатывать ошибку отправки email
+
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "User rejected"})
+}
+
 // @Summary Update User
-// @Tags Sealur Pro -> users
+// @Tags Users
 // @Security ApiKeyAuth
 // @Description обновление данных пользователя
 // @ModuleID updateUser
@@ -168,6 +202,8 @@ func (h *Handler) updateUser(c *gin.Context) {
 		Email:    dto.Email,
 		Position: dto.Position,
 		Phone:    dto.Phone,
+		Login:    dto.Login,
+		Password: dto.Password,
 	}
 
 	_, err := h.userClient.UpdateUser(c, &req)
@@ -180,7 +216,7 @@ func (h *Handler) updateUser(c *gin.Context) {
 }
 
 // @Summary Delete User
-// @Tags Sealur Pro -> users
+// @Tags Users
 // @Security ApiKeyAuth
 // @Description удаление пользователя
 // @ModuleID deleteUser

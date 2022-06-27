@@ -74,7 +74,7 @@ func main() {
 
 	//* Services, Repos & API Handlers
 
-	repos := repo.NewRepo(db)
+	repos := repo.NewRepo(db, conf)
 	services := service.NewServices(service.Deps{
 		Repos:  repos,
 		Email:  emailClient,

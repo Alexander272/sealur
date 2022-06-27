@@ -9,4 +9,9 @@ type User struct {
 	Position     string `db:"position"`
 	Phone        string `db:"phone"`
 	Password     string `db:"password"`
+	Login        string `db:"login"`
+}
+
+type Count struct {
+	Count int32 `db:"count"`
 }

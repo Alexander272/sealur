@@ -40,6 +40,8 @@ message UpdateUserRequest {
     string email = 3;
     string position = 4;
     string phone = 5;
+    string login = 6;
+    string password = 7;
 }
 
 message DeleteUserRequest {
@@ -61,7 +63,9 @@ message User {
     string city = 5;
     string position = 6;
     string phone = 7;
-    repeated Role roles = 8;
+    string login = 8;
+    repeated Role roles = 9;
+    repeated Ip ip = 10;
 }
 
 message UserResponse {
@@ -104,6 +108,23 @@ message RolesResponse {
     repeated Role roles = 1;
 }
 
+// IP service ------------------------------------------------------------
+message GetAllIpRequest {}
+
+message AddIpRequest {
+    string userId = 1;
+    string ip = 2;
+}
+
+message Ip {
+    string ip = 1;
+    string date = 2;
+}
+
+message IpResponse {
+    repeated Ip ip = 1;
+}
+
 service UserService {
     rpc Ping (PingRequest) returns (PingResponse);
 
@@ -115,10 +136,14 @@ service UserService {
     rpc ConfirmUser (ConfirmUserRequest) returns (SuccessResponse);
     rpc UpdateUser (UpdateUserRequest) returns (IdResponse);
     rpc DeleteUser (DeleteUserRequest) returns (IdResponse);
+    rpc RejectUser (DeleteUserRequest) returns (IdResponse);
 
     // Role Service ----------------------------------------------------------------------
     rpc GetRoles (GetRolesRequest) returns (RolesResponse);
     rpc CreateRole (CreateRoleRequest) returns (SuccessResponse);
     rpc UpdateRole (UpdateRoleRequest) returns (IdResponse);
     rpc DeleteRole (DeleteRoleRequest) returns (IdResponse);
+
+    // IP service ------------------------------------------------------------
+    rpc AddIp (AddIpRequest) returns (SuccessResponse);
 }

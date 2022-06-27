@@ -72,3 +72,11 @@ func (h *Handler) DeleteUser(ctx context.Context, user *proto_user.DeleteUserReq
 
 	return &proto_user.IdResponse{Id: user.Id}, nil
 }
+
+func (h *Handler) RejectUser(ctx context.Context, user *proto_user.DeleteUserRequest) (*proto_user.IdResponse, error) {
+	if err := h.service.User.Reject(ctx, user); err != nil {
+		return nil, err
+	}
+
+	return &proto_user.IdResponse{Id: user.Id}, nil
+}

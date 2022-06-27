@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
+	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -42,5 +44,21 @@ func (m *Middleware) UserIdentity(c *gin.Context) {
 	}
 
 	c.Set(userIdCtx, user.Id)
-	c.Set(userRolesCtx, user.Roles)
+	for _, r := range user.Roles {
+		c.Set(fmt.Sprintf("%s_%s", userRolesCtx, r.Service), r.Role)
+	}
+	// c.Set(userRolesCtx, user.Roles)
+}
+
+func (m *Middleware) AccessForSuperUser(c *gin.Context) {
+	userId, _ := c.Get(userIdCtx)
+	role, exists := c.Get(fmt.Sprintf("%s_sealur", userRolesCtx))
+	if !exists {
+		models.NewErrorResponse(c, http.StatusUnauthorized, "roles empty", "failed to get role")
+	}
+
+	if role != "superuser" {
+		models.NewErrorResponse(c, http.StatusForbidden, role.(string), "access not allowed")
+		logger.Error(userId)
+	}
 }

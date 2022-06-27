@@ -15,6 +15,7 @@ type (
 		Http        HttpConfig
 		Api         ApiConfig
 		Services    ServicesConfig
+		IP          IPConfig
 	}
 
 	PostgresConfig struct {
@@ -49,6 +50,10 @@ type (
 		AuthName     string
 		AuthPassword string
 	}
+
+	IPConfig struct {
+		Max int32
+	}
 )
 
 func Init(configDir string) (*Config, error) {
@@ -79,6 +84,9 @@ func unmarhal(conf *Config) error {
 		return err
 	}
 	if err := viper.UnmarshalKey("http", &conf.Http); err != nil {
+		return err
+	}
+	if err := viper.UnmarshalKey("ip", &conf.IP); err != nil {
 		return err
 	}
 

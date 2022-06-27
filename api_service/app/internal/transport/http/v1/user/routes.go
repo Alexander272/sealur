@@ -13,13 +13,14 @@ func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
 
 	users := api.Group("/users", h.middleware.UserIdentity)
 	{
-		users.GET("/all", h.getAllUsers)
-		users.GET("/new", h.getNewUsers)
+		users.GET("/all", h.middleware.AccessForSuperUser, h.getAllUsers)
+		users.GET("/new", h.middleware.AccessForSuperUser, h.getNewUsers)
 		users.GET("/:id", h.getUser)
 		users.PATCH("/:id", h.updateUser)
 		users.DELETE("/:id", h.deleteUser)
-		users.POST("/confirm", h.confirmUser)
-		roles := users.Group("/roles")
+		users.POST("/confirm", h.middleware.AccessForSuperUser, h.confirmUser)
+		users.DELETE("/reject/:id", h.middleware.AccessForSuperUser, h.rejectUser)
+		roles := users.Group("/roles", h.middleware.AccessForSuperUser)
 		{
 			roles.POST("/", h.createRole)
 			roles.PUT("/:id", h.updateRole)

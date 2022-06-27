@@ -42,7 +42,7 @@ func (r *UserRepo) Get(ctx context.Context, req *proto_user.GetUserRequest) (use
 }
 
 func (r *UserRepo) GetAll(ctx context.Context, req *proto_user.GetAllUserRequest) (users []models.User, err error) {
-	query := fmt.Sprintf("SELECT id, organization, name, email, city, position, phone FROM %s WHERE confirmed=true ORDER BY id", r.tableName)
+	query := fmt.Sprintf("SELECT id, organization, name, email, city, position, phone, login FROM %s WHERE confirmed=true ORDER BY id", r.tableName)
 
 	if err := r.db.Select(&users, query); err != nil {
 		return users, fmt.Errorf("failed to execute query. error: %w", err)
@@ -108,6 +108,16 @@ func (r *UserRepo) Update(ctx context.Context, user *proto_user.UpdateUserReques
 		args = append(args, user.Phone)
 		argId++
 	}
+	if user.Login != "" {
+		setValues = append(setValues, fmt.Sprintf("login=$%d", argId))
+		args = append(args, user.Login)
+		argId++
+	}
+	if user.Password != "" {
+		setValues = append(setValues, fmt.Sprintf("password=$%d", argId))
+		args = append(args, user.Password)
+		argId++
+	}
 
 	setQuery := strings.Join(setValues, ", ")
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", r.tableName, setQuery, argId)
@@ -121,13 +131,20 @@ func (r *UserRepo) Update(ctx context.Context, user *proto_user.UpdateUserReques
 	return nil
 }
 
-func (r *UserRepo) Delete(ctx context.Context, user *proto_user.DeleteUserRequest) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", r.tableName)
+func (r *UserRepo) Delete(ctx context.Context, user *proto_user.DeleteUserRequest) (string, error) {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1 RETURNING email", r.tableName)
+	row := r.db.QueryRow(query, user.Id)
 
-	_, err := r.db.Exec(query, user.Id)
-	if err != nil {
-		return fmt.Errorf("failed to execute query. error: %w", err)
+	var email string
+	if err := row.Scan(&email); err != nil {
+		return "", fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	return nil
+	return email, nil
+	// _, err := r.db.Exec(query, user.Id)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to execute query. error: %w", err)
+	// }
+
+	// return nil
 }
