@@ -74,6 +74,11 @@ func (h *Handler) updateRole(c *gin.Context) {
 		return
 	}
 
+	if err := h.services.Session.SingOut(c, dto.UserId); err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "failed to close session")
+		return
+	}
+
 	req := proto_user.UpdateRoleRequest{
 		Id:      id,
 		Service: dto.Service,
@@ -97,6 +102,7 @@ func (h *Handler) updateRole(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "role id"
+// @Param userId query string true "user id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -106,6 +112,17 @@ func (h *Handler) deleteRole(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	userId := c.Query("userId")
+	if userId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty userId", "empty userId param")
+		return
+	}
+
+	if err := h.services.Session.SingOut(c, userId); err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "failed to close session")
 		return
 	}
 

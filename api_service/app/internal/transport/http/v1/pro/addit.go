@@ -12,19 +12,22 @@ func (h *Handler) initAdditRoutes(api *gin.RouterGroup) {
 	addit := api.Group("/additionals")
 	{
 		addit.GET("/", h.getAddit)
-		addit.POST("/", h.createAddit)
-		addit.PATCH("/:id/mat", h.updateMat)
-		addit.PATCH("/:id/mod", h.updateMod)
-		addit.PATCH("/:id/temp", h.updateTemp)
-		addit.PATCH("/:id/moun", h.updateMoun)
-		addit.PATCH("/:id/grap", h.updateGrap)
-		addit.PATCH("/:id/fil", h.updateFillers)
-		addit.PATCH("/:id/coat", h.updateCoating)
-		addit.PATCH("/:id/constr", h.updateConstruction)
-		addit.PATCH("/:id/obt", h.updateObturator)
-		addit.PATCH("/:id/basis", h.updateBasis)
-		addit.PATCH("/:id/pobt", h.updatePObturator)
-		addit.PATCH("/:id/seal", h.updateSealant)
+		addit = addit.Group("", h.middleware.AccessForProAdmin)
+		{
+			addit.POST("/", h.createAddit)
+			addit.PATCH("/:id/mat", h.updateMat)
+			addit.PATCH("/:id/mod", h.updateMod)
+			addit.PATCH("/:id/temp", h.updateTemp)
+			addit.PATCH("/:id/moun", h.updateMoun)
+			addit.PATCH("/:id/grap", h.updateGrap)
+			addit.PATCH("/:id/fil", h.updateFillers)
+			addit.PATCH("/:id/coat", h.updateCoating)
+			addit.PATCH("/:id/constr", h.updateConstruction)
+			addit.PATCH("/:id/obt", h.updateObturator)
+			addit.PATCH("/:id/basis", h.updateBasis)
+			addit.PATCH("/:id/pobt", h.updatePObturator)
+			addit.PATCH("/:id/seal", h.updateSealant)
+		}
 	}
 }
 

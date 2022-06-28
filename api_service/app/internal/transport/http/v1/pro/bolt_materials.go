@@ -13,9 +13,12 @@ func (h *Handler) initBoltMaterialsRoutes(api *gin.RouterGroup) {
 	materials := api.Group("/bolt-materials")
 	{
 		materials.GET("/", h.getBoltMaterials)
-		materials.POST("/", h.createBoltMaterials)
-		materials.PUT("/:id", h.updateBoltMaterials)
-		materials.DELETE("/:id", h.deleteBoltMaterials)
+		materials = materials.Group("/", h.middleware.AccessForProAdmin)
+		{
+			materials.POST("/", h.createBoltMaterials)
+			materials.PUT("/:id", h.updateBoltMaterials)
+			materials.DELETE("/:id", h.deleteBoltMaterials)
+		}
 	}
 }
 

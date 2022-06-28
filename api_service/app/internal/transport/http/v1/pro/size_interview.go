@@ -17,11 +17,14 @@ func (h *Handler) initSizeIntRoutes(api *gin.RouterGroup) {
 	{
 		size.GET("/", h.getSizesInt)
 		size.GET("/all", h.getAllSizesInt)
-		size.POST("/", h.createSizeInt)
-		size.POST("/file", h.createSizeIntFromFile)
-		size.PUT("/:id", h.updateSizeInt)
-		size.DELETE("/:id", h.deleteSizeInt)
-		size.DELETE("/all", h.deleteAllSizeInt)
+		size = size.Group("/", h.middleware.AccessForProAdmin)
+		{
+			size.POST("/", h.createSizeInt)
+			size.POST("/file", h.createSizeIntFromFile)
+			size.PUT("/:id", h.updateSizeInt)
+			size.DELETE("/:id", h.deleteSizeInt)
+			size.DELETE("/all", h.deleteAllSizeInt)
+		}
 	}
 }
 

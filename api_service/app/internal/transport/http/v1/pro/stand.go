@@ -14,9 +14,12 @@ func (h *Handler) initStandRoutes(api *gin.RouterGroup) {
 	stand := api.Group("/standards")
 	{
 		stand.GET("/", h.getStands)
-		stand.POST("/", h.createStand)
-		stand.PUT("/:id", h.updateStand)
-		stand.DELETE("/:id", h.deleteStand)
+		stand = stand.Group("/", h.middleware.AccessForProAdmin)
+		{
+			stand.POST("/", h.createStand)
+			stand.PUT("/:id", h.updateStand)
+			stand.DELETE("/:id", h.deleteStand)
+		}
 	}
 }
 

@@ -14,9 +14,12 @@ func (h *Handler) initTypeFlRoutes(api *gin.RouterGroup) {
 	{
 		fl.GET("/", h.getTypeFl)
 		fl.GET("/all", h.getAllTypeFl)
-		fl.POST("/", h.createTypeFl)
-		fl.PUT("/:id", h.updateTypeFl)
-		fl.DELETE("/:id", h.deleteTypeFl)
+		fl = fl.Group("/", h.middleware.AccessForProAdmin)
+		{
+			fl.POST("/", h.createTypeFl)
+			fl.PUT("/:id", h.updateTypeFl)
+			fl.DELETE("/:id", h.deleteTypeFl)
+		}
 	}
 }
 

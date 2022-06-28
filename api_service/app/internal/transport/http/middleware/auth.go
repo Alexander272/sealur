@@ -50,6 +50,32 @@ func (m *Middleware) UserIdentity(c *gin.Context) {
 	// c.Set(userRolesCtx, user.Roles)
 }
 
+func (m *Middleware) AccessForProAdmin(c *gin.Context) {
+	userId, _ := c.Get(userIdCtx)
+	role, exists := c.Get(fmt.Sprintf("%s_pro", userRolesCtx))
+	if !exists {
+		models.NewErrorResponse(c, http.StatusUnauthorized, "roles empty", "failed to get role")
+	}
+
+	if role != "admin" {
+		models.NewErrorResponse(c, http.StatusForbidden, role.(string), "access not allowed")
+		logger.Error(userId)
+	}
+}
+
+func (m *Middleware) AccessForMomentAdmin(c *gin.Context) {
+	userId, _ := c.Get(userIdCtx)
+	role, exists := c.Get(fmt.Sprintf("%s_moment", userRolesCtx))
+	if !exists {
+		models.NewErrorResponse(c, http.StatusUnauthorized, "roles empty", "failed to get role")
+	}
+
+	if role != "admin" {
+		models.NewErrorResponse(c, http.StatusForbidden, role.(string), "access not allowed")
+		logger.Error(userId)
+	}
+}
+
 func (m *Middleware) AccessForSuperUser(c *gin.Context) {
 	userId, _ := c.Get(userIdCtx)
 	role, exists := c.Get(fmt.Sprintf("%s_sealur", userRolesCtx))

@@ -130,6 +130,21 @@ type SizeInt interface {
 	DeleteAll(*proto.DeleteAllSizeIntRequest) error
 }
 
+type Order interface {
+	GetAll(*proto.GetAllOrdersRequest) ([]models.Order, error)
+	Create(*proto.CreateOrderRequest) error
+	Delete(*proto.DeleteOrderRequest) error
+	Save(*proto.SaveOrderRequest) error
+}
+
+type OrderPosition interface {
+	Get(*proto.GetPositionsRequest) ([]models.Position, error)
+	GetCur(*proto.GetCurPositionsRequest) ([]models.Position, error)
+	Add(*proto.AddPositionRequest) (id string, err error)
+	Update(*proto.UpdatePositionRequest) error
+	Remove(*proto.RemovePositionRequest) error
+}
+
 type Repositories struct {
 	Stand
 	Flange
@@ -145,6 +160,8 @@ type Repositories struct {
 	Materials
 	BoltMaterials
 	SizeInt
+	Order
+	OrderPosition
 }
 
 func NewRepo(db *sqlx.DB) *Repositories {
@@ -163,5 +180,7 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		Materials:     NewMatRepo(db),
 		BoltMaterials: NewBoltMatRepo(db),
 		SizeInt:       NewSizeIntRepo(db),
+		Order:         NewOrderRepo(db),
+		OrderPosition: NewPositionRepo(db),
 	}
 }

@@ -51,7 +51,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	proClient := proto.NewProServiceClient(connect)
 	h.proClient = proClient
 
-	pro := api.Group("/sealur-pro", h.middleware.UserIdentity)
+	pro := api.Group("/sealur-pro")
 	{
 		pro.GET("/ping", h.pingPro)
 

@@ -20,7 +20,7 @@ import (
 )
 
 // @title Sealur
-// @version 0.5
+// @version 0.14.0
 // @description API Service for Sealur
 
 // @host localhost:8080

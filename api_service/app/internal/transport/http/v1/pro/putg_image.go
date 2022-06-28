@@ -15,9 +15,12 @@ func (h *Handler) initPutgImageRoutes(api *gin.RouterGroup) {
 	putgImage := api.Group("putg-image")
 	{
 		putgImage.GET("/", h.getPutgImage)
-		putgImage.POST("/", h.createPutgImage)
-		putgImage.PUT("/:id", h.updatePutgImage)
-		putgImage.DELETE("/:id", h.deletePutgImage)
+		putgImage = putgImage.Group("/", h.middleware.AccessForProAdmin)
+		{
+			putgImage.POST("/", h.createPutgImage)
+			putgImage.PUT("/:id", h.updatePutgImage)
+			putgImage.DELETE("/:id", h.deletePutgImage)
+		}
 	}
 }
 

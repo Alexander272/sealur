@@ -10,13 +10,16 @@ import (
 )
 
 func (h *Handler) initSNPRoutes(api *gin.RouterGroup) {
-	snp := api.Group("/snp")
+	snp := api.Group("/snp", h.middleware.UserIdentity)
 	{
 		snp.GET("/default", h.getDefault)
 		snp.GET("/", h.getSNP)
-		snp.POST("/", h.createSNP)
-		snp.PUT("/:id", h.updateSNP)
-		snp.DELETE("/:id", h.deleteSNP)
+		snp = snp.Group("/", h.middleware.AccessForProAdmin)
+		{
+			snp.POST("/", h.createSNP)
+			snp.PUT("/:id", h.updateSNP)
+			snp.DELETE("/:id", h.deleteSNP)
+		}
 	}
 }
 

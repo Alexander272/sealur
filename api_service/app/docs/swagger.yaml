@@ -234,6 +234,30 @@ definitions:
     - title
     - typeMat
     type: object
+  models.OrderDTO:
+    properties:
+      count:
+        type: integer
+      id:
+        type: string
+      userId:
+        type: string
+    required:
+    - userId
+    type: object
+  models.PositionDTO:
+    properties:
+      count:
+        type: integer
+      description:
+        type: string
+      designation:
+        type: string
+      drawing:
+        type: string
+      sizes:
+        type: string
+    type: object
   models.PutgDTO:
     properties:
       coating:
@@ -729,7 +753,11 @@ definitions:
     properties:
       email:
         type: string
+      login:
+        type: string
       name:
+        type: string
+      password:
         type: string
       phone:
         type: string
@@ -970,6 +998,32 @@ definitions:
       title:
         type: string
       typeMat:
+        type: string
+    type: object
+  proto.Order:
+    properties:
+      count:
+        type: integer
+      date:
+        type: string
+      id:
+        type: string
+    type: object
+  proto.OrderPosition:
+    properties:
+      count:
+        type: integer
+      description:
+        type: string
+      designation:
+        type: string
+      drawing:
+        type: string
+      id:
+        type: string
+      orderId:
+        type: string
+      sizes:
         type: string
     type: object
   proto.Putg:
@@ -1294,6 +1348,13 @@ definitions:
       title:
         type: string
     type: object
+  proto_user.Ip:
+    properties:
+      date:
+        type: string
+      ip:
+        type: string
+    type: object
   proto_user.Role:
     properties:
       id:
@@ -1310,6 +1371,12 @@ definitions:
       email:
         type: string
       id:
+        type: string
+      ip:
+        items:
+          $ref: '#/definitions/proto_user.Ip'
+        type: array
+      login:
         type: string
       name:
         type: string
@@ -1334,7 +1401,7 @@ info:
   contact: {}
   description: API Service for Sealur
   title: Sealur
-  version: "0.5"
+  version: 0.14.0
 paths:
   /auth/refresh:
     post:
@@ -1371,7 +1438,7 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Refresh
       tags:
-      - auth
+      - Auth
   /auth/sign-in:
     post:
       consumes:
@@ -1414,7 +1481,7 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: SignIn
       tags:
-      - auth
+      - Auth
   /auth/sign-out:
     post:
       consumes:
@@ -1445,7 +1512,7 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: SignOut
       tags:
-      - auth
+      - Auth
   /auth/sign-up:
     post:
       consumes:
@@ -1483,7 +1550,7 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: SignUp
       tags:
-      - auth
+      - Auth
   /files/drawings/{backet}:
     post:
       consumes:
@@ -2988,6 +3055,13 @@ paths:
       consumes:
       - application/json
       description: создание заказа
+      parameters:
+      - description: order info
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.OrderDTO'
       produces:
       - application/json
       responses:
@@ -3014,6 +3088,309 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Create Order
+      tags:
+      - Sealur Pro -> orders
+  /sealur-pro/orders/{orderId}:
+    delete:
+      consumes:
+      - application/json
+      description: сохранение заказа
+      parameters:
+      - description: order id
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Order
+      tags:
+      - Sealur Pro -> orders
+    post:
+      consumes:
+      - application/json
+      description: сохранение заказа
+      parameters:
+      - description: order id
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Save Order
+      tags:
+      - Sealur Pro -> orders
+  /sealur-pro/orders/{orderId}/positions:
+    get:
+      consumes:
+      - application/json
+      description: получение позиций к заказу
+      parameters:
+      - description: order id
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                Data:
+                  items:
+                    $ref: '#/definitions/proto.OrderPosition'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Position
+      tags:
+      - Sealur Pro -> orders
+    post:
+      consumes:
+      - application/json
+      description: добавление позиции к заказу
+      parameters:
+      - description: order id
+        in: path
+        name: orderId
+        required: true
+        type: string
+      - description: position info
+        in: body
+        name: position
+        required: true
+        schema:
+          $ref: '#/definitions/models.PositionDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Add Position
+      tags:
+      - Sealur Pro -> orders
+  /sealur-pro/orders/{orderId}/positions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: удаление позиции к заказу
+      parameters:
+      - description: order id
+        in: path
+        name: orderId
+        required: true
+        type: string
+      - description: position id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Remove Position
+      tags:
+      - Sealur Pro -> orders
+  /sealur-pro/orders/all:
+    get:
+      consumes:
+      - application/json
+      description: получение всех заказов
+      parameters:
+      - description: user id
+        in: query
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                Data:
+                  items:
+                    $ref: '#/definitions/proto.Order'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Orders
+      tags:
+      - Sealur Pro -> orders
+  /sealur-pro/orders/positions:
+    get:
+      consumes:
+      - application/json
+      description: получение позиций к несохранненому заказу
+      parameters:
+      - description: user id
+        in: query
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.DataResponse'
+            - properties:
+                Data:
+                  items:
+                    $ref: '#/definitions/proto.OrderPosition'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Cur Position
       tags:
       - Sealur Pro -> orders
   /sealur-pro/putg:
@@ -4033,6 +4410,11 @@ paths:
         name: flange
         required: true
         type: string
+      - description: flange type id
+        in: query
+        name: typeFlId
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -4260,7 +4642,7 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: создание размеров из файла excel
+      description: создание размеров (для опроса) из файла excel
       produces:
       - application/json
       responses:
@@ -4286,9 +4668,9 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Create Size From File
+      summary: Create Size Int From File
       tags:
-      - Sealur Pro -> sizes
+      - Sealur Pro -> sizes-interview
   /sealur-pro/snp:
     get:
       consumes:
@@ -4863,7 +5245,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete User
       tags:
-      - Sealur Pro -> users
+      - Users
     get:
       consumes:
       - application/json
@@ -4906,7 +5288,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get User
       tags:
-      - Sealur Pro -> users
+      - Users
     patch:
       consumes:
       - application/json
@@ -4950,7 +5332,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update User
       tags:
-      - Sealur Pro -> users
+      - Users
   /users/all:
     get:
       consumes:
@@ -4990,7 +5372,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get All Users
       tags:
-      - Sealur Pro -> users
+      - Users
   /users/confirm:
     post:
       consumes:
@@ -5030,7 +5412,7 @@ paths:
       - ApiKeyAuth: []
       summary: Confirm User
       tags:
-      - Sealur Pro -> users
+      - Users
   /users/new:
     get:
       consumes:
@@ -5070,7 +5452,40 @@ paths:
       - ApiKeyAuth: []
       summary: Get New Users
       tags:
-      - Sealur Pro -> users
+      - Users
+  /users/reject/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: оклонение пользователя
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Reject User
+      tags:
+      - Users
   /users/roles:
     post:
       consumes:
@@ -5120,6 +5535,11 @@ paths:
       - description: role id
         in: path
         name: id
+        required: true
+        type: string
+      - description: user id
+        in: query
+        name: userId
         required: true
         type: string
       produces:

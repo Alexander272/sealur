@@ -897,6 +897,84 @@ message SizesInt {
 	string h = 13;
 }
 
+// Order Service --------------------------------------------------------------------
+message GetOrderRequest {
+    string orderId = 1;
+}
+
+message GetAllOrdersRequest {
+    string userId = 1;
+}
+
+message GetCurOrderRequest {
+    string userId = 1;
+}
+
+message CreateOrderRequest {
+    string orderId = 1;
+    int32 count = 2;
+    string userId = 3;
+}
+
+message DeleteOrderRequest {
+    string orderId = 1;
+}
+
+message SaveOrderRequest {
+    string orderId = 1;
+}
+
+message GetPositionsRequest {
+    string orderId = 1;
+}
+
+message GetCurPositionsRequest {
+    string userId = 1;
+}
+
+message AddPositionRequest {
+    string orderId = 1;
+    string designation = 2;
+    string description = 3;
+    int32 count = 4;
+    string sizes = 5;
+    string drawing = 6;
+}
+
+message UpdatePositionRequest {
+    string id = 1;
+    int32 count = 2;
+}
+
+message RemovePositionRequest {
+    string id = 1;
+    string orderId = 2;
+}
+
+message Order {
+    string id = 1;
+    string date = 2;
+    int32 count = 3;
+}
+
+message OrderPosition {
+    string id = 1;
+    string designation = 2;
+    string description = 3;
+    int32 count = 4;
+    string sizes = 5;
+    string drawing = 6;
+    string orderId = 7;
+}
+
+message OrderResponse {
+    repeated Order orders = 1;
+}
+
+message OrderPositionResponse {
+    repeated OrderPosition positions = 1;
+}
+
 // commmon ----------------------------------------------------------------
 message IdResponse {
     string id = 1;
@@ -1015,4 +1093,16 @@ service ProService {
 
     //Interview
     rpc SendInterview (SendInterviewRequest) returns (SuccessResponse);
+
+    // Order Service --------------------------------------------------------------------
+    rpc GetAllOrders (GetAllOrdersRequest) returns (OrderResponse);
+    rpc CreateOrder (CreateOrderRequest) returns (IdResponse);
+    rpc DeleteOrder (DeleteOrderRequest) returns (IdResponse);
+    rpc SaveOrder (SaveOrderRequest) returns (SuccessResponse);
+
+    rpc GetPositions (GetPositionsRequest) returns (OrderPositionResponse);
+    rpc GetCurPositions (GetCurPositionsRequest) returns (OrderPositionResponse);
+    rpc AddPosition (AddPositionRequest) returns (IdResponse);
+    rpc UpdatePosition (UpdatePositionRequest) returns (IdResponse);
+    rpc RemovePosition (RemovePositionRequest) returns (IdResponse);
 }

@@ -14,9 +14,12 @@ func (h *Handler) initFlangeRoutes(api *gin.RouterGroup) {
 	flanges := api.Group("/flanges")
 	{
 		flanges.GET("/", h.getFlanges)
-		flanges.POST("/", h.createFlange)
-		flanges.PUT("/:id", h.updateFlange)
-		flanges.DELETE("/:id", h.deleteFlange)
+		flanges = flanges.Group("/", h.middleware.AccessForProAdmin)
+		{
+			flanges.POST("/", h.createFlange)
+			flanges.PUT("/:id", h.updateFlange)
+			flanges.DELETE("/:id", h.deleteFlange)
+		}
 	}
 }
 

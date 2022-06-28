@@ -13,9 +13,12 @@ func (h *Handler) initPutgmRoutes(api *gin.RouterGroup) {
 	putgm := api.Group("/putgm")
 	{
 		putgm.GET("/", h.getPutgm)
-		putgm.POST("/", h.createPutgm)
-		putgm.PUT("/:id", h.updatePutgm)
-		putgm.DELETE("/:id", h.deletePutgm)
+		putgm = putgm.Group("/", h.middleware.AccessForProAdmin)
+		{
+			putgm.POST("/", h.createPutgm)
+			putgm.PUT("/:id", h.updatePutgm)
+			putgm.DELETE("/:id", h.deletePutgm)
+		}
 	}
 }
 

@@ -14,7 +14,7 @@ import (
 )
 
 func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
-	drawing := api.Group("/drawings")
+	drawing := api.Group("/drawings", h.middleware.UserIdentity)
 	{
 		drawing.POST("/:backet", h.createDrawing)
 		drawing.GET("/:backet/:group/:id/:name", h.getDrawing)

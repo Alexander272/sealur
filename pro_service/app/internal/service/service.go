@@ -157,6 +157,21 @@ type Interview interface {
 	SendInterview(context.Context, *proto.SendInterviewRequest) error
 }
 
+type Order interface {
+	GetAll(*proto.GetAllOrdersRequest) ([]*proto.Order, error)
+	Create(*proto.CreateOrderRequest) (*proto.IdResponse, error)
+	Delete(*proto.DeleteOrderRequest) (*proto.IdResponse, error)
+	Save(*proto.SaveOrderRequest) error
+}
+
+type OrderPosition interface {
+	Get(*proto.GetPositionsRequest) ([]*proto.OrderPosition, error)
+	GetCur(*proto.GetCurPositionsRequest) ([]*proto.OrderPosition, error)
+	Add(*proto.AddPositionRequest) (*proto.IdResponse, error)
+	Update(*proto.UpdatePositionRequest) (*proto.IdResponse, error)
+	Remove(*proto.RemovePositionRequest) (*proto.IdResponse, error)
+}
+
 type Services struct {
 	Stand
 	Flange
@@ -173,6 +188,8 @@ type Services struct {
 	BoltMaterials
 	SizeInt
 	Interview
+	Order
+	OrderPosition
 }
 
 func NewServices(repos *repository.Repositories, email proto_email.EmailServiceClient, file proto_file.FileServiceClient) *Services {
@@ -192,5 +209,7 @@ func NewServices(repos *repository.Repositories, email proto_email.EmailServiceC
 		BoltMaterials: NewBoltMatRepo(repos.BoltMaterials),
 		SizeInt:       NewSizeIntService(repos.SizeInt),
 		Interview:     NewInterviewService(email, file),
+		Order:         NewOrderService(repos.Order),
+		OrderPosition: NewPositionService(repos.OrderPosition),
 	}
 }

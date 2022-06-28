@@ -13,15 +13,18 @@ import (
 )
 
 func (h *Handler) initSizeRoutes(api *gin.RouterGroup) {
-	sizes := api.Group("/sizes")
+	sizes := api.Group("/sizes", h.middleware.UserIdentity)
 	{
 		sizes.GET("/", h.getSizes)
 		sizes.GET("/all", h.getAllSizes)
-		sizes.POST("/", h.createSize)
-		sizes.POST("/file", h.createSizeFromFile)
-		sizes.PUT("/:id", h.updateSize)
-		sizes.DELETE("/:id", h.deleteSize)
-		sizes.DELETE("/all", h.deleteAllSize)
+		sizes = sizes.Group("/", h.middleware.AccessForProAdmin)
+		{
+			sizes.POST("/", h.createSize)
+			sizes.POST("/file", h.createSizeFromFile)
+			sizes.PUT("/:id", h.updateSize)
+			sizes.DELETE("/:id", h.deleteSize)
+			sizes.DELETE("/all", h.deleteAllSize)
+		}
 	}
 }
 
