@@ -59,7 +59,7 @@ func (r *PositionRepo) Add(position *proto.AddPositionRequest) (id string, err e
 		return id, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	return id, tx.Commit()
+	return fmt.Sprintf("%d", idInt), tx.Commit()
 }
 
 func (r *PositionRepo) Update(position *proto.UpdatePositionRequest) error {

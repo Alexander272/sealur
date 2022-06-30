@@ -9,7 +9,7 @@ import (
 
 type Store interface {
 	GetFile(ctx context.Context, backet, group, id, name string) (*models.File, error)
-	// GetFilesByOrderUUID(ctx context.Context, backet string) ([]*models.File, error)
+	GetFilesByGroup(ctx context.Context, backet, group string) ([]*models.File, error)
 	Create(ctx context.Context, backet string, dto models.CreateFileDTO) (string, error)
 	Delete(ctx context.Context, backet, group, id, name string) error
 }

@@ -34,30 +34,26 @@ func (c *MinioStorage) GetFile(bucketName, fileId string) (*minio.Object, error)
 	return obj, nil
 }
 
-// func (c *MinioStorage) GetBucketFiles(ctx context.Context, bucketName string) ([]*minio.Object, error) {
-// 	reqCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
-// 	defer cancel()
+func (c *MinioStorage) GetBucketFiles(bucketName, group string) ([]*minio.Object, error) {
+	var files []*minio.Object
+	doneCh := make(chan struct{})
 
-// 	var files []*minio.Object
-// 	for lobj := range c.Client.ListObjects(bucketName, minio.ListObjectsOptions{WithMetadata: true}) {
-// 		if lobj.Err != nil {
-// 			logger.Errorf("failed to list object from minio bucket %s. err: %v", bucketName, lobj.Err)
-// 			continue
-// 		}
-// 		object, err := c.Client.GetObject(ctx, bucketName, lobj.Key, minio.GetObjectOptions{})
-// 		if err != nil {
-// 			logger.Errorf("failed to get object key=%s from minio bucket %s. err: %v", lobj.Key, bucketName, lobj.Err)
-// 			continue
-// 		}
-// 		files = append(files, object)
-// 	}
-// 	return files, nil
-// }
+	for lobj := range c.Client.ListObjectsV2(bucketName, group, true, doneCh) {
+		if lobj.Err != nil {
+			logger.Errorf("failed to list object from minio bucket %s. err: %v", bucketName, lobj.Err)
+			continue
+		}
+		object, err := c.Client.GetObject(bucketName, lobj.Key, minio.GetObjectOptions{})
+		if err != nil {
+			logger.Errorf("failed to get object key=%s from minio bucket %s. err: %v", lobj.Key, bucketName, lobj.Err)
+			continue
+		}
+		files = append(files, object)
+	}
+	return files, nil
+}
 
 func (c *MinioStorage) UploadFile(fileId, fileName, contetnType, bucketName string, fileSize int64, reader io.Reader) error {
-	// reqCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	// defer cancel()
-
 	exists, errBucketExists := c.Client.BucketExists(bucketName)
 	if errBucketExists != nil || !exists {
 		logger.Warnf("no bucket %s. creating new one...", bucketName)

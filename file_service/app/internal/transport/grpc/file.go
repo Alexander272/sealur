@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"archive/zip"
 	"bufio"
 	"bytes"
 	"context"
@@ -36,6 +37,75 @@ func (h *Handler) Download(req *proto_file.FileDownloadRequest, stream proto_fil
 
 	f := bytes.NewReader(file.Bytes)
 	reader := bufio.NewReader(f)
+	buffer := make([]byte, 1024)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logger.Errorf("cannot read chunk to buffer: %w", err)
+			return fmt.Errorf("cannot read chunk to buffer %w", err)
+		}
+
+		reqChunk := &proto_file.FileDownloadResponse{
+			Response: &proto_file.FileDownloadResponse_File{File: &proto_file.File{
+				Content: buffer[:n],
+			}},
+		}
+
+		err = stream.Send(reqChunk)
+		if err != nil {
+			logger.Errorf("cannot send chunk to clinet: %w", err)
+			return fmt.Errorf("cannot send chunk to clinet %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (h *Handler) GroupDownload(req *proto_file.GroupDownloadRequest, stream proto_file.FileService_GroupDownloadServer) error {
+	files, err := h.service.GetFilesByGroup(context.Background(), req.Backet, req.Group)
+	if err != nil {
+		return fmt.Errorf("error getting files. error: %w", err)
+	}
+
+	buf := new(bytes.Buffer)
+	w := zip.NewWriter(buf)
+
+	for _, file := range files {
+		f, err := w.Create(file.Name)
+		if err != nil {
+			return fmt.Errorf("failed to create file in zip. err %w", err)
+		}
+		_, err = f.Write(file.Bytes)
+		if err != nil {
+			return fmt.Errorf("failed to write file in zip. err %w", err)
+		}
+	}
+
+	if err := w.Close(); err != nil {
+		return fmt.Errorf("failed to close writer. err %w", err)
+	}
+
+	size := int64(buf.Cap())
+	reqMeta := &proto_file.FileDownloadResponse{
+		Response: &proto_file.FileDownloadResponse_Metadata{
+			Metadata: &proto_file.MetaData{
+				Name: "Чертежи.zip",
+				Size: size,
+				Type: ".zip",
+			},
+		},
+	}
+	err = stream.Send(reqMeta)
+	if err != nil {
+		logger.Errorf("cannot send metadata to clinet: %w", err)
+		return fmt.Errorf("cannot send metadata to clinet %w", err)
+	}
+
+	reader := bufio.NewReader(buf)
 	buffer := make([]byte, 1024)
 
 	for {

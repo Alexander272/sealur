@@ -5,8 +5,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/Alexander272/sealur/file_service/internal/models"
+	"github.com/Alexander272/sealur/file_service/pkg/logger"
 	"github.com/Alexander272/sealur/file_service/pkg/storage"
 )
 
@@ -59,41 +61,41 @@ func (r *StoreRepo) GetFile(ctx context.Context, bucketName, fileName string) (*
 	// return &f, nil
 }
 
-// func (r *StoreRepo) GetFilesByOrderUUID(ctx context.Context, backet string) ([]*models.File, error) {
-// 	objects, err := r.storage.GetBucketFiles(backet)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to get objects. err: %w", err)
-// 	}
-// 	if len(objects) == 0 {
-// 		return nil, models.ErrNotFound
-// 	}
+func (r *StoreRepo) GetFilesByGroup(backet, group string) ([]*models.File, error) {
+	objects, err := r.storage.GetBucketFiles(backet, group)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get objects. err: %w", err)
+	}
+	if len(objects) == 0 {
+		return nil, models.ErrNotFound
+	}
 
-// 	var files []*models.File
-// 	for _, obj := range objects {
-// 		stat, err := obj.Stat()
-// 		if err != nil {
-// 			logger.Errorf("failed to get objects. err: %v", err)
-// 			continue
-// 		}
-// 		buffer := make([]byte, stat.Size)
-// 		_, err = obj.Read(buffer)
-// 		if err != nil && err != io.EOF {
-// 			logger.Errorf("failed to get objects. err: %v", err)
-// 			continue
-// 		}
-// 		f := models.File{
-// 			ID:          stat.Key,
-// 			Name:        stat.UserMetadata["Name"],
-// 			ContentType: stat.ContentType,
-// 			Size:        stat.Size,
-// 			Bytes:       buffer,
-// 		}
-// 		files = append(files, &f)
-// 		obj.Close()
-// 	}
+	var files []*models.File
+	for _, obj := range objects {
+		stat, err := obj.Stat()
+		if err != nil {
+			logger.Errorf("failed to get objects. err: %v", err)
+			continue
+		}
+		buffer := make([]byte, stat.Size)
+		_, err = obj.Read(buffer)
+		if err != nil && err != io.EOF {
+			logger.Errorf("failed to get objects. err: %v", err)
+			continue
+		}
+		f := models.File{
+			ID:          stat.Key,
+			Name:        strings.Split(stat.Key, "/")[1],
+			ContentType: stat.ContentType,
+			Size:        stat.Size,
+			Bytes:       buffer,
+		}
+		files = append(files, &f)
+		obj.Close()
+	}
 
-// 	return files, nil
-// }
+	return files, nil
+}
 
 func (r *StoreRepo) CreateFile(ctx context.Context, backet string, file *models.File) error {
 	err := r.storage.UploadFile(

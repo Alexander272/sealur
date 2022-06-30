@@ -135,6 +135,7 @@ type Order interface {
 	Create(*proto.CreateOrderRequest) error
 	Delete(*proto.DeleteOrderRequest) error
 	Save(*proto.SaveOrderRequest) error
+	GetPositions(*proto.GetPositionsRequest) ([]models.Position, error)
 }
 
 type OrderPosition interface {

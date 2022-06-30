@@ -1,7 +1,10 @@
 package grpc
 
 import (
+	"bufio"
 	"context"
+	"fmt"
+	"io"
 
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 )
@@ -31,8 +34,56 @@ func (h *Handler) DeleteOrder(ctx context.Context, order *proto.DeleteOrderReque
 	return id, nil
 }
 
-func (h *Handler) SaveOrder(ctx context.Context, order *proto.SaveOrderRequest) (*proto.SuccessResponse, error) {
-	if err := h.service.Order.Save(order); err != nil {
+func (h *Handler) SaveOrder(order *proto.SaveOrderRequest, stream proto.ProService_SaveOrderServer) error {
+	file, err := h.service.Order.Save(context.Background(), order)
+	if err != nil {
+		return err
+	}
+
+	reqMeta := &proto.FileDownloadResponse{
+		Response: &proto.FileDownloadResponse_Metadata{
+			Metadata: &proto.MetaData{
+				Name: "Order.zip",
+				Size: int64(file.Cap()),
+				Type: "application/zip",
+			},
+		},
+	}
+	err = stream.Send(reqMeta)
+	if err != nil {
+		return fmt.Errorf("cannot send metadata to clinet %w", err)
+	}
+
+	reader := bufio.NewReader(file)
+	buffer := make([]byte, 1024)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("cannot read chunk to buffer %w", err)
+		}
+
+		reqChunk := &proto.FileDownloadResponse{
+			Response: &proto.FileDownloadResponse_File{File: &proto.File{
+				Content: buffer[:n],
+			}},
+		}
+
+		err = stream.Send(reqChunk)
+		if err != nil {
+			return fmt.Errorf("cannot send chunk to clinet %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (h *Handler) SendOrder(ctx context.Context, order *proto.SaveOrderRequest) (*proto.SuccessResponse, error) {
+	// TODO иправить save на send
+	if _, err := h.service.Order.Save(ctx, order); err != nil {
 		return nil, err
 	}
 	return &proto.SuccessResponse{Success: true}, nil

@@ -1,12 +1,16 @@
 package pro
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -16,7 +20,8 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 	{
 		order.GET("/all", h.getAllOrders)
 		order.POST("/", h.createOrder)
-		order.POST("/:orderId", h.saveOrder)
+		order.GET("/:orderId/Order.zip", h.saveOrder)
+		order.POST("/:orderId/send", h.sendOrder)
 		order.DELETE("/:orderId", h.deleteOrder)
 
 		//TODO добавить ендпоинт для копирования заказа или его позиций в новый заказ
@@ -114,12 +119,94 @@ func (h *Handler) createOrder(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param orderId path string true "order id"
+// @Success 200 {object} models.ZipResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/orders/{orderId}/Order.zip [get]
+func (h *Handler) saveOrder(c *gin.Context) {
+	orderId := c.Param("orderId")
+	if orderId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty orderId param")
+		return
+	}
+
+	stream, err := h.proClient.SaveOrder(c, &proto.SaveOrderRequest{
+		OrderId: orderId,
+	})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	req, err := stream.Recv()
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	meta := req.GetMetadata()
+	fileData := bytes.Buffer{}
+
+	for {
+		logger.Debug("waiting to receive more data")
+
+		req, err := stream.Recv()
+		if err == io.EOF {
+			logger.Debug("no more data")
+			break
+		}
+
+		if err != nil {
+			models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+			return
+		}
+
+		chunk := req.GetFile().Content
+
+		_, err = fileData.Write(chunk)
+		if err != nil {
+			models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+			return
+		}
+	}
+
+	f, _ := os.Create(fmt.Sprintf("%s_Order.zip", orderId))
+	f.Write(fileData.Bytes())
+	defer os.Remove(fmt.Sprintf("%s_Order.zip", orderId))
+
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Length", fmt.Sprintf("%d", meta.Size))
+	c.Header("Content-Disposition", "attachment; filename="+meta.GetName())
+	c.File(fmt.Sprintf("%s_Order.zip", orderId))
+}
+
+// @Summary Send Order
+// @Tags Sealur Pro -> orders
+// @Security ApiKeyAuth
+// @Description отправление заказа
+// @ModuleID sendOrder
+// @Accept json
+// @Produce json
+// @Param orderId path string true "order id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-pro/orders/{orderId} [post]
-func (h *Handler) saveOrder(c *gin.Context) {
+// @Router /sealur-pro/orders/{orderId}/send [post]
+func (h *Handler) sendOrder(c *gin.Context) {
+	orderId := c.Param("orderId")
+	if orderId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty orderId param")
+		return
+	}
+
+	_, err := h.proClient.SaveOrder(c, &proto.SaveOrderRequest{OrderId: orderId})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
 
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Saved"})
 }

@@ -31,6 +31,11 @@ type StatusResponse struct {
 	Status string `json:"status"`
 }
 
+type ZipResponse struct {
+	Name string `json:"name"`
+	File []byte `json:"file"`
+}
+
 func NewErrorResponse(c *gin.Context, statusCode int, err, message string) {
 	logger.Errorf("Url: %s | ClientIp: %s | ErrorResponse: %s", c.Request.URL, c.ClientIP(), err)
 	c.AbortWithStatusJSON(statusCode, ErrorResponse{message})

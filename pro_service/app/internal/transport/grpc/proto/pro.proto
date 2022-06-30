@@ -975,6 +975,24 @@ message OrderPositionResponse {
     repeated OrderPosition positions = 1;
 }
 
+message MetaData {
+    string name = 1;
+    string type = 2;
+    int64 size = 3;
+}
+
+message File {
+    bytes content = 1;
+}
+
+message FileDownloadResponse {
+    oneof response {
+        MetaData metadata = 1;
+        File file = 2;
+    }
+}
+
+
 // commmon ----------------------------------------------------------------
 message IdResponse {
     string id = 1;
@@ -1098,7 +1116,8 @@ service ProService {
     rpc GetAllOrders (GetAllOrdersRequest) returns (OrderResponse);
     rpc CreateOrder (CreateOrderRequest) returns (IdResponse);
     rpc DeleteOrder (DeleteOrderRequest) returns (IdResponse);
-    rpc SaveOrder (SaveOrderRequest) returns (SuccessResponse);
+    rpc SaveOrder (SaveOrderRequest) returns (stream FileDownloadResponse);
+    rpc SendOrder (SaveOrderRequest) returns (SuccessResponse);
 
     rpc GetPositions (GetPositionsRequest) returns (OrderPositionResponse);
     rpc GetCurPositions (GetCurPositionsRequest) returns (OrderPositionResponse);

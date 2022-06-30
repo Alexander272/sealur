@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"context"
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
@@ -161,7 +162,7 @@ type Order interface {
 	GetAll(*proto.GetAllOrdersRequest) ([]*proto.Order, error)
 	Create(*proto.CreateOrderRequest) (*proto.IdResponse, error)
 	Delete(*proto.DeleteOrderRequest) (*proto.IdResponse, error)
-	Save(*proto.SaveOrderRequest) error
+	Save(context.Context, *proto.SaveOrderRequest) (*bytes.Buffer, error)
 }
 
 type OrderPosition interface {
@@ -209,7 +210,7 @@ func NewServices(repos *repository.Repositories, email proto_email.EmailServiceC
 		BoltMaterials: NewBoltMatRepo(repos.BoltMaterials),
 		SizeInt:       NewSizeIntService(repos.SizeInt),
 		Interview:     NewInterviewService(email, file),
-		Order:         NewOrderService(repos.Order),
+		Order:         NewOrderService(repos.Order, email, file),
 		OrderPosition: NewPositionService(repos.OrderPosition),
 	}
 }

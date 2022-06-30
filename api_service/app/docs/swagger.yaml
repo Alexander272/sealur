@@ -248,7 +248,7 @@ definitions:
   models.PositionDTO:
     properties:
       count:
-        type: integer
+        type: string
       description:
         type: string
       designation:
@@ -3129,44 +3129,6 @@ paths:
       summary: Delete Order
       tags:
       - Sealur Pro -> orders
-    post:
-      consumes:
-      - application/json
-      description: сохранение заказа
-      parameters:
-      - description: order id
-        in: path
-        name: orderId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.IdResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        default:
-          description: ""
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Save Order
-      tags:
-      - Sealur Pro -> orders
   /sealur-pro/orders/{orderId}/positions:
     get:
       consumes:
@@ -3299,6 +3261,133 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Remove Position
+      tags:
+      - Sealur Pro -> orders
+    patch:
+      consumes:
+      - application/json
+      description: обновление позиции к заказу
+      parameters:
+      - description: order id
+        in: path
+        name: orderId
+        required: true
+        type: string
+      - description: position id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: position info
+        in: body
+        name: position
+        required: true
+        schema:
+          $ref: '#/definitions/models.PositionDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Position
+      tags:
+      - Sealur Pro -> orders
+  /sealur-pro/orders/{orderId}/save:
+    post:
+      consumes:
+      - application/json
+      description: сохранение заказа
+      parameters:
+      - description: order id
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Save Order
+      tags:
+      - Sealur Pro -> orders
+  /sealur-pro/orders/{orderId}/send:
+    post:
+      consumes:
+      - application/json
+      description: отправление заказа
+      parameters:
+      - description: order id
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Send Order
       tags:
       - Sealur Pro -> orders
   /sealur-pro/orders/all:

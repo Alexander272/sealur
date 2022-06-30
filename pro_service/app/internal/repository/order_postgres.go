@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
@@ -46,6 +47,21 @@ func (r *OrderRepo) Delete(order *proto.DeleteOrderRequest) error {
 }
 
 func (r *OrderRepo) Save(order *proto.SaveOrderRequest) error {
-	// TODO дописать сохранение
+	query := fmt.Sprintf("UPDATE %s SET date=$1 WHERE id=$2", OrdersTable)
+
+	_, err := r.db.Exec(query, time.Now().UnixMilli(), order.OrderId)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
 	return nil
+}
+
+func (r *OrderRepo) GetPositions(req *proto.GetPositionsRequest) (position []models.Position, err error) {
+	query := fmt.Sprintf("SELECT id, designation, description, count, sizes, drawing FROM %s WHERE order_id=$1 ORDER BY id", OrderPositionTable)
+
+	if err = r.db.Select(&position, query, req.OrderId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return position, nil
 }

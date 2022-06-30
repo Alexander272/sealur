@@ -36,6 +36,11 @@ message FileDownloadRequest {
     string name = 4;
 }
 
+message GroupDownloadRequest {
+    string backet = 1;
+    string group = 2;
+}
+
 message FileDownloadResponse {
     oneof response {
         MetaData metadata = 1;
@@ -62,6 +67,7 @@ message PingResponse {
 service FileService {
     rpc Ping (PingRequest) returns (PingResponse);
     rpc Download (FileDownloadRequest) returns (stream FileDownloadResponse);
+    rpc GroupDownload (GroupDownloadRequest) returns (stream FileDownloadResponse);
     rpc Upload (stream FileUploadRequest) returns (FileUploadResponse);
     rpc Delete (FileDeleteRequest) returns (FileDeleteResponse);
 }
