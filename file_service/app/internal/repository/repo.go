@@ -9,9 +9,12 @@ import (
 
 type Store interface {
 	GetFile(ctx context.Context, bucketName, fileName string) (*models.File, error)
-	GetFilesByGroup(bucketName, group string) ([]*models.File, error)
-	CreateFile(ctx context.Context, backet string, file *models.File) error
-	DeleteFile(ctx context.Context, backet, fileName string) error
+	GetFilesByGroup(ctx context.Context, bucketName, group string) ([]*models.File, error)
+	CreateFile(ctx context.Context, bucket string, file *models.File) error
+	CopyFile(ctx context.Context, bucket, fileName, newFileName string) error
+	CopyFiles(ctx context.Context, bucket, group, newGroup string) error
+	DeleteFile(ctx context.Context, bucket, fileName string) error
+	DeleteFiles(ctx context.Context, bucket, group string) error
 }
 
 type Repo struct {

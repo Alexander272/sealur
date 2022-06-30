@@ -82,8 +82,14 @@ func (h *Handler) SaveOrder(order *proto.SaveOrderRequest, stream proto.ProServi
 }
 
 func (h *Handler) SendOrder(ctx context.Context, order *proto.SaveOrderRequest) (*proto.SuccessResponse, error) {
-	// TODO иправить save на send
-	if _, err := h.service.Order.Save(ctx, order); err != nil {
+	if err := h.service.Order.Send(ctx, order); err != nil {
+		return nil, err
+	}
+	return &proto.SuccessResponse{Success: true}, nil
+}
+
+func (h *Handler) CopyOrder(ctx context.Context, order *proto.CopyOrderRequest) (*proto.SuccessResponse, error) {
+	if err := h.service.Order.Copy(order); err != nil {
 		return nil, err
 	}
 	return &proto.SuccessResponse{Success: true}, nil
@@ -109,6 +115,14 @@ func (h *Handler) GetCurPositions(ctx context.Context, req *proto.GetCurPosition
 
 func (h *Handler) AddPosition(ctx context.Context, position *proto.AddPositionRequest) (*proto.IdResponse, error) {
 	id, err := h.service.OrderPosition.Add(position)
+	if err != nil {
+		return nil, err
+	}
+	return id, nil
+}
+
+func (h *Handler) CopyPosition(ctx context.Context, position *proto.CopyPositionRequest) (*proto.IdResponse, error) {
+	id, err := h.service.OrderPosition.Copy(position)
 	if err != nil {
 		return nil, err
 	}

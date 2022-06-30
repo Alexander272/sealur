@@ -72,25 +72,27 @@ func (r *PositionRepo) Update(position *proto.UpdatePositionRequest) error {
 	return nil
 }
 
-func (r *PositionRepo) Remove(position *proto.RemovePositionRequest) error {
+func (r *PositionRepo) Remove(position *proto.RemovePositionRequest) (string, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
-		return fmt.Errorf("failed to start transaction. error: %w", err)
+		return "", fmt.Errorf("failed to start transaction. error: %w", err)
 	}
 
-	deleteQuery := fmt.Sprintf("DELETE FROM %s WHERE id=$1", OrderPositionTable)
-	_, err = tx.Exec(deleteQuery, position.Id)
-	if err != nil {
+	deleteQuery := fmt.Sprintf("DELETE FROM %s WHERE id=$1 RETURNING drawing", OrderPositionTable)
+	row := tx.QueryRow(deleteQuery, position.Id)
+
+	var drawing string
+	if err := row.Scan(&drawing); err != nil {
 		tx.Rollback()
-		return fmt.Errorf("failed to execute query. error: %w", err)
+		return "", fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
 	updateQuery := fmt.Sprintf("UPDATE %s SET count_position=count_position-1 WHERE id=$1", OrdersTable)
 	_, err = tx.Exec(updateQuery, position.OrderId)
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("failed to execute query. error: %w", err)
+		return "", fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	return tx.Commit()
+	return drawing, tx.Commit()
 }

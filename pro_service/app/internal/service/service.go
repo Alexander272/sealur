@@ -163,12 +163,15 @@ type Order interface {
 	Create(*proto.CreateOrderRequest) (*proto.IdResponse, error)
 	Delete(*proto.DeleteOrderRequest) (*proto.IdResponse, error)
 	Save(context.Context, *proto.SaveOrderRequest) (*bytes.Buffer, error)
+	Send(context.Context, *proto.SaveOrderRequest) error
+	Copy(*proto.CopyOrderRequest) error
 }
 
 type OrderPosition interface {
 	Get(*proto.GetPositionsRequest) ([]*proto.OrderPosition, error)
 	GetCur(*proto.GetCurPositionsRequest) ([]*proto.OrderPosition, error)
 	Add(*proto.AddPositionRequest) (*proto.IdResponse, error)
+	Copy(*proto.CopyPositionRequest) (*proto.IdResponse, error)
 	Update(*proto.UpdatePositionRequest) (*proto.IdResponse, error)
 	Remove(*proto.RemovePositionRequest) (*proto.IdResponse, error)
 }
@@ -211,6 +214,6 @@ func NewServices(repos *repository.Repositories, email proto_email.EmailServiceC
 		SizeInt:       NewSizeIntService(repos.SizeInt),
 		Interview:     NewInterviewService(email, file),
 		Order:         NewOrderService(repos.Order, email, file),
-		OrderPosition: NewPositionService(repos.OrderPosition),
+		OrderPosition: NewPositionService(repos.OrderPosition, file),
 	}
 }

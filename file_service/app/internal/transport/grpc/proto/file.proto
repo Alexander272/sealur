@@ -8,7 +8,7 @@ message MetaData {
     string type = 2;
     int64 size = 3;
     string group = 4;
-    string backet = 5;
+    string bucket = 5;
 }
 
 message File {
@@ -31,13 +31,13 @@ message FileUploadResponse {
 
 message FileDownloadRequest {
     string id = 1;
-    string backet = 2;
+    string bucket = 2;
     string group = 3;
     string name = 4;
 }
 
 message GroupDownloadRequest {
-    string backet = 1;
+    string bucket = 1;
     string group = 2;
 }
 
@@ -48,14 +48,32 @@ message FileDownloadResponse {
     }
 }
 
+message CopyFileRequest {
+    string id = 1;
+    string bucket = 2;
+    string group = 3;
+    string newGroup = 4;
+}
+
+message CopyGroupRequest {
+    string bucket = 1;
+    string group = 2;
+    string newGroup = 3;
+}
+
 message FileDeleteRequest {
     string id = 1;
-    string backet = 2;
+    string bucket = 2;
     string group = 3;
     string name = 4;
 }
 
-message FileDeleteResponse {
+message GroupDeleteRequest {
+    string bucket = 1;
+    string group = 2;
+}
+
+message MessageResponse {
     string message = 1;
 }
 
@@ -69,5 +87,8 @@ service FileService {
     rpc Download (FileDownloadRequest) returns (stream FileDownloadResponse);
     rpc GroupDownload (GroupDownloadRequest) returns (stream FileDownloadResponse);
     rpc Upload (stream FileUploadRequest) returns (FileUploadResponse);
-    rpc Delete (FileDeleteRequest) returns (FileDeleteResponse);
+    rpc Copy (CopyFileRequest) returns (MessageResponse);
+    rpc CopyGroup (CopyGroupRequest) returns (MessageResponse);
+    rpc Delete (FileDeleteRequest) returns (MessageResponse);
+    rpc GroupDelete (GroupDeleteRequest) returns (MessageResponse);
 }

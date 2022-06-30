@@ -24,7 +24,7 @@ func (r *StoreRepo) GetFile(ctx context.Context, bucketName, fileName string) (*
 	// reqCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	// defer cancel()
 
-	obj, err := r.storage.GetFile(bucketName, fileName)
+	obj, err := r.storage.GetFile(ctx, bucketName, fileName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get file. err: %w", err)
 	}
@@ -61,8 +61,8 @@ func (r *StoreRepo) GetFile(ctx context.Context, bucketName, fileName string) (*
 	// return &f, nil
 }
 
-func (r *StoreRepo) GetFilesByGroup(backet, group string) ([]*models.File, error) {
-	objects, err := r.storage.GetBucketFiles(backet, group)
+func (r *StoreRepo) GetFilesByGroup(ctx context.Context, bucket, group string) ([]*models.File, error) {
+	objects, err := r.storage.GetBucketFiles(ctx, bucket, group)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get objects. err: %w", err)
 	}
@@ -97,12 +97,13 @@ func (r *StoreRepo) GetFilesByGroup(backet, group string) ([]*models.File, error
 	return files, nil
 }
 
-func (r *StoreRepo) CreateFile(ctx context.Context, backet string, file *models.File) error {
+func (r *StoreRepo) CreateFile(ctx context.Context, bucket string, file *models.File) error {
 	err := r.storage.UploadFile(
+		ctx,
 		fmt.Sprintf("%s/%s_%s", file.Group, file.ID, file.Name),
 		file.Name,
 		file.ContentType,
-		backet,
+		bucket,
 		file.Size,
 		bytes.NewBuffer(file.Bytes),
 	)
@@ -112,8 +113,32 @@ func (r *StoreRepo) CreateFile(ctx context.Context, backet string, file *models.
 	return nil
 }
 
-func (r *StoreRepo) DeleteFile(ctx context.Context, backet, fileName string) error {
-	err := r.storage.DeleteFile(backet, fileName)
+func (r *StoreRepo) CopyFile(ctx context.Context, bucket, fileName, newFileName string) error {
+	err := r.storage.CopyFile(ctx, bucket, newFileName, bucket, fileName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *StoreRepo) CopyFiles(ctx context.Context, bucket, group, newGroup string) error {
+	err := r.storage.CopyGroupFiles(ctx, bucket, group, newGroup)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *StoreRepo) DeleteFile(ctx context.Context, bucket, fileName string) error {
+	err := r.storage.DeleteFile(ctx, bucket, fileName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *StoreRepo) DeleteFiles(ctx context.Context, bucket, group string) error {
+	err := r.storage.DeleteGroupFiles(ctx, bucket, group)
 	if err != nil {
 		return err
 	}

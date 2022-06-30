@@ -158,7 +158,7 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInt
 	if req.Drawing != nil {
 		stream, err := s.file.Download(ctx, &proto_file.FileDownloadRequest{
 			Id:     req.Drawing.Id,
-			Backet: "pro",
+			Bucket: "pro",
 			Group:  req.Drawing.Group,
 			Name:   req.Drawing.OrigName,
 		})

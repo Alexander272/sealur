@@ -16,9 +16,9 @@ import (
 func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
 	drawing := api.Group("/drawings", h.middleware.UserIdentity)
 	{
-		drawing.POST("/:backet", h.createDrawing)
-		drawing.GET("/:backet/:group/:id/:name", h.getDrawing)
-		drawing.DELETE("/:backet/:group/:id/:name", h.deleteDrawing)
+		drawing.POST("/:bucket", h.createDrawing)
+		drawing.GET("/:bucket/:group/:id/:name", h.getDrawing)
+		drawing.DELETE("/:bucket/:group/:id/:name", h.deleteDrawing)
 	}
 }
 
@@ -32,12 +32,12 @@ func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
 // @Param name path string true "drawing name"
 // @Param id path string true "drawing id"
 // @Param group path string true "drawing group"
-// @Param backet path string true "backet"
+// @Param bucket path string true "bucket"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /files/drawings/{backet}/{group}/{id}/{name} [get]
+// @Router /files/drawings/{bucket}/{group}/{id}/{name} [get]
 func (h *Handler) getDrawing(c *gin.Context) {
 	name := c.Param("name")
 	if name == "" {
@@ -57,16 +57,16 @@ func (h *Handler) getDrawing(c *gin.Context) {
 		return
 	}
 
-	backet := c.Param("backet")
-	if backet == "" {
-		models.NewErrorResponse(c, http.StatusBadRequest, "empty backet", "empty backet param")
+	bucket := c.Param("bucket")
+	if bucket == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty bucket", "empty bucket param")
 		return
 	}
 
 	stream, err := h.fileClient.Download(c, &proto_file.FileDownloadRequest{
 		Id:     id,
 		Name:   name,
-		Backet: backet,
+		Bucket: bucket,
 		Group:  group,
 	})
 	if err != nil {
@@ -121,17 +121,17 @@ func (h *Handler) getDrawing(c *gin.Context) {
 // @ModuleID createDrawing
 // @Accept multipart/form-data
 // @Produce json
-// @Param backet path string true "backet"
+// @Param bucket path string true "bucket"
 // @Param group body string false "group image"
 // @Success 201 {object} models.FileResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /files/drawings/{backet} [post]
+// @Router /files/drawings/{bucket} [post]
 func (h *Handler) createDrawing(c *gin.Context) {
-	backet := c.Param("backet")
-	if backet == "" {
-		models.NewErrorResponse(c, http.StatusBadRequest, "empty backet", "empty backet param")
+	bucket := c.Param("bucket")
+	if bucket == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty bucket", "empty bucket param")
 		return
 	}
 
@@ -167,7 +167,7 @@ func (h *Handler) createDrawing(c *gin.Context) {
 				Type:   fileType,
 				Size:   file.Size,
 				Group:  group,
-				Backet: backet,
+				Bucket: bucket,
 			},
 		},
 	}
@@ -241,12 +241,12 @@ func (h *Handler) createDrawing(c *gin.Context) {
 // @Param name path string true "drawing name"
 // @Param id path string true "drawing id"
 // @Param group path string true "drawing group"
-// @Param backet path string true "backet"
+// @Param bucket path string true "bucket"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /files/drawings/{backet}/{group}/{id}/{name} [delete]
+// @Router /files/drawings/{bucket}/{group}/{id}/{name} [delete]
 func (h *Handler) deleteDrawing(c *gin.Context) {
 	name := c.Param("name")
 	if name == "" {
@@ -266,16 +266,16 @@ func (h *Handler) deleteDrawing(c *gin.Context) {
 		return
 	}
 
-	backet := c.Param("backet")
-	if backet == "" {
-		models.NewErrorResponse(c, http.StatusBadRequest, "empty backet", "empty backet param")
+	bucket := c.Param("bucket")
+	if bucket == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty bucket", "empty bucket param")
 		return
 	}
 
 	_, err := h.fileClient.Delete(c, &proto_file.FileDeleteRequest{
 		Id:     id,
 		Name:   name,
-		Backet: backet,
+		Bucket: bucket,
 		Group:  group,
 	})
 	if err != nil {

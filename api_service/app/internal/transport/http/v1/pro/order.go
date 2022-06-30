@@ -22,15 +22,15 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 		order.POST("/", h.createOrder)
 		order.GET("/:orderId/Order.zip", h.saveOrder)
 		order.POST("/:orderId/send", h.sendOrder)
+		order.POST("/:orderId/copy", h.copyOrder)
 		order.DELETE("/:orderId", h.deleteOrder)
-
-		//TODO добавить ендпоинт для копирования заказа или его позиций в новый заказ
 
 		order.GET("/positions", h.getCurPosition)
 		positions := order.Group("/:orderId/positions")
 		{
 			positions.GET("/", h.getPosition)
 			positions.POST("/", h.addPosition)
+			positions.POST("/copy", h.copyPosition)
 			positions.PATCH("/:id", h.updatePosition)
 			positions.DELETE("/:id", h.removePosition)
 		}
@@ -211,6 +211,41 @@ func (h *Handler) sendOrder(c *gin.Context) {
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Saved"})
 }
 
+// @Summary Copy Order
+// @Tags Sealur Pro -> orders
+// @Security ApiKeyAuth
+// @Description копирование заказа
+// @ModuleID copyOrder
+// @Accept json
+// @Produce json
+// @Param orderId path string true "order id
+// @Param order body models.CopyOrder true "order info"
+// @Success 200 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/orders/{orderId}/copy [post]
+func (h *Handler) copyOrder(c *gin.Context) {
+	orderId := c.Param("orderId")
+	if orderId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty orderId param")
+		return
+	}
+	var dto models.CopyOrder
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	_, err := h.proClient.CopyOrder(c, &proto.CopyOrderRequest{OrderId: orderId, OldOrderId: dto.OldId})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Copied"})
+}
+
 // @Summary Delete Order
 // @Tags Sealur Pro -> orders
 // @Security ApiKeyAuth
@@ -347,7 +382,56 @@ func (h *Handler) addPosition(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.IdResponse{Id: positions.Id, Message: "Created"})
+	c.JSON(http.StatusCreated, models.IdResponse{Id: positions.Id, Message: "Created"})
+}
+
+// @Summary Copy Position
+// @Tags Sealur Pro -> orders
+// @Security ApiKeyAuth
+// @Description копирование позиции
+// @ModuleID copyPosition
+// @Accept json
+// @Produce json
+// @Param orderId path string true "order id"
+// @Param position body models.CopyPosition true "position info"
+// @Success 201 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-pro/orders/{orderId}/positions/copy [post]
+func (h *Handler) copyPosition(c *gin.Context) {
+	orderId := c.Param("orderId")
+	if orderId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty orderId param")
+		return
+	}
+	var dto models.CopyPosition
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	count, err := strconv.Atoi(dto.Count)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	positions, err := h.proClient.CopyPosition(c, &proto.CopyPositionRequest{
+		OrderId:     orderId,
+		Designation: dto.Designation,
+		Description: dto.Descriprion,
+		Count:       int32(count),
+		Sizes:       dto.Sizes,
+		Drawing:     dto.Drawing,
+		OldOrderId:  dto.OldOrderId,
+	})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusCreated, models.IdResponse{Id: positions.Id, Message: "Created"})
 }
 
 // @Summary Update Position

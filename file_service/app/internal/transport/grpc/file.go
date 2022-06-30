@@ -14,7 +14,7 @@ import (
 )
 
 func (h *Handler) Download(req *proto_file.FileDownloadRequest, stream proto_file.FileService_DownloadServer) error {
-	file, err := h.service.GetFile(context.Background(), req.Backet, req.Group, req.Id, req.Name)
+	file, err := h.service.GetFile(context.Background(), req.Bucket, req.Group, req.Id, req.Name)
 	if err != nil {
 		return fmt.Errorf("error getting file %w", err)
 	}
@@ -66,7 +66,7 @@ func (h *Handler) Download(req *proto_file.FileDownloadRequest, stream proto_fil
 }
 
 func (h *Handler) GroupDownload(req *proto_file.GroupDownloadRequest, stream proto_file.FileService_GroupDownloadServer) error {
-	files, err := h.service.GetFilesByGroup(context.Background(), req.Backet, req.Group)
+	files, err := h.service.GetFilesByGroup(context.Background(), req.Bucket, req.Group)
 	if err != nil {
 		return fmt.Errorf("error getting files. error: %w", err)
 	}
@@ -174,7 +174,7 @@ func (h *Handler) Upload(stream proto_file.FileService_UploadServer) error {
 		Reader:      reader,
 	}
 
-	id, err := h.service.Create(context.Background(), meta.Backet, fileDTO)
+	id, err := h.service.Create(context.Background(), meta.Bucket, fileDTO)
 	if err != nil {
 		return fmt.Errorf("failed to save file: %w", err)
 	}
@@ -183,13 +183,34 @@ func (h *Handler) Upload(stream proto_file.FileService_UploadServer) error {
 		Id:       id,
 		OrigName: meta.Name,
 		Name:     fmt.Sprintf("%s_%s", id, meta.Name),
-		Url:      fmt.Sprintf("/files/%s/%s/%s/%s", meta.Backet, meta.Group, id, meta.Name),
+		Url:      fmt.Sprintf("/files/%s/%s/%s/%s", meta.Bucket, meta.Group, id, meta.Name),
 	})
 }
 
-func (h *Handler) Delete(ctx context.Context, req *proto_file.FileDeleteRequest) (*proto_file.FileDeleteResponse, error) {
-	if err := h.service.Delete(ctx, req.Backet, req.Group, req.Id, req.Name); err != nil {
+func (h *Handler) Copy(ctx context.Context, req *proto_file.CopyFileRequest) (*proto_file.MessageResponse, error) {
+	if err := h.service.Copy(ctx, req.Bucket, req.Group, req.NewGroup, req.Id); err != nil {
 		return nil, err
 	}
-	return &proto_file.FileDeleteResponse{Message: "Removed"}, nil
+	return &proto_file.MessageResponse{Message: "Copied"}, nil
+}
+
+func (h *Handler) CopyGroup(ctx context.Context, req *proto_file.CopyGroupRequest) (*proto_file.MessageResponse, error) {
+	if err := h.service.CopyGroup(ctx, req.Bucket, req.Group, req.NewGroup); err != nil {
+		return nil, err
+	}
+	return &proto_file.MessageResponse{Message: "Copied"}, nil
+}
+
+func (h *Handler) Delete(ctx context.Context, req *proto_file.FileDeleteRequest) (*proto_file.MessageResponse, error) {
+	if err := h.service.Delete(ctx, req.Bucket, req.Group, req.Id, req.Name); err != nil {
+		return nil, err
+	}
+	return &proto_file.MessageResponse{Message: "Removed"}, nil
+}
+
+func (h *Handler) GroupDelete(ctx context.Context, req *proto_file.GroupDeleteRequest) (*proto_file.MessageResponse, error) {
+	if err := h.service.DeleteGroup(ctx, req.Bucket, req.Group); err != nil {
+		return nil, err
+	}
+	return &proto_file.MessageResponse{Message: "Removed"}, nil
 }

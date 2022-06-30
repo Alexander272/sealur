@@ -4,10 +4,13 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 	proto_email "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/email"
@@ -47,6 +50,14 @@ func (s *OrderService) GetAll(req *proto.GetAllOrdersRequest) (orders []*proto.O
 }
 
 func (s *OrderService) Create(order *proto.CreateOrderRequest) (*proto.IdResponse, error) {
+	o, err := s.repo.GetCur(&proto.GetCurOrderRequest{UserId: order.UserId})
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, fmt.Errorf("failed to get order. error: %w", err)
+	}
+	if (o != models.Order{}) {
+		return &proto.IdResponse{Id: o.Id}, nil
+	}
+
 	if err := s.repo.Create(order); err != nil {
 		return nil, fmt.Errorf("failed to create order. error: %w", err)
 	}
@@ -54,14 +65,48 @@ func (s *OrderService) Create(order *proto.CreateOrderRequest) (*proto.IdRespons
 }
 
 func (s *OrderService) Delete(order *proto.DeleteOrderRequest) (*proto.IdResponse, error) {
+	_, err := s.file.GroupDelete(context.Background(), &proto_file.GroupDeleteRequest{
+		Bucket: "pro",
+		Group:  order.OrderId,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete group files. error: %w", err)
+	}
+
 	if err := s.repo.Delete(order); err != nil {
 		return nil, fmt.Errorf("failed to delete order. error: %w", err)
 	}
 	return &proto.IdResponse{Id: order.OrderId}, nil
 }
 
+func (s *OrderService) Copy(order *proto.CopyOrderRequest) error {
+	_, err := s.file.CopyGroup(context.Background(), &proto_file.CopyGroupRequest{
+		Bucket:   "pro",
+		Group:    order.OldOrderId,
+		NewGroup: order.OrderId,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to copy group files. error: %w", err)
+	}
+
+	if err := s.repo.Copy(order); err != nil {
+		return fmt.Errorf("failed to copy order. error: %w", err)
+	}
+
+	return nil
+}
+
 func (s *OrderService) Save(ctx context.Context, order *proto.SaveOrderRequest) (*bytes.Buffer, error) {
 	return s.createZip(ctx, order)
+}
+
+func (s *OrderService) Send(ctx context.Context, order *proto.SaveOrderRequest) error {
+	_, err := s.createZip(ctx, order)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *OrderService) createZip(ctx context.Context, order *proto.SaveOrderRequest) (*bytes.Buffer, error) {
@@ -100,7 +145,7 @@ func (s *OrderService) createZip(ctx context.Context, order *proto.SaveOrderRequ
 	}
 
 	stream, err := s.file.GroupDownload(ctx, &proto_file.GroupDownloadRequest{
-		Backet: "pro",
+		Bucket: "pro",
 		Group:  order.OrderId,
 	})
 	if err != nil {

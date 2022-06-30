@@ -132,7 +132,9 @@ type SizeInt interface {
 
 type Order interface {
 	GetAll(*proto.GetAllOrdersRequest) ([]models.Order, error)
+	GetCur(req *proto.GetCurOrderRequest) (order models.Order, err error)
 	Create(*proto.CreateOrderRequest) error
+	Copy(*proto.CopyOrderRequest) error
 	Delete(*proto.DeleteOrderRequest) error
 	Save(*proto.SaveOrderRequest) error
 	GetPositions(*proto.GetPositionsRequest) ([]models.Position, error)
@@ -143,7 +145,7 @@ type OrderPosition interface {
 	GetCur(*proto.GetCurPositionsRequest) ([]models.Position, error)
 	Add(*proto.AddPositionRequest) (id string, err error)
 	Update(*proto.UpdatePositionRequest) error
-	Remove(*proto.RemovePositionRequest) error
+	Remove(*proto.RemovePositionRequest) (string, error)
 }
 
 type Repositories struct {

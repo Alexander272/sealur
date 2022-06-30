@@ -924,6 +924,11 @@ message SaveOrderRequest {
     string orderId = 1;
 }
 
+message CopyOrderRequest {
+    string orderId = 1;
+    string OldOrderId = 2;
+}
+
 message GetPositionsRequest {
     string orderId = 1;
 }
@@ -939,6 +944,16 @@ message AddPositionRequest {
     int32 count = 4;
     string sizes = 5;
     string drawing = 6;
+}
+
+message CopyPositionRequest {
+    string orderId = 1;
+    string designation = 2;
+    string description = 3;
+    int32 count = 4;
+    string sizes = 5;
+    string drawing = 6;
+    string OldOrderId = 7;
 }
 
 message UpdatePositionRequest {
@@ -1118,10 +1133,12 @@ service ProService {
     rpc DeleteOrder (DeleteOrderRequest) returns (IdResponse);
     rpc SaveOrder (SaveOrderRequest) returns (stream FileDownloadResponse);
     rpc SendOrder (SaveOrderRequest) returns (SuccessResponse);
+    rpc CopyOrder (CopyOrderRequest) returns (SuccessResponse);
 
     rpc GetPositions (GetPositionsRequest) returns (OrderPositionResponse);
     rpc GetCurPositions (GetCurPositionsRequest) returns (OrderPositionResponse);
     rpc AddPosition (AddPositionRequest) returns (IdResponse);
+    rpc CopyPosition (CopyPositionRequest) returns (IdResponse);
     rpc UpdatePosition (UpdatePositionRequest) returns (IdResponse);
     rpc RemovePosition (RemovePositionRequest) returns (IdResponse);
 }

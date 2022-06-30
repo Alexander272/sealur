@@ -250,7 +250,7 @@ const docTemplate_swagger = `{
                 }
             }
         },
-        "/files/drawings/{backet}": {
+        "/files/drawings/{bucket}": {
             "post": {
                 "security": [
                     {
@@ -271,8 +271,8 @@ const docTemplate_swagger = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "backet",
-                        "name": "backet",
+                        "description": "bucket",
+                        "name": "bucket",
                         "in": "path",
                         "required": true
                     },
@@ -319,7 +319,7 @@ const docTemplate_swagger = `{
                 }
             }
         },
-        "/files/drawings/{backet}/{group}/{id}/{name}": {
+        "/files/drawings/{bucket}/{group}/{id}/{name}": {
             "get": {
                 "security": [
                     {
@@ -361,8 +361,8 @@ const docTemplate_swagger = `{
                     },
                     {
                         "type": "string",
-                        "description": "backet",
-                        "name": "backet",
+                        "description": "bucket",
+                        "name": "bucket",
                         "in": "path",
                         "required": true
                     }
@@ -441,8 +441,8 @@ const docTemplate_swagger = `{
                     },
                     {
                         "type": "string",
-                        "description": "backet",
-                        "name": "backet",
+                        "description": "bucket",
+                        "name": "bucket",
                         "in": "path",
                         "required": true
                     }
@@ -2883,6 +2883,128 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/sealur-pro/orders/{orderId}/Order.zip": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "сохранение заказа",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e orders"
+                ],
+                "summary": "Save Order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "order id",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ZipResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/orders/{orderId}/copy": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "копирование заказа",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e orders"
+                ],
+                "summary": "Copy Order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "order id",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/sealur-pro/orders/{orderId}/positions": {
             "get": {
                 "security": [
@@ -2975,6 +3097,76 @@ const docTemplate_swagger = `{
                     "Sealur Pro -\u003e orders"
                 ],
                 "summary": "Add Position",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "order id",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "position info",
+                        "name": "position",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PositionDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sealur-pro/orders/{orderId}/positions/copy": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "копирование позиции",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sealur Pro -\u003e orders"
+                ],
+                "summary": "Copy Position",
                 "parameters": [
                     {
                         "type": "string",
@@ -3134,67 +3326,6 @@ const docTemplate_swagger = `{
                         "schema": {
                             "$ref": "#/definitions/models.PositionDTO"
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.IdResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "default": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/sealur-pro/orders/{orderId}/save": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "сохранение заказа",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Sealur Pro -\u003e orders"
-                ],
-                "summary": "Save Order",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "order id",
-                        "name": "orderId",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -7950,6 +8081,20 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ZipResponse": {
+            "type": "object",
+            "properties": {
+                "file": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
                     "type": "string"
                 }
             }

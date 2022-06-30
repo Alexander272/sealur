@@ -15,8 +15,11 @@ It has these top-level messages:
 	FileDownloadRequest
 	GroupDownloadRequest
 	FileDownloadResponse
+	CopyFileRequest
+	CopyGroupRequest
 	FileDeleteRequest
-	FileDeleteResponse
+	GroupDeleteRequest
+	MessageResponse
 	PingRequest
 	PingResponse
 */
@@ -47,7 +50,7 @@ type MetaData struct {
 	Type   string `protobuf:"bytes,2,opt,name=type" json:"type,omitempty"`
 	Size   int64  `protobuf:"varint,3,opt,name=size" json:"size,omitempty"`
 	Group  string `protobuf:"bytes,4,opt,name=group" json:"group,omitempty"`
-	Backet string `protobuf:"bytes,5,opt,name=backet" json:"backet,omitempty"`
+	Bucket string `protobuf:"bytes,5,opt,name=bucket" json:"bucket,omitempty"`
 }
 
 func (m *MetaData) Reset()                    { *m = MetaData{} }
@@ -83,9 +86,9 @@ func (m *MetaData) GetGroup() string {
 	return ""
 }
 
-func (m *MetaData) GetBacket() string {
+func (m *MetaData) GetBucket() string {
 	if m != nil {
-		return m.Backet
+		return m.Bucket
 	}
 	return ""
 }
@@ -267,7 +270,7 @@ func (m *FileUploadResponse) GetUrl() string {
 
 type FileDownloadRequest struct {
 	Id     string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
-	Backet string `protobuf:"bytes,2,opt,name=backet" json:"backet,omitempty"`
+	Bucket string `protobuf:"bytes,2,opt,name=bucket" json:"bucket,omitempty"`
 	Group  string `protobuf:"bytes,3,opt,name=group" json:"group,omitempty"`
 	Name   string `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
 }
@@ -284,9 +287,9 @@ func (m *FileDownloadRequest) GetId() string {
 	return ""
 }
 
-func (m *FileDownloadRequest) GetBacket() string {
+func (m *FileDownloadRequest) GetBucket() string {
 	if m != nil {
-		return m.Backet
+		return m.Bucket
 	}
 	return ""
 }
@@ -306,7 +309,7 @@ func (m *FileDownloadRequest) GetName() string {
 }
 
 type GroupDownloadRequest struct {
-	Backet string `protobuf:"bytes,1,opt,name=backet" json:"backet,omitempty"`
+	Bucket string `protobuf:"bytes,1,opt,name=bucket" json:"bucket,omitempty"`
 	Group  string `protobuf:"bytes,2,opt,name=group" json:"group,omitempty"`
 }
 
@@ -315,9 +318,9 @@ func (m *GroupDownloadRequest) String() string            { return proto.Compact
 func (*GroupDownloadRequest) ProtoMessage()               {}
 func (*GroupDownloadRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
-func (m *GroupDownloadRequest) GetBacket() string {
+func (m *GroupDownloadRequest) GetBucket() string {
 	if m != nil {
-		return m.Backet
+		return m.Bucket
 	}
 	return ""
 }
@@ -448,9 +451,81 @@ func _FileDownloadResponse_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
+type CopyFileRequest struct {
+	Id       string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+	Bucket   string `protobuf:"bytes,2,opt,name=bucket" json:"bucket,omitempty"`
+	Group    string `protobuf:"bytes,3,opt,name=group" json:"group,omitempty"`
+	NewGroup string `protobuf:"bytes,4,opt,name=newGroup" json:"newGroup,omitempty"`
+}
+
+func (m *CopyFileRequest) Reset()                    { *m = CopyFileRequest{} }
+func (m *CopyFileRequest) String() string            { return proto.CompactTextString(m) }
+func (*CopyFileRequest) ProtoMessage()               {}
+func (*CopyFileRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+
+func (m *CopyFileRequest) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *CopyFileRequest) GetBucket() string {
+	if m != nil {
+		return m.Bucket
+	}
+	return ""
+}
+
+func (m *CopyFileRequest) GetGroup() string {
+	if m != nil {
+		return m.Group
+	}
+	return ""
+}
+
+func (m *CopyFileRequest) GetNewGroup() string {
+	if m != nil {
+		return m.NewGroup
+	}
+	return ""
+}
+
+type CopyGroupRequest struct {
+	Bucket   string `protobuf:"bytes,1,opt,name=bucket" json:"bucket,omitempty"`
+	Group    string `protobuf:"bytes,2,opt,name=group" json:"group,omitempty"`
+	NewGroup string `protobuf:"bytes,3,opt,name=newGroup" json:"newGroup,omitempty"`
+}
+
+func (m *CopyGroupRequest) Reset()                    { *m = CopyGroupRequest{} }
+func (m *CopyGroupRequest) String() string            { return proto.CompactTextString(m) }
+func (*CopyGroupRequest) ProtoMessage()               {}
+func (*CopyGroupRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+
+func (m *CopyGroupRequest) GetBucket() string {
+	if m != nil {
+		return m.Bucket
+	}
+	return ""
+}
+
+func (m *CopyGroupRequest) GetGroup() string {
+	if m != nil {
+		return m.Group
+	}
+	return ""
+}
+
+func (m *CopyGroupRequest) GetNewGroup() string {
+	if m != nil {
+		return m.NewGroup
+	}
+	return ""
+}
+
 type FileDeleteRequest struct {
 	Id     string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
-	Backet string `protobuf:"bytes,2,opt,name=backet" json:"backet,omitempty"`
+	Bucket string `protobuf:"bytes,2,opt,name=bucket" json:"bucket,omitempty"`
 	Group  string `protobuf:"bytes,3,opt,name=group" json:"group,omitempty"`
 	Name   string `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
 }
@@ -458,7 +533,7 @@ type FileDeleteRequest struct {
 func (m *FileDeleteRequest) Reset()                    { *m = FileDeleteRequest{} }
 func (m *FileDeleteRequest) String() string            { return proto.CompactTextString(m) }
 func (*FileDeleteRequest) ProtoMessage()               {}
-func (*FileDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (*FileDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
 
 func (m *FileDeleteRequest) GetId() string {
 	if m != nil {
@@ -467,9 +542,9 @@ func (m *FileDeleteRequest) GetId() string {
 	return ""
 }
 
-func (m *FileDeleteRequest) GetBacket() string {
+func (m *FileDeleteRequest) GetBucket() string {
 	if m != nil {
-		return m.Backet
+		return m.Bucket
 	}
 	return ""
 }
@@ -488,16 +563,40 @@ func (m *FileDeleteRequest) GetName() string {
 	return ""
 }
 
-type FileDeleteResponse struct {
+type GroupDeleteRequest struct {
+	Bucket string `protobuf:"bytes,1,opt,name=bucket" json:"bucket,omitempty"`
+	Group  string `protobuf:"bytes,2,opt,name=group" json:"group,omitempty"`
+}
+
+func (m *GroupDeleteRequest) Reset()                    { *m = GroupDeleteRequest{} }
+func (m *GroupDeleteRequest) String() string            { return proto.CompactTextString(m) }
+func (*GroupDeleteRequest) ProtoMessage()               {}
+func (*GroupDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
+
+func (m *GroupDeleteRequest) GetBucket() string {
+	if m != nil {
+		return m.Bucket
+	}
+	return ""
+}
+
+func (m *GroupDeleteRequest) GetGroup() string {
+	if m != nil {
+		return m.Group
+	}
+	return ""
+}
+
+type MessageResponse struct {
 	Message string `protobuf:"bytes,1,opt,name=message" json:"message,omitempty"`
 }
 
-func (m *FileDeleteResponse) Reset()                    { *m = FileDeleteResponse{} }
-func (m *FileDeleteResponse) String() string            { return proto.CompactTextString(m) }
-func (*FileDeleteResponse) ProtoMessage()               {}
-func (*FileDeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+func (m *MessageResponse) Reset()                    { *m = MessageResponse{} }
+func (m *MessageResponse) String() string            { return proto.CompactTextString(m) }
+func (*MessageResponse) ProtoMessage()               {}
+func (*MessageResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
-func (m *FileDeleteResponse) GetMessage() string {
+func (m *MessageResponse) GetMessage() string {
 	if m != nil {
 		return m.Message
 	}
@@ -510,7 +609,7 @@ type PingRequest struct {
 func (m *PingRequest) Reset()                    { *m = PingRequest{} }
 func (m *PingRequest) String() string            { return proto.CompactTextString(m) }
 func (*PingRequest) ProtoMessage()               {}
-func (*PingRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+func (*PingRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
 
 type PingResponse struct {
 	Ping string `protobuf:"bytes,1,opt,name=ping" json:"ping,omitempty"`
@@ -519,7 +618,7 @@ type PingResponse struct {
 func (m *PingResponse) Reset()                    { *m = PingResponse{} }
 func (m *PingResponse) String() string            { return proto.CompactTextString(m) }
 func (*PingResponse) ProtoMessage()               {}
-func (*PingResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
+func (*PingResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
 
 func (m *PingResponse) GetPing() string {
 	if m != nil {
@@ -536,8 +635,11 @@ func init() {
 	proto.RegisterType((*FileDownloadRequest)(nil), "proto_file.FileDownloadRequest")
 	proto.RegisterType((*GroupDownloadRequest)(nil), "proto_file.GroupDownloadRequest")
 	proto.RegisterType((*FileDownloadResponse)(nil), "proto_file.FileDownloadResponse")
+	proto.RegisterType((*CopyFileRequest)(nil), "proto_file.CopyFileRequest")
+	proto.RegisterType((*CopyGroupRequest)(nil), "proto_file.CopyGroupRequest")
 	proto.RegisterType((*FileDeleteRequest)(nil), "proto_file.FileDeleteRequest")
-	proto.RegisterType((*FileDeleteResponse)(nil), "proto_file.FileDeleteResponse")
+	proto.RegisterType((*GroupDeleteRequest)(nil), "proto_file.GroupDeleteRequest")
+	proto.RegisterType((*MessageResponse)(nil), "proto_file.MessageResponse")
 	proto.RegisterType((*PingRequest)(nil), "proto_file.PingRequest")
 	proto.RegisterType((*PingResponse)(nil), "proto_file.PingResponse")
 }
@@ -557,7 +659,10 @@ type FileServiceClient interface {
 	Download(ctx context.Context, in *FileDownloadRequest, opts ...grpc.CallOption) (FileService_DownloadClient, error)
 	GroupDownload(ctx context.Context, in *GroupDownloadRequest, opts ...grpc.CallOption) (FileService_GroupDownloadClient, error)
 	Upload(ctx context.Context, opts ...grpc.CallOption) (FileService_UploadClient, error)
-	Delete(ctx context.Context, in *FileDeleteRequest, opts ...grpc.CallOption) (*FileDeleteResponse, error)
+	Copy(ctx context.Context, in *CopyFileRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	CopyGroup(ctx context.Context, in *CopyGroupRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	Delete(ctx context.Context, in *FileDeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	GroupDelete(ctx context.Context, in *GroupDeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 }
 
 type fileServiceClient struct {
@@ -675,9 +780,36 @@ func (x *fileServiceUploadClient) CloseAndRecv() (*FileUploadResponse, error) {
 	return m, nil
 }
 
-func (c *fileServiceClient) Delete(ctx context.Context, in *FileDeleteRequest, opts ...grpc.CallOption) (*FileDeleteResponse, error) {
-	out := new(FileDeleteResponse)
+func (c *fileServiceClient) Copy(ctx context.Context, in *CopyFileRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := grpc.Invoke(ctx, "/proto_file.FileService/Copy", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *fileServiceClient) CopyGroup(ctx context.Context, in *CopyGroupRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := grpc.Invoke(ctx, "/proto_file.FileService/CopyGroup", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *fileServiceClient) Delete(ctx context.Context, in *FileDeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
 	err := grpc.Invoke(ctx, "/proto_file.FileService/Delete", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *fileServiceClient) GroupDelete(ctx context.Context, in *GroupDeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := grpc.Invoke(ctx, "/proto_file.FileService/GroupDelete", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -691,7 +823,10 @@ type FileServiceServer interface {
 	Download(*FileDownloadRequest, FileService_DownloadServer) error
 	GroupDownload(*GroupDownloadRequest, FileService_GroupDownloadServer) error
 	Upload(FileService_UploadServer) error
-	Delete(context.Context, *FileDeleteRequest) (*FileDeleteResponse, error)
+	Copy(context.Context, *CopyFileRequest) (*MessageResponse, error)
+	CopyGroup(context.Context, *CopyGroupRequest) (*MessageResponse, error)
+	Delete(context.Context, *FileDeleteRequest) (*MessageResponse, error)
+	GroupDelete(context.Context, *GroupDeleteRequest) (*MessageResponse, error)
 }
 
 func RegisterFileServiceServer(s *grpc.Server, srv FileServiceServer) {
@@ -784,6 +919,42 @@ func (x *fileServiceUploadServer) Recv() (*FileUploadRequest, error) {
 	return m, nil
 }
 
+func _FileService_Copy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CopyFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileServiceServer).Copy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto_file.FileService/Copy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileServiceServer).Copy(ctx, req.(*CopyFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FileService_CopyGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CopyGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileServiceServer).CopyGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto_file.FileService/CopyGroup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileServiceServer).CopyGroup(ctx, req.(*CopyGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _FileService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(FileDeleteRequest)
 	if err := dec(in); err != nil {
@@ -802,6 +973,24 @@ func _FileService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FileService_GroupDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GroupDeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileServiceServer).GroupDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto_file.FileService/GroupDelete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileServiceServer).GroupDelete(ctx, req.(*GroupDeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _FileService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "proto_file.FileService",
 	HandlerType: (*FileServiceServer)(nil),
@@ -811,8 +1000,20 @@ var _FileService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _FileService_Ping_Handler,
 		},
 		{
+			MethodName: "Copy",
+			Handler:    _FileService_Copy_Handler,
+		},
+		{
+			MethodName: "CopyGroup",
+			Handler:    _FileService_CopyGroup_Handler,
+		},
+		{
 			MethodName: "Delete",
 			Handler:    _FileService_Delete_Handler,
+		},
+		{
+			MethodName: "GroupDelete",
+			Handler:    _FileService_GroupDelete_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
@@ -838,37 +1039,43 @@ var _FileService_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("proto/file.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 503 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x53, 0x4b, 0x6f, 0xd3, 0x40,
-	0x10, 0xae, 0x1f, 0x4d, 0xd2, 0x49, 0x03, 0x61, 0x88, 0xc0, 0x8a, 0x04, 0x44, 0x7b, 0x40, 0x39,
-	0xb9, 0x28, 0x9c, 0x10, 0xb7, 0x2a, 0xa2, 0xe5, 0xc0, 0x43, 0x46, 0xbd, 0x70, 0x41, 0xdb, 0x64,
-	0x6a, 0x59, 0x38, 0xb6, 0xb1, 0x37, 0x20, 0x7a, 0xe0, 0xc4, 0x0f, 0x47, 0xfb, 0x70, 0xbc, 0x76,
-	0x5a, 0x01, 0x87, 0x9e, 0x3c, 0x2f, 0x7f, 0xdf, 0xec, 0xf7, 0xed, 0xc2, 0xb8, 0x28, 0x73, 0x91,
-	0x9f, 0x5c, 0x25, 0x29, 0x85, 0x2a, 0x44, 0x50, 0x9f, 0x2f, 0xb2, 0xc2, 0x04, 0x0c, 0xde, 0x91,
-	0xe0, 0x4b, 0x2e, 0x38, 0x22, 0xf8, 0x19, 0xdf, 0x50, 0xe0, 0xcc, 0x9c, 0xf9, 0x51, 0xa4, 0x62,
-	0x59, 0x13, 0x3f, 0x0b, 0x0a, 0x5c, 0x5d, 0x93, 0xb1, 0xac, 0x55, 0xc9, 0x35, 0x05, 0xde, 0xcc,
-	0x99, 0x7b, 0x91, 0x8a, 0x71, 0x02, 0x87, 0x71, 0x99, 0x6f, 0x8b, 0xc0, 0x57, 0x83, 0x3a, 0xc1,
-	0x47, 0xd0, 0xbb, 0xe4, 0xab, 0xaf, 0x24, 0x82, 0x43, 0x55, 0x36, 0x19, 0x9b, 0x81, 0xff, 0x26,
-	0x49, 0x09, 0x03, 0xe8, 0xaf, 0xf2, 0x4c, 0x50, 0x26, 0x14, 0xe9, 0x71, 0x54, 0xa7, 0xec, 0x1a,
-	0x1e, 0xc8, 0x89, 0x8b, 0x22, 0xcd, 0xf9, 0x3a, 0xa2, 0x6f, 0x5b, 0xaa, 0x04, 0x2e, 0x60, 0xb0,
-	0x21, 0xc1, 0xd7, 0x5c, 0x70, 0xb5, 0xd0, 0x70, 0x31, 0x09, 0x9b, 0xb3, 0x84, 0xf5, 0x41, 0xce,
-	0x0f, 0xa2, 0xdd, 0x1c, 0x3e, 0x07, 0x5f, 0x36, 0x15, 0xfe, 0x70, 0x31, 0xb6, 0xe7, 0x25, 0xc1,
-	0xf9, 0x41, 0xa4, 0xfa, 0xa7, 0x47, 0xd0, 0x2f, 0x35, 0x0d, 0xbb, 0x02, 0xb4, 0xb9, 0xab, 0x22,
-	0xcf, 0x2a, 0xc2, 0x7b, 0xe0, 0x26, 0x6b, 0xa3, 0x8d, 0x9b, 0xac, 0x77, 0x6a, 0xb9, 0x96, 0x5a,
-	0x53, 0x18, 0xe4, 0x65, 0x12, 0xbf, 0x97, 0x75, 0x4f, 0xd5, 0x77, 0x39, 0x8e, 0xc1, 0xdb, 0x96,
-	0xa9, 0xd1, 0x47, 0x86, 0x2c, 0x86, 0x87, 0x92, 0x67, 0x99, 0xff, 0xc8, 0xec, 0x53, 0x76, 0x89,
-	0x1a, 0x11, 0x5d, 0x5b, 0xc4, 0x46, 0x72, 0xcf, 0x96, 0xbc, 0x5e, 0xcb, 0x6f, 0xd6, 0x62, 0x4b,
-	0x98, 0x9c, 0xc9, 0x66, 0x97, 0xa9, 0x41, 0x76, 0x6e, 0x46, 0x76, 0x2d, 0x64, 0xf6, 0x0b, 0x26,
-	0xed, 0x75, 0x8d, 0x30, 0xb6, 0x2b, 0xce, 0x7f, 0xba, 0xe2, 0xfe, 0xc5, 0x15, 0x80, 0x41, 0x69,
-	0x78, 0x18, 0xe9, 0x2b, 0xb1, 0xa4, 0x94, 0x04, 0xdd, 0x9d, 0x58, 0xa1, 0x76, 0xbf, 0xa6, 0x31,
-	0x87, 0x0c, 0xa0, 0xbf, 0xa1, 0xaa, 0xe2, 0x71, 0xfd, 0x3c, 0xea, 0x94, 0x8d, 0x60, 0xf8, 0x31,
-	0xc9, 0x62, 0xb3, 0x10, 0x63, 0x70, 0xac, 0x53, 0xf3, 0x23, 0x82, 0x5f, 0x24, 0x59, 0x5c, 0x3f,
-	0x2a, 0x19, 0x2f, 0x7e, 0x7b, 0x30, 0x94, 0x1c, 0x9f, 0xa8, 0xfc, 0x9e, 0xac, 0x08, 0x5f, 0x81,
-	0x2f, 0xff, 0xc1, 0xc7, 0xb6, 0x0e, 0x16, 0xe8, 0x34, 0xd8, 0x6f, 0x18, 0xf8, 0x0f, 0x30, 0xa8,
-	0x0d, 0xc1, 0x67, 0x5d, 0x19, 0x3b, 0x7e, 0x4f, 0x67, 0xb7, 0x0f, 0x68, 0xb8, 0x17, 0x0e, 0x5e,
-	0xc0, 0xa8, 0x75, 0x57, 0xb0, 0xf5, 0xd3, 0x4d, 0xd7, 0xe8, 0x9f, 0x60, 0xdf, 0x42, 0x4f, 0xbf,
-	0x27, 0x7c, 0xd2, 0x9d, 0x6e, 0xbd, 0xf1, 0xe9, 0xd3, 0xdb, 0xda, 0x1a, 0x6a, 0xee, 0xe0, 0x19,
-	0xf4, 0xb4, 0x39, 0xfb, 0x50, 0xad, 0xbb, 0xb1, 0x0f, 0xd5, 0xf6, 0xf4, 0xf4, 0xfe, 0xe7, 0x51,
-	0x78, 0xf2, 0xba, 0x99, 0xb9, 0xec, 0xa9, 0xf8, 0xe5, 0x9f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x71,
-	0x27, 0x33, 0x13, 0x33, 0x05, 0x00, 0x00,
+	// 593 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0x4d, 0x6f, 0xd3, 0x40,
+	0x10, 0xad, 0x3f, 0x9a, 0x3a, 0x93, 0x86, 0x84, 0x21, 0x02, 0xcb, 0x85, 0x12, 0xed, 0x01, 0x45,
+	0x42, 0x4a, 0x51, 0x38, 0x21, 0x2e, 0x28, 0x44, 0x6d, 0x41, 0x2a, 0x20, 0xa3, 0x5e, 0x10, 0x12,
+	0x72, 0x93, 0xad, 0x65, 0xd5, 0xb1, 0x8d, 0xbd, 0xa1, 0x6a, 0x0f, 0xfc, 0x4d, 0xfe, 0x0e, 0xda,
+	0x5d, 0x7f, 0xac, 0x9d, 0xb6, 0xb4, 0x08, 0x4e, 0x9e, 0x99, 0x1d, 0xbf, 0xb7, 0xfb, 0xe6, 0xed,
+	0x42, 0x3f, 0x49, 0x63, 0x16, 0xef, 0x9d, 0x06, 0x21, 0x1d, 0x8b, 0x10, 0x41, 0x7c, 0xbe, 0xf1,
+	0x0a, 0x61, 0x60, 0x1d, 0x51, 0xe6, 0xcd, 0x3c, 0xe6, 0x21, 0x82, 0x19, 0x79, 0x4b, 0x6a, 0x6b,
+	0x43, 0x6d, 0xd4, 0x76, 0x45, 0xcc, 0x6b, 0xec, 0x22, 0xa1, 0xb6, 0x2e, 0x6b, 0x3c, 0xe6, 0xb5,
+	0x2c, 0xb8, 0xa4, 0xb6, 0x31, 0xd4, 0x46, 0x86, 0x2b, 0x62, 0x1c, 0xc0, 0xa6, 0x9f, 0xc6, 0xab,
+	0xc4, 0x36, 0x45, 0xa3, 0x4c, 0xf0, 0x21, 0xb4, 0x4e, 0x56, 0xf3, 0x33, 0xca, 0xec, 0x4d, 0x51,
+	0xce, 0x33, 0x32, 0x04, 0x73, 0x3f, 0x08, 0x29, 0xda, 0xb0, 0x35, 0x8f, 0x23, 0x46, 0x23, 0x26,
+	0x48, 0xb7, 0xdd, 0x22, 0x25, 0x97, 0x70, 0x9f, 0x77, 0x1c, 0x27, 0x61, 0xec, 0x2d, 0x5c, 0xfa,
+	0x7d, 0x45, 0x33, 0x86, 0x13, 0xb0, 0x96, 0x94, 0x79, 0x0b, 0x8f, 0x79, 0x62, 0x43, 0x9d, 0xc9,
+	0x60, 0x5c, 0x9d, 0x65, 0x5c, 0x1c, 0xe4, 0x70, 0xc3, 0x2d, 0xfb, 0xf0, 0x19, 0x98, 0x7c, 0x51,
+	0xe0, 0x77, 0x26, 0x7d, 0xb5, 0x9f, 0x13, 0x1c, 0x6e, 0xb8, 0x62, 0x7d, 0xda, 0x86, 0xad, 0x54,
+	0xd2, 0x90, 0x53, 0x40, 0x95, 0x3b, 0x4b, 0xe2, 0x28, 0xa3, 0x78, 0x0f, 0xf4, 0x60, 0x91, 0x6b,
+	0xa3, 0x07, 0x8b, 0x52, 0x2d, 0x5d, 0x51, 0xcb, 0x01, 0x2b, 0x4e, 0x03, 0xff, 0x03, 0xaf, 0x1b,
+	0xa2, 0x5e, 0xe6, 0xd8, 0x07, 0x63, 0x95, 0x86, 0xb9, 0x3e, 0x3c, 0x24, 0x3e, 0x3c, 0xe0, 0x3c,
+	0xb3, 0xf8, 0x3c, 0x52, 0x4f, 0xd9, 0x24, 0xaa, 0x44, 0xd4, 0x55, 0x11, 0x2b, 0xc9, 0x0d, 0x55,
+	0xf2, 0x62, 0x5b, 0x66, 0xb5, 0x2d, 0x32, 0x83, 0xc1, 0x01, 0x5f, 0x6c, 0x32, 0x55, 0xc8, 0xda,
+	0xd5, 0xc8, 0xba, 0x82, 0x4c, 0x7e, 0xc2, 0xa0, 0xbe, 0xdd, 0x5c, 0x18, 0x75, 0x2a, 0xda, 0x1d,
+	0xa7, 0xa2, 0xff, 0x61, 0x2a, 0x00, 0x56, 0x9a, 0xf3, 0x90, 0x33, 0xe8, 0xbd, 0x8d, 0x93, 0x0b,
+	0xbe, 0xfe, 0x6f, 0xa4, 0x72, 0xc0, 0x8a, 0xe8, 0xf9, 0x81, 0x62, 0xdb, 0x32, 0x27, 0x5f, 0xa1,
+	0xcf, 0xc9, 0x44, 0xf2, 0x57, 0x72, 0xd5, 0xd0, 0x8d, 0x06, 0x3a, 0x95, 0xee, 0x9e, 0xd1, 0x90,
+	0x32, 0xfa, 0xff, 0xe6, 0x3e, 0x05, 0x94, 0x73, 0xaf, 0xf1, 0xdc, 0x6d, 0xea, 0xcf, 0xa1, 0x77,
+	0x44, 0xb3, 0xcc, 0xf3, 0x69, 0x39, 0x70, 0x1b, 0xb6, 0x96, 0xb2, 0x94, 0x23, 0x14, 0x29, 0xe9,
+	0x42, 0xe7, 0x53, 0x10, 0xf9, 0x39, 0x13, 0x21, 0xb0, 0x2d, 0xd3, 0xfc, 0x47, 0x04, 0x33, 0x09,
+	0x22, 0xbf, 0x78, 0x60, 0x78, 0x3c, 0xf9, 0x65, 0x42, 0x87, 0x6b, 0xf1, 0x99, 0xa6, 0x3f, 0x82,
+	0x39, 0xc5, 0x57, 0x60, 0xf2, 0x7f, 0xf0, 0x91, 0xea, 0x09, 0x05, 0xd4, 0xb1, 0xd7, 0x17, 0x72,
+	0xf8, 0x8f, 0x60, 0x15, 0xe6, 0xc4, 0xa7, 0x4d, 0x4b, 0x35, 0xbc, 0xef, 0x0c, 0xaf, 0x6f, 0x90,
+	0x70, 0x2f, 0x34, 0x3c, 0x86, 0x6e, 0xed, 0xde, 0x60, 0xed, 0xa7, 0xab, 0xae, 0xd4, 0xad, 0x60,
+	0xdf, 0x41, 0x4b, 0xbe, 0x2d, 0xf8, 0xa4, 0xd9, 0x5d, 0x7b, 0xef, 0x9c, 0xdd, 0xeb, 0x96, 0x25,
+	0xd4, 0x48, 0xc3, 0x37, 0x60, 0x72, 0x9b, 0xe2, 0x8e, 0xda, 0xd9, 0xb8, 0x25, 0xce, 0x4e, 0xfd,
+	0x3a, 0xd6, 0x87, 0xb9, 0x0f, 0xed, 0xd2, 0xe8, 0xf8, 0xb8, 0x09, 0xa3, 0xfa, 0xff, 0x66, 0x9c,
+	0x19, 0xb4, 0xa4, 0xcd, 0xd6, 0x0f, 0x55, 0xb3, 0xdf, 0xcd, 0x28, 0xef, 0xa1, 0xa3, 0x38, 0x16,
+	0x77, 0xd7, 0xf5, 0xbe, 0x35, 0xd6, 0xb4, 0xf7, 0xa5, 0x3b, 0xde, 0x7b, 0x5d, 0x35, 0x9c, 0xb4,
+	0x44, 0xfc, 0xf2, 0x77, 0x00, 0x00, 0x00, 0xff, 0xff, 0xb8, 0xdb, 0x27, 0x93, 0x12, 0x07, 0x00,
+	0x00,
 }

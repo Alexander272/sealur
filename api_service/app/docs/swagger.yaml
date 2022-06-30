@@ -776,6 +776,15 @@ definitions:
     - role
     - service
     type: object
+  models.ZipResponse:
+    properties:
+      file:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+    type: object
   proto.AddBasis:
     properties:
       description:
@@ -1551,15 +1560,15 @@ paths:
       summary: SignUp
       tags:
       - Auth
-  /files/drawings/{backet}:
+  /files/drawings/{bucket}:
     post:
       consumes:
       - multipart/form-data
       description: создание чертежа
       parameters:
-      - description: backet
+      - description: bucket
         in: path
-        name: backet
+        name: bucket
         required: true
         type: string
       - description: group image
@@ -1595,7 +1604,7 @@ paths:
       summary: Create Drawing
       tags:
       - Files -> drawing
-  /files/drawings/{backet}/{group}/{id}/{name}:
+  /files/drawings/{bucket}/{group}/{id}/{name}:
     delete:
       consumes:
       - application/json
@@ -1616,9 +1625,9 @@ paths:
         name: group
         required: true
         type: string
-      - description: backet
+      - description: bucket
         in: path
-        name: backet
+        name: bucket
         required: true
         type: string
       produces:
@@ -1669,9 +1678,9 @@ paths:
         name: group
         required: true
         type: string
-      - description: backet
+      - description: bucket
         in: path
-        name: backet
+        name: bucket
         required: true
         type: string
       produces:
@@ -3129,6 +3138,84 @@ paths:
       summary: Delete Order
       tags:
       - Sealur Pro -> orders
+  /sealur-pro/orders/{orderId}/Order.zip:
+    get:
+      consumes:
+      - application/json
+      description: сохранение заказа
+      parameters:
+      - description: order id
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ZipResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Save Order
+      tags:
+      - Sealur Pro -> orders
+  /sealur-pro/orders/{orderId}/copy:
+    post:
+      consumes:
+      - application/json
+      description: копирование заказа
+      parameters:
+      - description: order id
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Copy Order
+      tags:
+      - Sealur Pro -> orders
   /sealur-pro/orders/{orderId}/positions:
     get:
       consumes:
@@ -3312,22 +3399,28 @@ paths:
       summary: Update Position
       tags:
       - Sealur Pro -> orders
-  /sealur-pro/orders/{orderId}/save:
+  /sealur-pro/orders/{orderId}/positions/copy:
     post:
       consumes:
       - application/json
-      description: сохранение заказа
+      description: копирование позиции
       parameters:
       - description: order id
         in: path
         name: orderId
         required: true
         type: string
+      - description: position info
+        in: body
+        name: position
+        required: true
+        schema:
+          $ref: '#/definitions/models.PositionDTO'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/models.IdResponse'
         "400":
@@ -3348,7 +3441,7 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Save Order
+      summary: Copy Position
       tags:
       - Sealur Pro -> orders
   /sealur-pro/orders/{orderId}/send:
