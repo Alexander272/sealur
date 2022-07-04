@@ -1,0 +1,22 @@
+package models
+
+type JoinTemplate struct {
+	Name     string
+	Login    string
+	Password string
+	Services string
+	Link     string
+	Email    string
+}
+
+type ConfirmTemplate struct {
+	Name         string
+	Organization string
+	Position     string
+	Link         string
+}
+
+type RejectTemplate struct {
+	Name  string
+	Email string
+}

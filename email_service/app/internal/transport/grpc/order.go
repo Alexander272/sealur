@@ -9,7 +9,7 @@ import (
 	"github.com/Alexander272/sealur/email_service/pkg/logger"
 )
 
-func (h *Handler) SendInterview(stream proto_email.EmailService_SendInterviewServer) error {
+func (h *Handler) SendOrder(stream proto_email.EmailService_SendOrderServer) error {
 	req, err := stream.Recv()
 	if err != nil {
 		return fmt.Errorf("cannot receive image info %w", err)
@@ -39,8 +39,8 @@ func (h *Handler) SendInterview(stream proto_email.EmailService_SendInterviewSer
 		}
 	}
 
-	if err := h.service.Interview.SendInterview(data, &file); err != nil {
-		return fmt.Errorf("failed to send interview email. err: %w", err)
+	if err := h.service.Order.SendOrder(data, &file); err != nil {
+		return fmt.Errorf("failed to send order email. err: %w", err)
 	}
 
 	return stream.SendAndClose(&proto_email.SuccessResponse{Success: true})

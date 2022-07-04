@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/Alexander272/sealur/email_service/internal/config"
+	"github.com/Alexander272/sealur/email_service/internal/models"
 	proto_email "github.com/Alexander272/sealur/email_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/email_service/pkg/email"
 )
@@ -18,22 +19,6 @@ func NewTestService(sender email.Sender, conf config.RecipientsConfig) *TestwSer
 	}
 }
 
-type Join struct {
-	Name     string
-	Login    string
-	Password string
-	Services string
-	Link     string
-	Email    string
-}
-
-type Confirm struct {
-	Name         string
-	Organization string
-	Position     string
-	Link         string
-}
-
 func (s *TestwService) SendEmail(req *proto_email.SendTestRequest) error {
 	input := email.SendEmailInput{
 		Subject: "Testing Join Email Sealur Pro",
@@ -44,7 +29,7 @@ func (s *TestwService) SendEmail(req *proto_email.SendTestRequest) error {
 	case "join":
 		input.Subject = "Testing Join Email Sealur Pro"
 
-		data := Join{
+		data := models.JoinTemplate{
 			Name:     "Alex",
 			Login:    "testname",
 			Password: "qwerty",
@@ -60,7 +45,7 @@ func (s *TestwService) SendEmail(req *proto_email.SendTestRequest) error {
 	case "confirm":
 		input.Subject = "Testing Confirm Email Sealur Pro"
 
-		data := Confirm{
+		data := models.ConfirmTemplate{
 			Name:         "Alex",
 			Organization: "Sealur",
 			Position:     "developer",
@@ -106,7 +91,7 @@ func (s *TestwService) SendEmail(req *proto_email.SendTestRequest) error {
 	case "reject":
 		input.Subject = "Testing Reject Email Sealur Pro"
 
-		data := Join{
+		data := models.RejectTemplate{
 			Name:  "Alex",
 			Email: s.conf.Support,
 		}
@@ -118,7 +103,7 @@ func (s *TestwService) SendEmail(req *proto_email.SendTestRequest) error {
 	default:
 		input.Subject = "Testing Join Email Sealur Pro"
 
-		data := Join{
+		data := models.JoinTemplate{
 			Name:     "Alex",
 			Login:    "testname",
 			Password: "qwerty",

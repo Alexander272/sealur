@@ -47,6 +47,40 @@ message SendInterviewRequest {
     }
 }
 
+// Order --------------------------------------------------
+message OrderData {
+    User user = 1;
+    FileData file = 2;
+}
+
+message SendOrderRequest {
+    oneof request {
+        OrderData data = 2;
+        File file = 1;
+    }
+}
+
+// Confirm --------------------------------------------------
+message ConfirmUserRequest {
+    string organization = 1;
+	string name = 2;
+    string position = 3;
+}
+
+// Reject --------------------------------------------------
+message RejectUserRequest {
+    string name = 1;
+    string email = 2;
+}
+
+// Join --------------------------------------------------
+message JoinUserRequest {
+    string name = 1;
+    string login = 2;
+    string password = 3;
+    string email = 4;
+    repeated string services = 5;
+}
 
 // TEST ---------------------------------------------------
 message SendTestRequest {
@@ -67,6 +101,18 @@ service EmailService {
 
     // Interview --------------------------------------------------
     rpc SendInterview (stream SendInterviewRequest) returns (SuccessResponse);
+
+    // Order --------------------------------------------------
+    rpc SendOrder (stream SendOrderRequest) returns (SuccessResponse);
+    
+    // Confirm --------------------------------------------------
+    rpc SendConfirm (ConfirmUserRequest) returns (SuccessResponse);
+    
+    // Reject --------------------------------------------------
+    rpc SendReject (RejectUserRequest) returns (SuccessResponse);
+    
+    // Join --------------------------------------------------
+    rpc SendJoin (JoinUserRequest) returns (SuccessResponse);
 
     // TEST ---------------------------------------------------
     rpc SendTest (SendTestRequest) returns (SuccessResponse);

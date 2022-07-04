@@ -11,22 +11,22 @@ import (
 	"github.com/Alexander272/sealur/email_service/pkg/email"
 )
 
-type InterviewService struct {
+type OrderService struct {
 	sender email.Sender
 	conf   config.RecipientsConfig
 }
 
-func NewInterviewService(sender email.Sender, conf config.RecipientsConfig) *InterviewService {
-	return &InterviewService{
+func NewOrderService(sender email.Sender, conf config.RecipientsConfig) *OrderService {
+	return &OrderService{
 		sender: sender,
 		conf:   conf,
 	}
 }
 
-func (s *InterviewService) SendInterview(data *proto_email.InterviewData, file *bytes.Buffer) error {
+func (s *OrderService) SendOrder(data *proto_email.OrderData, file *bytes.Buffer) error {
 	input := email.SendEmailInput{
-		Subject: s.conf.InterviewSubject,
-		To:      []string{s.conf.Interview},
+		Subject: s.conf.OrderSubject,
+		To:      []string{s.conf.Order},
 	}
 
 	if data.User.City == "" {
@@ -39,7 +39,7 @@ func (s *InterviewService) SendInterview(data *proto_email.InterviewData, file *
 		data.User.Phone = "-"
 	}
 
-	if err := input.GenerateBodyFromHTML("interview.html", data.User); err != nil {
+	if err := input.GenerateBodyFromHTML("order.html", data.User); err != nil {
 		return err
 	}
 
@@ -71,7 +71,7 @@ func (s *InterviewService) SendInterview(data *proto_email.InterviewData, file *
 	return s.sender.Send(input)
 }
 
-func (s *InterviewService) readZipFile(zf *zip.File) ([]byte, error) {
+func (s *OrderService) readZipFile(zf *zip.File) ([]byte, error) {
 	f, err := zf.Open()
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file in zip. err %w", err)

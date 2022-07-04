@@ -39,12 +39,17 @@ type (
 	}
 
 	RecipientsConfig struct {
-		Interview string
-		Confirm   string
-		Order     string
-		Test      string
-		Support   string
-		Link      string
+		Interview        string
+		InterviewSubject string
+		Order            string
+		OrderSubject     string
+		Confirm          string
+		ConfirmSubject   string
+		JoinSubject      string // Заголовок письма отпрявляемого пользователю после подтверждения
+		RejectSubject    string // Заголовок письма - если регистрацию отклонили
+		Support          string
+		Link             string // Ссылка на кореневой ендпоинт приложения
+		Test             string // email для тестирования писем
 	}
 )
 

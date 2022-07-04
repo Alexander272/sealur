@@ -57,7 +57,7 @@ services:
 
     email_service:
         restart: on-failure:5
-        image: email_service:0.2.15d
+        image: email_service:0.2.16d
         container_name: dev-email_service
         volumes:
             - ./email_service/app/template:/template
