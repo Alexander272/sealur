@@ -35,11 +35,16 @@ type (
 		Sender   string
 		Password string
 		Host     string
-		Port     string
+		Port     int
 	}
 
 	RecipientsConfig struct {
 		Interview string
+		Confirm   string
+		Order     string
+		Test      string
+		Support   string
+		Link      string
 	}
 )
 

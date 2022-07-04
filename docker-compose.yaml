@@ -3,7 +3,7 @@ version: '3.4'
 services:
     nginx_service:
         restart: on-failure:5
-        image: nginx_service:0.70b
+        image: nginx_service:0.7.0d
         container_name: dev-nginx_service
         volumes:
             - ./build:/usr/app
@@ -48,7 +48,7 @@ services:
 
     user_service:
         restart: on-failure:5
-        image: user_service:0.3.2
+        image: user_service:0.3.4
         container_name: dev-user_service
         env_file:
             - .env
@@ -57,12 +57,14 @@ services:
 
     email_service:
         restart: on-failure:5
-        image: email_service:0.15
+        image: email_service:0.2.15d
         container_name: dev-email_service
         volumes:
             - ./email_service/app/template:/template
         env_file:
             - .env
+        ports:
+            - 12000:12000
 
     file_service:
         restart: on-failure:5

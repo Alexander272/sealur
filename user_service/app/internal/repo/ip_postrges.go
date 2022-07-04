@@ -2,6 +2,8 @@ package repo
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Alexander272/sealur/user_service/internal/config"
@@ -35,14 +37,18 @@ func (r *IpRepo) GetAll(ctx context.Context, req *proto_user.GetAllIpRequest) (i
 
 func (r *IpRepo) Add(ctx context.Context, ip *proto_user.AddIpRequest) error {
 	var count models.Count
-	query := fmt.Sprintf("SELECT COUNT(ip) as count FROM %s GROUP BY user_id", r.tableName)
-	if err := r.db.Get(&count, query); err != nil {
-		return fmt.Errorf("failed to execute query. error: %w", err)
+	query := fmt.Sprintf("SELECT COUNT(ip) as count FROM %s GROUP BY user_id HAVING user_id=$1", r.tableName)
+	if err := r.db.Get(&count, query, ip.UserId); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			count.Count = 0
+		} else {
+			return fmt.Errorf("failed to execute query. error: %w", err)
+		}
 	}
 
 	if count.Count >= r.conf.Max {
-		query := fmt.Sprintf("DELETE FROM %s WHERE date = (SELECT min(date) FROM %s GROUP BY user_id)", r.tableName, r.tableName)
-		_, err := r.db.Exec(query)
+		query := fmt.Sprintf("DELETE FROM %s WHERE date = (SELECT min(date) FROM %s GROUP BY user_id HAVING user_id=$1)", r.tableName, r.tableName)
+		_, err := r.db.Exec(query, ip.UserId)
 		if err != nil {
 			return fmt.Errorf("failed to execute query. error: %w", err)
 		}

@@ -47,9 +47,27 @@ message SendInterviewRequest {
     }
 }
 
+
+// TEST ---------------------------------------------------
+message SendTestRequest {
+    enum Type {
+        join = 0;
+        confirm = 1;
+        interview = 2;
+        order = 3;
+        reject = 4;
+    }
+
+    Type type = 1;
+}
+
+
 service EmailService {
     rpc Ping (PingRequest) returns (PingResponse);
 
     // Interview --------------------------------------------------
     rpc SendInterview (stream SendInterviewRequest) returns (SuccessResponse);
+
+    // TEST ---------------------------------------------------
+    rpc SendTest (SendTestRequest) returns (SuccessResponse);
 }

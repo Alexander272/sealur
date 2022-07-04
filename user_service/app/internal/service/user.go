@@ -153,7 +153,7 @@ func (s *UserService) GetNew(ctx context.Context, req *proto_user.GetNewUserRequ
 	}
 
 	if len(users) == 0 {
-		return nil, models.ErrUsersEmpty
+		return []*proto_user.User{}, nil
 	}
 
 	var u []*proto_user.User
