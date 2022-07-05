@@ -7,7 +7,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
-	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/file"
+	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/proto_file"
 )
 
 type PositionService struct {

@@ -14,7 +14,8 @@ import (
 	handlers "github.com/Alexander272/sealur/pro_service/internal/transport/grpc"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 	proto_email "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/email"
-	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/file"
+	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/proto_file"
+	proto_user "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/user"
 	"github.com/Alexander272/sealur/pro_service/pkg/database/postgres"
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	_ "github.com/lib/pq"
@@ -85,14 +86,33 @@ func main() {
 	//* подключение к сервису
 	connectFile, err := grpc.Dial(conf.Services.FileService.Url, optsFile...)
 	if err != nil {
-		logger.Fatalf("failed connection to email service. error: %w", err)
+		logger.Fatalf("failed connection to file service. error: %w", err)
 	}
 	fileClient := proto_file.NewFileServiceClient(connectFile)
+
+	//* данные для аутентификации
+	authUser := models.Authentication{
+		ServiceName: conf.Services.UserService.AuthName,
+		Password:    conf.Services.UserService.AuthPassword,
+	}
+
+	//* опции grpc
+	optsUser := []grpc.DialOption{
+		grpc.WithTransportCredentials(creds),
+		grpc.WithPerRPCCredentials(&authUser),
+	}
+
+	//* подключение к сервису
+	connectUser, err := grpc.Dial(conf.Services.UserService.Url, optsUser...)
+	if err != nil {
+		logger.Fatalf("failed connection to user service. error: %w", err)
+	}
+	userClient := proto_user.NewUserServiceClient(connectUser)
 
 	//* Services, Repos & API Handlers
 
 	repos := repository.NewRepo(db)
-	services := service.NewServices(repos, emailClient, fileClient)
+	services := service.NewServices(repos, emailClient, fileClient, userClient)
 	handlers := handlers.NewHandler(services, conf.Api)
 
 	//TODO надо посмотреть как это по нормальному пишется

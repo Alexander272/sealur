@@ -12,7 +12,6 @@ import (
 	proto_user "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto"
 	proto_email "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto/email"
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
-	"github.com/Alexander272/sealur/user_service/pkg/logger"
 )
 
 type UserService struct {
@@ -174,17 +173,23 @@ func (s *UserService) GetNew(ctx context.Context, req *proto_user.GetNewUserRequ
 }
 
 func (s *UserService) Create(ctx context.Context, user *proto_user.CreateUserRequest) (*proto_user.SuccessResponse, error) {
-	//TODO надо отправлять уведомление на почту (кому-то)
-
 	if err := s.userRepo.Create(ctx, user); err != nil {
 		return nil, fmt.Errorf("failed to create user. error: %w", err)
+	}
+
+	_, err := s.email.SendConfirm(ctx, &proto_email.ConfirmUserRequest{
+		Organization: user.Organization,
+		Name:         user.Name,
+		Position:     user.Position,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to send email. error: %w", err)
 	}
 
 	return &proto_user.SuccessResponse{Success: true}, nil
 }
 
 func (s *UserService) Confirm(ctx context.Context, user *proto_user.ConfirmUserRequest) (*proto_user.SuccessResponse, error) {
-	//TODO надо отправлять уведомление на почту пользователю
 	candidate, err := s.userRepo.Get(ctx, &proto_user.GetUserRequest{Login: user.Login})
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, fmt.Errorf("failed to get user. error: %w", err)
@@ -192,6 +197,8 @@ func (s *UserService) Confirm(ctx context.Context, user *proto_user.ConfirmUserR
 	if (candidate != models.User{}) {
 		return nil, models.ErrUserExist
 	}
+
+	origPas := user.Password
 
 	salt, err := s.hasher.GenerateSalt()
 	if err != nil {
@@ -203,12 +210,14 @@ func (s *UserService) Confirm(ctx context.Context, user *proto_user.ConfirmUserR
 	}
 	user.Password = fmt.Sprintf("%s.%s", pass, salt)
 
-	email, err := s.userRepo.Confirm(ctx, user)
+	confirmUser, err := s.userRepo.Confirm(ctx, user)
 	if err != nil {
 		return nil, fmt.Errorf("failed to verify user. error: %w", err)
 	}
 
+	services := make([]string, 0, len(user.Roles))
 	var roles []*proto_user.CreateRoleRequest
+
 	for _, item := range user.Roles {
 		role := proto_user.CreateRoleRequest{
 			UserId:  user.Id,
@@ -216,13 +225,29 @@ func (s *UserService) Confirm(ctx context.Context, user *proto_user.ConfirmUserR
 			Role:    item.Role,
 		}
 		roles = append(roles, &role)
+
+		switch item.Service {
+		case "pro":
+			services = append(services, "Sealur Pro")
+		case "moment":
+			services = append(services, "Расчет момента затяжки")
+		}
 	}
 
 	if err := s.roleRepo.Create(ctx, roles); err != nil {
 		return nil, fmt.Errorf("failed to create roles. error: %w", err)
 	}
 
-	logger.Debug(email)
+	_, err = s.email.SendJoin(ctx, &proto_email.JoinUserRequest{
+		Name:     confirmUser.Name,
+		Login:    user.Login,
+		Password: origPas,
+		Email:    confirmUser.Email,
+		Services: services,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to send email. error: %w", err)
+	}
 
 	return &proto_user.SuccessResponse{Success: true}, nil
 }
@@ -256,14 +281,18 @@ func (s *UserService) Delete(ctx context.Context, user *proto_user.DeleteUserReq
 }
 
 func (s *UserService) Reject(ctx context.Context, user *proto_user.DeleteUserRequest) error {
-	//TODO отправлять уведомление пользователю об отклонении заявки на регистрацию
-
-	email, err := s.userRepo.Delete(ctx, user)
+	deleteUser, err := s.userRepo.Delete(ctx, user)
 	if err != nil {
 		return fmt.Errorf("failed to delete user. error: %w", err)
 	}
 
-	logger.Debug(email)
+	_, err = s.email.SendReject(ctx, &proto_email.RejectUserRequest{
+		Name:  deleteUser.Name,
+		Email: deleteUser.Email,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to send email. error: %w", err)
+	}
 
 	return nil
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"archive/zip"
+	"bufio"
 	"bytes"
 	"context"
 	"database/sql"
@@ -14,7 +15,8 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 	proto_email "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/email"
-	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/file"
+	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/proto_file"
+	proto_user "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/user"
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	"github.com/xuri/excelize/v2"
 )
@@ -23,15 +25,18 @@ type OrderService struct {
 	repo  repository.Order
 	email proto_email.EmailServiceClient
 	file  proto_file.FileServiceClient
+	user  proto_user.UserServiceClient
 }
 
 var columnNames = []interface{}{"№", "Обозначение", "Количество", "Описание", "Размеры", "Чертеж"}
 
-func NewOrderService(repo repository.Order, email proto_email.EmailServiceClient, file proto_file.FileServiceClient) *OrderService {
+func NewOrderService(repo repository.Order, email proto_email.EmailServiceClient,
+	file proto_file.FileServiceClient, user proto_user.UserServiceClient) *OrderService {
 	return &OrderService{
 		repo:  repo,
 		email: email,
 		file:  file,
+		user:  user,
 	}
 }
 
@@ -97,26 +102,100 @@ func (s *OrderService) Copy(order *proto.CopyOrderRequest) error {
 }
 
 func (s *OrderService) Save(ctx context.Context, order *proto.SaveOrderRequest) (*bytes.Buffer, error) {
-	return s.createZip(ctx, order)
+	file, _, err := s.createZip(ctx, order)
+	if err != nil {
+		return nil, err
+	}
+	return file, err
 }
 
 func (s *OrderService) Send(ctx context.Context, order *proto.SaveOrderRequest) error {
-	_, err := s.createZip(ctx, order)
+	user, err := s.user.GetUser(ctx, &proto_user.GetUserRequest{Id: order.UserId})
 	if err != nil {
 		return err
+	}
+
+	file, names, err := s.createZip(ctx, order)
+	if err != nil {
+		return err
+	}
+
+	data := &proto_email.SendOrderRequest{
+		Request: &proto_email.SendOrderRequest_Data{
+			Data: &proto_email.OrderData{
+				User: &proto_email.User{
+					Organization: user.User.Organization,
+					Name:         user.User.Name,
+					Email:        user.User.Email,
+					Phone:        user.User.Phone,
+					Position:     user.User.Position,
+					City:         user.User.City,
+				},
+				File: &proto_email.FileData{
+					Name: names,
+					Type: ".zip",
+					Size: int64(file.Cap()),
+				},
+			},
+		},
+	}
+
+	stream, err := s.email.SendOrder(ctx)
+	if err != nil {
+		return fmt.Errorf("error while connect wuth service. err: %w", err)
+	}
+
+	err = stream.Send(data)
+	if err != nil {
+		logger.Errorf("cannot send docx info to server: %w %w", err, stream.RecvMsg(nil))
+		return fmt.Errorf("cannot send docx info to server. err: %w", err)
+	}
+
+	reader := bufio.NewReader(file)
+	buffer := make([]byte, 1024)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logger.Errorf("cannot read chunk to buffer: %w", err)
+			return fmt.Errorf("cannot read chunk to buffer: %w", err)
+		}
+
+		reqChunk := &proto_email.SendOrderRequest{
+			Request: &proto_email.SendOrderRequest_File{
+				File: &proto_email.File{
+					Content: buffer[:n],
+				},
+			},
+		}
+
+		err = stream.Send(reqChunk)
+		if err != nil {
+			logger.Errorf("cannot send chunk to server: %w", err)
+			return fmt.Errorf("cannot send chunk to server: %w", err)
+		}
+	}
+
+	_, err = stream.CloseAndRecv()
+	if err != nil {
+		logger.Errorf("cannot receive response: %w", err)
+		return fmt.Errorf("cannot receive response: %w", err)
 	}
 
 	return nil
 }
 
-func (s *OrderService) createZip(ctx context.Context, order *proto.SaveOrderRequest) (*bytes.Buffer, error) {
+func (s *OrderService) createZip(ctx context.Context, order *proto.SaveOrderRequest) (*bytes.Buffer, []string, error) {
 	if err := s.repo.Save(order); err != nil {
-		return nil, fmt.Errorf("failed to save order. error: %w", err)
+		return nil, nil, fmt.Errorf("failed to save order. error: %w", err)
 	}
 
 	positions, err := s.repo.GetPositions(&proto.GetPositionsRequest{OrderId: order.OrderId})
 	if err != nil {
-		return nil, fmt.Errorf("failed to get positions. error: %w", err)
+		return nil, nil, fmt.Errorf("failed to get positions. error: %w", err)
 	}
 
 	file := excelize.NewFile()
@@ -124,12 +203,12 @@ func (s *OrderService) createZip(ctx context.Context, order *proto.SaveOrderRequ
 
 	streamWriter, err := file.NewStreamWriter(sheetName)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create stream writer. error: %w", err)
+		return nil, nil, fmt.Errorf("failed to create stream writer. error: %w", err)
 	}
 
 	cell, _ := excelize.CoordinatesToCellName(1, 1)
 	if err := streamWriter.SetRow(cell, columnNames); err != nil {
-		return nil, fmt.Errorf("failed to create header table. error: %w", err)
+		return nil, nil, fmt.Errorf("failed to create header table. error: %w", err)
 	}
 
 	for i, p := range positions {
@@ -137,11 +216,11 @@ func (s *OrderService) createZip(ctx context.Context, order *proto.SaveOrderRequ
 
 		cell, _ := excelize.CoordinatesToCellName(1, i+2)
 		if err := streamWriter.SetRow(cell, line); err != nil {
-			return nil, fmt.Errorf("failed to create line table. error: %w", err)
+			return nil, nil, fmt.Errorf("failed to create line table. error: %w", err)
 		}
 	}
 	if err := streamWriter.Flush(); err != nil {
-		return nil, fmt.Errorf("failed to close stream writer. error: %w", err)
+		return nil, nil, fmt.Errorf("failed to close stream writer. error: %w", err)
 	}
 
 	stream, err := s.file.GroupDownload(ctx, &proto_file.GroupDownloadRequest{
@@ -150,12 +229,12 @@ func (s *OrderService) createZip(ctx context.Context, order *proto.SaveOrderRequ
 	})
 	if err != nil {
 		logger.Errorf("failed to download drawing. err :%w", err)
-		return nil, fmt.Errorf("failed to download drawing. err :%w", err)
+		return nil, nil, fmt.Errorf("failed to download drawing. err :%w", err)
 	}
 
 	req, err := stream.Recv()
 	if err != nil && !strings.Contains(err.Error(), "file not found") {
-		return nil, fmt.Errorf("failed to get data. err: %w", err)
+		return nil, nil, fmt.Errorf("failed to get data. err: %w", err)
 	}
 	meta := req.GetMetadata()
 	fileData := bytes.Buffer{}
@@ -171,44 +250,47 @@ func (s *OrderService) createZip(ctx context.Context, order *proto.SaveOrderRequ
 			}
 
 			if err != nil {
-				return nil, fmt.Errorf("failed to get chunk. err %w", err)
+				return nil, nil, fmt.Errorf("failed to get chunk. err %w", err)
 			}
 
 			chunk := req.GetFile().Content
 
 			_, err = fileData.Write(chunk)
 			if err != nil {
-				return nil, fmt.Errorf("failed to write chunk. err %w", err)
+				return nil, nil, fmt.Errorf("failed to write chunk. err %w", err)
 			}
 		}
 	}
 
 	buf := new(bytes.Buffer)
 	writer := zip.NewWriter(buf)
+	names := make([]string, 0)
 
 	fw, err := writer.Create("Заказ.xlsx")
 	if err != nil {
-		return nil, fmt.Errorf("failed to create xlsx in zip. err %w", err)
+		return nil, nil, fmt.Errorf("failed to create xlsx in zip. err %w", err)
 	}
 	_, err = file.WriteTo(fw)
 	if err != nil {
-		return nil, fmt.Errorf("failed to write xlsx in zip. err %w", err)
+		return nil, nil, fmt.Errorf("failed to write xlsx in zip. err %w", err)
 	}
+	names = append(names, "Заказ.xlsx")
 
 	if meta != nil {
 		fw, err := writer.Create(meta.Name)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create zip in zip. err %w", err)
+			return nil, nil, fmt.Errorf("failed to create zip in zip. err %w", err)
 		}
 		_, err = fw.Write(fileData.Bytes())
 		if err != nil {
-			return nil, fmt.Errorf("failed to write zip in zip. err %w", err)
+			return nil, nil, fmt.Errorf("failed to write zip in zip. err %w", err)
 		}
+		names = append(names, meta.Name)
 	}
 
 	if err := writer.Close(); err != nil {
-		return nil, fmt.Errorf("failed to close writer. err %w", err)
+		return nil, nil, fmt.Errorf("failed to close writer. err %w", err)
 	}
 
-	return buf, nil
+	return buf, names, nil
 }

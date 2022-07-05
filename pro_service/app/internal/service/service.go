@@ -7,7 +7,8 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 	proto_email "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/email"
-	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/file"
+	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/proto_file"
+	proto_user "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/user"
 )
 
 type Stand interface {
@@ -196,7 +197,8 @@ type Services struct {
 	OrderPosition
 }
 
-func NewServices(repos *repository.Repositories, email proto_email.EmailServiceClient, file proto_file.FileServiceClient) *Services {
+func NewServices(repos *repository.Repositories, email proto_email.EmailServiceClient,
+	file proto_file.FileServiceClient, user proto_user.UserServiceClient) *Services {
 	return &Services{
 		Stand:         NewStandService(repos.Stand),
 		Flange:        NewFlangeService(repos.Flange),
@@ -213,7 +215,7 @@ func NewServices(repos *repository.Repositories, email proto_email.EmailServiceC
 		BoltMaterials: NewBoltMatRepo(repos.BoltMaterials),
 		SizeInt:       NewSizeIntService(repos.SizeInt),
 		Interview:     NewInterviewService(email, file),
-		Order:         NewOrderService(repos.Order, email, file),
+		Order:         NewOrderService(repos.Order, email, file, user),
 		OrderPosition: NewPositionService(repos.OrderPosition, file),
 	}
 }

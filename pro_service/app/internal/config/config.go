@@ -43,6 +43,7 @@ type (
 	ServicesConfig struct {
 		EmailService ServiceConfig
 		FileService  ServiceConfig
+		UserService  ServiceConfig
 	}
 
 	ServiceConfig struct {
@@ -109,9 +110,12 @@ func setFromEnv(conf *Config) error {
 	conf.Services.EmailService.AuthPassword = os.Getenv("API_PASSWORD")
 	conf.Services.FileService.AuthName = os.Getenv("API_NAME")
 	conf.Services.FileService.AuthPassword = os.Getenv("API_PASSWORD")
+	conf.Services.UserService.AuthName = os.Getenv("API_NAME")
+	conf.Services.UserService.AuthPassword = os.Getenv("API_PASSWORD")
 
 	conf.Services.EmailService.Url = os.Getenv("EMAIL_HOST") + ":" + os.Getenv("EMAIL_PORT")
 	conf.Services.FileService.Url = os.Getenv("FILE_HOST") + ":" + os.Getenv("FILE_PORT")
+	conf.Services.UserService.Url = os.Getenv("USER_HOST") + ":" + os.Getenv("USER_PORT")
 
 	return nil
 }

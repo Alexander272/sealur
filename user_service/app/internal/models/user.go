@@ -12,6 +12,16 @@ type User struct {
 	Login        string `db:"login"`
 }
 
+type ConfirmUser struct {
+	Name  string `db:"name"`
+	Email string `db:"email"`
+}
+
+type DeleteUser struct {
+	Name  string `db:"name"`
+	Email string `db:"email"`
+}
+
 type Count struct {
 	Count int32 `db:"count"`
 }

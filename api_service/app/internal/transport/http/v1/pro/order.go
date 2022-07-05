@@ -201,8 +201,12 @@ func (h *Handler) sendOrder(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty orderId param")
 		return
 	}
+	userId, _ := c.Get(h.middleware.UserIdCtx)
 
-	_, err := h.proClient.SaveOrder(c, &proto.SaveOrderRequest{OrderId: orderId})
+	_, err := h.proClient.SaveOrder(c, &proto.SaveOrderRequest{
+		OrderId: orderId,
+		UserId:  userId.(string),
+	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

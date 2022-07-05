@@ -9,11 +9,13 @@ type Middleware struct {
 	CookieName string
 	services   *service.Services
 	auth       config.AuthConfig
+	UserIdCtx  string
 }
 
 func NewMiddleware(services *service.Services, auth config.AuthConfig) *Middleware {
 	return &Middleware{
-		services: services,
-		auth:     auth,
+		services:  services,
+		auth:      auth,
+		UserIdCtx: "userId",
 	}
 }

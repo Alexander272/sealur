@@ -71,16 +71,20 @@ func (r *UserRepo) Create(ctx context.Context, user *proto_user.CreateUserReques
 	return nil
 }
 
-func (r *UserRepo) Confirm(ctx context.Context, user *proto_user.ConfirmUserRequest) (string, error) {
-	query := fmt.Sprintf("UPDATE %s SET login=$1, password=$2, confirmed=true WHERE id=$3 RETURNING email", r.tableName)
+func (r *UserRepo) Confirm(ctx context.Context, user *proto_user.ConfirmUserRequest) (models.ConfirmUser, error) {
+	query := fmt.Sprintf("UPDATE %s SET login=$1, password=$2, confirmed=true WHERE id=$3 RETURNING name, email", r.tableName)
 	row := r.db.QueryRow(query, user.Login, user.Password, user.Id)
 
-	var email string
-	if err := row.Scan(&email); err != nil {
-		return "", fmt.Errorf("failed to execute query. error: %w", err)
+	if row.Err() != nil {
+		return models.ConfirmUser{}, fmt.Errorf("failed to execute query. error: %w", row.Err())
 	}
 
-	return email, nil
+	var u models.ConfirmUser
+	if err := row.Scan(&u.Name, &u.Email); err != nil {
+		return models.ConfirmUser{}, fmt.Errorf("failed to scan result. error: %w", err)
+	}
+
+	return u, nil
 }
 
 func (r *UserRepo) Update(ctx context.Context, user *proto_user.UpdateUserRequest) error {
@@ -131,16 +135,20 @@ func (r *UserRepo) Update(ctx context.Context, user *proto_user.UpdateUserReques
 	return nil
 }
 
-func (r *UserRepo) Delete(ctx context.Context, user *proto_user.DeleteUserRequest) (string, error) {
-	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1 RETURNING email", r.tableName)
+func (r *UserRepo) Delete(ctx context.Context, user *proto_user.DeleteUserRequest) (models.DeleteUser, error) {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1 RETURNING name, email", r.tableName)
 	row := r.db.QueryRow(query, user.Id)
 
-	var email string
-	if err := row.Scan(&email); err != nil {
-		return "", fmt.Errorf("failed to execute query. error: %w", err)
+	if row.Err() != nil {
+		return models.DeleteUser{}, fmt.Errorf("failed to execute query. error: %w", row.Err())
 	}
 
-	return email, nil
+	var u models.DeleteUser
+	if err := row.Scan(&u.Name, &u.Email); err != nil {
+		return models.DeleteUser{}, fmt.Errorf("failed to scan result. error: %w", err)
+	}
+
+	return u, nil
 	// _, err := r.db.Exec(query, user.Id)
 	// if err != nil {
 	// 	return fmt.Errorf("failed to execute query. error: %w", err)

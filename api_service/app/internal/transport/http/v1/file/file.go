@@ -14,11 +14,11 @@ import (
 )
 
 func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
-	drawing := api.Group("/drawings", h.middleware.UserIdentity)
+	drawing := api.Group("/drawings")
 	{
 		drawing.POST("/:bucket", h.createDrawing)
 		drawing.GET("/:bucket/:group/:id/:name", h.getDrawing)
-		drawing.DELETE("/:bucket/:group/:id/:name", h.deleteDrawing)
+		drawing.DELETE("/:bucket/:group/:id/:name", h.middleware.UserIdentity, h.deleteDrawing)
 	}
 }
 

@@ -922,6 +922,7 @@ message DeleteOrderRequest {
 
 message SaveOrderRequest {
     string orderId = 1;
+    string userId = 2;
 }
 
 message CopyOrderRequest {

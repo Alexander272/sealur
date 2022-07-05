@@ -14,7 +14,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
 	proto_email "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/email"
-	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/file"
+	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/proto_file"
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	docx "github.com/lukasjarosch/go-docx"
 )

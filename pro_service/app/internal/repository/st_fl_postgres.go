@@ -6,7 +6,6 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
-	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -29,7 +28,6 @@ func (r *StFlRepo) Get() (st []*proto.StFl, err error) {
 	}
 
 	for _, d := range data {
-		logger.Debug(d)
 		s := proto.StFl(d)
 		st = append(st, &s)
 	}

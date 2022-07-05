@@ -45,7 +45,7 @@ func main() {
 
 	opts := []grpc.ServerOption{
 		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
-		// grpc.UnaryInterceptor(handlers.UnaryInterceptor),
+		grpc.UnaryInterceptor(handlers.UnaryInterceptor),
 	}
 
 	server := grpc.NewServer(opts...)
