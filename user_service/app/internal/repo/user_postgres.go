@@ -42,7 +42,8 @@ func (r *UserRepo) Get(ctx context.Context, req *proto_user.GetUserRequest) (use
 }
 
 func (r *UserRepo) GetAll(ctx context.Context, req *proto_user.GetAllUserRequest) (users []models.User, err error) {
-	query := fmt.Sprintf("SELECT id, organization, name, email, city, position, phone, login FROM %s WHERE confirmed=true ORDER BY id", r.tableName)
+	query := fmt.Sprintf(`SELECT id, organization, name, email, city, position, phone, login FROM %s WHERE confirmed=true 
+		ORDER BY organization, name, id`, r.tableName)
 
 	if err := r.db.Select(&users, query); err != nil {
 		return users, fmt.Errorf("failed to execute query. error: %w", err)
@@ -51,7 +52,7 @@ func (r *UserRepo) GetAll(ctx context.Context, req *proto_user.GetAllUserRequest
 }
 
 func (r *UserRepo) GetNew(ctx context.Context, req *proto_user.GetNewUserRequest) (users []models.User, err error) {
-	query := fmt.Sprintf("SELECT id, organization, name, email, city, position, phone FROM %s WHERE confirmed=false", r.tableName)
+	query := fmt.Sprintf("SELECT id, organization, name, email, city, position, phone FROM %s WHERE confirmed=false ORDER BY date_reg", r.tableName)
 
 	if err := r.db.Select(&users, query); err != nil {
 		return users, fmt.Errorf("failed to execute query. error: %w", err)

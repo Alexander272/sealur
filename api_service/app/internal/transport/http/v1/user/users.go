@@ -127,7 +127,10 @@ func (h *Handler) confirmUser(c *gin.Context) {
 			return
 		}
 
-		//TODO надо отдельно обрабатывать ошибку отправки email
+		if strings.Contains(err.Error(), "failed to send") {
+			models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Failed to send email")
+			return
+		}
 
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -161,7 +164,10 @@ func (h *Handler) rejectUser(c *gin.Context) {
 
 	_, err := h.userClient.RejectUser(c, &req)
 	if err != nil {
-		//TODO надо отдельно обрабатывать ошибку отправки email
+		if strings.Contains(err.Error(), "failed to send") {
+			models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Failed to send email")
+			return
+		}
 
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

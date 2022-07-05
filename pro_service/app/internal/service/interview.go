@@ -55,8 +55,6 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInt
 		medium = append(medium, "с высокой проникающей способностью")
 	}
 
-	//TODO отправляться должно менеджеру
-
 	replaceMap := docx.PlaceholderMap{
 		"_organization_": req.Organization,
 		"_name_":         req.Name,

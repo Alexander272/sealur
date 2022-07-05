@@ -38,7 +38,7 @@ services:
 
     pro_service:
         restart: on-failure:5
-        image: pro_service:0.11.2d
+        image: pro_service:0.11.3
         container_name: dev-pro_service
         env_file:
             - .env
@@ -49,7 +49,7 @@ services:
 
     user_service:
         restart: on-failure:5
-        image: user_service:0.4.2
+        image: user_service:0.4.3
         container_name: dev-user_service
         env_file:
             - .env
