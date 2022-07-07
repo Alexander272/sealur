@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package moment_proto;
+option go_package = "./;moment_proto";
+
+message PingRequest {}
+message PingResponse {
+    string ping = 1;
+}
+
+service PingService {
+    rpc Ping (PingRequest) returns (PingResponse);
+}
