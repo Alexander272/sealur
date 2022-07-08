@@ -11,3 +11,55 @@ message PingResponse {
 service PingService {
     rpc Ping (PingRequest) returns (PingResponse);
 }
+
+// flanges можно, наверное, сделать enum
+// type тоже самое
+// condition ...
+// calculation ...
+
+message FlangeData {
+    string type = 1;
+    string standart = 2;
+    string markId = 3;
+    int32 dOut = 4;
+    float py = 5;
+    int32 corrosion = 6;
+}
+
+message BoltData {
+    
+}
+
+message GasketData {
+    string type = 1;
+    string env = 2;
+    float thickness = 3;
+    float d_out = 4;
+    float d_in = 5;
+}
+
+message FlangeRequest {
+    float pressure = 1;//P
+    int32 axialForce = 2;//F
+    int32 bendingMoment = 3;//M
+    float temp = 4;//T
+    bool isWork = 5;//work
+    string flanges = 6;//ParTem
+    bool isSameFlange = 7;//Odin
+    bool isEmbedded = 8;//ZakDet
+    string type = 9;//Tip
+    string condition = 10;//UsZat
+    string calculation = 11;//Moment
+
+    repeated FlangeData flangesData = 12;
+
+    GasketData gasket = 13;
+}
+
+message FlangeResponse {
+    string test = 1;
+}
+
+service FlangeService {
+    rpc CalculateFlange (FlangeRequest) returns (FlangeResponse);
+}

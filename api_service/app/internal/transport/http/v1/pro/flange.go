@@ -25,7 +25,6 @@ func (h *Handler) initFlangeRoutes(api *gin.RouterGroup) {
 
 // @Summary Get Flanges
 // @Tags Sealur Pro -> flanges
-// @Security ApiKeyAuth
 // @Description получение всех стандартов на фланцы
 // @ModuleID getFlanges
 // @Accept json

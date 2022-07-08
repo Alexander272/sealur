@@ -30,7 +30,6 @@ func (h *Handler) initSizeRoutes(api *gin.RouterGroup) {
 
 // @Summary Get Sizes
 // @Tags Sealur Pro -> sizes
-// @Security ApiKeyAuth
 // @Description получение размеров
 // @ModuleID getSizes
 // @Accept json
@@ -82,7 +81,6 @@ func (h *Handler) getSizes(c *gin.Context) {
 
 // @Summary Get All Sizes
 // @Tags Sealur Pro -> sizes
-// @Security ApiKeyAuth
 // @Description получение размеров
 // @ModuleID getSizes
 // @Accept json

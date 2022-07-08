@@ -24,7 +24,6 @@ func (h *Handler) initPutgRoutes(api *gin.RouterGroup) {
 
 // @Summary Get Putg
 // @Tags Sealur Pro -> putg
-// @Security ApiKeyAuth
 // @Description получение прокладок путг
 // @ModuleID getPutg
 // @Accept json

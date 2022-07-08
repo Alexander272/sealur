@@ -64,6 +64,7 @@ func main() {
 
 	server := grpc.NewServer(opts...)
 	moment_proto.RegisterPingServiceServer(server, handlers.Ping)
+	moment_proto.RegisterFlangeServiceServer(server, handlers.Flange)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {

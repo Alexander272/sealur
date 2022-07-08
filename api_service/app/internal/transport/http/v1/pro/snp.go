@@ -25,7 +25,6 @@ func (h *Handler) initSNPRoutes(api *gin.RouterGroup) {
 
 // @Summary Get SNP
 // @Tags Sealur Pro -> snp
-// @Security ApiKeyAuth
 // @Description получение прокладок снп
 // @ModuleID getSNP
 // @Accept json
@@ -63,7 +62,6 @@ func (h *Handler) getSNP(c *gin.Context) {
 
 // @Summary Get Default Data
 // @Tags Sealur Pro -> snp
-// @Security ApiKeyAuth
 // @Description получение значений по умолчание (снп, размеров для первого элемента и типов фланца)
 // @ModuleID getDefault
 // @Accept json

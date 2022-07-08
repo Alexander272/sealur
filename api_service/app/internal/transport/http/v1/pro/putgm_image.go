@@ -26,7 +26,6 @@ func (h *Handler) initPutgmImageRoutes(api *gin.RouterGroup) {
 
 // @Summary Get Putgm Image
 // @Tags Sealur Pro -> putgm-image
-// @Security ApiKeyAuth
 // @Description получение списка чертежей для путгм
 // @ModuleID getPutgmImage
 // @Accept json

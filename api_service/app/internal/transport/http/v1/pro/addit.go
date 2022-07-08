@@ -33,7 +33,6 @@ func (h *Handler) initAdditRoutes(api *gin.RouterGroup) {
 
 // @Summary Get Addit
 // @Tags Sealur Pro -> additionals
-// @Security ApiKeyAuth
 // @Description получение всех дополнительных сведенний (список материалов, креплений и тд)
 // @ModuleID getAddit
 // @Accept json

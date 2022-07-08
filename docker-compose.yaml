@@ -3,7 +3,7 @@ version: '3.4'
 services:
     nginx_service:
         restart: on-failure:5
-        image: nginx_service:0.7.0d
+        image: nginx_service:0.7.3
         container_name: dev-nginx_service
         volumes:
             - ./build:/usr/app
@@ -19,7 +19,7 @@ services:
 
     api_service:
         restart: on-failure:5
-        image: api_service:0.15.3
+        image: sealur/api_service:1.0.1
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images
@@ -38,7 +38,7 @@ services:
 
     pro_service:
         restart: on-failure:5
-        image: pro_service:0.11.3
+        image: sealur/pro_service:1.0.0
         container_name: dev-pro_service
         env_file:
             - .env
@@ -49,7 +49,7 @@ services:
 
     user_service:
         restart: on-failure:5
-        image: user_service:0.4.3
+        image: sealur/user_service:1.0.0
         container_name: dev-user_service
         env_file:
             - .env
@@ -58,7 +58,7 @@ services:
 
     email_service:
         restart: on-failure:5
-        image: email_service:0.3.1
+        image: sealur/email_service:1.0.0
         container_name: dev-email_service
         volumes:
             - ./email_service/app/template:/template
@@ -69,7 +69,7 @@ services:
 
     file_service:
         restart: on-failure:5
-        image: file_service:0.6.3
+        image: sealur/file_service:1.0.0
         container_name: dev-file_service
         env_file:
             - .env
@@ -84,7 +84,7 @@ services:
         command: server --console-address ":9001" /data/
         ports:
             # - "9000:9000"
-            - "9001:9001"
+            - "9091:9001"
         volumes:
             - ./storage:/data
         env_file:

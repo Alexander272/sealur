@@ -119,7 +119,6 @@ func (h *Handler) createOrder(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param orderId path string true "order id"
-// @Success 200 {object} models.ZipResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -222,7 +221,7 @@ func (h *Handler) sendOrder(c *gin.Context) {
 // @ModuleID copyOrder
 // @Accept json
 // @Produce json
-// @Param orderId path string true "order id
+// @Param orderId path string true "order id"
 // @Param order body models.CopyOrder true "order info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse

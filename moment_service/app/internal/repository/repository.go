@@ -8,21 +8,27 @@ import (
 )
 
 type Flange interface {
-	GetSize(ctx context.Context, dn, pn float32) (models.FlangeSize, error)
+	GetSize(ctx context.Context, dn, pn float64) (models.FlangeSize, error)
 }
 
 type Materials interface {
-	Get(ctx context.Context, markId, tempId string) (models.Materials, error)
+	GetAll(ctx context.Context, markId string) ([]models.Materials, error)
+}
+
+type Gasket interface {
+	Get(ctx context.Context, gasket models.GetGasket) (models.Gasket, error)
 }
 
 type Repositories struct {
 	Flange
 	Materials
+	Gasket
 }
 
 func NewRepo(db *sqlx.DB) *Repositories {
 	return &Repositories{
 		Flange:    NewFlangeRepo(db),
 		Materials: NewMaterialsRepo(db),
+		Gasket:    NewGasketRepo(db),
 	}
 }

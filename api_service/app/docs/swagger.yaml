@@ -28,6 +28,30 @@ definitions:
     - password
     - roles
     type: object
+  models.CopyOrder:
+    properties:
+      orderId:
+        type: string
+    required:
+    - orderId
+    type: object
+  models.CopyPosition:
+    properties:
+      count:
+        type: string
+      description:
+        type: string
+      designation:
+        type: string
+      drawing:
+        type: string
+      orderId:
+        type: string
+      sizes:
+        type: string
+    required:
+    - orderId
+    type: object
   models.CreateAdditDTO:
     properties:
       basis:
@@ -775,15 +799,6 @@ definitions:
     required:
     - role
     - service
-    type: object
-  models.ZipResponse:
-    properties:
-      file:
-        items:
-          type: integer
-        type: array
-      name:
-        type: string
     type: object
   proto.AddBasis:
     properties:
@@ -1599,8 +1614,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Create Drawing
       tags:
       - Files -> drawing
@@ -1653,8 +1666,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Delete Drawing
       tags:
       - Files -> drawing
@@ -1706,8 +1717,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Drawing
       tags:
       - Files -> drawing
@@ -1747,8 +1756,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Addit
       tags:
       - Sealur Pro -> additionals
@@ -2366,8 +2373,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Bolt Materials
       tags:
       - Sealur Pro -> bolt materials
@@ -2528,8 +2533,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Type Flange
       tags:
       - Sealur Pro -> flange-types
@@ -2690,8 +2693,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get All Type Flange
       tags:
       - Sealur Pro -> flange-types
@@ -2730,8 +2731,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Flanges
       tags:
       - Sealur Pro -> flanges
@@ -2892,8 +2891,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Send Interview
       tags:
       - Sealur Pro -> interview
@@ -2932,8 +2929,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Materials
       tags:
       - Sealur Pro -> materials
@@ -3152,10 +3147,6 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ZipResponse'
         "400":
           description: Bad Request
           schema:
@@ -3188,6 +3179,12 @@ paths:
         name: orderId
         required: true
         type: string
+      - description: order info
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.CopyOrder'
       produces:
       - application/json
       responses:
@@ -3415,7 +3412,7 @@ paths:
         name: position
         required: true
         schema:
-          $ref: '#/definitions/models.PositionDTO'
+          $ref: '#/definitions/models.CopyPosition'
       produces:
       - application/json
       responses:
@@ -3621,8 +3618,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Putg
       tags:
       - Sealur Pro -> putg
@@ -3706,8 +3701,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Putg Image
       tags:
       - Sealur Pro -> putg-image
@@ -3968,8 +3961,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Putgm
       tags:
       - Sealur Pro -> putgm
@@ -4053,8 +4044,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Putgm Image
       tags:
       - Sealur Pro -> putgm-image
@@ -4323,8 +4312,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Sizes
       tags:
       - Sealur Pro -> sizes
@@ -4416,8 +4403,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Sizes Int
       tags:
       - Sealur Pro -> sizes-interview
@@ -4625,8 +4610,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get All Sizes Int
       tags:
       - Sealur Pro -> sizes-interview
@@ -4815,8 +4798,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get All Sizes
       tags:
       - Sealur Pro -> sizes
@@ -4899,8 +4880,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get SNP
       tags:
       - Sealur Pro -> snp
@@ -5060,8 +5039,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Default Data
       tags:
       - Sealur Pro -> snp
@@ -5100,8 +5077,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Stand/Flange
       tags:
       - Sealur Pro -> st-fl
@@ -5262,8 +5237,6 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get Stand
       tags:
       - Sealur Pro -> standards

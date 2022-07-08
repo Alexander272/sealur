@@ -24,7 +24,6 @@ func (h *Handler) initMaterialsRoutes(api *gin.RouterGroup) {
 
 // @Summary Get Materials
 // @Tags Sealur Pro -> materials
-// @Security ApiKeyAuth
 // @Description получение материалов (для опроса)
 // @ModuleID getMaterials
 // @Accept json

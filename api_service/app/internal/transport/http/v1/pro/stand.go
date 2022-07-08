@@ -25,7 +25,6 @@ func (h *Handler) initStandRoutes(api *gin.RouterGroup) {
 
 // @Summary Get Stand
 // @Tags Sealur Pro -> standards
-// @Security ApiKeyAuth
 // @Description получение всех стандартов на прокладки
 // @ModuleID getStands
 // @Accept json

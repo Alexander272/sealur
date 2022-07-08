@@ -252,11 +252,6 @@ const docTemplate_swagger = `{
         },
         "/files/drawings/{bucket}": {
             "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "создание чертежа",
                 "consumes": [
                     "multipart/form-data"
@@ -321,11 +316,6 @@ const docTemplate_swagger = `{
         },
         "/files/drawings/{bucket}/{group}/{id}/{name}": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "создание чертежа",
                 "consumes": [
                     "application/json"
@@ -401,11 +391,6 @@ const docTemplate_swagger = `{
                 }
             },
             "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "удаление чертежа",
                 "consumes": [
                     "application/json"
@@ -483,11 +468,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/additionals": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение всех дополнительных сведенний (список материалов, креплений и тд)",
                 "consumes": [
                     "application/json"
@@ -1451,11 +1431,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/bolt-materials": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение материалов болтов/шпилек (для опроса)",
                 "consumes": [
                     "application/json"
@@ -1708,11 +1683,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/flange-types": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение базовых типов фланца",
                 "consumes": [
                     "application/json"
@@ -1836,11 +1806,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/flange-types/all": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение всех типов фланца",
                 "consumes": [
                     "application/json"
@@ -2032,11 +1997,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/flanges": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение всех стандартов на фланцы",
                 "consumes": [
                     "application/json"
@@ -2289,11 +2249,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/interview": {
             "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "отправление данных опроса",
                 "consumes": [
                     "application/json"
@@ -2352,11 +2307,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/materials": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение материалов (для опроса)",
                 "consumes": [
                     "application/json"
@@ -2911,12 +2861,6 @@ const docTemplate_swagger = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ZipResponse"
-                        }
-                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -2969,6 +2913,15 @@ const docTemplate_swagger = `{
                         "name": "orderId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "order info",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CopyOrder"
+                        }
                     }
                 ],
                 "responses": {
@@ -3181,7 +3134,7 @@ const docTemplate_swagger = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.PositionDTO"
+                            "$ref": "#/definitions/models.CopyPosition"
                         }
                     }
                 ],
@@ -3425,11 +3378,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/putg": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение прокладок путг",
                 "consumes": [
                     "application/json"
@@ -3569,11 +3517,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/putg-image": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение списка чертежей для путг",
                 "consumes": [
                     "application/json"
@@ -3972,11 +3915,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/putgm": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение прокладок путгм",
                 "consumes": [
                     "application/json"
@@ -4116,11 +4054,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/putgm-image": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение списка чертежей для путгм",
                 "consumes": [
                     "application/json"
@@ -4519,11 +4452,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/sizes": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение размеров",
                 "consumes": [
                     "application/json"
@@ -4674,11 +4602,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/sizes-interview": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение размеров (для опроса)",
                 "consumes": [
                     "application/json"
@@ -4822,11 +4745,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/sizes-interview/all": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение размеров (для опроса)",
                 "consumes": [
                     "application/json"
@@ -5090,11 +5008,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/sizes/all": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение размеров",
                 "consumes": [
                     "application/json"
@@ -5438,11 +5351,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/snp": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение прокладок снп",
                 "consumes": [
                     "application/json"
@@ -5582,11 +5490,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/snp/default": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение значений по умолчание (снп, размеров для первого элемента и типов фланца)",
                 "consumes": [
                     "application/json"
@@ -5775,11 +5678,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/st-fl": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение списка стандартов (только для снп)",
                 "consumes": [
                     "application/json"
@@ -6032,11 +5930,6 @@ const docTemplate_swagger = `{
         },
         "/sealur-pro/standards": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "получение всех стандартов на прокладки",
                 "consumes": [
                     "application/json"
@@ -6975,6 +6868,43 @@ const docTemplate_swagger = `{
                     "items": {
                         "$ref": "#/definitions/models.UserRole"
                     }
+                }
+            }
+        },
+        "models.CopyOrder": {
+            "type": "object",
+            "required": [
+                "orderId"
+            ],
+            "properties": {
+                "orderId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CopyPosition": {
+            "type": "object",
+            "required": [
+                "orderId"
+            ],
+            "properties": {
+                "count": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "designation": {
+                    "type": "string"
+                },
+                "drawing": {
+                    "type": "string"
+                },
+                "orderId": {
+                    "type": "string"
+                },
+                "sizes": {
+                    "type": "string"
                 }
             }
         },
@@ -8081,20 +8011,6 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "userId": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.ZipResponse": {
-            "type": "object",
-            "properties": {
-                "file": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "name": {
                     "type": "string"
                 }
             }

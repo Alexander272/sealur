@@ -1,17 +1,43 @@
 package models
 
+// TODO надо назвать поля по другому
 type FlangeSize struct {
-	D  float32 `db:"D"`
-	Pn float32 `db:"pn"`
-	D1 float32 `db:"D1"`
-	D2 float32 `db:"D2"`
+	D  float64 `db:"D"`
+	Pn float64 `db:"pn"`
+	D1 float64 `db:"D1"`
+	D2 float64 `db:"D2"`
 	// D6       float32 `db:"D6"`
 	// D7       float32 `db:"D7"`
-	S0 float32 `db:"S0"`
-	S1 float32 `db:"S1"`
 	// H        float32 `db:"h"`
-	B        float32 `db:"b"`
-	Lenght   float32 `db:"lenght"`
+	S0       float64 `db:"S0"`
+	S1       float64 `db:"S1"`
+	B        float64 `db:"b"`
+	Lenght   float64 `db:"lenght"`
 	Count    int32   `db:"count"`
-	Diameter string  `db:"diameter"`
+	Diameter int32   `db:"diameter"`
+}
+
+type InitialDataFlange struct {
+	DOut        float64
+	D           float64
+	H           float64
+	S0          float64
+	S1          float64
+	L           float64
+	D6          float64
+	C           float64
+	Tf          float64
+	AlphaF      float64
+	EpsilonAt20 float64
+	Epsilon     float64
+	SigmaAt20   float64
+	Sigma       float64
+	SigmaM      float64
+	SigmaMAt20  float64
+	SigmaR      float64
+	SigmaRAt20  float64
+	Material    string
+}
+
+type InitialDataBolt struct {
 }

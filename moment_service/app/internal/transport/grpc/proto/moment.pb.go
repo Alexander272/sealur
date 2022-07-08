@@ -10,6 +10,11 @@ It is generated from these files:
 It has these top-level messages:
 	PingRequest
 	PingResponse
+	FlangeData
+	BoltData
+	GasketData
+	FlangeRequest
+	FlangeResponse
 */
 package moment_proto
 
@@ -57,9 +62,254 @@ func (m *PingResponse) GetPing() string {
 	return ""
 }
 
+type FlangeData struct {
+	Type      string  `protobuf:"bytes,1,opt,name=type" json:"type,omitempty"`
+	Standart  string  `protobuf:"bytes,2,opt,name=standart" json:"standart,omitempty"`
+	MarkId    string  `protobuf:"bytes,3,opt,name=markId" json:"markId,omitempty"`
+	DOut      int32   `protobuf:"varint,4,opt,name=dOut" json:"dOut,omitempty"`
+	Py        float32 `protobuf:"fixed32,5,opt,name=py" json:"py,omitempty"`
+	Corrosion int32   `protobuf:"varint,6,opt,name=corrosion" json:"corrosion,omitempty"`
+}
+
+func (m *FlangeData) Reset()                    { *m = FlangeData{} }
+func (m *FlangeData) String() string            { return proto.CompactTextString(m) }
+func (*FlangeData) ProtoMessage()               {}
+func (*FlangeData) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *FlangeData) GetType() string {
+	if m != nil {
+		return m.Type
+	}
+	return ""
+}
+
+func (m *FlangeData) GetStandart() string {
+	if m != nil {
+		return m.Standart
+	}
+	return ""
+}
+
+func (m *FlangeData) GetMarkId() string {
+	if m != nil {
+		return m.MarkId
+	}
+	return ""
+}
+
+func (m *FlangeData) GetDOut() int32 {
+	if m != nil {
+		return m.DOut
+	}
+	return 0
+}
+
+func (m *FlangeData) GetPy() float32 {
+	if m != nil {
+		return m.Py
+	}
+	return 0
+}
+
+func (m *FlangeData) GetCorrosion() int32 {
+	if m != nil {
+		return m.Corrosion
+	}
+	return 0
+}
+
+type BoltData struct {
+}
+
+func (m *BoltData) Reset()                    { *m = BoltData{} }
+func (m *BoltData) String() string            { return proto.CompactTextString(m) }
+func (*BoltData) ProtoMessage()               {}
+func (*BoltData) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+type GasketData struct {
+	Type      string  `protobuf:"bytes,1,opt,name=type" json:"type,omitempty"`
+	Env       string  `protobuf:"bytes,2,opt,name=env" json:"env,omitempty"`
+	Thickness float32 `protobuf:"fixed32,3,opt,name=thickness" json:"thickness,omitempty"`
+	DOut      float32 `protobuf:"fixed32,4,opt,name=d_out,json=dOut" json:"d_out,omitempty"`
+	DIn       float32 `protobuf:"fixed32,5,opt,name=d_in,json=dIn" json:"d_in,omitempty"`
+}
+
+func (m *GasketData) Reset()                    { *m = GasketData{} }
+func (m *GasketData) String() string            { return proto.CompactTextString(m) }
+func (*GasketData) ProtoMessage()               {}
+func (*GasketData) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *GasketData) GetType() string {
+	if m != nil {
+		return m.Type
+	}
+	return ""
+}
+
+func (m *GasketData) GetEnv() string {
+	if m != nil {
+		return m.Env
+	}
+	return ""
+}
+
+func (m *GasketData) GetThickness() float32 {
+	if m != nil {
+		return m.Thickness
+	}
+	return 0
+}
+
+func (m *GasketData) GetDOut() float32 {
+	if m != nil {
+		return m.DOut
+	}
+	return 0
+}
+
+func (m *GasketData) GetDIn() float32 {
+	if m != nil {
+		return m.DIn
+	}
+	return 0
+}
+
+type FlangeRequest struct {
+	Pressure      float32       `protobuf:"fixed32,1,opt,name=pressure" json:"pressure,omitempty"`
+	AxialForce    int32         `protobuf:"varint,2,opt,name=axialForce" json:"axialForce,omitempty"`
+	BendingMoment int32         `protobuf:"varint,3,opt,name=bendingMoment" json:"bendingMoment,omitempty"`
+	Temp          float32       `protobuf:"fixed32,4,opt,name=temp" json:"temp,omitempty"`
+	IsWork        bool          `protobuf:"varint,5,opt,name=isWork" json:"isWork,omitempty"`
+	Flanges       string        `protobuf:"bytes,6,opt,name=flanges" json:"flanges,omitempty"`
+	IsSameFlange  bool          `protobuf:"varint,7,opt,name=isSameFlange" json:"isSameFlange,omitempty"`
+	IsEmbedded    bool          `protobuf:"varint,8,opt,name=isEmbedded" json:"isEmbedded,omitempty"`
+	Type          string        `protobuf:"bytes,9,opt,name=type" json:"type,omitempty"`
+	Condition     string        `protobuf:"bytes,10,opt,name=condition" json:"condition,omitempty"`
+	Calculation   string        `protobuf:"bytes,11,opt,name=calculation" json:"calculation,omitempty"`
+	FlangesData   []*FlangeData `protobuf:"bytes,12,rep,name=flangesData" json:"flangesData,omitempty"`
+	Gasket        *GasketData   `protobuf:"bytes,13,opt,name=gasket" json:"gasket,omitempty"`
+}
+
+func (m *FlangeRequest) Reset()                    { *m = FlangeRequest{} }
+func (m *FlangeRequest) String() string            { return proto.CompactTextString(m) }
+func (*FlangeRequest) ProtoMessage()               {}
+func (*FlangeRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+
+func (m *FlangeRequest) GetPressure() float32 {
+	if m != nil {
+		return m.Pressure
+	}
+	return 0
+}
+
+func (m *FlangeRequest) GetAxialForce() int32 {
+	if m != nil {
+		return m.AxialForce
+	}
+	return 0
+}
+
+func (m *FlangeRequest) GetBendingMoment() int32 {
+	if m != nil {
+		return m.BendingMoment
+	}
+	return 0
+}
+
+func (m *FlangeRequest) GetTemp() float32 {
+	if m != nil {
+		return m.Temp
+	}
+	return 0
+}
+
+func (m *FlangeRequest) GetIsWork() bool {
+	if m != nil {
+		return m.IsWork
+	}
+	return false
+}
+
+func (m *FlangeRequest) GetFlanges() string {
+	if m != nil {
+		return m.Flanges
+	}
+	return ""
+}
+
+func (m *FlangeRequest) GetIsSameFlange() bool {
+	if m != nil {
+		return m.IsSameFlange
+	}
+	return false
+}
+
+func (m *FlangeRequest) GetIsEmbedded() bool {
+	if m != nil {
+		return m.IsEmbedded
+	}
+	return false
+}
+
+func (m *FlangeRequest) GetType() string {
+	if m != nil {
+		return m.Type
+	}
+	return ""
+}
+
+func (m *FlangeRequest) GetCondition() string {
+	if m != nil {
+		return m.Condition
+	}
+	return ""
+}
+
+func (m *FlangeRequest) GetCalculation() string {
+	if m != nil {
+		return m.Calculation
+	}
+	return ""
+}
+
+func (m *FlangeRequest) GetFlangesData() []*FlangeData {
+	if m != nil {
+		return m.FlangesData
+	}
+	return nil
+}
+
+func (m *FlangeRequest) GetGasket() *GasketData {
+	if m != nil {
+		return m.Gasket
+	}
+	return nil
+}
+
+type FlangeResponse struct {
+	Test string `protobuf:"bytes,1,opt,name=test" json:"test,omitempty"`
+}
+
+func (m *FlangeResponse) Reset()                    { *m = FlangeResponse{} }
+func (m *FlangeResponse) String() string            { return proto.CompactTextString(m) }
+func (*FlangeResponse) ProtoMessage()               {}
+func (*FlangeResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+
+func (m *FlangeResponse) GetTest() string {
+	if m != nil {
+		return m.Test
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*PingRequest)(nil), "moment_proto.PingRequest")
 	proto.RegisterType((*PingResponse)(nil), "moment_proto.PingResponse")
+	proto.RegisterType((*FlangeData)(nil), "moment_proto.FlangeData")
+	proto.RegisterType((*BoltData)(nil), "moment_proto.BoltData")
+	proto.RegisterType((*GasketData)(nil), "moment_proto.GasketData")
+	proto.RegisterType((*FlangeRequest)(nil), "moment_proto.FlangeRequest")
+	proto.RegisterType((*FlangeResponse)(nil), "moment_proto.FlangeResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -134,17 +384,106 @@ var _PingService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "proto/moment.proto",
 }
 
+// Client API for FlangeService service
+
+type FlangeServiceClient interface {
+	CalculateFlange(ctx context.Context, in *FlangeRequest, opts ...grpc.CallOption) (*FlangeResponse, error)
+}
+
+type flangeServiceClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewFlangeServiceClient(cc *grpc.ClientConn) FlangeServiceClient {
+	return &flangeServiceClient{cc}
+}
+
+func (c *flangeServiceClient) CalculateFlange(ctx context.Context, in *FlangeRequest, opts ...grpc.CallOption) (*FlangeResponse, error) {
+	out := new(FlangeResponse)
+	err := grpc.Invoke(ctx, "/moment_proto.FlangeService/CalculateFlange", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for FlangeService service
+
+type FlangeServiceServer interface {
+	CalculateFlange(context.Context, *FlangeRequest) (*FlangeResponse, error)
+}
+
+func RegisterFlangeServiceServer(s *grpc.Server, srv FlangeServiceServer) {
+	s.RegisterService(&_FlangeService_serviceDesc, srv)
+}
+
+func _FlangeService_CalculateFlange_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FlangeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlangeServiceServer).CalculateFlange(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/moment_proto.FlangeService/CalculateFlange",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlangeServiceServer).CalculateFlange(ctx, req.(*FlangeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _FlangeService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "moment_proto.FlangeService",
+	HandlerType: (*FlangeServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CalculateFlange",
+			Handler:    _FlangeService_CalculateFlange_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/moment.proto",
+}
+
 func init() { proto.RegisterFile("proto/moment.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 136 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2a, 0x28, 0xca, 0x2f,
-	0xc9, 0xd7, 0xcf, 0xcd, 0xcf, 0x4d, 0xcd, 0x2b, 0xd1, 0x03, 0x73, 0x84, 0x78, 0x20, 0xbc, 0x78,
-	0x30, 0x4f, 0x89, 0x97, 0x8b, 0x3b, 0x20, 0x33, 0x2f, 0x3d, 0x28, 0xb5, 0xb0, 0x34, 0xb5, 0xb8,
-	0x44, 0x49, 0x89, 0x8b, 0x07, 0xc2, 0x2d, 0x2e, 0xc8, 0xcf, 0x2b, 0x4e, 0x15, 0x12, 0xe2, 0x62,
-	0x29, 0xc8, 0xcc, 0x4b, 0x97, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x02, 0xb3, 0x8d, 0x7c, 0x20,
-	0x5a, 0x82, 0x53, 0x8b, 0xca, 0x32, 0x93, 0x53, 0x85, 0x6c, 0xb9, 0x58, 0x40, 0x5c, 0x21, 0x49,
-	0x3d, 0x64, 0x83, 0xf5, 0x90, 0x4c, 0x95, 0x92, 0xc2, 0x26, 0x05, 0xb1, 0xc1, 0x49, 0x30, 0x8a,
-	0x5f, 0x4f, 0xdf, 0x1a, 0x59, 0x3e, 0x89, 0x0d, 0x4c, 0x19, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff,
-	0xd3, 0x1a, 0x6d, 0x37, 0xbe, 0x00, 0x00, 0x00,
+	// 530 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x53, 0x5f, 0x6f, 0xd3, 0x3e,
+	0x14, 0x55, 0xd2, 0x3f, 0x6b, 0x6f, 0xdb, 0xed, 0x37, 0xff, 0x24, 0x64, 0xca, 0x84, 0xa2, 0x68,
+	0x0f, 0x7d, 0xea, 0x50, 0x79, 0x03, 0xf1, 0x32, 0x60, 0x68, 0xd2, 0x10, 0xc8, 0x7b, 0x40, 0x42,
+	0x42, 0x95, 0x1b, 0x9b, 0x62, 0x35, 0xb1, 0x43, 0xec, 0x4e, 0xeb, 0x17, 0xe1, 0xdb, 0xf0, 0xdd,
+	0x90, 0x6f, 0x92, 0x26, 0x15, 0xe5, 0x29, 0xf7, 0x9c, 0x7b, 0x7d, 0x73, 0x7c, 0xee, 0x35, 0x90,
+	0xbc, 0x30, 0xce, 0x5c, 0x65, 0x26, 0x93, 0xda, 0xcd, 0x11, 0x90, 0x71, 0x89, 0x96, 0x88, 0xe2,
+	0x09, 0x8c, 0x3e, 0x2b, 0xbd, 0x66, 0xf2, 0xe7, 0x56, 0x5a, 0x17, 0xc7, 0x30, 0x2e, 0xa1, 0xcd,
+	0x8d, 0xb6, 0x92, 0x10, 0xe8, 0xe6, 0x4a, 0xaf, 0x69, 0x10, 0x05, 0xb3, 0x21, 0xc3, 0x38, 0xfe,
+	0x15, 0x00, 0xdc, 0xa4, 0x5c, 0xaf, 0xe5, 0x3b, 0xee, 0xb8, 0x2f, 0x71, 0xbb, 0x5c, 0xd6, 0x25,
+	0x3e, 0x26, 0x53, 0x18, 0x58, 0xc7, 0xb5, 0xe0, 0x85, 0xa3, 0x21, 0xf2, 0x7b, 0x4c, 0x9e, 0x40,
+	0x3f, 0xe3, 0xc5, 0xe6, 0x56, 0xd0, 0x0e, 0x66, 0x2a, 0xe4, 0xfb, 0x88, 0x4f, 0x5b, 0x47, 0xbb,
+	0x51, 0x30, 0xeb, 0x31, 0x8c, 0xc9, 0x29, 0x84, 0xf9, 0x8e, 0xf6, 0xa2, 0x60, 0x16, 0xb2, 0x30,
+	0xdf, 0x91, 0x0b, 0x18, 0x26, 0xa6, 0x28, 0x8c, 0x55, 0x46, 0xd3, 0x3e, 0x16, 0x36, 0x44, 0x0c,
+	0x30, 0xb8, 0x36, 0xa9, 0xf3, 0xaa, 0xe2, 0x47, 0x80, 0x0f, 0xdc, 0x6e, 0xa4, 0xfb, 0xa7, 0xc6,
+	0xff, 0xa0, 0x23, 0xf5, 0x43, 0x25, 0xcf, 0x87, 0xbe, 0xbb, 0xfb, 0xa1, 0x92, 0x8d, 0x96, 0xd6,
+	0xa2, 0xb8, 0x90, 0x35, 0x04, 0xf9, 0x1f, 0x7a, 0x62, 0x69, 0x2a, 0x81, 0x61, 0x25, 0xf0, 0x1c,
+	0xba, 0x62, 0xa9, 0x74, 0x25, 0xb1, 0x23, 0x6e, 0x75, 0xfc, 0xbb, 0x03, 0x93, 0xd2, 0x9e, 0xca,
+	0x54, 0xef, 0x46, 0x5e, 0x48, 0x6b, 0xb7, 0x45, 0xa9, 0x20, 0x64, 0x7b, 0x4c, 0x9e, 0x03, 0xf0,
+	0x47, 0xc5, 0xd3, 0x1b, 0x53, 0x24, 0x12, 0xc5, 0xf4, 0x58, 0x8b, 0x21, 0x97, 0x30, 0x59, 0x49,
+	0x2d, 0x94, 0x5e, 0x7f, 0xc4, 0xb1, 0xa1, 0xae, 0x1e, 0x3b, 0x24, 0xf1, 0x7e, 0x32, 0xcb, 0x6b,
+	0x69, 0x3e, 0xf6, 0x3e, 0x2b, 0xfb, 0xc5, 0x14, 0x1b, 0x14, 0x37, 0x60, 0x15, 0x22, 0x14, 0x4e,
+	0xbe, 0xa3, 0x3c, 0x8b, 0x0e, 0x0e, 0x59, 0x0d, 0x49, 0x0c, 0x63, 0x65, 0xef, 0x79, 0x26, 0x4b,
+	0xf9, 0xf4, 0x04, 0xcf, 0x1d, 0x70, 0x5e, 0xaf, 0xb2, 0xef, 0xb3, 0x95, 0x14, 0x42, 0x0a, 0x3a,
+	0xc0, 0x8a, 0x16, 0xb3, 0x77, 0x7a, 0xd8, 0x72, 0x1a, 0xa7, 0xa6, 0x85, 0x72, 0x7e, 0x6a, 0x80,
+	0x89, 0x86, 0x20, 0x11, 0x8c, 0x12, 0x9e, 0x26, 0xdb, 0x94, 0x63, 0x7e, 0x84, 0xf9, 0x36, 0x45,
+	0x5e, 0xc1, 0xa8, 0x92, 0xe8, 0x87, 0x49, 0xc7, 0x51, 0x67, 0x36, 0x5a, 0xd0, 0x79, 0x7b, 0x8f,
+	0xe7, 0xcd, 0x42, 0xb2, 0x76, 0x31, 0x79, 0x01, 0xfd, 0x35, 0xee, 0x01, 0x9d, 0x44, 0xc1, 0xdf,
+	0xc7, 0x9a, 0x1d, 0x61, 0x55, 0x5d, 0x7c, 0x09, 0xa7, 0xf5, 0xf8, 0x9a, 0x47, 0xe0, 0xa4, 0x75,
+	0xfb, 0xed, 0x91, 0xd6, 0x2d, 0xee, 0xca, 0x77, 0x73, 0x2f, 0x8b, 0x07, 0x95, 0x48, 0xf2, 0x06,
+	0xba, 0x1e, 0x92, 0xa7, 0x87, 0xed, 0x5b, 0x4f, 0x6b, 0x3a, 0x3d, 0x96, 0x2a, 0xff, 0xb0, 0xf8,
+	0x56, 0xaf, 0x4c, 0xdd, 0xef, 0x0e, 0xce, 0xde, 0x56, 0x0e, 0xd4, 0xce, 0x3f, 0x3b, 0x76, 0xe1,
+	0xba, 0xf9, 0xc5, 0xf1, 0x64, 0xd9, 0xfe, 0xfa, 0xfc, 0xeb, 0xd9, 0xfc, 0xea, 0x75, 0xbb, 0x62,
+	0xd5, 0xc7, 0xcf, 0xcb, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x61, 0x0b, 0xb1, 0xc3, 0x22, 0x04,
+	0x00, 0x00,
 }

@@ -18,13 +18,12 @@ func (h *Handler) initFilesRoutes(api *gin.RouterGroup) {
 	{
 		drawing.POST("/:bucket", h.createDrawing)
 		drawing.GET("/:bucket/:group/:id/:name", h.getDrawing)
-		drawing.DELETE("/:bucket/:group/:id/:name", h.middleware.UserIdentity, h.deleteDrawing)
+		drawing.DELETE("/:bucket/:group/:id/:name", h.deleteDrawing)
 	}
 }
 
 // @Summary Get Drawing
 // @Tags Files -> drawing
-// @Security ApiKeyAuth
 // @Description создание чертежа
 // @ModuleID getDrawing
 // @Accept json
@@ -116,7 +115,6 @@ func (h *Handler) getDrawing(c *gin.Context) {
 
 // @Summary Create Drawing
 // @Tags Files -> drawing
-// @Security ApiKeyAuth
 // @Description создание чертежа
 // @ModuleID createDrawing
 // @Accept multipart/form-data
@@ -233,7 +231,6 @@ func (h *Handler) createDrawing(c *gin.Context) {
 
 // @Summary Delete Drawing
 // @Tags Files -> drawing
-// @Security ApiKeyAuth
 // @Description удаление чертежа
 // @ModuleID deleteDrawing
 // @Accept json

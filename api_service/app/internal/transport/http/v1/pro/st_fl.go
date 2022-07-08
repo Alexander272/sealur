@@ -24,7 +24,6 @@ func (h *Handler) initStFlRoutes(api *gin.RouterGroup) {
 
 // @Summary Get Stand/Flange
 // @Tags Sealur Pro -> st-fl
-// @Security ApiKeyAuth
 // @Description получение списка стандартов (только для снп)
 // @ModuleID getStFl
 // @Accept json

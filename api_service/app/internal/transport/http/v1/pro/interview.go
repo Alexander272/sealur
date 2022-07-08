@@ -17,7 +17,6 @@ func (h *Handler) initInterviewRoutes(api *gin.RouterGroup) {
 
 // @Summary Send Interview
 // @Tags Sealur Pro -> interview
-// @Security ApiKeyAuth
 // @Description отправление данных опроса
 // @ModuleID sendInterview
 // @Accept json

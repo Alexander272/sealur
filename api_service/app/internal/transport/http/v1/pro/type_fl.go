@@ -25,7 +25,6 @@ func (h *Handler) initTypeFlRoutes(api *gin.RouterGroup) {
 
 // @Summary Get Type Flange
 // @Tags Sealur Pro -> flange-types
-// @Security ApiKeyAuth
 // @Description получение базовых типов фланца
 // @ModuleID getTypeFl
 // @Accept json
@@ -46,7 +45,6 @@ func (h *Handler) getTypeFl(c *gin.Context) {
 
 // @Summary Get All Type Flange
 // @Tags Sealur Pro -> flange-types
-// @Security ApiKeyAuth
 // @Description получение всех типов фланца
 // @ModuleID getAllTypeFl
 // @Accept json

@@ -24,7 +24,6 @@ func (h *Handler) initBoltMaterialsRoutes(api *gin.RouterGroup) {
 
 // @Summary Get Bolt Materials
 // @Tags Sealur Pro -> bolt materials
-// @Security ApiKeyAuth
 // @Description получение материалов болтов/шпилек (для опроса)
 // @ModuleID getBoltMaterials
 // @Accept json
