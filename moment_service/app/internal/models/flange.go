@@ -15,11 +15,14 @@ type FlangeSize struct {
 	Lenght   float64 `db:"lenght"`
 	Count    int32   `db:"count"`
 	Diameter int32   `db:"diameter"`
+	Area     float32 `db:"area"`
 }
 
 type InitialDataFlange struct {
 	DOut        float64
 	D           float64
+	Dk          float64
+	Ds          float64
 	H           float64
 	S0          float64
 	S1          float64
@@ -37,6 +40,36 @@ type InitialDataFlange struct {
 	SigmaR      float64
 	SigmaRAt20  float64
 	Material    string
+
+	Count    int32
+	Diameter int32
+	Area     float32
+}
+
+type CalculatedData struct {
+	B      float64
+	A      float64
+	Ds     float64
+	E      float64
+	Se     float64
+	Zak    float64
+	Betta  float64
+	X      float64
+	L0     float64
+	K      float64
+	BettaT float64
+	BettaU float64
+	BettaY float64
+	BettaZ float64
+	BettaF float64
+	BettaV float64
+	F      float64
+	Lymda  float64
+	Yf     float64
+	Yk     float64
+	Psik   float64
+	Yfn    float64
+	Yfc    float64
 }
 
 type InitialDataBolt struct {

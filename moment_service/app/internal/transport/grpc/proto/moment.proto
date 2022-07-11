@@ -21,13 +21,13 @@ message FlangeData {
     string type = 1;
     string standart = 2;
     string markId = 3;
-    int32 dOut = 4;
+    int32 dy = 4;
     float py = 5;
     int32 corrosion = 6;
 }
 
 message BoltData {
-    
+    string markId = 1;
 }
 
 message GasketData {
@@ -52,8 +52,8 @@ message FlangeRequest {
     string calculation = 11;//Moment
 
     repeated FlangeData flangesData = 12;
-
-    GasketData gasket = 13;
+    BoltData bolt = 13;
+    GasketData gasket = 14;
 }
 
 message FlangeResponse {
