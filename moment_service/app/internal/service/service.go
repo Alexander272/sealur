@@ -37,7 +37,7 @@ type Services struct {
 func NewServices(repos *repository.Repositories) *Services {
 	Materials := NewMaterialsService(repos.Materials)
 	Gasket := NewGasketService(repos.Gasket)
-	Graphic := NewGrapgicService()
+	Graphic := NewGraphicService()
 
 	return &Services{
 		Flange:    NewFlangeService(repos.Flange, Materials, Gasket, Graphic),

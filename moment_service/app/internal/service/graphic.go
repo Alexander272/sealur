@@ -4,7 +4,7 @@ import "math"
 
 type GraphicService struct{}
 
-func NewGrapgicService() *GraphicService {
+func NewGraphicService() *GraphicService {
 	return &GraphicService{}
 }
 

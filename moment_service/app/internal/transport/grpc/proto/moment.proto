@@ -12,14 +12,15 @@ service PingService {
     rpc Ping (PingRequest) returns (PingResponse);
 }
 
-// flanges можно, наверное, сделать enum
-// type тоже самое
-// condition ...
-// calculation ...
-
 message FlangeData {
-    string type = 1;
-    string standart = 2;
+    enum Type {
+        welded = 0;
+        flat = 1;
+        free = 2;
+    }
+
+    Type type = 1;
+    string standartId = 2;
     string markId = 3;
     int32 dy = 4;
     float py = 5;
@@ -31,28 +32,50 @@ message BoltData {
 }
 
 message GasketData {
-    string type = 1;
-    string env = 2;
+    string typeId = 1;
+    string envId = 2;
     float thickness = 3;
     float d_out = 4;
     float d_in = 5;
 }
 
 message FlangeRequest {
+    enum Flanges {
+        isolated = 0;
+        nonIsolated = 1;
+        manually = 2;
+    }
+
+    enum Type {
+        bolt = 0;
+        pin = 1;
+    }
+
+    enum Condition {
+        uncontrollable = 0;
+        controllable = 1;
+        controllablePin = 2;
+    }
+
+    enum Calcutation {
+        basis = 0;
+        strength = 1;
+    }
+
     float pressure = 1;//P
     int32 axialForce = 2;//F
     int32 bendingMoment = 3;//M
     float temp = 4;//T
     bool isWork = 5;//work
-    string flanges = 6;//ParTem
+    Flanges flanges = 6;//ParTem
     bool isSameFlange = 7;//Odin
     bool isEmbedded = 8;//ZakDet
-    string type = 9;//Tip
-    string condition = 10;//UsZat
-    string calculation = 11;//Moment
+    Type type = 9;//Tip
+    Condition condition = 10;//UsZat
+    Calcutation calculation = 11;//Moment
 
     repeated FlangeData flangesData = 12;
-    BoltData bolt = 13;
+    BoltData bolts = 13;
     GasketData gasket = 14;
 }
 

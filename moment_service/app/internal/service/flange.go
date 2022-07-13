@@ -55,13 +55,13 @@ func NewFlangeService(repo repository.Flange, materials *MaterialsService, gaske
 
 // TODO в зависимости от госта можно будет вызывать отдельные функции (возможно придется делать все в одной функции)
 func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.FlangeRequest) (*moment_proto.FlangeResponse, error) {
-	dataFlangeFirst, err := s.getDataFlange(ctx, data.FlangesData[0], data.Flanges, data.Temp)
+	dataFlangeFirst, err := s.getDataFlange(ctx, data.FlangesData[0], data.Flanges.String(), data.Temp)
 	if err != nil {
 		return nil, err
 	}
 	var dataFlangeSecond models.InitialDataFlange
 	if len(data.FlangesData) > 1 {
-		dataFlangeSecond, err = s.getDataFlange(ctx, data.FlangesData[1], data.Flanges, data.Temp)
+		dataFlangeSecond, err = s.getDataFlange(ctx, data.FlangesData[1], data.Flanges.String(), data.Temp)
 		if err != nil {
 			return nil, err
 		}
@@ -70,11 +70,11 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 	}
 
 	//TODO добавить зависимость от типа фланца
-	Tb := s.typeFlangesTD[data.Flanges] * float64(data.Temp)
+	Tb := s.typeFlangesTD[data.Flanges.String()] * float64(data.Temp)
 	// if ($TipF1 == 2) {
 
 	//TODO
-	boltMat, err := s.materials.GetMatFotCalculate(ctx, data.Bolt.MarkId, Tb)
+	boltMat, err := s.materials.GetMatFotCalculate(ctx, data.Bolts.MarkId, Tb)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 	//? иногда она не считается
 	yp = float64(gasket.Thickness*gasket.Compression) / (float64(gasket.Epsilon) * math.Pi * Dcp * bp)
 
-	Lb := Lb0 + s.typeBolt[data.Type]*float64(dataFlangeFirst.Diameter)
+	Lb := Lb0 + s.typeBolt[data.Type.String()]*float64(dataFlangeFirst.Diameter)
 
 	yb := Lb / (boltMat.EpsilonAt20 * float64(dataFlangeFirst.Area) * float64(dataFlangeFirst.Count))
 	Ab := float64(dataFlangeFirst.Count) * float64(dataFlangeFirst.Area)
@@ -202,9 +202,9 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 	} else {
 		Kyp = 1.35
 	}
-	if data.Condition == "uncontrollable" {
+	if data.Condition == moment_proto.FlangeRequest_uncontrollable {
 		Kyz = 1
-	} else if data.Condition == "controllable" {
+	} else if data.Condition == moment_proto.FlangeRequest_controllable {
 		Kyz = 1.1
 	} else {
 		Kyz = 1.3
@@ -308,7 +308,6 @@ func (s *FlangeService) getDataFlange(
 	typeFlange string,
 	temp float32,
 ) (models.InitialDataFlange, error) {
-
 	size, err := s.repo.GetSize(ctx, float64(flange.Dy), float64(flange.Py))
 	if err != nil {
 		return models.InitialDataFlange{}, fmt.Errorf("failed to get size. error: %w", err)
@@ -359,7 +358,7 @@ func (s *FlangeService) getCalculatedData(
 	Dcp float64,
 ) (models.CalculatedData, error) {
 	var calculated models.CalculatedData
-	if flange.Type != "free" {
+	if flange.Type != moment_proto.FlangeData_free {
 		calculated.B = 0.5 * (data.D6 - Dcp)
 	} else {
 		calculated.Ds = 0.5 * (data.D + data.Dk + 2*data.H)
@@ -367,7 +366,7 @@ func (s *FlangeService) getCalculatedData(
 		calculated.B = 0.5 * (data.Ds - Dcp)
 	}
 
-	if flange.Type != "welded" {
+	if flange.Type != moment_proto.FlangeData_welded {
 		calculated.Se = data.S0
 	} else {
 		calculated.X = data.L / (math.Sqrt(data.D * data.S0))
@@ -395,7 +394,7 @@ func (s *FlangeService) getCalculatedData(
 	divider = math.Pow(calculated.K, 2) - 1
 	calculated.BettaZ = dividend / divider
 
-	if flange.Type == "welded" && data.S0 != data.S1 {
+	if flange.Type == moment_proto.FlangeData_welded && data.S0 != data.S1 {
 		betta := data.S1 / data.S0
 		x := data.L / calculated.L0
 
@@ -411,12 +410,12 @@ func (s *FlangeService) getCalculatedData(
 	calculated.Lymda = (calculated.BettaF+data.H+calculated.L0)/calculated.BettaT*data.L + calculated.BettaV*math.Pow(data.H, 3)/(calculated.BettaU*calculated.L0*math.Pow(data.S0, 2))
 	calculated.Yf = (0.91 * calculated.BettaV) / (data.EpsilonAt20 * calculated.Lymda * math.Pow(data.S0, 2) * calculated.L0)
 
-	if flange.Type == "free" {
+	if flange.Type == moment_proto.FlangeData_free {
 		calculated.Psik = 1.28 * (math.Log(data.Dnk/data.Dk) / math.Log(10))
 		calculated.Yk = 1 / (data.EpsilonKAt20 * math.Pow(data.Hk, 3) * calculated.Psik)
 	}
 
-	if flange.Type != "free" {
+	if flange.Type != moment_proto.FlangeData_free {
 		calculated.Yfn = math.Pow(math.Pi/4, 3) * (data.D6 / (data.EpsilonAt20 * data.D * math.Pow(data.H, 3)))
 	} else {
 		calculated.Yfn = math.Pow(math.Pi/4, 3) * (data.Ds / (data.EpsilonAt20 * data.D * math.Pow(data.H, 3)))
