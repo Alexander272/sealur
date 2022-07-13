@@ -20,19 +20,29 @@ type Gasket interface {
 	Get(ctx context.Context, gasket models.GetGasket) (models.Gasket, error)
 }
 
+type Graphic interface {
+	CalculateBettaF(betta, x float64) float64
+	CalculateBettaV(betta, x float64) float64
+	CalculateF(betta, x float64) float64
+	CalculateMkp(diameter int32, sigma float64) float64
+}
+
 type Services struct {
 	Flange
 	Materials
 	Gasket
+	Graphic
 }
 
 func NewServices(repos *repository.Repositories) *Services {
 	Materials := NewMaterialsService(repos.Materials)
 	Gasket := NewGasketService(repos.Gasket)
+	Graphic := NewGrapgicService()
 
 	return &Services{
-		Flange:    NewFlangeService(repos.Flange, Materials, Gasket),
+		Flange:    NewFlangeService(repos.Flange, Materials, Gasket, Graphic),
 		Materials: Materials,
 		Gasket:    Gasket,
+		Graphic:   Graphic,
 	}
 }

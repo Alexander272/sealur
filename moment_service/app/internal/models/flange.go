@@ -19,27 +19,30 @@ type FlangeSize struct {
 }
 
 type InitialDataFlange struct {
-	DOut        float64
-	D           float64
-	Dk          float64
-	Ds          float64
-	H           float64
-	S0          float64
-	S1          float64
-	L           float64
-	D6          float64
-	C           float64
-	Tf          float64
-	AlphaF      float64
-	EpsilonAt20 float64
-	Epsilon     float64
-	SigmaAt20   float64
-	Sigma       float64
-	SigmaM      float64
-	SigmaMAt20  float64
-	SigmaR      float64
-	SigmaRAt20  float64
-	Material    string
+	DOut         float64
+	D            float64
+	Dk           float64
+	Dnk          float64
+	Ds           float64
+	H            float64
+	Hk           float64
+	S0           float64
+	S1           float64
+	L            float64
+	D6           float64
+	C            float64
+	Tf           float64
+	AlphaF       float64
+	EpsilonAt20  float64
+	EpsilonKAt20 float64
+	Epsilon      float64
+	SigmaAt20    float64
+	Sigma        float64
+	SigmaM       float64
+	SigmaMAt20   float64
+	SigmaR       float64
+	SigmaRAt20   float64
+	Material     string
 
 	Count    int32
 	Diameter int32
