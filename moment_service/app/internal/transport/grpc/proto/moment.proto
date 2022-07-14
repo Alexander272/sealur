@@ -12,6 +12,8 @@ service PingService {
     rpc Ping (PingRequest) returns (PingResponse);
 }
 
+// -----------------------------------------------------------------------
+
 message FlangeData {
     enum Type {
         welded = 0;
@@ -23,7 +25,7 @@ message FlangeData {
     string standartId = 2;
     string markId = 3;
     int32 dy = 4;
-    float py = 5;
+    double py = 5;
     int32 corrosion = 6;
 }
 
@@ -34,9 +36,9 @@ message BoltData {
 message GasketData {
     string typeId = 1;
     string envId = 2;
-    float thickness = 3;
-    float d_out = 4;
-    float d_in = 5;
+    double thickness = 3;
+    double d_out = 4;
+    double d_in = 5;
 }
 
 message FlangeRequest {
@@ -62,10 +64,10 @@ message FlangeRequest {
         strength = 1;
     }
 
-    float pressure = 1;//P
+    double pressure = 1;//P
     int32 axialForce = 2;//F
     int32 bendingMoment = 3;//M
-    float temp = 4;//T
+    double temp = 4;//T
     bool isWork = 5;//work
     Flanges flanges = 6;//ParTem
     bool isSameFlange = 7;//Odin
@@ -79,8 +81,100 @@ message FlangeRequest {
     GasketData gasket = 14;
 }
 
+message FlangeResult {
+    double dOut = 1;
+	double d = 2;
+	double dk = 3;
+	double dnk = 4;
+	double ds = 5;
+	double h = 6;
+	double hk = 7;
+	double s0 = 8;
+	double s1 = 9;
+	double l = 10;
+	double d6 = 11;
+	double c = 12;
+	double tf = 13;
+	double tk = 14;
+	double alphaK = 15;
+	double epsilonKAt20 = 16;
+	double epsilonK = 17;
+	double sigmaKAt20 = 18;
+	double sigmaK = 19;
+	double alphaF = 20;
+	double epsilonAt20 = 21;
+	double epsilon = 22;
+	double sigmaAt20 = 23;
+	double sigma = 24;
+	double sigmaM = 25;
+	double sigmaMAt20 = 26;
+	double sigmaR = 27;
+	double sigmaRAt20 = 28;
+	string material = 29;
+}
+
+message BoltResult {
+    int32 diameter = 1;
+	double area = 2;
+    int32 count = 3;
+    double lenght = 4;
+    double temp = 5;
+    double alpha = 6;
+	double epsilonAt20 = 7;
+	double epsilon = 8;
+	double sigmaAt20 = 9;
+	double sigma = 10;
+}
+
+message GasketResult {
+    string typeId = 1;
+    string envId = 2;
+    double thickness = 3;
+    double d_out = 4;
+    double width = 5;
+    double m = 6;
+    double pres = 7;
+    double compression = 8;
+    double epsilon = 9;
+    double permissiblePres = 10;
+}
+
+message CalculatedFlange {
+    double b0 = 1;
+    double Dsp = 2;
+    double Po = 3;
+    double Rp = 4;
+    double A = 5;
+    double Qd = 6;
+    double Qfm = 7;
+    double Qt = 8;
+    double Pb = 9;
+    double alpha = 10;
+    double alphaM = 11;
+    double Pb1 = 12;
+    double Pb2 = 13;
+    double Pbr = 14;
+
+    double sigmaB1 = 15;
+    double sigmaB2 = 16;
+    double dSigmaM = 17;
+    double dSigmaR = 18;
+    double q = 19;
+    double qP = 20;
+    double Mkp = 21;
+    double Mkp1 = 22;
+    double Mrek = 23;
+    double Qrek = 24;
+    double Mmax = 25;
+    double Qmax = 26;
+}
+
 message FlangeResponse {
-    string test = 1;
+    bool isSameFlange = 1;
+    repeated FlangeResult flanges = 2;
+    BoltResult bolt = 3;
+    GasketResult gasket = 4;
+    CalculatedFlange calc = 5;
 }
 
 service FlangeService {

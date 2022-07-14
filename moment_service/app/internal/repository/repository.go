@@ -8,7 +8,7 @@ import (
 )
 
 type Flange interface {
-	GetSize(ctx context.Context, dn, pn float64) (models.FlangeSize, error)
+	GetSize(ctx context.Context, dn, pn float64, standId string) (models.FlangeSize, error)
 }
 
 type Materials interface {

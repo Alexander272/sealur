@@ -34,20 +34,23 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 		sigma = mats[0].Voltage
 	} else {
 		for i, m := range mats {
+			if i == 0 {
+				continue
+			}
 			temps := float64((temp - mats[i-1].Temp) / (m.Temp - mats[i-1].Temp))
 
 			//TODO добавить проверку на nil для m.Alpha
-			if temp > m.Temp {
+			if temp >= mats[i-1].Temp && temp < m.Temp {
 				alphaF = (temps*(m.Alpha-mats[i-1].Alpha) + mats[i-1].Alpha) * math.Pow10(-5)
 			}
 
 			//TODO добавить проверку на nil для m.Elasticity
-			if temp > m.Temp {
+			if temp >= mats[i-1].Temp && temp < m.Temp {
 				epsilon = (temps*(m.Elasticity-mats[i-1].Elasticity) + mats[i-1].Elasticity) * math.Pow10(5)
 			}
 
 			//TODO добавить проверку на nil для m.Voltage
-			if temp > m.Temp {
+			if temp >= mats[i-1].Temp && temp < m.Temp {
 				sigma = temps*(m.Voltage-mats[i-1].Voltage) + mats[i-1].Voltage
 			}
 		}
