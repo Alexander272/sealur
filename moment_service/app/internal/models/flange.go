@@ -79,9 +79,23 @@ type CalculatedData struct {
 	Yfc    float64
 }
 
-type InitialDataBolt struct {
+type CalculatedBasis struct {
+	Qt      float64
+	Pb1     float64
+	Pb2     float64
+	Pbm     float64
+	Pbr     float64
+	SigmaB1 float64
+	SigmaB2 float64
+	DSigmaM float64
+	DSigmaR float64
+	Q       float64
+	Mkp     float64
+	Mkp1    float64
+	Mrek    float64
+	Qrek    float64
+	Mmax    float64
+	Qmax    float64
 }
 
-type CalculatedBasis struct{}
-
-type CalculatedDSigma struct{}
+type CalculatedStrength struct{}

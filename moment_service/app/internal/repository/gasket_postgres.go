@@ -18,10 +18,10 @@ func NewGasketRepo(db *sqlx.DB) *GasketRepo {
 
 //TODO isOval и isMetal надо заменить на тип прокладки
 var gaskets = []models.Gasket{
-	{M: 3.0, SpecificPres: 69.0, PermissiblePres: 400.0, Compression: 1, Epsilon: 0.02 * math.Pow10(5), Thickness: 2.3, IsOval: false, IsMetal: false},
-	{M: 3.0, SpecificPres: 69.0, PermissiblePres: 400.0, Compression: 1, Epsilon: 0.02 * math.Pow10(5), Thickness: 3.2, IsOval: false, IsMetal: false},
-	{M: 3.0, SpecificPres: 69.0, PermissiblePres: 400.0, Compression: 1, Epsilon: 0.02 * math.Pow10(5), Thickness: 4.5, IsOval: false, IsMetal: false},
-	{M: 3.0, SpecificPres: 69.0, PermissiblePres: 400.0, Compression: 1, Epsilon: 0.02 * math.Pow10(5), Thickness: 6.5, IsOval: false, IsMetal: false},
+	{M: 3.0, SpecificPres: 69.0, PermissiblePres: 400.0, Compression: 1, Epsilon: 0.02 * math.Pow10(5), Thickness: 2.3, Type: "Metal"},
+	{M: 3.0, SpecificPres: 69.0, PermissiblePres: 400.0, Compression: 1, Epsilon: 0.02 * math.Pow10(5), Thickness: 3.2, Type: "Metal"},
+	{M: 3.0, SpecificPres: 69.0, PermissiblePres: 400.0, Compression: 1, Epsilon: 0.02 * math.Pow10(5), Thickness: 4.5, Type: "Metal"},
+	{M: 3.0, SpecificPres: 69.0, PermissiblePres: 400.0, Compression: 1, Epsilon: 0.02 * math.Pow10(5), Thickness: 6.5, Type: "Metal"},
 }
 
 func (r *GasketRepo) Get(ctx context.Context, gasket models.GetGasket) (models.Gasket, error) {

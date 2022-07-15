@@ -21,4 +21,18 @@ const (
 	Bp    float64 = 15
 	BoltD float64 = 0.28
 	PinD  float64 = 0.56
+
+	WorkKyp float64 = 1
+	TestKyp float64 = 1.35
+
+	UncontrollableKyz  float64 = 1
+	ControllableKyz    float64 = 1.1
+	ControllablePinKyz float64 = 1.3
+
+	NoLoadKyt float64 = 1
+	LoadKyt   float64 = 1.3
+
+	MinDiameter int32   = 20
+	MaxDiameter int32   = 52
+	MaxSigmaB   float64 = 120
 )

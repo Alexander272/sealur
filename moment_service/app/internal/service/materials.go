@@ -28,8 +28,9 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 	epsilonAt20 = mats[0].Elasticity * math.Pow10(5)
 	sigmaAt20 = mats[0].Voltage
 
+	//TODO разделить на три части (будет 3 таблицы)
 	if temp < mats[0].Temp {
-		alphaF = mats[0].Alpha * math.Pow10(-5)
+		alphaF = mats[0].Alpha * math.Pow10(-6)
 		epsilon = mats[0].Elasticity * math.Pow10(5)
 		sigma = mats[0].Voltage
 	} else {
@@ -37,19 +38,16 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 			if i == 0 {
 				continue
 			}
-			temps := float64((temp - mats[i-1].Temp) / (m.Temp - mats[i-1].Temp))
+			temps := (temp - mats[i-1].Temp) / (m.Temp - mats[i-1].Temp)
 
-			//TODO добавить проверку на nil для m.Alpha
 			if temp >= mats[i-1].Temp && temp < m.Temp {
-				alphaF = (temps*(m.Alpha-mats[i-1].Alpha) + mats[i-1].Alpha) * math.Pow10(-5)
+				alphaF = (temps*(m.Alpha-mats[i-1].Alpha) + mats[i-1].Alpha) * math.Pow10(-6)
 			}
 
-			//TODO добавить проверку на nil для m.Elasticity
 			if temp >= mats[i-1].Temp && temp < m.Temp {
 				epsilon = (temps*(m.Elasticity-mats[i-1].Elasticity) + mats[i-1].Elasticity) * math.Pow10(5)
 			}
 
-			//TODO добавить проверку на nil для m.Voltage
 			if temp >= mats[i-1].Temp && temp < m.Temp {
 				sigma = temps*(m.Voltage-mats[i-1].Voltage) + mats[i-1].Voltage
 			}

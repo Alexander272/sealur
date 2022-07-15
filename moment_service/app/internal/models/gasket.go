@@ -1,9 +1,17 @@
 package models
 
+type GasketType int
+
+const (
+	Soft GasketType = iota
+	Oval
+	Metal
+)
+
 type GetGasket struct {
-	TypeGasket string  `db:"type_gasket"`
-	Env        string  `db:"env"`
-	Thickness  float64 `db:"thickness"`
+	GasketId  string  `db:"gasket_id"`
+	EnvId     string  `db:"env_id"`
+	Thickness float64 `db:"thickness"`
 }
 
 type Gasket struct {
@@ -15,6 +23,5 @@ type Gasket struct {
 	Compression     float64 `db:"k"`
 	Epsilon         float64 `db:"e"`
 	Thickness       float64 `db:"thickness"`
-	IsOval          bool    `db:"is_oval"`
-	IsMetal         bool    `db:"is_metal"`
+	Type            string  `db:"gasket_type"`
 }

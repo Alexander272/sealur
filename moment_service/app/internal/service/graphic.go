@@ -1,6 +1,10 @@
 package service
 
-import "math"
+import (
+	"math"
+
+	"github.com/Alexander272/sealur/moment_service/internal/constants"
+)
 
 type GraphicService struct{}
 
@@ -15,7 +19,7 @@ func (s *GraphicService) CalculateBettaF(betta, x float64) float64 {
 
 	switch {
 	case x >= 0 && x < 0.1:
-		f1 = 0.908920
+		f1 = constants.InitBettaF
 		f2 = (-0.000000685709774295162)*math.Pow(betta, 6) + 0.00000179042442916*math.Pow(betta, 5) + 0.00121342871946961*math.Pow(betta, 4) - 0.0156079520766816*math.Pow(betta, 3) + 0.0713852548204228*math.Pow(betta, 2) - 0.132033833830155*betta + 0.983961997348035
 		f = ((x-0.0)/(0.10-0.0))*(f2-f1) + f1
 	case x >= 0.1 && x < 0.2:
@@ -92,7 +96,7 @@ func (s *GraphicService) CalculateBettaV(betta, x float64) float64 {
 
 	switch {
 	case x >= 0 && x < 0.10:
-		f1 = 0.550103
+		f1 = constants.InitBettaV
 		f2 = 0.0058641634223339*math.Pow(betta, 4) - 0.0748566044272087*math.Pow(betta, 3) + 0.345864798973686*math.Pow(betta, 2) - 0.708412154836844*betta + 0.980776349799449
 		f = ((x-0.00)/(0.10-0.00))*(f2-f1) + f1
 	case x >= 0.10 && x < 0.12:
@@ -256,7 +260,7 @@ func (s *GraphicService) CalculateF(betta, x float64) float64 {
 		f2 = ((betta-4.63)/(5.0-4.63))*(1.3-1.0) + 1.0
 		f = ((x-1.20)/(1.30-1.20))*(f2-f1) + f1
 	default:
-		f = 1.0
+		f = constants.InitF
 	}
 
 	return f

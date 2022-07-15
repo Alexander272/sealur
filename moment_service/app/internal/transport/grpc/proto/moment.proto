@@ -14,6 +14,12 @@ service PingService {
 
 // -----------------------------------------------------------------------
 
+message Gasket {
+    
+}
+
+// -----------------------------------------------------------------------
+
 message FlangeData {
     enum Type {
         welded = 0;
@@ -34,11 +40,16 @@ message BoltData {
 }
 
 message GasketData {
-    string typeId = 1;
+    string gasketId = 1;
     string envId = 2;
     double thickness = 3;
     double d_out = 4;
     double d_in = 5;
+}
+
+message EmbedData {
+    string markId = 1;
+    double thickness = 2;
 }
 
 message FlangeRequest {
@@ -79,6 +90,9 @@ message FlangeRequest {
     repeated FlangeData flangesData = 12;
     BoltData bolts = 13;
     GasketData gasket = 14;
+    EmbedData embed = 15;
+
+    bool isNeedFormulas = 16;
 }
 
 message FlangeResult {
@@ -127,7 +141,7 @@ message BoltResult {
 }
 
 message GasketResult {
-    string typeId = 1;
+    string gasketId = 1;
     string envId = 2;
     double thickness = 3;
     double d_out = 4;
@@ -137,6 +151,13 @@ message GasketResult {
     double compression = 8;
     double epsilon = 9;
     double permissiblePres = 10;
+}
+
+message EmbedResult {
+    string markId = 1;
+    double thickness = 2;
+    double alpfa = 3;
+    double temp = 4;
 }
 
 message CalculatedFlange {
@@ -169,12 +190,44 @@ message CalculatedFlange {
     double Qmax = 26;
 }
 
+message CalcFormulas {
+    string b0 = 1;
+    string Dsp = 2;
+    string Po = 3;
+    string Rp = 4;
+    string A = 5;
+    string Qd = 6;
+    string Qfm = 7;
+    string Qt = 8;
+    string Pb = 9;
+    string alpha = 10;
+    string alphaM = 11;
+    string Pb1 = 12;
+    string Pb2 = 13;
+    string Pbr = 14;
+
+    string sigmaB1 = 15;
+    string sigmaB2 = 16;
+    string dSigmaM = 17;
+    string dSigmaR = 18;
+    string q = 19;
+    string qP = 20;
+    string Mkp = 21;
+    string Mkp1 = 22;
+    string Mrek = 23;
+    string Qrek = 24;
+    string Mmax = 25;
+    string Qmax = 26;
+}
+
 message FlangeResponse {
     bool isSameFlange = 1;
     repeated FlangeResult flanges = 2;
     BoltResult bolt = 3;
     GasketResult gasket = 4;
-    CalculatedFlange calc = 5;
+    EmbedResult embed = 5;
+    CalculatedFlange calc = 6;
+    CalcFormulas formulas = 7;
 }
 
 service FlangeService {
