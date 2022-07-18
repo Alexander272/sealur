@@ -35,4 +35,9 @@ const (
 	MinDiameter int32   = 20
 	MaxDiameter int32   = 52
 	MaxSigmaB   float64 = 120
+
+	MinD      float64 = 400
+	MaxD      float64 = 2000
+	MinDTetta float64 = 0.006
+	MaxDTetta float64 = 0.013
 )

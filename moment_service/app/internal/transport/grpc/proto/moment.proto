@@ -32,7 +32,7 @@ message FlangeData {
     string markId = 3;
     int32 dy = 4;
     double py = 5;
-    int32 corrosion = 6;
+    double corrosion = 6;
 }
 
 message BoltData {
@@ -160,6 +160,68 @@ message EmbedResult {
     double temp = 4;
 }
 
+message StrengthResult {
+    double Mkp = 1;
+    double Mkp1 = 2;
+    double Cf = 3;
+    double Dzv = 4;
+    double MM = 5;
+    double MMk = 6;
+    double Mpk = 7;
+	double Mp = 8;
+	double sigmaM1 = 9;
+	double sigmaM0 = 10;
+	double sigmaT = 11;
+	double sigmaR = 12;
+	double sigmaTp = 13;
+	double sigmaRp = 14;
+	double sigmaK = 15;
+	double sigmaP1 = 16;
+	double sigmaP0 = 17;
+	double sigmaMp = 18;
+	double sigmaMpm = 19;
+	double sigmaMp0 = 20;
+	double sigmaMpm0 = 21;
+	double sigmaMop = 22;
+	double sigmaKp = 23;
+	double teta = 24;
+	double dTeta = 25;
+	double dTetaK = 26;
+	double tetaK = 27;
+
+	double Max1 = 28;
+    double Max2 = 29;
+    double Max3 = 30;
+    double Max4 = 31;
+    double Max5 = 32;
+    double Max6 = 33;
+    double Max7 = 34;
+    double Max8 = 35;
+    double Max9 = 36;
+    double Max10 = 37;
+    double Max11 = 38;
+}
+
+message CalcMoment {
+    double Pb = 1;
+    double Pb1 = 2;
+    double Pb2 = 3;
+    double Pbr = 4;
+    double sigmaB1 = 5;
+    double sigmaB2 = 6;
+    double dSigmaM = 7;
+    double dSigmaR = 8;
+    double q = 9;
+    double qP = 10;
+    double Mkp = 11;
+    double Mkp1 = 12;
+    double Mrek = 13;
+    double Qrek = 14;
+    double Mmax = 15;
+    double Qmax = 16;
+    repeated StrengthResult strength = 17;
+}
+
 message CalculatedFlange {
     double b0 = 1;
     double Dsp = 2;
@@ -169,25 +231,10 @@ message CalculatedFlange {
     double Qd = 6;
     double Qfm = 7;
     double Qt = 8;
-    double Pb = 9;
-    double alpha = 10;
-    double alphaM = 11;
-    double Pb1 = 12;
-    double Pb2 = 13;
-    double Pbr = 14;
-
-    double sigmaB1 = 15;
-    double sigmaB2 = 16;
-    double dSigmaM = 17;
-    double dSigmaR = 18;
-    double q = 19;
-    double qP = 20;
-    double Mkp = 21;
-    double Mkp1 = 22;
-    double Mrek = 23;
-    double Qrek = 24;
-    double Mmax = 25;
-    double Qmax = 26;
+    double alpha = 9;
+    double alphaM = 10;
+    CalcMoment strength = 11;
+    CalcMoment basis = 12;
 }
 
 message CalcFormulas {

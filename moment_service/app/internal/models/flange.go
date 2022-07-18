@@ -19,18 +19,18 @@ type FlangeSize struct {
 }
 
 type InitialDataFlange struct {
-	DOut float64
-	D    float64
-	Dk   float64
-	Dnk  float64
-	Ds   float64
-	H    float64
-	Hk   float64
-	S0   float64
-	S1   float64
-	L    float64
-	D6   float64
-	// C            float64
+	DOut         float64
+	D            float64
+	Dk           float64
+	Dnk          float64
+	Ds           float64
+	H            float64
+	Hk           float64
+	S0           float64
+	S1           float64
+	L            float64
+	D6           float64
+	C            float64
 	Tf           float64
 	Tk           float64
 	AlphaK       float64
@@ -98,4 +98,35 @@ type CalculatedBasis struct {
 	Qmax    float64
 }
 
-type CalculatedStrength struct{}
+type CalculatedStrength struct {
+	Mkp       float64
+	Mkp1      float64
+	Cf        float64
+	Dzv       float64
+	MM        float64
+	MMk       float64
+	Mpk       float64
+	Mp        float64
+	SigmaM1   float64
+	SigmaM0   float64
+	SigmaT    float64
+	SigmaR    float64
+	SigmaTp   float64
+	SigmaRp   float64
+	SigmaK    float64
+	SigmaP1   float64
+	SigmaP0   float64
+	SigmaMp   float64
+	SigmaMpm  float64
+	SigmaMp0  float64
+	SigmaMpm0 float64
+	SigmaMop  float64
+	SigmaKp   float64
+
+	Teta   float64
+	DTeta  float64
+	DTetaK float64
+	TetaK  float64
+
+	Max1, Max2, Max3, Max4, Max5, Max6, Max7, Max8, Max9, Max10, Max11 float64
+}
