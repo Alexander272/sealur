@@ -3,8 +3,9 @@ package constants
 const (
 	IsolatedFlatTb float64 = 0.97
 	IsolatedFlatTf float64 = 1
-	// NonIsolatedFlatTb float64 = 0.95
-	NonIsolatedFlatTb float64 = 0.85
+	//rTODO вернуть новое занчение
+	NonIsolatedFlatTb float64 = 0.95
+	// NonIsolatedFlatTb float64 = 0.85
 	NonIsolatedFlatTf float64 = 0.96
 
 	IsolatedFreeTb    float64 = 0.9
@@ -40,4 +41,7 @@ const (
 	MaxD      float64 = 2000
 	MinDTetta float64 = 0.006
 	MaxDTetta float64 = 0.013
+
+	WorkTeta float64 = 1
+	TestTeta float64 = 1.3
 )

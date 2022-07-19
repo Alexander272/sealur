@@ -1,28 +1,53 @@
 package models
 
-/*
+type Voltage struct {
+	Id          string  `db:"id"`
+	Temperature float64 `db:"temperature"`
+	Voltage     float64 `db:"voltage"`
+}
 
-	Mark Table
-		id sereal
-		title text
+type Elasticity struct {
+	Id          string  `db:"id"`
+	Temperature float64 `db:"temperature"`
+	Elasticity  float64 `db:"elasticity"`
+}
 
+type Alpha struct {
+	Id          string  `db:"id"`
+	Temperature float64 `db:"temperature"`
+	Alpha       float64 `db:"alpha"`
+}
 
-	Сделаю три таблицы. Запрос буду делать с джоином или чем-то подобным (вроде должно сработать)
-	надо еще сортировать по температуре
+type MaterialsAll struct {
+	Alpha      []Alpha
+	Elasticity []Elasticity
+	Voltage    []Voltage
+}
 
-	^ - at
+type MaterialsDTO struct {
+	Id    string `db:"id"`
+	Title string `db:"title"`
+}
 
-	может болты тоже отдельно в таблицу вынести (можно будет сразу забирать диаметр)
-*/
+type VoltageDTO struct {
+	Id          string  `db:"id"`
+	MarkId      string  `db:"mark_id"`
+	Temperature float64 `db:"temperature"`
+	Voltage     float64 `db:"voltage"`
+}
 
-//? //TODO Хз правильно это или нет
-type Materials struct {
-	// возможно нужно сделать *float32 или разделить структуру на 3 части
-	MarkId     string  `db:"mark_id"`
-	Temp       float64 `db:"temp"`
-	Voltage    float64 `db:"voltage"`
-	Elasticity float64 `db:"elasticity"`
-	Alpha      float64 `db:"alpha"`
+type ElasticityDTO struct {
+	Id          string  `db:"id"`
+	MarkId      string  `db:"mark_id"`
+	Temperature float64 `db:"temperature"`
+	Elasticity  float64 `db:"elasticity"`
+}
+
+type AlphaDTO struct {
+	Id          string  `db:"id"`
+	MarkId      string  `db:"mark_id"`
+	Temperature float64 `db:"temperature"`
+	Alpha       float64 `db:"alpha"`
 }
 
 type MaterialsResult struct {

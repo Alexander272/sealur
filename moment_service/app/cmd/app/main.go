@@ -12,8 +12,8 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service"
 	handlers "github.com/Alexander272/sealur/moment_service/internal/transport/grpc"
 	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur/moment_service/pkg/database/postgres"
 	"github.com/Alexander272/sealur/moment_service/pkg/logger"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/subosito/gotenv"
 	"google.golang.org/grpc"
@@ -32,21 +32,21 @@ func main() {
 
 	//* Dependencies
 
-	// db, err := postgres.NewPostgresDB(postgres.Config{
-	// 	Host:     conf.Postgres.Host,
-	// 	Port:     conf.Postgres.Port,
-	// 	Username: conf.Postgres.Username,
-	// 	Password: conf.Postgres.Password,
-	// 	DBName:   conf.Postgres.DbName,
-	// 	SSLMode:  conf.Postgres.SSLMode,
-	// })
-	// if err != nil {
-	// 	logger.Fatalf("failed to initialize db: %s", err.Error())
-	// }
+	db, err := postgres.NewPostgresDB(postgres.Config{
+		Host:     conf.Postgres.Host,
+		Port:     conf.Postgres.Port,
+		Username: conf.Postgres.Username,
+		Password: conf.Postgres.Password,
+		DBName:   conf.Postgres.DbName,
+		SSLMode:  conf.Postgres.SSLMode,
+	})
+	if err != nil {
+		logger.Fatalf("failed to initialize db: %s", err.Error())
+	}
 
 	//* Services, Repos & API Handlers
 
-	repos := repository.NewRepo(&sqlx.DB{})
+	repos := repository.NewRepo(db)
 	services := service.NewServices(repos)
 	handlers := handlers.NewHandler(services, conf.Api)
 
@@ -65,6 +65,7 @@ func main() {
 	server := grpc.NewServer(opts...)
 	moment_proto.RegisterPingServiceServer(server, handlers.Ping)
 	moment_proto.RegisterFlangeServiceServer(server, handlers.Flange)
+	moment_proto.RegisterMaterialsServiceServer(server, handlers.Materials)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {

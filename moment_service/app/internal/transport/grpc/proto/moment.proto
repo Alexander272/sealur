@@ -14,8 +14,105 @@ service PingService {
 
 // -----------------------------------------------------------------------
 
-message Gasket {
-    
+message IdResponse {
+    string id = 1;
+}
+message Response {}
+
+// -----------------------------------------------------------------------
+
+message Material {
+    string id = 1;
+    string title = 2;
+}
+
+message GetMaterialsRequest {}
+message CreateMaterialRequest {
+    string title = 1;
+}
+message UpdateMaterialRequest {
+    string id = 1;
+    string title = 2;
+}
+message DeleteMaterialRequest {
+    string id = 1;
+}
+
+message MaterialsResponse {
+    repeated Material materials = 1;
+}
+
+message Voltage {
+    double temperature = 1;
+    double voltage = 2;
+}
+message CreateVoltageRequest {
+    string markId = 1;
+    repeated Voltage voltage = 2;
+}
+message UpdateVoltageRequest {
+    string id = 1;
+    string markId = 2;
+    double temperature = 3;
+    double voltage = 4;
+}
+message DeleteVoltageRequest {
+    string id = 1;
+}
+
+message Elasticity {
+    double temperature = 1;
+    double elasticity = 2;
+}
+message CreateElasticityRequest {
+    string markId = 1;
+    repeated Elasticity elasticity = 2;
+}
+message UpdateElasticityRequest {
+    string id = 1;
+    string markId = 2;
+    double temperature = 3;
+    double elasticity = 4;
+}
+message DeleteElasticityRequest {
+    string id = 1;
+}
+
+message Alpha {
+    double temperature = 1;
+    double alpha = 2;
+}
+message CreateAlphaRequest {
+    string markId = 1;
+    repeated Alpha alpha = 2;
+}
+message UpdateAlphaRequest {
+    string id = 1;
+    string markId = 2;
+    double temperature = 3;
+    double alpha = 4;
+}
+message DeleteAlphaRequest {
+    string id = 1;
+}
+
+service MaterialsService {
+    rpc GetMaterials (GetMaterialsRequest) returns (MaterialsResponse);
+    rpc CreateMaterial (CreateMaterialRequest) returns (IdResponse);
+    rpc UpdateMaterial (UpdateMaterialRequest) returns (Response);
+    rpc DeleteMaterial (DeleteMaterialRequest) returns (Response);
+
+    rpc CreateVoltage (CreateVoltageRequest) returns (Response);
+    rpc UpdateVoltage (UpdateVoltageRequest) returns (Response);
+    rpc DeleteVoltage (DeleteVoltageRequest) returns (Response);
+
+    rpc CreateElasticity (CreateElasticityRequest) returns (Response);
+    rpc UpdateElasticity (UpdateElasticityRequest) returns (Response);
+    rpc DeleteElasticity (DeleteElasticityRequest) returns (Response);
+
+    rpc CreateAlpha (CreateAlphaRequest) returns (Response);
+    rpc UpdateAlpha (UpdateAlphaRequest) returns (Response);
+    rpc DeleteAlpha (DeleteAlphaRequest) returns (Response);
 }
 
 // -----------------------------------------------------------------------
@@ -202,7 +299,43 @@ message StrengthResult {
     double Max11 = 38;
 }
 
-message CalcMoment {
+message CalcMomentStrength {
+    double fPb = 1;
+    double fPb1 = 2;
+    double fPb2 = 3;
+    double fPbr = 4;
+    double fSigmaB1 = 5;
+    double fSigmaB2 = 6;
+    double fDSigmaM = 7;
+    double fDSigmaR = 8;
+    double fQ = 9;
+    double sPb = 10;
+    double sPb1 = 11;
+    double sPb2 = 12;
+    double sPbr = 13;
+    double sSigmaB1 = 14;
+    double sSigmaB2 = 15;
+    double sDSigmaM = 16;
+    double sDSigmaR = 17;
+    double sQ = 18;
+    double qP = 19;
+    double Mkp = 20;
+    double Mkp1 = 21;
+    double Mrek = 22;
+    double Qrek = 23;
+    double Mmax = 24;
+    double Qmax = 25;
+    repeated StrengthResult strength = 26;
+    bool vSigmaB1 = 27;
+    bool vSigmaB2 = 28;
+    bool vQmax = 29;
+    bool vTeta1 = 30;
+    bool vTetaK1 = 31;
+    bool vTeta2 = 32;
+    bool vTetaK2 = 33;
+}
+
+message CalcMomentBasis {
     double Pb = 1;
     double Pb1 = 2;
     double Pb2 = 3;
@@ -219,7 +352,8 @@ message CalcMoment {
     double Qrek = 14;
     double Mmax = 15;
     double Qmax = 16;
-    repeated StrengthResult strength = 17;
+    bool VSigmaB1 = 17;
+    bool VSigmaB2 = 18;
 }
 
 message CalculatedFlange {
@@ -233,38 +367,21 @@ message CalculatedFlange {
     double Qt = 8;
     double alpha = 9;
     double alphaM = 10;
-    CalcMoment strength = 11;
-    CalcMoment basis = 12;
+    CalcMomentStrength strength = 11;
+    CalcMomentBasis basis = 12;
 }
 
 message CalcFormulas {
     string b0 = 1;
-    string Dsp = 2;
+    string Dcp = 2;
     string Po = 3;
     string Rp = 4;
     string A = 5;
     string Qd = 6;
     string Qfm = 7;
     string Qt = 8;
-    string Pb = 9;
-    string alpha = 10;
-    string alphaM = 11;
-    string Pb1 = 12;
-    string Pb2 = 13;
-    string Pbr = 14;
-
-    string sigmaB1 = 15;
-    string sigmaB2 = 16;
-    string dSigmaM = 17;
-    string dSigmaR = 18;
-    string q = 19;
-    string qP = 20;
-    string Mkp = 21;
-    string Mkp1 = 22;
-    string Mrek = 23;
-    string Qrek = 24;
-    string Mmax = 25;
-    string Qmax = 26;
+    string alpha = 9;
+    string alphaM = 10;
 }
 
 message FlangeResponse {

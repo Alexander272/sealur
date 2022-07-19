@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"strconv"
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
@@ -78,8 +79,8 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 		IsSameFlange: data.IsSameFlange,
 		Bolt:         &moment_proto.BoltResult{},
 		Calc: &moment_proto.CalculatedFlange{
-			Strength: &moment_proto.CalcMoment{},
-			Basis:    &moment_proto.CalcMoment{},
+			Strength: &moment_proto.CalcMomentStrength{},
+			Basis:    &moment_proto.CalcMomentBasis{},
 		},
 		Gasket:   &moment_proto.GasketResult{},
 		Formulas: &moment_proto.CalcFormulas{},
@@ -194,7 +195,8 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 	}
 
 	//TODO учесть ввод данных для прокладки (все значения заносятся ручками)
-	gasket, err := s.gasket.Get(ctx, models.GetGasket{GasketId: data.Gasket.GasketId, EnvId: data.Gasket.EnvId, Thickness: data.Gasket.Thickness})
+	g := models.GetGasket{GasketId: data.Gasket.GasketId, EnvId: data.Gasket.EnvId, Thickness: data.Gasket.Thickness}
+	gasket, err := s.gasket.Get(ctx, g)
 	if err != nil {
 		return nil, err
 	}
@@ -252,7 +254,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 
 		if data.IsNeedFormulas {
 			result.Formulas.B0 = fmt.Sprintf("%.3f/4", bp)
-			result.Formulas.Dsp = fmt.Sprintf("%.0f - %.3f/2", data.Gasket.DOut, bp)
+			result.Formulas.Dcp = fmt.Sprintf("%.0f - %.3f/2", data.Gasket.DOut, bp)
 		}
 	} else {
 		if bp <= constants.Bp {
@@ -267,7 +269,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 		Dcp = data.Gasket.DOut - b0
 
 		if data.IsNeedFormulas {
-			result.Formulas.Dsp = fmt.Sprintf("%.0f - %.3f", data.Gasket.DOut, b0)
+			result.Formulas.Dcp = fmt.Sprintf("%s - %s", strconv.FormatFloat(data.Gasket.DOut, 'f', -1, 64), strconv.FormatFloat(b0, 'f', -1, 64))
 		}
 	}
 	result.Calc.B0 = b0
@@ -287,7 +289,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 	result.Calc.A = Ab
 
 	if data.IsNeedFormulas {
-		result.Formulas.A = fmt.Sprintf("%d * %.3f", flange1.Count, flange1.Area)
+		result.Formulas.A = fmt.Sprintf("%d * %s", flange1.Count, strconv.FormatFloat(flange1.Area, 'f', -1, 64))
 	}
 
 	res1, err := s.getCalculatedData(ctx, data.FlangesData[0], flange1, Dcp)
@@ -307,47 +309,87 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 
 	var alpha, dividend, divider float64
 
-	divider = yp + yb*boltMat.EpsilonAt20/boltMat.Epsilon + (res1.Yf*flange1.EpsilonAt20/flange1.Epsilon)*math.Pow(res1.B, 2) + (res2.Yf*flange2.EpsilonAt20/flange2.Epsilon)*math.Pow(res2.B, 2)
+	// divider = yp + yb*boltMat.EpsilonAt20/boltMat.Epsilon + (res1.Yf*flange1.EpsilonAt20/flange1.Epsilon)*math.Pow(res1.B, 2) +
+	// 	+(res2.Yf*flange2.EpsilonAt20/flange2.Epsilon)*math.Pow(res2.B, 2)
 
-	if type1 == moment_proto.FlangeData_free {
-		divider += (res1.Yk * flange1.EpsilonKAt20 / flange1.EpsilonK) * math.Pow(res1.A, 2)
-	}
-	if type2 == moment_proto.FlangeData_free {
-		divider += (res2.Yk * flange2.EpsilonKAt20 / flange2.EpsilonK) * math.Pow(res2.A, 2)
-	}
+	// if type1 == moment_proto.FlangeData_free {
+	// 	divider += (res1.Yk * flange1.EpsilonKAt20 / flange1.EpsilonK) * math.Pow(res1.A, 2)
+	// }
+	// if type2 == moment_proto.FlangeData_free {
+	// 	divider += (res2.Yk * flange2.EpsilonKAt20 / flange2.EpsilonK) * math.Pow(res2.A, 2)
+	// }
 
-	gamma := 1 / divider
+	// gamma := 1 / divider
 
 	//TODO заменить на тип из proto
 	if gasket.Type == "Oval" || type1 == moment_proto.FlangeData_free || type2 == moment_proto.FlangeData_free {
 		alpha = 1
 	} else {
-		alpha = 1 - (yp-(res1.Yf*res1.E*res1.B+res2.Yf*res2.E*res2.B))/(yp+yb+(res1.Yf*math.Pow(res1.B, 2)+res2.Yf*math.Pow(res2.B, 2)))
+		alpha = 1 - (yp-(res1.Yf*res1.E*res1.B+res2.Yf*res2.E*res2.B))/
+			(yp+yb+(res1.Yf*math.Pow(res1.B, 2)+res2.Yf*math.Pow(res2.B, 2)))
 
 		if data.IsNeedFormulas {
-			result.Formulas.Alpha = fmt.Sprintf("1 - (%f - (%f*%f*%f + %f*%f*%f)/(%f + %f + (%f*%f^2 + %f*%f^2)))", yp, res1.Yf, res1.E, res1.B, res2.Yf, res2.E, res2.B, yp, yb, res1.Yf, res1.B, res2.Yf, res2.B)
+			yp := strconv.FormatFloat(yp, 'f', -1, 64)
+			yb := strconv.FormatFloat(yb, 'f', -1, 64)
+			yf1 := strconv.FormatFloat(res1.Yf, 'f', -1, 64)
+			e1 := strconv.FormatFloat(res1.E, 'f', -1, 64)
+			b1 := strconv.FormatFloat(res1.B, 'f', -1, 64)
+			yf2 := strconv.FormatFloat(res2.Yf, 'f', -1, 64)
+			e2 := strconv.FormatFloat(res2.E, 'f', -1, 64)
+			b2 := strconv.FormatFloat(res2.B, 'f', -1, 64)
+			result.Formulas.Alpha = fmt.Sprintf("1 - (%s - (%s * %s * %s + %s * %s * %s)/(%s + %s + (%s * %s^2 + %s * %s^2)))",
+				yp, yf1, e1, b1, yf2, e2, b2, yp, yb, yf1, b1, yf2, b2)
 		}
 	}
 	result.Calc.Alpha = alpha
 
 	dividend = yb + res1.Yfn*res1.B*(res1.B+res1.E-math.Pow(res1.E, 2)/Dcp) + res2.Yfn*res2.B*(res2.B+res2.E-math.Pow(res2.E, 2)/Dcp)
 	divider = yb + yp*math.Pow(flange1.D6/Dcp, 2) + res1.Yfn*math.Pow(res1.B, 2) + res2.Yfn*math.Pow(res2.B, 2)
-	dividendF := fmt.Sprintf("(%f + %f*%f*(%f + %f - %f^2/%f) + %f*%f*(%f + %f - %f^2/%f)", yb, res1.Yfn, res1.B, res1.B, res1.E, res1.E, Dcp, res2.Yfn, res2.B, res2.B, res2.E, res2.E, Dcp)
-	dividerF := fmt.Sprintf("(%f + %f*(%f/%f)^2 + %f*%f^2 + %f*%f^2", yb, yp, flange1.D6, Dcp, res1.Yfn, res1.B, res2.Yfn, res2.B)
+
+	var dividendF, dividerF string
+
+	if data.IsNeedFormulas {
+		yb := strconv.FormatFloat(yb, 'f', -1, 64)
+		yp := strconv.FormatFloat(yp, 'f', -1, 64)
+		dcp := strconv.FormatFloat(Dcp, 'f', -1, 64)
+		d6 := strconv.FormatFloat(flange1.D6, 'f', -1, 64)
+		yfn1 := strconv.FormatFloat(res1.Yfn, 'f', -1, 64)
+		e1 := strconv.FormatFloat(res1.E, 'f', -1, 64)
+		b1 := strconv.FormatFloat(res1.B, 'f', -1, 64)
+		yfn2 := strconv.FormatFloat(res2.Yfn, 'f', -1, 64)
+		e2 := strconv.FormatFloat(res2.E, 'f', -1, 64)
+		b2 := strconv.FormatFloat(res2.B, 'f', -1, 64)
+
+		dividendF = fmt.Sprintf("(%s + %s * %s * (%s + %s - %s^2/%s) + %s * %s * (%s + %s - %s^2/%s)",
+			yb, yfn1, b1, b1, e1, e1, dcp, yfn2, b2, b2, e2, e2, dcp)
+		dividerF = fmt.Sprintf("(%s + %s * (%s/%s)^2 + %s * %s^2 + %s * %s^2",
+			yb, yp, d6, dcp, yfn1, b1, yfn2, b2)
+	}
 
 	if type1 == moment_proto.FlangeData_free {
 		dividend += res1.Yfc * math.Pow(res1.A, 2)
 		divider += res1.Yfc * math.Pow(res1.A, 2)
 
-		dividendF += fmt.Sprintf("%f*%f^2", res1.Yfc, res1.A)
-		dividerF += fmt.Sprintf("%f*%f^2", res1.Yfc, res1.A)
+		if data.IsNeedFormulas {
+			yfc := strconv.FormatFloat(res1.Yfc, 'f', -1, 64)
+			a := strconv.FormatFloat(res1.A, 'f', -1, 64)
+
+			dividendF += fmt.Sprintf("%s * %s^2", yfc, a)
+			dividerF += fmt.Sprintf("%s * %s^2", yfc, a)
+		}
+
 	}
 	if type2 == moment_proto.FlangeData_free {
 		dividend += res2.Yfc * math.Pow(res2.A, 2)
 		divider += res2.Yfc * math.Pow(res2.A, 2)
 
-		dividendF += fmt.Sprintf("%f*%f^2", res2.Yfc, res2.A)
-		dividerF += fmt.Sprintf("%f*%f^2", res2.Yfc, res2.A)
+		if data.IsNeedFormulas {
+			yfc := strconv.FormatFloat(res2.Yfc, 'f', -1, 64)
+			a := strconv.FormatFloat(res2.A, 'f', -1, 64)
+
+			dividendF += fmt.Sprintf("%s * %s^2", yfc, a)
+			dividerF += fmt.Sprintf("%s * %s^2", yfc, a)
+		}
 	}
 
 	alphaM := dividend / divider
@@ -358,16 +400,30 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 
 	Pobg := 0.5 * math.Pi * Dcp * b0 * gasket.SpecificPres
 	if data.IsNeedFormulas {
-		result.Formulas.Po = fmt.Sprintf("0.5 * %f * %.3f * %f * %f", math.Pi, Dcp, b0, gasket.SpecificPres)
+		dcp := strconv.FormatFloat(Dcp, 'f', -1, 64)
+		b0 := strconv.FormatFloat(b0, 'f', -1, 64)
+		p := strconv.FormatFloat(gasket.SpecificPres, 'f', -1, 64)
+
+		result.Formulas.Po = fmt.Sprintf("0.5 * %f * %s * %s * %s", math.Pi, dcp, b0, p)
 	}
 
 	var Rp float64 = 0
 	if data.Pressure >= 0 {
-		//TODO формула изменилась
-		Rp = math.Pi * Dcp * b0 * gasket.M * data.Pressure
+		//rTODO формула изменилась
+		// Rp = math.Pi * Dcp * b0 * gasket.M * data.Pressure
+
+		//* исправлено
+		Rp = math.Pi * Dcp * b0 * gasket.M * math.Abs(data.Pressure)
 
 		if data.IsNeedFormulas {
-			result.Formulas.Rp = fmt.Sprintf("%f * %f * %f * %f * %.0f", math.Pi, Dcp, b0, gasket.M, data.Pressure)
+			dcp := strconv.FormatFloat(Dcp, 'f', -1, 64)
+			b0 := strconv.FormatFloat(b0, 'f', -1, 64)
+			p := strconv.FormatFloat(math.Abs(gasket.SpecificPres), 'f', -1, 64)
+			m := strconv.FormatFloat(gasket.M, 'f', -1, 64)
+
+			// result.Formulas.Rp = fmt.Sprintf("%f * %s * %s * %s * %s", math.Pi, dcp, b0, m, p)
+			//* исправлено
+			result.Formulas.Rp = fmt.Sprintf("%f * %s * %s * %s * |%s|", math.Pi, dcp, b0, m, p)
 		}
 	}
 
@@ -379,8 +435,12 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 	QFM := math.Max(temp1, temp2)
 
 	if data.IsNeedFormulas {
-		result.Formulas.Qd = fmt.Sprintf("0.785 * %.3f^2 * %.0f", Dcp, data.Pressure)
-		result.Formulas.Qfm = fmt.Sprintf("max((%d + 4*|%d/%.3f|);(%d - 4*|%d/%.3f|))", data.AxialForce, data.BendingMoment, Dcp, data.AxialForce, data.BendingMoment, Dcp)
+		dcp := strconv.FormatFloat(Dcp, 'f', -1, 64)
+		p := strconv.FormatFloat(gasket.SpecificPres, 'f', -1, 64)
+
+		result.Formulas.Qd = fmt.Sprintf("0.785 * %s^2 * %s", dcp, p)
+		result.Formulas.Qfm = fmt.Sprintf("max((%d + 4*|%d/%s|);(%d - 4*|%d/%s|))",
+			data.AxialForce, data.BendingMoment, dcp, data.AxialForce, data.BendingMoment, dcp)
 	}
 
 	result.Calc.Po = Pobg
@@ -393,61 +453,149 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 
 	// if ($Moment != 1)
 	if data.Calculation != moment_proto.FlangeRequest_basis {
-		result.Calc.Strength.Pb1 = Pb1
-		result.Calc.Strength.Pb2 = Pb2
+		result.Calc.Strength.FPb1 = Pb1
+		result.Calc.Strength.FPb2 = Pb2
 
 		Pbm := math.Max(Pb1, Pb2)
 		Pbr := Pbm + (1-alpha)*(Qd+float64(data.AxialForce)) + 4*(1-alphaM)*math.Abs(float64(data.BendingMoment))/Dcp
-		result.Calc.Strength.Pb = Pbm
-		result.Calc.Strength.Pbr = Pbr
+		result.Calc.Strength.FPb = Pbm
+		result.Calc.Strength.FPbr = Pbr
 
-		result.Calc.Strength.SigmaB1 = Pbm / Ab
-		result.Calc.Strength.SigmaB2 = Pbr / Ab
+		result.Calc.Strength.FSigmaB1 = Pbm / Ab
+		result.Calc.Strength.FSigmaB2 = Pbr / Ab
 
 		Kyp := s.Kyp[data.IsWork]
 		Kyz := s.Kyz[data.Condition.String()]
 		Kyt := constants.NoLoadKyt
 
-		result.Calc.Strength.DSigmaM = 1.2 * Kyp * Kyz * Kyt * boltMat.SigmaAt20
-		result.Calc.Strength.DSigmaR = Kyp * Kyz * Kyt * boltMat.Sigma
+		result.Calc.Strength.FDSigmaM = 1.2 * Kyp * Kyz * Kyt * boltMat.SigmaAt20
+		result.Calc.Strength.FDSigmaR = Kyp * Kyz * Kyt * boltMat.Sigma
 
 		var qmax float64
 		//TODO заменить на тип из proto
 		if gasket.Type == "Soft" {
 			qmax = math.Max(Pbm, Pbr) / (math.Pi * Dcp * bp)
 		}
-		result.Calc.Strength.Q = qmax
+		result.Calc.Strength.FQ = qmax
 
-		strength1 := s.getCalculatedStrength(flange1, res1, type1, gasket.M, data.Pressure, Qd, Dcp, result.Calc.Strength.SigmaB1, Pbm, Pbr, QFM, data.AxialForce, data.BendingMoment)
+		strength1 := s.getCalculatedStrength(
+			flange1,
+			res1,
+			type1,
+			gasket.M,
+			data.Pressure,
+			Qd,
+			Dcp,
+			result.Calc.Strength.FSigmaB1,
+			Pbm,
+			Pbr,
+			QFM,
+			data.AxialForce,
+			data.BendingMoment,
+		)
 		st := moment_proto.StrengthResult(strength1)
 		result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &st)
 
 		if len(data.FlangesData) > 1 {
-			strength2 := s.getCalculatedStrength(flange2, res2, type2, gasket.M, data.Pressure, Qd, Dcp, result.Calc.Strength.SigmaB2, Pbm, Pbr, QFM, data.AxialForce, data.BendingMoment)
+			strength2 := s.getCalculatedStrength(
+				flange2,
+				res2,
+				type2,
+				gasket.M,
+				data.Pressure,
+				Qd,
+				Dcp,
+				result.Calc.Strength.FSigmaB2,
+				Pbm,
+				Pbr,
+				QFM,
+				data.AxialForce,
+				data.BendingMoment,
+			)
 			st := moment_proto.StrengthResult(strength2)
 			result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &st)
 		}
 	}
 
+	divider = yp + yb*boltMat.EpsilonAt20/boltMat.Epsilon + (res1.Yf*flange1.EpsilonAt20/flange1.Epsilon)*math.Pow(res1.B, 2) +
+		+(res2.Yf*flange2.EpsilonAt20/flange2.Epsilon)*math.Pow(res2.B, 2)
+
+	if type1 == moment_proto.FlangeData_free {
+		divider += (res1.Yk * flange1.EpsilonKAt20 / flange1.EpsilonK) * math.Pow(res1.A, 2)
+	}
+	if type2 == moment_proto.FlangeData_free {
+		divider += (res2.Yk * flange2.EpsilonKAt20 / flange2.EpsilonK) * math.Pow(res2.A, 2)
+	}
+
+	gamma := 1 / divider
+
 	temp1 = flange1.AlphaF*flange1.H*(flange1.Tf-20) + flange2.AlphaF*flange2.H*(flange2.Tf-20)
 	temp2 = flange1.H + flange2.H
+
+	var tF1, tF2 string
+	if data.IsNeedFormulas {
+		af1 := strconv.FormatFloat(flange1.AlphaF, 'f', -1, 64)
+		h1 := strconv.FormatFloat(flange1.H, 'f', -1, 64)
+		tf1 := strconv.FormatFloat(flange1.Tf, 'f', -1, 64)
+		af2 := strconv.FormatFloat(flange2.AlphaF, 'f', -1, 64)
+		h2 := strconv.FormatFloat(flange2.H, 'f', -1, 64)
+		tf2 := strconv.FormatFloat(flange2.Tf, 'f', -1, 64)
+
+		tF1 = fmt.Sprintf("%s * %s * (%s-20) + %s * %s * (%s-20)", af1, h1, tf1, af2, h2, tf2)
+		tF2 = fmt.Sprintf("%s + %s", h1, h2)
+	}
 
 	if type1 == moment_proto.FlangeData_free {
 		temp1 += flange1.AlphaK * flange1.Hk * (flange1.Tk - 20)
 		temp2 += flange1.Hk
+
+		if data.IsNeedFormulas {
+			ak := strconv.FormatFloat(flange1.AlphaK, 'f', -1, 64)
+			h := strconv.FormatFloat(flange1.Hk, 'f', -1, 64)
+			tk := strconv.FormatFloat(flange1.Tk, 'f', -1, 64)
+
+			tF1 += fmt.Sprintf(" + %s * %s * (%s-20)", ak, h, tk)
+			tF2 += " + " + h
+		}
 	}
 	if type2 == moment_proto.FlangeData_free {
 		temp1 += flange2.AlphaK * flange2.Hk * (flange2.Tk - 20)
 		temp2 += flange2.Hk
+
+		if data.IsNeedFormulas {
+			ak := strconv.FormatFloat(flange2.AlphaK, 'f', -1, 64)
+			h := strconv.FormatFloat(flange2.Hk, 'f', -1, 64)
+			tk := strconv.FormatFloat(flange2.Tk, 'f', -1, 64)
+
+			tF1 += fmt.Sprintf(" + %s * %s * (%s-20)", ak, h, tk)
+			tF2 += " + " + h
+		}
 	}
 	if data.IsEmbedded {
 		temp1 += detMat.AlphaF * data.Embed.Thickness * (data.Temp - 20)
 		temp2 += data.Embed.Thickness
+
+		if data.IsNeedFormulas {
+			af := strconv.FormatFloat(detMat.AlphaF, 'f', -1, 64)
+			h := strconv.FormatFloat(data.Embed.Thickness, 'f', -1, 64)
+			t := strconv.FormatFloat(data.Temp, 'f', -1, 64)
+
+			tF1 += fmt.Sprintf(" + %s * %s * (%s-20)", af, h, t)
+			tF2 += " + " + h
+		}
 	}
 
 	//TODO здесь должна быть новая формула (Qt)
 	Qt := gamma * (temp1 - boltMat.AlphaF*temp2*(Tb-20))
 	result.Calc.Qt = Qt
+
+	if data.IsNeedFormulas {
+		g := strconv.FormatFloat(gamma, 'f', -1, 64)
+		af := strconv.FormatFloat(boltMat.AlphaF, 'f', -1, 64)
+		tb := strconv.FormatFloat(Tb, 'f', -1, 64)
+
+		result.Formulas.Qt = fmt.Sprintf("%s * (%s - %s * (%s) * (%s-20))", g, tF1, af, tF2, tb)
+	}
 
 	Pb1 = math.Max(Pb1, Pb1-Qt)
 	Pbm := math.Max(Pb1, Pb2)
@@ -488,6 +636,8 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 		result.Calc.Basis.SigmaB2 = SigmaB2
 		result.Calc.Basis.DSigmaM = DSigmaM
 		result.Calc.Basis.DSigmaR = DSigmaR
+		result.Calc.Basis.VSigmaB1 = v_sigmab1
+		result.Calc.Basis.VSigmaB2 = v_sigmab2
 
 		//TODO заменить на тип из proto
 		if (v_sigmab1 && v_sigmab2 && gasket.Type != "Soft") || (v_sigmab1 && v_sigmab2 && qmax <= float64(gasket.PermissiblePres) && gasket.Type == "Soft") {
@@ -495,7 +645,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 			if result.Calc.Basis.SigmaB1 > constants.MaxSigmaB && flange1.Diameter >= constants.MinDiameter && flange1.Diameter <= constants.MaxDiameter {
 				result.Calc.Basis.Mkp = s.graphic.CalculateMkp(flange1.Diameter, result.Calc.Basis.SigmaB1)
 			} else {
-				//TODO вроде как формула изменилась
+				//? вроде как формула изменилась, но почему-то использовалась новая формула
 				// зачем-то делится на 1000
 				result.Calc.Basis.Mkp = (0.3 * Pbm * float64(flange1.Diameter) / float64(flange1.Count)) / 1000
 			}
@@ -510,7 +660,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 			result.Calc.Basis.Qmax = Pmax / (math.Pi * Dcp * bp)
 
 			//TODO заменить на тип из proto
-			if gasket.Type == "Soft" && result.Calc.Basis.Qmax > float64(gasket.PermissiblePres) {
+			if gasket.Type == "Soft" && result.Calc.Basis.Qmax > gasket.PermissiblePres {
 				Pmax = float64(gasket.PermissiblePres) * (math.Pi * Dcp * bp)
 				result.Calc.Basis.Qmax = float64(gasket.PermissiblePres)
 			}
@@ -518,17 +668,137 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 			result.Calc.Basis.Mmax = (0.3 * Pmax * float64(flange1.Diameter) / float64(flange1.Count)) / 1000
 		}
 	} else {
-		strength1 := s.getCalculatedStrength(flange1, res1, type1, gasket.M, data.Pressure, Qd, Dcp, result.Calc.Strength.SigmaB1, Pbm, Pbr, QFM, data.AxialForce, data.BendingMoment)
+		result.Calc.Strength.SPb1 = Pb1
+		result.Calc.Strength.SPb2 = Pb2
+		result.Calc.Strength.SPbr = Pbr
+		result.Calc.Strength.SPb = Pbm
+		result.Calc.Strength.SQ = qmax
+		result.Calc.Strength.SSigmaB1 = SigmaB1
+		result.Calc.Strength.SSigmaB2 = SigmaB2
+		result.Calc.Strength.SDSigmaM = DSigmaM
+		result.Calc.Strength.SDSigmaR = DSigmaR
+		result.Calc.Strength.VSigmaB1 = v_sigmab1
+		result.Calc.Strength.VSigmaB2 = v_sigmab2
+
+		teta := map[bool]float64{
+			true:  constants.WorkTeta,
+			false: constants.TestTeta,
+		}
+
+		strength1 := s.getCalculatedStrength(
+			flange1,
+			res1,
+			type1,
+			gasket.M,
+			data.Pressure,
+			Qd,
+			Dcp,
+			result.Calc.Strength.SSigmaB1,
+			Pbm,
+			Pbr,
+			QFM,
+			data.AxialForce,
+			data.BendingMoment,
+		)
 		st := moment_proto.StrengthResult(strength1)
 		result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &st)
 
+		var strength2 models.CalculatedStrength
 		if len(data.FlangesData) > 1 {
-			strength2 := s.getCalculatedStrength(flange2, res2, type2, gasket.M, data.Pressure, Qd, Dcp, result.Calc.Strength.SigmaB2, Pbm, Pbr, QFM, data.AxialForce, data.BendingMoment)
+			strength2 = s.getCalculatedStrength(
+				flange2,
+				res2,
+				type2,
+				gasket.M,
+				data.Pressure,
+				Qd,
+				Dcp,
+				result.Calc.Strength.SSigmaB2,
+				Pbm,
+				Pbr,
+				QFM,
+				data.AxialForce,
+				data.BendingMoment,
+			)
 			st := moment_proto.StrengthResult(strength2)
 			result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &st)
 		}
 
-		//TODO
+		//TODO заменить на тип из proto
+		if gasket.Type == "Soft" && qmax <= gasket.PermissiblePres {
+			result.Calc.Strength.VQmax = true
+		}
+
+		//TODO формула ищменилась (добавилось Ks, ф. 43 или 44)
+		if strength1.Teta <= teta[data.IsWork]*strength1.DTeta {
+			result.Calc.Strength.VTeta1 = true
+		}
+
+		//TODO формула ищменилась (добавилось Ks)
+		if type1 == moment_proto.FlangeData_free && strength1.TetaK <= teta[data.IsWork]*strength1.DTetaK {
+			result.Calc.Strength.VTetaK1 = true
+		}
+
+		if data.IsSameFlange {
+			//TODO формула ищменилась (добавилось Ks)
+			if strength2.Teta <= teta[data.IsWork]*strength2.DTeta {
+				result.Calc.Strength.VTeta2 = true
+			}
+
+			//TODO формула ищменилась (добавилось Ks)
+			if type2 == moment_proto.FlangeData_free && strength2.TetaK <= teta[data.IsWork]*strength2.DTetaK {
+				result.Calc.Strength.VTetaK2 = true
+			}
+		}
+
+		//TODO заменить на тип из proto
+		if (v_sigmab1 && v_sigmab2 && gasket.Type != "Soft") || (v_sigmab1 && v_sigmab2 && qmax <= float64(gasket.PermissiblePres) && gasket.Type == "Soft") {
+			ok := false
+
+			if data.IsSameFlange {
+				commonCond := result.Calc.Strength.VTeta1 && result.Calc.Strength.VTeta2
+				cond1 := commonCond && type1 != moment_proto.FlangeData_free && type2 != moment_proto.FlangeData_free
+				cond2 := commonCond && type1 == moment_proto.FlangeData_free && type2 != moment_proto.FlangeData_free && result.Calc.Strength.VTetaK1
+				cond3 := commonCond && type1 != moment_proto.FlangeData_free && type2 == moment_proto.FlangeData_free && result.Calc.Strength.VTetaK2
+				cond4 := commonCond && type1 == moment_proto.FlangeData_free && type2 == moment_proto.FlangeData_free &&
+					result.Calc.Strength.VTetaK1 && result.Calc.Strength.VTetaK2
+
+				if cond1 || cond2 || cond3 || cond4 {
+					ok = true
+				}
+			} else {
+				if (result.Calc.Strength.VTeta1 && type1 != moment_proto.FlangeData_free) ||
+					(result.Calc.Strength.VTeta1 && type1 == moment_proto.FlangeData_free && result.Calc.Strength.VTetaK1) {
+					ok = true
+				}
+			}
+
+			if ok {
+				if result.Calc.Basis.SigmaB1 > constants.MaxSigmaB && flange1.Diameter >= constants.MinDiameter && flange1.Diameter <= constants.MaxDiameter {
+					result.Calc.Strength.Mkp = s.graphic.CalculateMkp(flange1.Diameter, result.Calc.Strength.SSigmaB1)
+				} else {
+					//? вроде как формула изменилась, но почему-то использовалась новая формула
+					result.Calc.Strength.Mkp = (0.3 * Pbm * float64(flange1.Diameter) / float64(flange1.Count)) / 1000
+				}
+
+				result.Calc.Strength.Mkp1 = 0.75 * result.Calc.Strength.Mkp
+
+				Prek := 0.8 * Ab * boltMat.SigmaAt20
+				result.Calc.Strength.Qrek = Prek / (math.Pi * Dcp * bp)
+				result.Calc.Strength.Mrek = (0.3 * Prek * float64(flange1.Diameter) / float64(flange1.Count)) / 1000
+
+				Pmax := result.Calc.Strength.SDSigmaM * Ab
+				result.Calc.Strength.Qmax = Pmax / (math.Pi * Dcp * bp)
+
+				//TODO заменить на тип из proto
+				if gasket.Type == "Soft" && result.Calc.Strength.Qmax > gasket.PermissiblePres {
+					Pmax = float64(gasket.PermissiblePres) * (math.Pi * Dcp * bp)
+					result.Calc.Strength.Qmax = float64(gasket.PermissiblePres)
+				}
+
+				result.Calc.Strength.Mmax = (0.3 * Pmax * float64(flange1.Diameter) / float64(flange1.Count)) / 1000
+			}
+		}
 	}
 
 	return &result, nil
@@ -547,13 +817,13 @@ func (s *FlangeService) getDataFlange(
 	}
 
 	dataFlange := models.InitialDataFlange{
-		DOut:     size.D1,
+		DOut:     size.DOut,
 		D:        size.D,
-		H:        size.B,
+		H:        size.H,
 		S0:       size.S0,
 		S1:       size.S1,
 		L:        size.Lenght,
-		D6:       size.D2,
+		D6:       size.D6,
 		Diameter: size.Diameter,
 		Count:    size.Count,
 		Area:     size.Area,
@@ -654,7 +924,8 @@ func (s *FlangeService) getCalculatedData(
 		calculated.F = constants.InitF
 	}
 
-	calculated.Lymda = (calculated.BettaF*data.H+calculated.L0)/(calculated.BettaT*calculated.L0) + (calculated.BettaV*math.Pow(data.H, 3))/(calculated.BettaU*calculated.L0*math.Pow(data.S0, 2))
+	calculated.Lymda = (calculated.BettaF*data.H+calculated.L0)/(calculated.BettaT*calculated.L0) +
+		+(calculated.BettaV*math.Pow(data.H, 3))/(calculated.BettaU*calculated.L0*math.Pow(data.S0, 2))
 	calculated.Yf = (0.91 * calculated.BettaV) / (data.EpsilonAt20 * calculated.Lymda * math.Pow(data.S0, 2) * calculated.L0)
 
 	if flange.Type == moment_proto.FlangeData_free {
@@ -749,13 +1020,21 @@ func (s *FlangeService) getCalculatedStrength(
 
 	if type1 == moment_proto.FlangeData_welded {
 		temp := math.Pi * (flange.D + flange.S1) * (flange.S1 - flange.C)
-		sigmaMp = (Qd + float64(AxialForce) + 4*math.Abs(float64(BendingMoment)/Dcp)) / temp
-		sigmaMpm = (Qd + float64(AxialForce) - 4*math.Abs(float64(BendingMoment)/Dcp)) / temp
+		//rTODO формула изменилась (ф. 37)
+		// sigmaMp = (Qd + float64(AxialForce) + 4*math.Abs(float64(BendingMoment)/Dcp)) / temp
+		// sigmaMpm = (Qd + float64(AxialForce) - 4*math.Abs(float64(BendingMoment)/Dcp)) / temp
+		//* Исправлено
+		sigmaMp = (0.785*math.Pow(flange.D, 2)*Pressure + float64(AxialForce) + 4*math.Abs(float64(BendingMoment)/(flange.D+flange.S1))) / temp
+		sigmaMpm = (0.785*math.Pow(flange.D, 2)*Pressure + float64(AxialForce) - 4*math.Abs(float64(BendingMoment)/(flange.D+flange.S1))) / temp
 	}
 
 	temp := math.Pi * (flange.D + flange.S0) * (flange.S0 - flange.C)
-	sigmaMp0 := (Qd + float64(AxialForce) + 4*math.Abs(float64(BendingMoment)/Dcp)) / temp
-	sigmaMpm0 := (Qd + float64(AxialForce) - 4*math.Abs(float64(BendingMoment)/Dcp)) / temp
+	//rTODO формула изменилась (ф. 37)
+	// sigmaMp0 := (Qd + float64(AxialForce) + 4*math.Abs(float64(BendingMoment)/Dcp)) / temp
+	// sigmaMpm0 := (Qd + float64(AxialForce) - 4*math.Abs(float64(BendingMoment)/Dcp)) / temp
+	//* Исправлено
+	sigmaMp0 := (0.785*math.Pow(flange.D, 2)*Pressure + float64(AxialForce) + 4*math.Abs(float64(BendingMoment)/(flange.D+flange.S0))) / temp
+	sigmaMpm0 := (0.785*math.Pow(flange.D, 2)*Pressure + float64(AxialForce) - 4*math.Abs(float64(BendingMoment)/(flange.D+flange.S0))) / temp
 	sigmaMop := Pressure * flange.D / (2.0 * (flange.S0 - flange.C))
 
 	sigmaRp := ((1.33*res.BettaF*flange.H + res.L0) / (res.Lymda * math.Pow(flange.H, 2) * res.L0 * flange.D)) * Mp1
@@ -772,7 +1051,8 @@ func (s *FlangeService) getCalculatedStrength(
 		} else if flange.D > constants.MaxD {
 			strength.DTeta = constants.MaxDTetta
 		} else {
-			strength.DTeta = ((flange.D-constants.MinD)/(constants.MaxD-constants.MinD))*(constants.MaxDTetta-constants.MinDTetta) + constants.MinDTetta
+			strength.DTeta = ((flange.D-constants.MinD)/(constants.MaxD-constants.MinD))*
+				(constants.MaxDTetta-constants.MinDTetta) + constants.MinDTetta
 		}
 	} else {
 		strength.DTeta = constants.MaxDTetta
@@ -781,7 +1061,8 @@ func (s *FlangeService) getCalculatedStrength(
 	strength.Teta = Mp1 * res.Yf * flange.EpsilonAt20 / flange.Epsilon
 
 	if type1 == moment_proto.FlangeData_free {
-		strength.DTetaK = 0.002
+		//strength.DTetaK = 0.002
+		strength.DTetaK = 0.02
 		strength.TetaK = Mpk * res.Yk * flange.EpsilonKAt20 / flange.EpsilonK
 	}
 
