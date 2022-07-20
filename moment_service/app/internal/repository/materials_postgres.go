@@ -19,7 +19,11 @@ func NewMaterialsRepo(db *sqlx.DB) *MaterialsRepo {
 }
 
 func (r *MaterialsRepo) GetMaterials(ctx context.Context, req *moment_proto.GetMaterialsRequest) (materials []models.MaterialsDTO, err error) {
-	query := fmt.Sprintf("SELECT id, title FROM %s ORDER BY id", MaterialsTable)
+	query := fmt.Sprintf(`SELECT id, title FROM %s WHERE 
+			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) > 0 AND
+			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) > 0 AND
+			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) > 0
+		ORDER BY id`, MaterialsTable, ElasticityTable, MaterialsTable, VoltageTable, MaterialsTable, AlphaTable, MaterialsTable)
 
 	if err := r.db.Select(&materials, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -27,7 +31,45 @@ func (r *MaterialsRepo) GetMaterials(ctx context.Context, req *moment_proto.GetM
 	return materials, nil
 }
 
-func (r *MaterialsRepo) GetAllData(ctx context.Context, markId string) (materials models.MaterialsAll, err error) {
+func (r *MaterialsRepo) GetMaterialsWithIsEmpty(ctx context.Context, req *moment_proto.GetMaterialsRequest,
+) (materials []models.MaterialsWithIsEmpty, err error) {
+	query := fmt.Sprintf(`SELECT id, title, 
+			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0 as is_empty_elasticity, 
+			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0 as is_empty_voltage, 
+			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0 as is_empty_alpha
+		FROM %s ORDER BY id`, ElasticityTable, MaterialsTable, VoltageTable, MaterialsTable, AlphaTable, MaterialsTable, MaterialsTable)
+
+	if err := r.db.Select(&materials, query); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return materials, nil
+}
+
+func (r *MaterialsRepo) GetAllData(ctx context.Context, req *moment_proto.GetMaterialsDataRequest) (materials models.MaterialsAll, err error) {
+	voltageQuery := fmt.Sprintf("SELECT id, temperature, voltage FROM %s WHERE mark_id=$1 ORDER BY temperature", VoltageTable)
+	var voltage []models.Voltage
+
+	if err := r.db.Select(&voltage, voltageQuery, req.MarkId); err != nil {
+		return materials, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	elasticityQuery := fmt.Sprintf("SELECT id, temperature, elasticity FROM %s WHERE mark_id=$1 ORDER BY temperature", ElasticityTable)
+	var elasticity []models.Elasticity
+
+	if err := r.db.Select(&elasticity, elasticityQuery, req.MarkId); err != nil {
+		return materials, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	alphaQuery := fmt.Sprintf("SELECT id, temperature, alpha FROM %s WHERE mark_id=$1 ORDER BY temperature", AlphaTable)
+	var alpha []models.Alpha
+
+	if err := r.db.Select(&alpha, alphaQuery, req.MarkId); err != nil {
+		return materials, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	materials.Voltage = voltage
+	materials.Elasticity = elasticity
+	materials.Alpha = alpha
 
 	return materials, nil
 }
@@ -70,18 +112,6 @@ func (r *MaterialsRepo) DeleteMaterial(ctx context.Context, material *moment_pro
 func (r *MaterialsRepo) CreateVoltage(ctx context.Context, voltage *moment_proto.CreateVoltageRequest) error {
 	query := fmt.Sprintf("INSERT INTO %s (mark_id, temperature, voltage) VALUES ($1, $2, $3)", VoltageTable)
 
-	// row := r.db.QueryRow(query, voltage.MarkId, voltage.Temperature, voltage.Voltage)
-	// if row.Err() != nil {
-	// 	return "", fmt.Errorf("failed to execute query. error: %w", err)
-	// }
-
-	// var idInt int
-	// if err := row.Scan(&idInt); err != nil {
-	// 	return "", fmt.Errorf("failed to scan result. error: %w", err)
-	// }
-
-	// return fmt.Sprintf("%d", idInt), nil
-
 	args := make([]interface{}, 0)
 	args = append(args, voltage.MarkId, voltage.Voltage[0].Temperature, voltage.Voltage[0].Voltage)
 
@@ -103,6 +133,9 @@ func (r *MaterialsRepo) UpdateVoltage(ctx context.Context, voltage *moment_proto
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1
+
+	//TODO будут проблемы если нужно будет записать 0 в бд
+	//? можно передавать инфинити если значения нет и делать проверку на равенство
 
 	if voltage.MarkId != "" {
 		setValues = append(setValues, fmt.Sprintf("mark_id=$%d", argId))
@@ -142,19 +175,7 @@ func (r *MaterialsRepo) DeleteVoltage(ctx context.Context, voltage *moment_proto
 }
 
 func (r *MaterialsRepo) CreateElasticity(ctx context.Context, elasticity *moment_proto.CreateElasticityRequest) error {
-	query := fmt.Sprintf("INSERT INTO %s (mark_id, temperature, elasticity) VALUES ($1, $2, $3) RETURNING id", ElasticityTable)
-
-	// row := r.db.QueryRow(query, elasticity.MarkId, elasticity.Temperature, elasticity.Elasticity)
-	// if row.Err() != nil {
-	// 	return "", fmt.Errorf("failed to execute query. error: %w", err)
-	// }
-
-	// var idInt int
-	// if err := row.Scan(&idInt); err != nil {
-	// 	return "", fmt.Errorf("failed to scan result. error: %w", err)
-	// }
-
-	// return fmt.Sprintf("%d", idInt), nil
+	query := fmt.Sprintf("INSERT INTO %s (mark_id, temperature, elasticity) VALUES ($1, $2, $3)", ElasticityTable)
 
 	args := make([]interface{}, 0)
 	args = append(args, elasticity.MarkId, elasticity.Elasticity[0].Temperature, elasticity.Elasticity[0].Elasticity)
@@ -216,19 +237,7 @@ func (r *MaterialsRepo) DeleteElasticity(ctx context.Context, elasticity *moment
 }
 
 func (r *MaterialsRepo) CreateAlpha(ctx context.Context, alpha *moment_proto.CreateAlphaRequest) error {
-	query := fmt.Sprintf("INSERT INTO %s (mark_id, temperature, alpha) VALUES ($1, $2, $3) RETURNING id", AlphaTable)
-
-	// row := r.db.QueryRow(query, alpha.MarkId, alpha.Temperature, alpha.Alpha)
-	// if row.Err() != nil {
-	// 	return "", fmt.Errorf("failed to execute query. error: %w", err)
-	// }
-
-	// var idInt int
-	// if err := row.Scan(&idInt); err != nil {
-	// 	return "", fmt.Errorf("failed to scan result. error: %w", err)
-	// }
-
-	// return fmt.Sprintf("%d", idInt), nil
+	query := fmt.Sprintf("INSERT INTO %s (mark_id, temperature, alpha) VALUES ($1, $2, $3)", AlphaTable)
 
 	args := make([]interface{}, 0)
 	args = append(args, alpha.MarkId, alpha.Alpha[0].Temperature, alpha.Alpha[0].Alpha)

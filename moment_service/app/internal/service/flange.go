@@ -196,7 +196,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_proto.Flan
 
 	//TODO учесть ввод данных для прокладки (все значения заносятся ручками)
 	g := models.GetGasket{GasketId: data.Gasket.GasketId, EnvId: data.Gasket.EnvId, Thickness: data.Gasket.Thickness}
-	gasket, err := s.gasket.Get(ctx, g)
+	gasket, err := s.gasket.GetFullData(ctx, g)
 	if err != nil {
 		return nil, err
 	}

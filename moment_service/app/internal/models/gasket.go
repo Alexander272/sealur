@@ -1,13 +1,5 @@
 package models
 
-type GasketType int
-
-const (
-	Soft GasketType = iota
-	Oval
-	Metal
-)
-
 type GetGasket struct {
 	GasketId  string  `db:"gasket_id"`
 	EnvId     string  `db:"env_id"`
@@ -34,7 +26,7 @@ type TypeGasketDTO struct {
 	Title string `db:"title"`
 }
 
-type Gasket struct {
+type FullDataGasket struct {
 	Id              string  `db:"id"`
 	GasketId        string  `db:"gasket_id"`
 	EnvId           string  `db:"env_id"`

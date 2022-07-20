@@ -13,8 +13,9 @@ type Flange interface {
 }
 
 type Materials interface {
-	GetMaterials(context.Context, *moment_proto.GetMaterialsRequest) (materials []models.MaterialsDTO, err error)
-	GetAllData(context.Context, string) (models.MaterialsAll, error)
+	GetMaterials(context.Context, *moment_proto.GetMaterialsRequest) ([]models.MaterialsDTO, error)
+	GetMaterialsWithIsEmpty(context.Context, *moment_proto.GetMaterialsRequest) ([]models.MaterialsWithIsEmpty, error)
+	GetAllData(context.Context, *moment_proto.GetMaterialsDataRequest) (models.MaterialsAll, error)
 
 	CreateMaterial(context.Context, *moment_proto.CreateMaterialRequest) (id string, err error)
 	UpdateMaterial(context.Context, *moment_proto.UpdateMaterialRequest) error
@@ -34,7 +35,30 @@ type Materials interface {
 }
 
 type Gasket interface {
-	Get(ctx context.Context, gasket models.GetGasket) (models.Gasket, error)
+	GetFullData(context.Context, models.GetGasket) (models.FullDataGasket, error)
+
+	GetGasket(context.Context, *moment_proto.GetGasketRequest) ([]models.GasketDTO, error)
+	CreateGasket(context.Context, *moment_proto.CreateGasketRequest) (id string, err error)
+	UpdateGasket(context.Context, *moment_proto.UpdateGasketRequest) error
+	DeleteGasket(context.Context, *moment_proto.DeleteGasketRequest) error
+
+	GetTypeGasket(context.Context, *moment_proto.GetGasketTypeRequest) ([]models.TypeGasketDTO, error)
+	CreateTypeGasket(context.Context, *moment_proto.CreateGasketTypeRequest) (id string, err error)
+	UpdateTypeGasket(context.Context, *moment_proto.UpdateGasketTypeRequest) error
+	DeleteTypeGasket(context.Context, *moment_proto.DeleteGasketTypeRequest) error
+
+	GetEnv(context.Context, *moment_proto.GetEnvRequest) ([]models.EnvDTO, error)
+	CreateEnv(context.Context, *moment_proto.CreateEnvRequest) (id string, err error)
+	UpdateEnv(context.Context, *moment_proto.UpdateEnvRequest) error
+	DeleteEnv(context.Context, *moment_proto.DeleteEnvRequest) error
+
+	CreateEnvData(context.Context, *moment_proto.CreateEnvDataRequest) error
+	UpdateEnvData(context.Context, *moment_proto.UpdateEnvDataRequest) error
+	DeleteEnvData(context.Context, *moment_proto.DeleteEnvDataRequest) error
+
+	CreateGasketData(context.Context, *moment_proto.CreateGasketDataRequest) error
+	UpdateGasketData(context.Context, *moment_proto.UpdateGasketDataRequest) error
+	DeleteGasketData(context.Context, *moment_proto.DeleteGasketDataRequest) error
 }
 
 type Repositories struct {

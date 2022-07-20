@@ -16,6 +16,6 @@ func NewFlangeRepo(db *sqlx.DB) *FlangeRepo {
 }
 
 func (r *FlangeRepo) GetSize(ctx context.Context, dn, pn float64, standId string) (size models.FlangeSize, err error) {
-
+	//TODO
 	return size, nil
 }

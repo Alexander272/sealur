@@ -16,6 +16,8 @@ type Materials interface {
 	GetMatFotCalculate(ctx context.Context, markId string, temp float64) (models.MaterialsResult, error)
 
 	GetMaterials(context.Context, *moment_proto.GetMaterialsRequest) ([]*moment_proto.Material, error)
+	GetMaterialsWithIsEmpty(context.Context, *moment_proto.GetMaterialsRequest) ([]*moment_proto.MaterialWithIsEmpty, error)
+	GetMaterialsData(context.Context, *moment_proto.GetMaterialsDataRequest) (*moment_proto.MaterialsDataResponse, error)
 	CreateMaterial(context.Context, *moment_proto.CreateMaterialRequest) (id string, err error)
 	UpdateMaterial(context.Context, *moment_proto.UpdateMaterialRequest) error
 	DeleteMaterial(context.Context, *moment_proto.DeleteMaterialRequest) error
@@ -34,7 +36,30 @@ type Materials interface {
 }
 
 type Gasket interface {
-	Get(ctx context.Context, gasket models.GetGasket) (models.Gasket, error)
+	GetFullData(context.Context, models.GetGasket) (models.FullDataGasket, error)
+
+	GetGasket(context.Context, *moment_proto.GetGasketRequest) ([]*moment_proto.Gasket, error)
+	CreateGasket(context.Context, *moment_proto.CreateGasketRequest) (id string, err error)
+	UpdateGasket(context.Context, *moment_proto.UpdateGasketRequest) error
+	DeleteGasket(context.Context, *moment_proto.DeleteGasketRequest) error
+
+	GetTypeGasket(context.Context, *moment_proto.GetGasketTypeRequest) ([]*moment_proto.GasketType, error)
+	CreateTypeGasket(context.Context, *moment_proto.CreateGasketTypeRequest) (id string, err error)
+	UpdateTypeGasket(context.Context, *moment_proto.UpdateGasketTypeRequest) error
+	DeleteTypeGasket(context.Context, *moment_proto.DeleteGasketTypeRequest) error
+
+	GetEnv(context.Context, *moment_proto.GetEnvRequest) ([]*moment_proto.Env, error)
+	CreateEnv(context.Context, *moment_proto.CreateEnvRequest) (id string, err error)
+	UpdateEnv(context.Context, *moment_proto.UpdateEnvRequest) error
+	DeleteEnv(context.Context, *moment_proto.DeleteEnvRequest) error
+
+	CreateEnvData(context.Context, *moment_proto.CreateEnvDataRequest) error
+	UpdateEnvData(context.Context, *moment_proto.UpdateEnvDataRequest) error
+	DeleteEnvData(context.Context, *moment_proto.DeleteEnvDataRequest) error
+
+	CreateGasketData(context.Context, *moment_proto.CreateGasketDataRequest) error
+	UpdateGasketData(context.Context, *moment_proto.UpdateGasketDataRequest) error
+	DeleteGasketData(context.Context, *moment_proto.DeleteGasketDataRequest) error
 }
 
 type Graphic interface {

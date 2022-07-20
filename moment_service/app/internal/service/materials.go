@@ -19,7 +19,7 @@ func NewMaterialsService(repo repository.Materials) *MaterialsService {
 }
 
 func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string, temp float64) (models.MaterialsResult, error) {
-	mats, err := s.repo.GetAllData(ctx, markId)
+	mats, err := s.repo.GetAllData(ctx, &moment_proto.GetMaterialsDataRequest{MarkId: markId})
 	if err != nil {
 		return models.MaterialsResult{}, fmt.Errorf("failed to get materials. error: %w", err)
 	}
@@ -103,6 +103,55 @@ func (s *MaterialsService) GetMaterials(ctx context.Context, req *moment_proto.G
 	for _, item := range mats {
 		m := moment_proto.Material(item)
 		materials = append(materials, &m)
+	}
+
+	return materials, nil
+}
+
+func (s *MaterialsService) GetMaterialsWithIsEmpty(ctx context.Context, req *moment_proto.GetMaterialsRequest,
+) (materials []*moment_proto.MaterialWithIsEmpty, err error) {
+	mats, err := s.repo.GetMaterialsWithIsEmpty(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get materials. error: %w", err)
+	}
+
+	for _, item := range mats {
+		m := moment_proto.MaterialWithIsEmpty(item)
+		materials = append(materials, &m)
+	}
+
+	return materials, nil
+}
+
+func (s *MaterialsService) GetMaterialsData(ctx context.Context, req *moment_proto.GetMaterialsDataRequest,
+) (materials *moment_proto.MaterialsDataResponse, err error) {
+	mats, err := s.repo.GetAllData(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get materials. error: %w", err)
+	}
+
+	voltage := make([]*moment_proto.MaterialsDataResponse_Voltage, 0, len(mats.Voltage))
+	for _, item := range mats.Voltage {
+		v := moment_proto.MaterialsDataResponse_Voltage(item)
+		voltage = append(voltage, &v)
+	}
+
+	elasticity := make([]*moment_proto.MaterialsDataResponse_Elasticity, 0, len(mats.Elasticity))
+	for _, item := range mats.Elasticity {
+		e := moment_proto.MaterialsDataResponse_Elasticity(item)
+		elasticity = append(elasticity, &e)
+	}
+
+	alpha := make([]*moment_proto.MaterialsDataResponse_Alpha, 0, len(mats.Alpha))
+	for _, item := range mats.Alpha {
+		a := moment_proto.MaterialsDataResponse_Alpha(item)
+		alpha = append(alpha, &a)
+	}
+
+	materials = &moment_proto.MaterialsDataResponse{
+		Voltage:    voltage,
+		Elasticity: elasticity,
+		Alpha:      alpha,
 	}
 
 	return materials, nil

@@ -24,6 +24,14 @@ type MaterialsAll struct {
 	Voltage    []Voltage
 }
 
+type MaterialsWithIsEmpty struct {
+	Id                string `db:"id"`
+	Title             string `db:"title"`
+	IsEmptyAlpha      bool   `db:"is_empty_alpha"`
+	IsEmptyElasticity bool   `db:"is_empty_elasticity"`
+	IsEmptyVoltage    bool   `db:"is_empty_voltage"`
+}
+
 type MaterialsDTO struct {
 	Id    string `db:"id"`
 	Title string `db:"title"`

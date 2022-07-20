@@ -26,6 +26,25 @@ func (h *MaterialsHandlers) GetMaterials(ctx context.Context, req *moment_proto.
 	return &moment_proto.MaterialsResponse{Materials: materials}, nil
 }
 
+func (h *MaterialsHandlers) GetMaterialsWithIsEmpty(ctx context.Context, req *moment_proto.GetMaterialsRequest,
+) (*moment_proto.MaterialsWithIsEmptyResponse, error) {
+	materials, err := h.service.GetMaterialsWithIsEmpty(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &moment_proto.MaterialsWithIsEmptyResponse{Materials: materials}, nil
+}
+
+func (h *MaterialsHandlers) GetMaterialsData(ctx context.Context, req *moment_proto.GetMaterialsDataRequest) (*moment_proto.MaterialsDataResponse, error) {
+	materials, err := h.service.GetMaterialsData(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return materials, nil
+}
+
 func (h *MaterialsHandlers) CreateMaterial(ctx context.Context, material *moment_proto.CreateMaterialRequest) (*moment_proto.IdResponse, error) {
 	id, err := h.service.CreateMaterial(ctx, material)
 	if err != nil {

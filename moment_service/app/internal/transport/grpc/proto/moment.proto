@@ -25,6 +25,13 @@ message Material {
     string id = 1;
     string title = 2;
 }
+message MaterialWithIsEmpty {
+    string id = 1;
+    string title = 2;
+    bool IsEmptyAlpha = 3;
+    bool IsEmptyElasticity = 4;
+    bool IsEmptyVoltage = 5;
+}
 
 message GetMaterialsRequest {}
 message CreateMaterialRequest {
@@ -40,6 +47,35 @@ message DeleteMaterialRequest {
 
 message MaterialsResponse {
     repeated Material materials = 1;
+}
+message MaterialsWithIsEmptyResponse {
+    repeated MaterialWithIsEmpty materials = 1;
+}
+
+message GetMaterialsDataRequest {
+    string markId = 1;
+}
+
+message MaterialsDataResponse {
+    message Voltage {
+        string id = 1;
+        double temperature = 2;
+        double voltage = 3;
+    }
+    message Elasticity {
+        string id = 1;
+        double temperature = 2;
+        double elasticity = 3;
+    }
+    message Alpha {
+        string id = 1;
+        double temperature = 2;
+        double alpha = 3;
+    }
+
+    repeated Voltage voltage = 1;
+    repeated Elasticity elasticity = 2;
+    repeated Alpha alpha = 3;
 }
 
 message Voltage {
@@ -98,6 +134,8 @@ message DeleteAlphaRequest {
 
 service MaterialsService {
     rpc GetMaterials (GetMaterialsRequest) returns (MaterialsResponse);
+    rpc GetMaterialsData (GetMaterialsDataRequest) returns (MaterialsDataResponse);
+    rpc GetMaterialsWithIsEmpty (GetMaterialsRequest) returns (MaterialsWithIsEmptyResponse);
     rpc CreateMaterial (CreateMaterialRequest) returns (IdResponse);
     rpc UpdateMaterial (UpdateMaterialRequest) returns (Response);
     rpc DeleteMaterial (DeleteMaterialRequest) returns (Response);
@@ -113,6 +151,134 @@ service MaterialsService {
     rpc CreateAlpha (CreateAlphaRequest) returns (Response);
     rpc UpdateAlpha (UpdateAlphaRequest) returns (Response);
     rpc DeleteAlpha (DeleteAlphaRequest) returns (Response);
+}
+
+// -----------------------------------------------------------------------
+
+message Gasket {
+    string id = 1;
+    string title = 2;
+}
+
+message GetGasketRequest {}
+message CreateGasketRequest {
+    string title = 1;
+}
+message UpdateGasketRequest {
+    string id = 1;
+    string title = 2;
+}
+message DeleteGasketRequest {
+    string id = 1;
+}
+
+message GasketResponse {
+    repeated Gasket gasket = 1;
+}
+
+message GasketType {
+    string id = 1;
+    string title = 2;
+}
+
+message GetGasketTypeRequest {}
+message CreateGasketTypeRequest {
+    string title = 1;
+}
+message UpdateGasketTypeRequest {
+    string id = 1;
+    string title = 2;
+}
+message DeleteGasketTypeRequest {
+    string id = 1;
+}
+
+message GasketTypeResponse {
+    repeated GasketType gasketType = 1;
+}
+
+message Env {
+    string id = 1;
+    string title = 2;
+}
+
+message GetEnvRequest {}
+message CreateEnvRequest {
+    string title = 1;
+}
+message UpdateEnvRequest {
+    string id = 1;
+    string title = 2;
+}
+message DeleteEnvRequest {
+    string id = 1;
+}
+
+message EnvResponse {
+    repeated Env env = 1;
+}
+
+message CreateEnvDataRequest {
+    string envId = 1;
+    string gasketId = 2;
+    double m = 3;
+    double specificPres = 4;
+}
+message UpdateEnvDataRequest {
+    string id = 1;
+    string envId = 2;
+    string gasketId = 3;
+    double m = 4;
+    double specificPres = 5;
+}
+message DeleteEnvDataRequest {
+    string id = 1;
+}
+
+message CreateGasketDataRequest {
+    string gasketId = 1;
+    double permissiblePres = 2;
+    double compression = 3;
+    double epsilon = 4;
+    double thickness = 5;
+    string typeId = 6;
+}
+message UpdateGasketDataRequest {
+    string id = 1;
+    string gasketId = 2;
+    double permissiblePres = 3;
+    double compression = 4;
+    double epsilon = 5;
+    double thickness = 6;
+    string typeId = 7;
+}
+message DeleteGasketDataRequest {
+    string id = 1;
+}
+
+service GasketService {
+    rpc GetGasket (GetGasketRequest) returns (GasketResponse);
+    rpc CreateGasket (CreateGasketRequest) returns (IdResponse);
+    rpc UpdateGasket (UpdateGasketRequest) returns (Response);
+    rpc DeleteGasket (DeleteGasketRequest) returns (Response);
+
+    rpc GetGasketType (GetGasketTypeRequest) returns (GasketTypeResponse);
+    rpc CreateGasketType (CreateGasketTypeRequest) returns (IdResponse);
+    rpc UpdateGasketType (UpdateGasketTypeRequest) returns (Response);
+    rpc DeleteGasketType (DeleteGasketTypeRequest) returns (Response);
+
+    rpc GetEnv (GetEnvRequest) returns (EnvResponse);
+    rpc CreateEnv (CreateEnvRequest) returns (IdResponse);
+    rpc UpdateEnv (UpdateEnvRequest) returns (Response);
+    rpc DeleteEnv (DeleteEnvRequest) returns (Response);
+
+    rpc CreateEnvData (CreateEnvDataRequest) returns (Response);
+    rpc UpdateEnvData (UpdateEnvDataRequest) returns (Response);
+    rpc DeleteEnvData (DeleteEnvDataRequest) returns (Response);
+
+    rpc CreateGasketData (CreateGasketDataRequest) returns (Response);
+    rpc UpdateGasketData (UpdateGasketDataRequest) returns (Response);
+    rpc DeleteGasketData (DeleteGasketDataRequest) returns (Response);
 }
 
 // -----------------------------------------------------------------------
