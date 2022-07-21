@@ -62,6 +62,13 @@ type Gasket interface {
 	DeleteGasketData(context.Context, *moment_proto.DeleteGasketDataRequest) (*moment_proto.Response, error)
 }
 
+type Flange interface {
+	GetBolts(ctx context.Context, req *moment_proto.GetBoltsRequest) (*moment_proto.BoltsResponse, error)
+	CreateBolt(ctx context.Context, bolt *moment_proto.CreateBoltRequest) (*moment_proto.Response, error)
+	UpdateBolt(ctx context.Context, bolt *moment_proto.UpdateBoltRequest) (*moment_proto.Response, error)
+	DeleteBolt(ctx context.Context, bolt *moment_proto.DeleteBoltRequest) (*moment_proto.Response, error)
+}
+
 type Handler struct {
 	service *service.Services
 	conf    config.ApiConfig
@@ -69,6 +76,7 @@ type Handler struct {
 	CalcFlange
 	Materials
 	Gasket
+	Flange
 }
 
 func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
@@ -79,5 +87,6 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		CalcFlange: NewCalcFlangeHandlers(service.CalcFlange),
 		Materials:  NewMaterialsHandlers(service.Materials),
 		Gasket:     NewGasketService(service.Gasket),
+		Flange:     NewFlangeHandlers(service.Flange),
 	}
 }

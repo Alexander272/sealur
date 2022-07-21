@@ -12,7 +12,12 @@ type CalcFlange interface {
 	Calculation(ctx context.Context, data *moment_proto.FlangeRequest) (*moment_proto.FlangeResponse, error)
 }
 
-type Flange interface{}
+type Flange interface {
+	GetBolts(context.Context, *moment_proto.GetBoltsRequest) ([]*moment_proto.Bolt, error)
+	CreateBolt(context.Context, *moment_proto.CreateBoltRequest) error
+	UpdateBolt(context.Context, *moment_proto.UpdateBoltRequest) error
+	DeleteBolt(context.Context, *moment_proto.DeleteBoltRequest) error
+}
 
 type Materials interface {
 	GetMatFotCalculate(ctx context.Context, markId string, temp float64) (models.MaterialsResult, error)

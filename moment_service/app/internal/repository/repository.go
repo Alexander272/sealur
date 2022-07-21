@@ -10,6 +10,11 @@ import (
 
 type Flange interface {
 	GetSize(ctx context.Context, dn, pn float64, standId string) (models.FlangeSize, error)
+
+	GetBolts(context.Context, *moment_proto.GetBoltsRequest) ([]models.BoltsDTO, error)
+	CreateBolt(context.Context, *moment_proto.CreateBoltRequest) error
+	UpdateBolt(context.Context, *moment_proto.UpdateBoltRequest) error
+	DeleteBolt(context.Context, *moment_proto.DeleteBoltRequest) error
 }
 
 type Materials interface {
