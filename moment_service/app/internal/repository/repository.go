@@ -15,6 +15,16 @@ type Flange interface {
 	CreateBolt(context.Context, *moment_proto.CreateBoltRequest) error
 	UpdateBolt(context.Context, *moment_proto.UpdateBoltRequest) error
 	DeleteBolt(context.Context, *moment_proto.DeleteBoltRequest) error
+
+	GetTypeFlange(context.Context, *moment_proto.GetTypeFlangeRequest) ([]models.TypeFlangeDTO, error)
+	CreateTypeFlange(context.Context, *moment_proto.CreateTypeFlangeRequest) (id string, err error)
+	UpdateTypeFlange(context.Context, *moment_proto.UpdateTypeFlangeRequest) error
+	DeleteTypeFlange(context.Context, *moment_proto.DeleteTypeFlangeRequest) error
+
+	GetStandarts(context.Context, *moment_proto.GetStandartsRequest) ([]models.StandartDTO, error)
+	CreateStandart(context.Context, *moment_proto.CreateStandartRequest) (id string, err error)
+	UpdateStandart(context.Context, *moment_proto.UpdateStandartRequest) error
+	DeleteStandart(context.Context, *moment_proto.DeleteStandartRequest) error
 }
 
 type Materials interface {

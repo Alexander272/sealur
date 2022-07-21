@@ -67,6 +67,16 @@ type Flange interface {
 	CreateBolt(ctx context.Context, bolt *moment_proto.CreateBoltRequest) (*moment_proto.Response, error)
 	UpdateBolt(ctx context.Context, bolt *moment_proto.UpdateBoltRequest) (*moment_proto.Response, error)
 	DeleteBolt(ctx context.Context, bolt *moment_proto.DeleteBoltRequest) (*moment_proto.Response, error)
+
+	GetTypeFlange(ctx context.Context, req *moment_proto.GetTypeFlangeRequest) (*moment_proto.TypeFlangeResponse, error)
+	CreateTypeFlange(ctx context.Context, typeFlange *moment_proto.CreateTypeFlangeRequest) (*moment_proto.IdResponse, error)
+	UpdateTypeFlange(ctx context.Context, typeFlange *moment_proto.UpdateTypeFlangeRequest) (*moment_proto.Response, error)
+	DeleteTypeFlange(ctx context.Context, typeFlange *moment_proto.DeleteTypeFlangeRequest) (*moment_proto.Response, error)
+
+	GetStandarts(ctx context.Context, req *moment_proto.GetStandartsRequest) (*moment_proto.StandartsResponse, error)
+	CreateStandart(ctx context.Context, stand *moment_proto.CreateStandartRequest) (*moment_proto.IdResponse, error)
+	UpdateStandart(ctx context.Context, stand *moment_proto.UpdateStandartRequest) (*moment_proto.Response, error)
+	DeleteStandart(ctx context.Context, stand *moment_proto.DeleteStandartRequest) (*moment_proto.Response, error)
 }
 
 type Handler struct {
