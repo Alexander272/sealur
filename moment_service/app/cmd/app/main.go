@@ -67,6 +67,7 @@ func main() {
 	moment_proto.RegisterCalcFlangeServiceServer(server, handlers.CalcFlange)
 	moment_proto.RegisterMaterialsServiceServer(server, handlers.Materials)
 	moment_proto.RegisterGasketServiceServer(server, handlers.Gasket)
+	moment_proto.RegisterFlangeServiceServer(server, handlers.Flange)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {

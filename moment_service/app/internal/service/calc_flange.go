@@ -8,12 +8,11 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	"github.com/Alexander272/sealur/moment_service/internal/repository"
 	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
 )
 
 type CalcFlangeService struct {
-	repo          repository.Flange
+	flange        *FlangeService
 	materials     *MaterialsService
 	gasket        *GasketService
 	graphic       *GraphicService
@@ -25,7 +24,7 @@ type CalcFlangeService struct {
 	Kyz           map[string]float64
 }
 
-func NewCalcFlangeService(repo repository.Flange, materials *MaterialsService, gasket *GasketService, graphic *GraphicService) *CalcFlangeService {
+func NewCalcFlangeService(flange *FlangeService, materials *MaterialsService, gasket *GasketService, graphic *GraphicService) *CalcFlangeService {
 	flangesTF := map[string]float64{
 		"isolated":    constants.IsolatedFlatTf,
 		"nonIsolated": constants.NonIsolatedFlatTf,
@@ -60,7 +59,7 @@ func NewCalcFlangeService(repo repository.Flange, materials *MaterialsService, g
 	}
 
 	return &CalcFlangeService{
-		repo:          repo,
+		flange:        flange,
 		materials:     materials,
 		gasket:        gasket,
 		graphic:       graphic,
@@ -811,7 +810,7 @@ func (s *CalcFlangeService) getDataFlange(
 	typeFlange string,
 	temp float64,
 ) (models.InitialDataFlange, error) {
-	size, err := s.repo.GetSize(ctx, float64(flange.Dy), flange.Py, flange.StandartId)
+	size, err := s.flange.GetFlangeSize(ctx, &moment_proto.GetFlangeSizeRequest{D: float64(flange.Dy), Pn: flange.Py, StandId: flange.StandartId})
 	if err != nil {
 		return models.InitialDataFlange{}, fmt.Errorf("failed to get size. error: %w", err)
 	}

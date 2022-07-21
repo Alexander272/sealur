@@ -13,6 +13,11 @@ type CalcFlange interface {
 }
 
 type Flange interface {
+	GetFlangeSize(context.Context, *moment_proto.GetFlangeSizeRequest) (models.FlangeSize, error)
+	CreateFlangeSize(context.Context, *moment_proto.CreateFlangeSizeRequest) error
+	UpdateFlangeSize(context.Context, *moment_proto.UpdateFlangeSizeRequest) error
+	DeleteFlangeSize(context.Context, *moment_proto.DeleteFlangeSizeRequest) error
+
 	GetBolts(context.Context, *moment_proto.GetBoltsRequest) ([]*moment_proto.Bolt, error)
 	CreateBolt(context.Context, *moment_proto.CreateBoltRequest) error
 	UpdateBolt(context.Context, *moment_proto.UpdateBoltRequest) error
@@ -101,7 +106,7 @@ func NewServices(repos *repository.Repositories) *Services {
 	graphic := NewGraphicService()
 
 	return &Services{
-		CalcFlange: NewCalcFlangeService(repos.Flange, materials, gasket, graphic),
+		CalcFlange: NewCalcFlangeService(flange, materials, gasket, graphic),
 		Flange:     flange,
 		Materials:  materials,
 		Gasket:     gasket,

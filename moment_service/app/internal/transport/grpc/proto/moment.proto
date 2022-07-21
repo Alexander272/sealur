@@ -354,6 +354,11 @@ message StandartsResponse {
     repeated Standart standarts = 1;
 }
 
+message GetFlangeSizeRequest {
+    string standId = 1;
+    double pn = 2;
+    double d = 3;
+}
 message CreateFlangeSizeRequest {
     string standId = 1;
     double pn = 2;
