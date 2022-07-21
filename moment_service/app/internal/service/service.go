@@ -8,9 +8,11 @@ import (
 	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
 )
 
-type Flange interface {
+type CalcFlange interface {
 	Calculation(ctx context.Context, data *moment_proto.FlangeRequest) (*moment_proto.FlangeResponse, error)
 }
+
+type Flange interface{}
 
 type Materials interface {
 	GetMatFotCalculate(ctx context.Context, markId string, temp float64) (models.MaterialsResult, error)
@@ -70,6 +72,7 @@ type Graphic interface {
 }
 
 type Services struct {
+	CalcFlange
 	Flange
 	Materials
 	Gasket
@@ -77,14 +80,16 @@ type Services struct {
 }
 
 func NewServices(repos *repository.Repositories) *Services {
-	Materials := NewMaterialsService(repos.Materials)
-	Gasket := NewGasketService(repos.Gasket)
-	Graphic := NewGraphicService()
+	flange := NewFlangeService(repos.Flange)
+	materials := NewMaterialsService(repos.Materials)
+	gasket := NewGasketService(repos.Gasket)
+	graphic := NewGraphicService()
 
 	return &Services{
-		Flange:    NewFlangeService(repos.Flange, Materials, Gasket, Graphic),
-		Materials: Materials,
-		Gasket:    Gasket,
-		Graphic:   Graphic,
+		CalcFlange: NewCalcFlangeService(repos.Flange, materials, gasket, graphic),
+		Flange:     flange,
+		Materials:  materials,
+		Gasket:     gasket,
+		Graphic:    graphic,
 	}
 }

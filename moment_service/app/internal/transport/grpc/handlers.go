@@ -12,7 +12,7 @@ type Ping interface {
 	Ping(context.Context, *moment_proto.PingRequest) (*moment_proto.PingResponse, error)
 }
 
-type Flange interface {
+type CalcFlange interface {
 	CalculateFlange(context.Context, *moment_proto.FlangeRequest) (*moment_proto.FlangeResponse, error)
 }
 
@@ -66,18 +66,18 @@ type Handler struct {
 	service *service.Services
 	conf    config.ApiConfig
 	Ping
-	Flange
+	CalcFlange
 	Materials
 	Gasket
 }
 
 func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 	return &Handler{
-		service:   service,
-		conf:      conf,
-		Ping:      NewPingHandlers(),
-		Flange:    NewFlangeHandlers(service.Flange),
-		Materials: NewMaterialsHandlers(service.Materials),
-		Gasket:    NewGasketService(service.Gasket),
+		service:    service,
+		conf:       conf,
+		Ping:       NewPingHandlers(),
+		CalcFlange: NewCalcFlangeHandlers(service.CalcFlange),
+		Materials:  NewMaterialsHandlers(service.Materials),
+		Gasket:     NewGasketService(service.Gasket),
 	}
 }

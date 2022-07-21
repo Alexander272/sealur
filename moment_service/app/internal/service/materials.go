@@ -41,7 +41,9 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 
 			if temp >= mats.Alpha[i-1].Temperature && temp < m.Temperature {
 				temps := (temp - mats.Alpha[i-1].Temperature) / (m.Temperature - mats.Alpha[i-1].Temperature)
-				alphaF = (temps*(m.Alpha-mats.Alpha[i-1].Alpha) + mats.Alpha[i-1].Alpha) * math.Pow10(-6)
+				al1 := math.Round(m.Alpha*1000) / 1000
+				al2 := math.Round(mats.Alpha[i-1].Alpha*1000) / 1000
+				alphaF = (temps*(al1-al2) + al2) * math.Pow10(-6)
 				break
 			}
 		}
@@ -59,7 +61,9 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 
 			if temp >= mats.Elasticity[i-1].Temperature && temp < m.Temperature {
 				temps := (temp - mats.Elasticity[i-1].Temperature) / (m.Temperature - mats.Elasticity[i-1].Temperature)
-				epsilon = (temps*(m.Elasticity-mats.Elasticity[i-1].Elasticity) + mats.Elasticity[i-1].Elasticity) * math.Pow10(5)
+				el1 := math.Round(m.Elasticity*1000) / 1000
+				el2 := math.Round(mats.Elasticity[i-1].Elasticity*1000) / 1000
+				epsilon = (temps*(el1-el2) + el2) * math.Pow10(5)
 				break
 			}
 		}
@@ -77,7 +81,9 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 
 			if temp >= mats.Voltage[i-1].Temperature && temp < m.Temperature {
 				temps := (temp - mats.Voltage[i-1].Temperature) / (m.Temperature - mats.Voltage[i-1].Temperature)
-				sigma = (temps*(m.Voltage-mats.Voltage[i-1].Voltage) + mats.Voltage[i-1].Voltage)
+				v1 := math.Round(m.Voltage*1000) / 1000
+				v2 := math.Round(mats.Voltage[i-1].Voltage*1000) / 1000
+				sigma = (temps*(v1-v2) + v2)
 				break
 			}
 		}
