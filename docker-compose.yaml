@@ -19,7 +19,7 @@ services:
 
     api_service:
         restart: on-failure:5
-        image: sealur/api_service:1.0.1
+        image: sealur/api_service:1.0.3
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images
@@ -35,6 +35,13 @@ services:
             - pro_service
             - file_service
             - user_service
+
+    moment_service:
+        restart: on-failure:5
+        image: sealur/moment_service:0.3.0
+        container_name: dev-moment_service
+        env_file:
+            - .env
 
     pro_service:
         restart: on-failure:5

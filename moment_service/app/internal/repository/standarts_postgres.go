@@ -10,7 +10,7 @@ import (
 )
 
 func (r *FlangeRepo) GetTypeFlange(ctx context.Context, req *moment_proto.GetTypeFlangeRequest) (typeFlange []models.TypeFlangeDTO, err error) {
-	query := fmt.Sprintf(`SELECT id, title FROM %s ORDER BY title`, TypeFlangeTable)
+	query := fmt.Sprintf(`SELECT id, title FROM %s ORDER BY id`, TypeFlangeTable)
 
 	if err := r.db.Select(&typeFlange, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -63,11 +63,11 @@ func (r *FlangeRepo) GetStandarts(ctx context.Context, req *moment_proto.GetStan
 }
 
 func (r *FlangeRepo) CreateStandart(ctx context.Context, stand *moment_proto.CreateStandartRequest) (id string, err error) {
-	query := fmt.Sprintf("INSERT INTO %s (title, type_id) VALUES ($1, $2) RETURNING id", TypeFlangeTable)
+	query := fmt.Sprintf("INSERT INTO %s (title, type_id) VALUES ($1, $2) RETURNING id", StandartsTable)
 
 	row := r.db.QueryRow(query, stand.Title, stand.TypeId)
 	if row.Err() != nil {
-		return "", fmt.Errorf("failed to execute query. error: %w", err)
+		return "", fmt.Errorf("failed to execute query. error: %w", row.Err())
 	}
 
 	var idInt int

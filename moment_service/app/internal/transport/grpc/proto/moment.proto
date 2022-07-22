@@ -368,7 +368,7 @@ message CreateFlangeSizeRequest {
     double h = 6;
     double s0 = 7;
     double s1 = 8;
-    double lenght = 9;
+    double length = 9;
     int32 count = 10;
     string boltId = 11;
 }
@@ -382,7 +382,7 @@ message UpdateFlangeSizeRequest {
     double h = 7;
     double s0 = 8;
     double s1 = 9;
-    double lenght = 10;
+    double length = 10;
     int32 count = 11;
     string boltId = 12;
 }
@@ -430,6 +430,11 @@ message FlangeData {
 
 message BoltData {
     string markId = 1;
+}
+
+message WasherData {
+    string markId = 1;
+    double thickness = 2;
 }
 
 message GasketData {
@@ -484,8 +489,10 @@ message FlangeRequest {
     BoltData bolts = 13;
     GasketData gasket = 14;
     EmbedData embed = 15;
+    bool isUseWasher = 16;
+    repeated WasherData washer = 17; 
 
-    bool isNeedFormulas = 16;
+    bool isNeedFormulas = 18;
 }
 
 message FlangeResult {
@@ -668,6 +675,27 @@ message CalculatedFlange {
 }
 
 message CalcFormulas {
+    message Basis {
+        string Pb = 1;
+        string Pb1 = 2;
+        string Pb2 = 3;
+        string Pbr = 4;
+        string sigmaB1 = 5;
+        string sigmaB2 = 6;
+        string dSigmaM = 7;
+        string dSigmaR = 8;
+        string q = 9;
+        string qP = 10;
+        string Mkp = 11;
+        string Mkp1 = 12;
+        string Mrek = 13;
+        string Qrek = 14;
+        string Mmax = 15;
+        string Qmax = 16;
+        string VSigmaB1 = 17;
+        string VSigmaB2 = 18;
+    }
+
     string b0 = 1;
     string Dcp = 2;
     string Po = 3;
@@ -678,6 +706,7 @@ message CalcFormulas {
     string Qt = 8;
     string alpha = 9;
     string alphaM = 10;
+    Basis basis = 12;
 }
 
 message FlangeResponse {

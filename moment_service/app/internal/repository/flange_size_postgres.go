@@ -19,15 +19,21 @@ func NewFlangeRepo(db *sqlx.DB) *FlangeRepo {
 }
 
 func (r *FlangeRepo) GetFlangeSize(ctx context.Context, req *moment_proto.GetFlangeSizeRequest) (size models.FlangeSize, err error) {
-	//TODO
+	query := fmt.Sprintf(`SELECT %s.id, pn, d, d6, d_out, h, s0, s1, length, count, diameter, area FROM %s
+		INNER JOIN %s on bolt_id=%s.id WHERE stand_id=$1 AND d=$2 AND pn=$3`,
+		FlangeSizeTable, FlangeSizeTable, BoltsTable, BoltsTable)
+
+	if err := r.db.Get(&size, query, req.StandId, req.D, req.Pn); err != nil {
+		return size, fmt.Errorf("failed to execute query. error: %w", err)
+	}
 	return size, nil
 }
 
 func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_proto.CreateFlangeSizeRequest) error {
-	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, d, d6, d_out, h, s0, s1, lenght, count, bolt_id)
+	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, d, d6, d_out, h, s0, s1, length, count, bolt_id)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, FlangeSizeTable)
 
-	_, err := r.db.Exec(query, size.StandId, size.Pn, size.D, size.D6, size.DOut, size.H, size.S0, size.S1, size.Lenght, size.Count, size.BoltId)
+	_, err := r.db.Exec(query, size.StandId, size.Pn, size.D, size.D6, size.DOut, size.H, size.S0, size.S1, size.Length, size.Count, size.BoltId)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -80,9 +86,9 @@ func (r *FlangeRepo) UpdateFlangeSize(ctx context.Context, size *moment_proto.Up
 		args = append(args, size.S1)
 		argId++
 	}
-	if size.Lenght != 0 {
-		setValues = append(setValues, fmt.Sprintf("lenght=$%d", argId))
-		args = append(args, size.Lenght)
+	if size.Length != 0 {
+		setValues = append(setValues, fmt.Sprintf("length=$%d", argId))
+		args = append(args, size.Length)
 		argId++
 	}
 	if size.Count != 0 {

@@ -9,7 +9,7 @@ type FlangeSize struct {
 	H        float64 `db:"h"`
 	S0       float64 `db:"s0"`
 	S1       float64 `db:"s1"`
-	Lenght   float64 `db:"lenght"`
+	Length   float64 `db:"length"`
 	Count    int32   `db:"count"`
 	Diameter int32   `db:"diameter"`
 	Area     float64 `db:"area"`
@@ -25,7 +25,7 @@ type FlangeSizeDTO struct {
 	H       float64 `db:"h"`
 	S0      float64 `db:"s0"`
 	S1      float64 `db:"s1"`
-	Lenght  float64 `db:"lenght"`
+	Length  float64 `db:"length"`
 	Count   int32   `db:"count"`
 	BoltId  string  `db:"bolt_id"`
 }

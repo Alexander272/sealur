@@ -49,12 +49,13 @@ type (
 	}
 
 	ServicesConfig struct {
-		ProService  ProConfig
-		FileService ProConfig
-		UserService ProConfig
+		ProService    ServiceConfig
+		FileService   ServiceConfig
+		UserService   ServiceConfig
+		MomentService ServiceConfig
 	}
 
-	ProConfig struct {
+	ServiceConfig struct {
 		Url          string
 		AuthName     string
 		AuthPassword string
@@ -124,6 +125,10 @@ func setFromEnv(conf *Config) error {
 	conf.Services.UserService.AuthName = os.Getenv("API_NAME")
 	conf.Services.UserService.AuthPassword = os.Getenv("API_PASSWORD")
 	conf.Services.UserService.Url = os.Getenv("USER_HOST") + ":" + os.Getenv("USER_PORT")
+
+	conf.Services.MomentService.AuthName = os.Getenv("API_NAME")
+	conf.Services.MomentService.AuthPassword = os.Getenv("API_PASSWORD")
+	conf.Services.MomentService.Url = os.Getenv("MOMENT_HOST") + ":" + os.Getenv("MOMENT_PORT")
 
 	return nil
 }

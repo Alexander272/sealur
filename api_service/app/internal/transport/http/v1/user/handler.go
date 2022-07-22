@@ -61,11 +61,11 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	userClient := proto_user.NewUserServiceClient(connect)
 	h.userClient = userClient
 
-	files := api.Group("/")
+	users := api.Group("/")
 	{
-		files.GET("/users/ping", h.pingUsers)
+		users.GET("/users/ping", h.pingUsers)
 
-		h.initUserRoutes(files)
+		h.initUserRoutes(users)
 	}
 }
 
