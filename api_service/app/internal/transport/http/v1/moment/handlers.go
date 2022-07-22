@@ -76,6 +76,16 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		h.initEnvRoutes(moment)
 		h.initEnvDataRoutes(moment)
 		h.initGasketDataRoutes(moment)
+
+		h.initMaterialsRoutes(moment)
+		h.initVoltageRoutes(moment)
+		h.initElasticityRoutes(moment)
+		h.initAlphaRoutes(moment)
+
+		h.initBoltsRoutes(moment)
+		h.initTypeFlangeRoutes(moment)
+		h.initStandartsRoutes(moment)
+		h.initFlangeRoutes(moment)
 	}
 }
 
