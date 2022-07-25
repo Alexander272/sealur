@@ -1,0 +1,724 @@
+syntax = "proto3";
+
+package moment_api;
+option go_package = "/moment_api";
+
+message PingRequest {}
+message PingResponse {
+    string ping = 1;
+}
+
+service PingService {
+    rpc Ping (PingRequest) returns (PingResponse);
+}
+
+// -----------------------------------------------------------------------
+
+message IdResponse {
+    string id = 1;
+}
+message Response {}
+
+// -----------------------------------------------------------------------
+
+message Material {
+    string id = 1;
+    string title = 2;
+}
+message MaterialWithIsEmpty {
+    string id = 1;
+    string title = 2;
+    bool IsEmptyAlpha = 3;
+    bool IsEmptyElasticity = 4;
+    bool IsEmptyVoltage = 5;
+}
+
+message GetMaterialsRequest {}
+message CreateMaterialRequest {
+    string title = 1;
+}
+message UpdateMaterialRequest {
+    string id = 1;
+    string title = 2;
+}
+message DeleteMaterialRequest {
+    string id = 1;
+}
+
+message MaterialsResponse {
+    repeated Material materials = 1;
+}
+message MaterialsWithIsEmptyResponse {
+    repeated MaterialWithIsEmpty materials = 1;
+}
+
+message GetMaterialsDataRequest {
+    string markId = 1;
+}
+
+message MaterialsDataResponse {
+    message Voltage {
+        string id = 1;
+        double temperature = 2;
+        double voltage = 3;
+    }
+    message Elasticity {
+        string id = 1;
+        double temperature = 2;
+        double elasticity = 3;
+    }
+    message Alpha {
+        string id = 1;
+        double temperature = 2;
+        double alpha = 3;
+    }
+
+    repeated Voltage voltage = 1;
+    repeated Elasticity elasticity = 2;
+    repeated Alpha alpha = 3;
+}
+
+message Voltage {
+    double temperature = 1;
+    double voltage = 2;
+}
+message CreateVoltageRequest {
+    string markId = 1;
+    repeated Voltage voltage = 2;
+}
+message UpdateVoltageRequest {
+    string id = 1;
+    string markId = 2;
+    double temperature = 3;
+    double voltage = 4;
+}
+message DeleteVoltageRequest {
+    string id = 1;
+}
+
+message Elasticity {
+    double temperature = 1;
+    double elasticity = 2;
+}
+message CreateElasticityRequest {
+    string markId = 1;
+    repeated Elasticity elasticity = 2;
+}
+message UpdateElasticityRequest {
+    string id = 1;
+    string markId = 2;
+    double temperature = 3;
+    double elasticity = 4;
+}
+message DeleteElasticityRequest {
+    string id = 1;
+}
+
+message Alpha {
+    double temperature = 1;
+    double alpha = 2;
+}
+message CreateAlphaRequest {
+    string markId = 1;
+    repeated Alpha alpha = 2;
+}
+message UpdateAlphaRequest {
+    string id = 1;
+    string markId = 2;
+    double temperature = 3;
+    double alpha = 4;
+}
+message DeleteAlphaRequest {
+    string id = 1;
+}
+
+service MaterialsService {
+    rpc GetMaterials (GetMaterialsRequest) returns (MaterialsResponse);
+    rpc GetMaterialsData (GetMaterialsDataRequest) returns (MaterialsDataResponse);
+    rpc GetMaterialsWithIsEmpty (GetMaterialsRequest) returns (MaterialsWithIsEmptyResponse);
+    rpc CreateMaterial (CreateMaterialRequest) returns (IdResponse);
+    rpc UpdateMaterial (UpdateMaterialRequest) returns (Response);
+    rpc DeleteMaterial (DeleteMaterialRequest) returns (Response);
+
+    rpc CreateVoltage (CreateVoltageRequest) returns (Response);
+    rpc UpdateVoltage (UpdateVoltageRequest) returns (Response);
+    rpc DeleteVoltage (DeleteVoltageRequest) returns (Response);
+
+    rpc CreateElasticity (CreateElasticityRequest) returns (Response);
+    rpc UpdateElasticity (UpdateElasticityRequest) returns (Response);
+    rpc DeleteElasticity (DeleteElasticityRequest) returns (Response);
+
+    rpc CreateAlpha (CreateAlphaRequest) returns (Response);
+    rpc UpdateAlpha (UpdateAlphaRequest) returns (Response);
+    rpc DeleteAlpha (DeleteAlphaRequest) returns (Response);
+}
+
+// -----------------------------------------------------------------------
+
+message Gasket {
+    string id = 1;
+    string title = 2;
+}
+
+message GetGasketRequest {}
+message CreateGasketRequest {
+    string title = 1;
+}
+message UpdateGasketRequest {
+    string id = 1;
+    string title = 2;
+}
+message DeleteGasketRequest {
+    string id = 1;
+}
+
+message GasketResponse {
+    repeated Gasket gasket = 1;
+}
+
+message GasketType {
+    string id = 1;
+    string title = 2;
+}
+
+message GetGasketTypeRequest {}
+message CreateGasketTypeRequest {
+    string title = 1;
+}
+message UpdateGasketTypeRequest {
+    string id = 1;
+    string title = 2;
+}
+message DeleteGasketTypeRequest {
+    string id = 1;
+}
+
+message GasketTypeResponse {
+    repeated GasketType gasketType = 1;
+}
+
+message Env {
+    string id = 1;
+    string title = 2;
+}
+
+message GetEnvRequest {}
+message CreateEnvRequest {
+    string title = 1;
+}
+message UpdateEnvRequest {
+    string id = 1;
+    string title = 2;
+}
+message DeleteEnvRequest {
+    string id = 1;
+}
+
+message EnvResponse {
+    repeated Env env = 1;
+}
+
+message CreateEnvDataRequest {
+    string envId = 1;
+    string gasketId = 2;
+    double m = 3;
+    double specificPres = 4;
+}
+message UpdateEnvDataRequest {
+    string id = 1;
+    string envId = 2;
+    string gasketId = 3;
+    double m = 4;
+    double specificPres = 5;
+}
+message DeleteEnvDataRequest {
+    string id = 1;
+}
+
+message CreateGasketDataRequest {
+    string gasketId = 1;
+    double permissiblePres = 2;
+    double compression = 3;
+    double epsilon = 4;
+    double thickness = 5;
+    string typeId = 6;
+}
+message UpdateGasketDataRequest {
+    string id = 1;
+    string gasketId = 2;
+    double permissiblePres = 3;
+    double compression = 4;
+    double epsilon = 5;
+    double thickness = 6;
+    string typeId = 7;
+}
+message DeleteGasketDataRequest {
+    string id = 1;
+}
+
+service GasketService {
+    rpc GetGasket (GetGasketRequest) returns (GasketResponse);
+    rpc CreateGasket (CreateGasketRequest) returns (IdResponse);
+    rpc UpdateGasket (UpdateGasketRequest) returns (Response);
+    rpc DeleteGasket (DeleteGasketRequest) returns (Response);
+
+    rpc GetGasketType (GetGasketTypeRequest) returns (GasketTypeResponse);
+    rpc CreateGasketType (CreateGasketTypeRequest) returns (IdResponse);
+    rpc UpdateGasketType (UpdateGasketTypeRequest) returns (Response);
+    rpc DeleteGasketType (DeleteGasketTypeRequest) returns (Response);
+
+    rpc GetEnv (GetEnvRequest) returns (EnvResponse);
+    rpc CreateEnv (CreateEnvRequest) returns (IdResponse);
+    rpc UpdateEnv (UpdateEnvRequest) returns (Response);
+    rpc DeleteEnv (DeleteEnvRequest) returns (Response);
+
+    rpc CreateEnvData (CreateEnvDataRequest) returns (Response);
+    rpc UpdateEnvData (UpdateEnvDataRequest) returns (Response);
+    rpc DeleteEnvData (DeleteEnvDataRequest) returns (Response);
+
+    rpc CreateGasketData (CreateGasketDataRequest) returns (Response);
+    rpc UpdateGasketData (UpdateGasketDataRequest) returns (Response);
+    rpc DeleteGasketData (DeleteGasketDataRequest) returns (Response);
+}
+
+// -----------------------------------------------------------------------
+
+message GetBoltsRequest {}
+message CreateBoltRequest {
+    string title = 1;
+    int32 diameter = 2;
+    double area = 3;
+}
+message UpdateBoltRequest {
+    string id = 1;
+    string title = 2;
+    int32 diameter = 3;
+    double area = 4;
+}
+message DeleteBoltRequest {
+    string id = 1;
+}
+
+message Bolt {
+    string id = 1;
+    string title = 2;
+    int32 diameter = 3;
+    double area = 4;
+}
+message BoltsResponse {
+    repeated Bolt bolts = 1;
+}
+
+message GetTypeFlangeRequest {}
+message CreateTypeFlangeRequest {
+    string title = 1;
+}
+message UpdateTypeFlangeRequest {
+    string id = 1;
+    string title = 2;
+}
+message DeleteTypeFlangeRequest {
+    string id = 1;
+}
+
+message TypeFlange {
+    string id = 1;
+    string title = 2;
+}
+message TypeFlangeResponse {
+    repeated TypeFlange typeFlanges = 1;
+}
+
+message GetStandartsRequest {
+    string typeId = 1;
+}
+message CreateStandartRequest {
+    string title = 1;
+    string typeId = 2;
+}
+message UpdateStandartRequest {
+    string id = 1;
+    string title = 2;
+    string typeId = 3;
+}
+message DeleteStandartRequest {
+    string id = 1;
+}
+
+message Standart {
+    string id = 1;
+    string title = 2;
+    string typeId = 3;
+}
+message StandartsResponse {
+    repeated Standart standarts = 1;
+}
+
+message GetFlangeSizeRequest {
+    string standId = 1;
+    double pn = 2;
+    double d = 3;
+}
+message CreateFlangeSizeRequest {
+    string standId = 1;
+    double pn = 2;
+    double d = 3;
+    double d6 = 4;
+    double dOut = 5;
+    double h = 6;
+    double s0 = 7;
+    double s1 = 8;
+    double length = 9;
+    int32 count = 10;
+    string boltId = 11;
+}
+message UpdateFlangeSizeRequest {
+    string id = 1;
+    string standId = 2;
+    double pn = 3;
+    double d = 4;
+    double d6 = 5;
+    double dOut = 6;
+    double h = 7;
+    double s0 = 8;
+    double s1 = 9;
+    double length = 10;
+    int32 count = 11;
+    string boltId = 12;
+}
+message DeleteFlangeSizeRequest {
+    string id = 1;
+}
+
+service FlangeService {
+    rpc GetBolts (GetBoltsRequest) returns (BoltsResponse);
+    rpc CreateBolt (CreateBoltRequest) returns (Response);
+    rpc UpdateBolt (UpdateBoltRequest) returns (Response);
+    rpc DeleteBolt (DeleteBoltRequest) returns (Response);
+
+    rpc GetTypeFlange (GetTypeFlangeRequest) returns (TypeFlangeResponse);
+    rpc CreateTypeFlange (CreateTypeFlangeRequest) returns (IdResponse);
+    rpc UpdateTypeFlange (UpdateTypeFlangeRequest) returns (Response);
+    rpc DeleteTypeFlange (DeleteTypeFlangeRequest) returns (Response);
+
+    rpc GetStandarts (GetStandartsRequest) returns (StandartsResponse);
+    rpc CreateStandart (CreateStandartRequest) returns (IdResponse);
+    rpc UpdateStandart (UpdateStandartRequest) returns (Response);
+    rpc DeleteStandart (DeleteStandartRequest) returns (Response);
+
+    rpc CreateFlangeSize (CreateFlangeSizeRequest) returns (Response);
+    rpc UpdateFlangeSize (UpdateFlangeSizeRequest) returns (Response);
+    rpc DeleteFlangeSize (DeleteFlangeSizeRequest) returns (Response);
+}
+
+// -----------------------------------------------------------------------
+
+message FlangeData {
+    enum Type {
+        welded = 0;
+        flat = 1;
+        free = 2;
+    }
+
+    Type type = 1;
+    string standartId = 2;
+    string markId = 3;
+    int32 dy = 4;
+    double py = 5;
+    double corrosion = 6;
+}
+
+message BoltData {
+    string markId = 1;
+}
+
+message WasherData {
+    string markId = 1;
+    double thickness = 2;
+}
+
+message GasketData {
+    string gasketId = 1;
+    string envId = 2;
+    double thickness = 3;
+    double d_out = 4;
+    double d_in = 5;
+}
+
+message EmbedData {
+    string markId = 1;
+    double thickness = 2;
+}
+
+message CalcFlangeRequest {
+    enum Flanges {
+        isolated = 0;
+        nonIsolated = 1;
+        manually = 2;
+    }
+
+    enum Type {
+        bolt = 0;
+        pin = 1;
+    }
+
+    enum Condition {
+        uncontrollable = 0;
+        controllable = 1;
+        controllablePin = 2;
+    }
+
+    enum Calcutation {
+        basis = 0;
+        strength = 1;
+    }
+
+    double pressure = 1;//P
+    int32 axialForce = 2;//F
+    int32 bendingMoment = 3;//M
+    double temp = 4;//T
+    bool isWork = 5;//work
+    Flanges flanges = 6;//ParTem
+    bool isSameFlange = 7;//Odin
+    bool isEmbedded = 8;//ZakDet
+    Type type = 9;//Tip
+    Condition condition = 10;//UsZat
+    Calcutation calculation = 11;//Moment
+
+    repeated FlangeData flangesData = 12;
+    BoltData bolts = 13;
+    GasketData gasket = 14;
+    EmbedData embed = 15;
+    bool isUseWasher = 16;
+    repeated WasherData washer = 17; 
+
+    bool isNeedFormulas = 18;
+}
+
+message FlangeResult {
+    double dOut = 1;
+	double d = 2;
+	double dk = 3;
+	double dnk = 4;
+	double ds = 5;
+	double h = 6;
+	double hk = 7;
+	double s0 = 8;
+	double s1 = 9;
+	double l = 10;
+	double d6 = 11;
+	double c = 12;
+	double tf = 13;
+	double tk = 14;
+	double alphaK = 15;
+	double epsilonKAt20 = 16;
+	double epsilonK = 17;
+	double sigmaKAt20 = 18;
+	double sigmaK = 19;
+	double alphaF = 20;
+	double epsilonAt20 = 21;
+	double epsilon = 22;
+	double sigmaAt20 = 23;
+	double sigma = 24;
+	double sigmaM = 25;
+	double sigmaMAt20 = 26;
+	double sigmaR = 27;
+	double sigmaRAt20 = 28;
+	string material = 29;
+}
+
+message BoltResult {
+    int32 diameter = 1;
+	double area = 2;
+    int32 count = 3;
+    double lenght = 4;
+    double temp = 5;
+    double alpha = 6;
+	double epsilonAt20 = 7;
+	double epsilon = 8;
+	double sigmaAt20 = 9;
+	double sigma = 10;
+}
+
+message GasketResult {
+    string gasketId = 1;
+    string envId = 2;
+    double thickness = 3;
+    double d_out = 4;
+    double width = 5;
+    double m = 6;
+    double pres = 7;
+    double compression = 8;
+    double epsilon = 9;
+    double permissiblePres = 10;
+}
+
+message EmbedResult {
+    string markId = 1;
+    double thickness = 2;
+    double alpfa = 3;
+    double temp = 4;
+}
+
+message StrengthResult {
+    double Mkp = 1;
+    double Mkp1 = 2;
+    double Cf = 3;
+    double Dzv = 4;
+    double MM = 5;
+    double MMk = 6;
+    double Mpk = 7;
+	double Mp = 8;
+	double sigmaM1 = 9;
+	double sigmaM0 = 10;
+	double sigmaT = 11;
+	double sigmaR = 12;
+	double sigmaTp = 13;
+	double sigmaRp = 14;
+	double sigmaK = 15;
+	double sigmaP1 = 16;
+	double sigmaP0 = 17;
+	double sigmaMp = 18;
+	double sigmaMpm = 19;
+	double sigmaMp0 = 20;
+	double sigmaMpm0 = 21;
+	double sigmaMop = 22;
+	double sigmaKp = 23;
+	double teta = 24;
+	double dTeta = 25;
+	double dTetaK = 26;
+	double tetaK = 27;
+
+	double Max1 = 28;
+    double Max2 = 29;
+    double Max3 = 30;
+    double Max4 = 31;
+    double Max5 = 32;
+    double Max6 = 33;
+    double Max7 = 34;
+    double Max8 = 35;
+    double Max9 = 36;
+    double Max10 = 37;
+    double Max11 = 38;
+}
+
+message CalcMomentStrength {
+    double fPb = 1;
+    double fPb1 = 2;
+    double fPb2 = 3;
+    double fPbr = 4;
+    double fSigmaB1 = 5;
+    double fSigmaB2 = 6;
+    double fDSigmaM = 7;
+    double fDSigmaR = 8;
+    double fQ = 9;
+    double sPb = 10;
+    double sPb1 = 11;
+    double sPb2 = 12;
+    double sPbr = 13;
+    double sSigmaB1 = 14;
+    double sSigmaB2 = 15;
+    double sDSigmaM = 16;
+    double sDSigmaR = 17;
+    double sQ = 18;
+    double qP = 19;
+    double Mkp = 20;
+    double Mkp1 = 21;
+    double Mrek = 22;
+    double Qrek = 23;
+    double Mmax = 24;
+    double Qmax = 25;
+    repeated StrengthResult strength = 26;
+    bool vSigmaB1 = 27;
+    bool vSigmaB2 = 28;
+    bool vQmax = 29;
+    bool vTeta1 = 30;
+    bool vTetaK1 = 31;
+    bool vTeta2 = 32;
+    bool vTetaK2 = 33;
+}
+
+message CalcMomentBasis {
+    double Pb = 1;
+    double Pb1 = 2;
+    double Pb2 = 3;
+    double Pbr = 4;
+    double sigmaB1 = 5;
+    double sigmaB2 = 6;
+    double dSigmaM = 7;
+    double dSigmaR = 8;
+    double q = 9;
+    double qP = 10;
+    double Mkp = 11;
+    double Mkp1 = 12;
+    double Mrek = 13;
+    double Qrek = 14;
+    double Mmax = 15;
+    double Qmax = 16;
+    bool VSigmaB1 = 17;
+    bool VSigmaB2 = 18;
+}
+
+message CalculatedFlange {
+    double b0 = 1;
+    double Dsp = 2;
+    double Po = 3;
+    double Rp = 4;
+    double A = 5;
+    double Qd = 6;
+    double Qfm = 7;
+    double Qt = 8;
+    double alpha = 9;
+    double alphaM = 10;
+    CalcMomentStrength strength = 11;
+    CalcMomentBasis basis = 12;
+}
+
+message CalcFormulas {
+    message Basis {
+        string Pb = 1;
+        string Pb1 = 2;
+        string Pb2 = 3;
+        string Pbr = 4;
+        string sigmaB1 = 5;
+        string sigmaB2 = 6;
+        string dSigmaM = 7;
+        string dSigmaR = 8;
+        string q = 9;
+        string qP = 10;
+        string Mkp = 11;
+        string Mkp1 = 12;
+        string Mrek = 13;
+        string Qrek = 14;
+        string Mmax = 15;
+        string Qmax = 16;
+        string VSigmaB1 = 17;
+        string VSigmaB2 = 18;
+    }
+
+    string b0 = 1;
+    string Dcp = 2;
+    string Po = 3;
+    string Rp = 4;
+    string A = 5;
+    string Qd = 6;
+    string Qfm = 7;
+    string Qt = 8;
+    string alpha = 9;
+    string alphaM = 10;
+    Basis basis = 12;
+}
+
+message FlangeResponse {
+    bool isSameFlange = 1;
+    repeated FlangeResult flanges = 2;
+    BoltResult bolt = 3;
+    GasketResult gasket = 4;
+    EmbedResult embed = 5;
+    CalculatedFlange calc = 6;
+    CalcFormulas formulas = 7;
+}
+
+service CalcFlangeService {
+    rpc CalculateFlange (CalcFlangeRequest) returns (FlangeResponse);
+}
