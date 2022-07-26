@@ -3,8 +3,8 @@ package service
 import (
 	"github.com/Alexander272/sealur/email_service/internal/config"
 	"github.com/Alexander272/sealur/email_service/internal/models"
-	proto_email "github.com/Alexander272/sealur/email_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/email_service/pkg/email"
+	"github.com/Alexander272/sealur_proto/api/email_api"
 )
 
 type TestwService struct {
@@ -19,7 +19,7 @@ func NewTestService(sender email.Sender, conf config.RecipientsConfig) *TestwSer
 	}
 }
 
-func (s *TestwService) SendEmail(req *proto_email.SendTestRequest) error {
+func (s *TestwService) SendEmail(req *email_api.SendTestRequest) error {
 	input := email.SendEmailInput{
 		Subject: "Testing Join Email Sealur Pro",
 		To:      []string{s.conf.Test},
@@ -59,7 +59,7 @@ func (s *TestwService) SendEmail(req *proto_email.SendTestRequest) error {
 	case "interview":
 		input.Subject = "Testing Interview Email Sealur Pro"
 
-		data := proto_email.User{
+		data := email_api.User{
 			Name:         "Alex",
 			Organization: "Sealur",
 			Position:     "developer",
@@ -75,7 +75,7 @@ func (s *TestwService) SendEmail(req *proto_email.SendTestRequest) error {
 	case "order":
 		input.Subject = "Testing Order Email Sealur Pro"
 
-		data := proto_email.User{
+		data := email_api.User{
 			Name:         "Alex",
 			Organization: "Sealur",
 			Position:     "developer",

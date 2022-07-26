@@ -13,25 +13,25 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
-	proto_email "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/email"
-	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/proto_file"
-	proto_user "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/user"
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/email_api"
+	"github.com/Alexander272/sealur_proto/api/file_api"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 	"github.com/xuri/excelize/v2"
 )
 
 type OrderService struct {
 	repo  repository.Order
-	email proto_email.EmailServiceClient
-	file  proto_file.FileServiceClient
-	user  proto_user.UserServiceClient
+	email email_api.EmailServiceClient
+	file  file_api.FileServiceClient
+	user  user_api.UserServiceClient
 }
 
 var columnNames = []interface{}{"№", "Обозначение", "Количество", "Описание", "Размеры", "Чертеж"}
 
-func NewOrderService(repo repository.Order, email proto_email.EmailServiceClient,
-	file proto_file.FileServiceClient, user proto_user.UserServiceClient) *OrderService {
+func NewOrderService(repo repository.Order, email email_api.EmailServiceClient,
+	file file_api.FileServiceClient, user user_api.UserServiceClient) *OrderService {
 	return &OrderService{
 		repo:  repo,
 		email: email,
@@ -40,37 +40,40 @@ func NewOrderService(repo repository.Order, email proto_email.EmailServiceClient
 	}
 }
 
-func (s *OrderService) GetAll(req *proto.GetAllOrdersRequest) (orders []*proto.Order, err error) {
+func (s *OrderService) GetAll(req *pro_api.GetAllOrdersRequest) (orders []*pro_api.Order, err error) {
 	o, err := s.repo.GetAll(req)
 	if err != nil {
 		return orders, fmt.Errorf("failed to get orders. error: %w", err)
 	}
 
 	for _, item := range o {
-		order := proto.Order(item)
-		orders = append(orders, &order)
+		orders = append(orders, &pro_api.Order{
+			Id:    item.Id,
+			Date:  item.Date,
+			Count: item.Count,
+		})
 	}
 
 	return orders, nil
 }
 
-func (s *OrderService) Create(order *proto.CreateOrderRequest) (*proto.IdResponse, error) {
-	o, err := s.repo.GetCur(&proto.GetCurOrderRequest{UserId: order.UserId})
+func (s *OrderService) Create(order *pro_api.CreateOrderRequest) (*pro_api.IdResponse, error) {
+	o, err := s.repo.GetCur(&pro_api.GetCurOrderRequest{UserId: order.UserId})
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, fmt.Errorf("failed to get order. error: %w", err)
 	}
 	if (o != models.Order{}) {
-		return &proto.IdResponse{Id: o.Id}, nil
+		return &pro_api.IdResponse{Id: o.Id}, nil
 	}
 
 	if err := s.repo.Create(order); err != nil {
 		return nil, fmt.Errorf("failed to create order. error: %w", err)
 	}
-	return &proto.IdResponse{Id: order.OrderId}, nil
+	return &pro_api.IdResponse{Id: order.OrderId}, nil
 }
 
-func (s *OrderService) Delete(order *proto.DeleteOrderRequest) (*proto.IdResponse, error) {
-	_, err := s.file.GroupDelete(context.Background(), &proto_file.GroupDeleteRequest{
+func (s *OrderService) Delete(order *pro_api.DeleteOrderRequest) (*pro_api.IdResponse, error) {
+	_, err := s.file.GroupDelete(context.Background(), &file_api.GroupDeleteRequest{
 		Bucket: "pro",
 		Group:  order.OrderId,
 	})
@@ -81,11 +84,11 @@ func (s *OrderService) Delete(order *proto.DeleteOrderRequest) (*proto.IdRespons
 	if err := s.repo.Delete(order); err != nil {
 		return nil, fmt.Errorf("failed to delete order. error: %w", err)
 	}
-	return &proto.IdResponse{Id: order.OrderId}, nil
+	return &pro_api.IdResponse{Id: order.OrderId}, nil
 }
 
-func (s *OrderService) Copy(order *proto.CopyOrderRequest) error {
-	_, err := s.file.CopyGroup(context.Background(), &proto_file.CopyGroupRequest{
+func (s *OrderService) Copy(order *pro_api.CopyOrderRequest) error {
+	_, err := s.file.CopyGroup(context.Background(), &file_api.CopyGroupRequest{
 		Bucket:   "pro",
 		Group:    order.OldOrderId,
 		NewGroup: order.OrderId,
@@ -101,7 +104,7 @@ func (s *OrderService) Copy(order *proto.CopyOrderRequest) error {
 	return nil
 }
 
-func (s *OrderService) Save(ctx context.Context, order *proto.SaveOrderRequest) (*bytes.Buffer, error) {
+func (s *OrderService) Save(ctx context.Context, order *pro_api.SaveOrderRequest) (*bytes.Buffer, error) {
 	file, _, err := s.createZip(ctx, order)
 	if err != nil {
 		return nil, err
@@ -109,8 +112,8 @@ func (s *OrderService) Save(ctx context.Context, order *proto.SaveOrderRequest) 
 	return file, err
 }
 
-func (s *OrderService) Send(ctx context.Context, order *proto.SaveOrderRequest) error {
-	user, err := s.user.GetUser(ctx, &proto_user.GetUserRequest{Id: order.UserId})
+func (s *OrderService) Send(ctx context.Context, order *pro_api.SaveOrderRequest) error {
+	user, err := s.user.GetUser(ctx, &user_api.GetUserRequest{Id: order.UserId})
 	if err != nil {
 		return err
 	}
@@ -120,10 +123,10 @@ func (s *OrderService) Send(ctx context.Context, order *proto.SaveOrderRequest) 
 		return err
 	}
 
-	data := &proto_email.SendOrderRequest{
-		Request: &proto_email.SendOrderRequest_Data{
-			Data: &proto_email.OrderData{
-				User: &proto_email.User{
+	data := &email_api.SendOrderRequest{
+		Request: &email_api.SendOrderRequest_Data{
+			Data: &email_api.OrderData{
+				User: &email_api.User{
 					Organization: user.User.Organization,
 					Name:         user.User.Name,
 					Email:        user.User.Email,
@@ -131,7 +134,7 @@ func (s *OrderService) Send(ctx context.Context, order *proto.SaveOrderRequest) 
 					Position:     user.User.Position,
 					City:         user.User.City,
 				},
-				File: &proto_email.FileData{
+				File: &email_api.FileData{
 					Name: names,
 					Type: ".zip",
 					Size: int64(file.Cap()),
@@ -164,9 +167,9 @@ func (s *OrderService) Send(ctx context.Context, order *proto.SaveOrderRequest) 
 			return fmt.Errorf("cannot read chunk to buffer: %w", err)
 		}
 
-		reqChunk := &proto_email.SendOrderRequest{
-			Request: &proto_email.SendOrderRequest_File{
-				File: &proto_email.File{
+		reqChunk := &email_api.SendOrderRequest{
+			Request: &email_api.SendOrderRequest_File{
+				File: &email_api.File{
 					Content: buffer[:n],
 				},
 			},
@@ -188,12 +191,12 @@ func (s *OrderService) Send(ctx context.Context, order *proto.SaveOrderRequest) 
 	return nil
 }
 
-func (s *OrderService) createZip(ctx context.Context, order *proto.SaveOrderRequest) (*bytes.Buffer, []string, error) {
+func (s *OrderService) createZip(ctx context.Context, order *pro_api.SaveOrderRequest) (*bytes.Buffer, []string, error) {
 	if err := s.repo.Save(order); err != nil {
 		return nil, nil, fmt.Errorf("failed to save order. error: %w", err)
 	}
 
-	positions, err := s.repo.GetPositions(&proto.GetPositionsRequest{OrderId: order.OrderId})
+	positions, err := s.repo.GetPositions(&pro_api.GetPositionsRequest{OrderId: order.OrderId})
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get positions. error: %w", err)
 	}
@@ -223,7 +226,7 @@ func (s *OrderService) createZip(ctx context.Context, order *proto.SaveOrderRequ
 		return nil, nil, fmt.Errorf("failed to close stream writer. error: %w", err)
 	}
 
-	stream, err := s.file.GroupDownload(ctx, &proto_file.GroupDownloadRequest{
+	stream, err := s.file.GroupDownload(ctx, &file_api.GroupDownloadRequest{
 		Bucket: "pro",
 		Group:  order.OrderId,
 	})

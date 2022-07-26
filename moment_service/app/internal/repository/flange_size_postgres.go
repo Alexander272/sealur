@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -18,7 +18,7 @@ func NewFlangeRepo(db *sqlx.DB) *FlangeRepo {
 	return &FlangeRepo{db: db}
 }
 
-func (r *FlangeRepo) GetFlangeSize(ctx context.Context, req *moment_proto.GetFlangeSizeRequest) (size models.FlangeSize, err error) {
+func (r *FlangeRepo) GetFlangeSize(ctx context.Context, req *moment_api.GetFlangeSizeRequest) (size models.FlangeSize, err error) {
 	query := fmt.Sprintf(`SELECT %s.id, pn, d, d6, d_out, h, s0, s1, length, count, diameter, area FROM %s
 		INNER JOIN %s on bolt_id=%s.id WHERE stand_id=$1 AND d=$2 AND pn=$3`,
 		FlangeSizeTable, FlangeSizeTable, BoltsTable, BoltsTable)
@@ -29,7 +29,7 @@ func (r *FlangeRepo) GetFlangeSize(ctx context.Context, req *moment_proto.GetFla
 	return size, nil
 }
 
-func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_proto.CreateFlangeSizeRequest) error {
+func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_api.CreateFlangeSizeRequest) error {
 	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, d, d6, d_out, h, s0, s1, length, count, bolt_id)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, FlangeSizeTable)
 
@@ -40,7 +40,7 @@ func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_proto.Cr
 	return nil
 }
 
-func (r *FlangeRepo) UpdateFlangeSize(ctx context.Context, size *moment_proto.UpdateFlangeSizeRequest) error {
+func (r *FlangeRepo) UpdateFlangeSize(ctx context.Context, size *moment_api.UpdateFlangeSizeRequest) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1
@@ -114,7 +114,7 @@ func (r *FlangeRepo) UpdateFlangeSize(ctx context.Context, size *moment_proto.Up
 	return nil
 }
 
-func (r *FlangeRepo) DeleteFlangeSize(ctx context.Context, size *moment_proto.DeleteFlangeSizeRequest) error {
+func (r *FlangeRepo) DeleteFlangeSize(ctx context.Context, size *moment_api.DeleteFlangeSizeRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", FlangeSizeTable)
 
 	if _, err := r.db.Exec(query, size.Id); err != nil {

@@ -8,7 +8,7 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
 type CalcFlangeService struct {
@@ -73,17 +73,17 @@ func NewCalcFlangeService(flange *FlangeService, materials *MaterialsService, ga
 }
 
 //? можно расчет по основным формулам вынести в отдельный пакет, а потом просто использовать (должно сделать код более понятным)
-func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.FlangeRequest) (*moment_proto.FlangeResponse, error) {
-	result := moment_proto.FlangeResponse{
+func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.CalcFlangeRequest) (*moment_api.FlangeResponse, error) {
+	result := moment_api.FlangeResponse{
 		IsSameFlange: data.IsSameFlange,
-		Bolt:         &moment_proto.BoltResult{},
-		Calc: &moment_proto.CalculatedFlange{
-			Strength: &moment_proto.CalcMomentStrength{},
-			Basis:    &moment_proto.CalcMomentBasis{},
+		Bolt:         &moment_api.BoltResult{},
+		Calc: &moment_api.CalculatedFlange{
+			Strength: &moment_api.CalcMomentStrength{},
+			Basis:    &moment_api.CalcMomentBasis{},
 		},
-		Gasket: &moment_proto.GasketResult{},
-		Formulas: &moment_proto.CalcFormulas{
-			Basis: &moment_proto.CalcFormulas_Basis{},
+		Gasket: &moment_api.GasketResult{},
+		Formulas: &moment_api.CalcFormulas{
+			Basis: &moment_api.CalcFormulas_Basis{},
 		},
 	}
 
@@ -99,7 +99,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 		return nil, err
 	}
 
-	result.Flanges = append(result.Flanges, &moment_proto.FlangeResult{
+	result.Flanges = append(result.Flanges, &moment_api.FlangeResult{
 		DOut:         flange1.DOut,
 		D:            flange1.D,
 		Dk:           flange1.Dk,
@@ -132,7 +132,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 	})
 
 	type1 := data.FlangesData[0].Type
-	var type2 moment_proto.FlangeData_Type
+	var type2 moment_api.FlangeData_Type
 
 	var flange2 models.InitialDataFlange
 	if len(data.FlangesData) > 1 {
@@ -145,8 +145,8 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 			return nil, err
 		}
 
-		// res := moment_proto.FlangeResult(flange2)
-		result.Flanges = append(result.Flanges, &moment_proto.FlangeResult{
+		// res := moment_api.FlangeResult(flange2)
+		result.Flanges = append(result.Flanges, &moment_api.FlangeResult{
 			DOut:         flange2.DOut,
 			D:            flange2.D,
 			Dk:           flange2.Dk,
@@ -186,7 +186,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 
 	//* формула из Таблицы В.1
 	Tb := s.typeFlangesTB[data.Flanges.String()] * data.Temp
-	if data.FlangesData[0].Type == moment_proto.FlangeData_free {
+	if data.FlangesData[0].Type == moment_api.FlangeData_free {
 		Tb = s.typeFlangesTB[data.Flanges.String()+"-free"] * data.Temp
 	}
 	//TODO учитывать возможность ввода вручную
@@ -195,7 +195,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 	if err != nil {
 		return nil, err
 	}
-	result.Bolt = &moment_proto.BoltResult{
+	result.Bolt = &moment_api.BoltResult{
 		Diameter:    flange1.Diameter,
 		Area:        flange1.Area,
 		Count:       flange1.Count,
@@ -218,10 +218,10 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 	Lb0 := gasket.Thickness
 	Lb0 += flange1.H + flange2.H
 
-	if type1 == moment_proto.FlangeData_free {
+	if type1 == moment_api.FlangeData_free {
 		Lb0 += flange1.Hk
 	}
-	if type2 == moment_proto.FlangeData_free {
+	if type2 == moment_api.FlangeData_free {
 		Lb0 += flange2.Hk
 	}
 
@@ -236,7 +236,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 			return nil, err
 		}
 
-		result.Embed = &moment_proto.EmbedResult{
+		result.Embed = &moment_api.EmbedResult{
 			MarkId:    data.Embed.MarkId,
 			Thickness: data.Embed.Thickness,
 			Alpfa:     detMat.AlphaF,
@@ -246,7 +246,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 
 	bp := (data.Gasket.DOut - data.Gasket.DIn) / 2
 
-	result.Gasket = &moment_proto.GasketResult{
+	result.Gasket = &moment_api.GasketResult{
 		GasketId:        data.Gasket.GasketId,
 		EnvId:           data.Gasket.EnvId,
 		Thickness:       data.Gasket.Thickness,
@@ -330,7 +330,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 
 	var alpha, dividend, divider float64
 
-	if gasket.Type == "Oval" || type1 == moment_proto.FlangeData_free || type2 == moment_proto.FlangeData_free {
+	if gasket.Type == "Oval" || type1 == moment_api.FlangeData_free || type2 == moment_api.FlangeData_free {
 		// Для фланцев с овальными и восьмигранными прокладками и для свободных фланцев коэффициенты жесткости фланцевого соединения принимают равными 1.
 		alpha = 1
 	} else {
@@ -376,7 +376,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 			yb, yp, d6, dcp, yfn1, b1, yfn2, b2)
 	}
 
-	if type1 == moment_proto.FlangeData_free {
+	if type1 == moment_api.FlangeData_free {
 		dividend += res1.Yfc * math.Pow(res1.A, 2)
 		divider += res1.Yfc * math.Pow(res1.A, 2)
 
@@ -389,7 +389,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 		}
 
 	}
-	if type2 == moment_proto.FlangeData_free {
+	if type2 == moment_api.FlangeData_free {
 		dividend += res2.Yfc * math.Pow(res2.A, 2)
 		divider += res2.Yfc * math.Pow(res2.A, 2)
 
@@ -467,7 +467,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 	Pb1 := alpha*(Qd+float64(data.AxialForce)) + Rp + 4*alphaM*math.Abs(float64(data.BendingMoment))/Dcp
 
 	// if ($Moment != 1)
-	if data.Calculation != moment_proto.FlangeRequest_basis {
+	if data.Calculation != moment_api.CalcFlangeRequest_basis {
 		result.Calc.Strength.FPb1 = Pb1
 		result.Calc.Strength.FPb2 = Pb2
 
@@ -508,8 +508,47 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 			data.AxialForce,
 			data.BendingMoment,
 		)
-		st := moment_proto.StrengthResult(strength1)
-		result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &st)
+
+		result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &moment_api.StrengthResult{
+			Mkp:       strength1.Mkp,
+			Mkp1:      strength1.Mkp1,
+			Cf:        strength1.Cf,
+			Dzv:       strength1.Dzv,
+			MM:        strength1.MM,
+			MMk:       strength1.MMk,
+			Mpk:       strength1.Mkp,
+			Mp:        strength1.Mp,
+			SigmaM1:   strength1.SigmaM1,
+			SigmaM0:   strength1.SigmaM0,
+			SigmaT:    strength1.SigmaT,
+			SigmaR:    strength1.SigmaR,
+			SigmaTp:   strength1.SigmaTp,
+			SigmaRp:   strength1.SigmaRp,
+			SigmaK:    strength1.SigmaK,
+			SigmaP1:   strength1.SigmaP1,
+			SigmaP0:   strength1.SigmaP0,
+			SigmaMp:   strength1.SigmaMp,
+			SigmaMpm:  strength1.SigmaMpm,
+			SigmaMp0:  strength1.SigmaMp0,
+			SigmaMpm0: strength1.SigmaMpm0,
+			SigmaMop:  strength1.SigmaMop,
+			SigmaKp:   strength1.SigmaKp,
+			Teta:      strength1.Teta,
+			DTeta:     strength1.DTeta,
+			DTetaK:    strength1.DTetaK,
+			TetaK:     strength1.TetaK,
+			Max1:      strength1.Max1,
+			Max2:      strength1.Max2,
+			Max3:      strength1.Max3,
+			Max4:      strength1.Max4,
+			Max5:      strength1.Max5,
+			Max6:      strength1.Max6,
+			Max7:      strength1.Max7,
+			Max8:      strength1.Max8,
+			Max9:      strength1.Max9,
+			Max10:     strength1.Max10,
+			Max11:     strength1.Max11,
+		})
 
 		if len(data.FlangesData) > 1 {
 			strength2 := s.getCalculatedStrength(
@@ -527,18 +566,57 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 				data.AxialForce,
 				data.BendingMoment,
 			)
-			st := moment_proto.StrengthResult(strength2)
-			result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &st)
+
+			result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &moment_api.StrengthResult{
+				Mkp:       strength2.Mkp,
+				Mkp1:      strength2.Mkp1,
+				Cf:        strength2.Cf,
+				Dzv:       strength2.Dzv,
+				MM:        strength2.MM,
+				MMk:       strength2.MMk,
+				Mpk:       strength2.Mkp,
+				Mp:        strength2.Mp,
+				SigmaM1:   strength2.SigmaM1,
+				SigmaM0:   strength2.SigmaM0,
+				SigmaT:    strength2.SigmaT,
+				SigmaR:    strength2.SigmaR,
+				SigmaTp:   strength2.SigmaTp,
+				SigmaRp:   strength2.SigmaRp,
+				SigmaK:    strength2.SigmaK,
+				SigmaP1:   strength2.SigmaP1,
+				SigmaP0:   strength2.SigmaP0,
+				SigmaMp:   strength2.SigmaMp,
+				SigmaMpm:  strength2.SigmaMpm,
+				SigmaMp0:  strength2.SigmaMp0,
+				SigmaMpm0: strength2.SigmaMpm0,
+				SigmaMop:  strength2.SigmaMop,
+				SigmaKp:   strength2.SigmaKp,
+				Teta:      strength2.Teta,
+				DTeta:     strength2.DTeta,
+				DTetaK:    strength2.DTetaK,
+				TetaK:     strength2.TetaK,
+				Max1:      strength2.Max1,
+				Max2:      strength2.Max2,
+				Max3:      strength2.Max3,
+				Max4:      strength2.Max4,
+				Max5:      strength2.Max5,
+				Max6:      strength2.Max6,
+				Max7:      strength2.Max7,
+				Max8:      strength2.Max8,
+				Max9:      strength2.Max9,
+				Max10:     strength2.Max10,
+				Max11:     strength2.Max11,
+			})
 		}
 	}
 
 	divider = yp + yb*boltMat.EpsilonAt20/boltMat.Epsilon + (res1.Yf*flange1.EpsilonAt20/flange1.Epsilon)*math.Pow(res1.B, 2) +
 		+(res2.Yf*flange2.EpsilonAt20/flange2.Epsilon)*math.Pow(res2.B, 2)
 
-	if type1 == moment_proto.FlangeData_free {
+	if type1 == moment_api.FlangeData_free {
 		divider += (res1.Yk * flange1.EpsilonKAt20 / flange1.EpsilonK) * math.Pow(res1.A, 2)
 	}
-	if type2 == moment_proto.FlangeData_free {
+	if type2 == moment_api.FlangeData_free {
 		divider += (res2.Yk * flange2.EpsilonKAt20 / flange2.EpsilonK) * math.Pow(res2.A, 2)
 	}
 
@@ -573,7 +651,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 		tF2 = fmt.Sprintf("%s + %s", h1, h2)
 	}
 
-	if type1 == moment_proto.FlangeData_free {
+	if type1 == moment_api.FlangeData_free {
 		temp1 += flange1.AlphaK * flange1.Hk * (flange1.Tk - 20)
 		temp2 += flange1.Hk
 
@@ -586,7 +664,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 			tF2 += " + " + h
 		}
 	}
-	if type2 == moment_proto.FlangeData_free {
+	if type2 == moment_api.FlangeData_free {
 		temp1 += flange2.AlphaK * flange2.Hk * (flange2.Tk - 20)
 		temp2 += flange2.Hk
 
@@ -657,7 +735,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 		v_sigmab2 = true
 	}
 
-	if data.Calculation == moment_proto.FlangeRequest_basis {
+	if data.Calculation == moment_api.CalcFlangeRequest_basis {
 		result.Calc.Basis.Pb1 = Pb1
 		result.Calc.Basis.Pb2 = Pb2
 		result.Calc.Basis.Pbr = Pbr
@@ -763,8 +841,47 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 			data.AxialForce,
 			data.BendingMoment,
 		)
-		st := moment_proto.StrengthResult(strength1)
-		result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &st)
+
+		result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &moment_api.StrengthResult{
+			Mkp:       strength1.Mkp,
+			Mkp1:      strength1.Mkp1,
+			Cf:        strength1.Cf,
+			Dzv:       strength1.Dzv,
+			MM:        strength1.MM,
+			MMk:       strength1.MMk,
+			Mpk:       strength1.Mkp,
+			Mp:        strength1.Mp,
+			SigmaM1:   strength1.SigmaM1,
+			SigmaM0:   strength1.SigmaM0,
+			SigmaT:    strength1.SigmaT,
+			SigmaR:    strength1.SigmaR,
+			SigmaTp:   strength1.SigmaTp,
+			SigmaRp:   strength1.SigmaRp,
+			SigmaK:    strength1.SigmaK,
+			SigmaP1:   strength1.SigmaP1,
+			SigmaP0:   strength1.SigmaP0,
+			SigmaMp:   strength1.SigmaMp,
+			SigmaMpm:  strength1.SigmaMpm,
+			SigmaMp0:  strength1.SigmaMp0,
+			SigmaMpm0: strength1.SigmaMpm0,
+			SigmaMop:  strength1.SigmaMop,
+			SigmaKp:   strength1.SigmaKp,
+			Teta:      strength1.Teta,
+			DTeta:     strength1.DTeta,
+			DTetaK:    strength1.DTetaK,
+			TetaK:     strength1.TetaK,
+			Max1:      strength1.Max1,
+			Max2:      strength1.Max2,
+			Max3:      strength1.Max3,
+			Max4:      strength1.Max4,
+			Max5:      strength1.Max5,
+			Max6:      strength1.Max6,
+			Max7:      strength1.Max7,
+			Max8:      strength1.Max8,
+			Max9:      strength1.Max9,
+			Max10:     strength1.Max10,
+			Max11:     strength1.Max11,
+		})
 
 		var strength2 models.CalculatedStrength
 		if len(data.FlangesData) > 1 {
@@ -783,8 +900,47 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 				data.AxialForce,
 				data.BendingMoment,
 			)
-			st := moment_proto.StrengthResult(strength2)
-			result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &st)
+
+			result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, &moment_api.StrengthResult{
+				Mkp:       strength2.Mkp,
+				Mkp1:      strength2.Mkp1,
+				Cf:        strength2.Cf,
+				Dzv:       strength2.Dzv,
+				MM:        strength2.MM,
+				MMk:       strength2.MMk,
+				Mpk:       strength2.Mkp,
+				Mp:        strength2.Mp,
+				SigmaM1:   strength2.SigmaM1,
+				SigmaM0:   strength2.SigmaM0,
+				SigmaT:    strength2.SigmaT,
+				SigmaR:    strength2.SigmaR,
+				SigmaTp:   strength2.SigmaTp,
+				SigmaRp:   strength2.SigmaRp,
+				SigmaK:    strength2.SigmaK,
+				SigmaP1:   strength2.SigmaP1,
+				SigmaP0:   strength2.SigmaP0,
+				SigmaMp:   strength2.SigmaMp,
+				SigmaMpm:  strength2.SigmaMpm,
+				SigmaMp0:  strength2.SigmaMp0,
+				SigmaMpm0: strength2.SigmaMpm0,
+				SigmaMop:  strength2.SigmaMop,
+				SigmaKp:   strength2.SigmaKp,
+				Teta:      strength2.Teta,
+				DTeta:     strength2.DTeta,
+				DTetaK:    strength2.DTetaK,
+				TetaK:     strength2.TetaK,
+				Max1:      strength2.Max1,
+				Max2:      strength2.Max2,
+				Max3:      strength2.Max3,
+				Max4:      strength2.Max4,
+				Max5:      strength2.Max5,
+				Max6:      strength2.Max6,
+				Max7:      strength2.Max7,
+				Max8:      strength2.Max8,
+				Max9:      strength2.Max9,
+				Max10:     strength2.Max10,
+				Max11:     strength2.Max11,
+			})
 		}
 
 		if gasket.Type == "Soft" && qmax <= gasket.PermissiblePres {
@@ -795,7 +951,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 			result.Calc.Strength.VTeta1 = true
 		}
 
-		if type1 == moment_proto.FlangeData_free && strength1.TetaK <= teta[data.IsWork]*strength1.DTetaK {
+		if type1 == moment_api.FlangeData_free && strength1.TetaK <= teta[data.IsWork]*strength1.DTetaK {
 			result.Calc.Strength.VTetaK1 = true
 		}
 
@@ -804,7 +960,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 				result.Calc.Strength.VTeta2 = true
 			}
 
-			if type2 == moment_proto.FlangeData_free && strength2.TetaK <= teta[data.IsWork]*strength2.DTetaK {
+			if type2 == moment_api.FlangeData_free && strength2.TetaK <= teta[data.IsWork]*strength2.DTetaK {
 				result.Calc.Strength.VTetaK2 = true
 			}
 		}
@@ -814,18 +970,18 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 
 			if data.IsSameFlange {
 				commonCond := result.Calc.Strength.VTeta1 && result.Calc.Strength.VTeta2
-				cond1 := commonCond && type1 != moment_proto.FlangeData_free && type2 != moment_proto.FlangeData_free
-				cond2 := commonCond && type1 == moment_proto.FlangeData_free && type2 != moment_proto.FlangeData_free && result.Calc.Strength.VTetaK1
-				cond3 := commonCond && type1 != moment_proto.FlangeData_free && type2 == moment_proto.FlangeData_free && result.Calc.Strength.VTetaK2
-				cond4 := commonCond && type1 == moment_proto.FlangeData_free && type2 == moment_proto.FlangeData_free &&
+				cond1 := commonCond && type1 != moment_api.FlangeData_free && type2 != moment_api.FlangeData_free
+				cond2 := commonCond && type1 == moment_api.FlangeData_free && type2 != moment_api.FlangeData_free && result.Calc.Strength.VTetaK1
+				cond3 := commonCond && type1 != moment_api.FlangeData_free && type2 == moment_api.FlangeData_free && result.Calc.Strength.VTetaK2
+				cond4 := commonCond && type1 == moment_api.FlangeData_free && type2 == moment_api.FlangeData_free &&
 					result.Calc.Strength.VTetaK1 && result.Calc.Strength.VTetaK2
 
 				if cond1 || cond2 || cond3 || cond4 {
 					ok = true
 				}
 			} else {
-				if (result.Calc.Strength.VTeta1 && type1 != moment_proto.FlangeData_free) ||
-					(result.Calc.Strength.VTeta1 && type1 == moment_proto.FlangeData_free && result.Calc.Strength.VTetaK1) {
+				if (result.Calc.Strength.VTeta1 && type1 != moment_api.FlangeData_free) ||
+					(result.Calc.Strength.VTeta1 && type1 == moment_api.FlangeData_free && result.Calc.Strength.VTetaK1) {
 					ok = true
 				}
 			}
@@ -863,11 +1019,11 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_proto.
 // Функция для получения данных необходимых для расчетов
 func (s *CalcFlangeService) getDataFlange(
 	ctx context.Context,
-	flange *moment_proto.FlangeData,
+	flange *moment_api.FlangeData,
 	typeFlange string,
 	temp float64,
 ) (models.InitialDataFlange, error) {
-	size, err := s.flange.GetFlangeSize(ctx, &moment_proto.GetFlangeSizeRequest{D: float64(flange.Dy), Pn: flange.Py, StandId: flange.StandartId})
+	size, err := s.flange.GetFlangeSize(ctx, &moment_api.GetFlangeSizeRequest{D: float64(flange.Dy), Pn: flange.Py, StandId: flange.StandartId})
 	if err != nil {
 		return models.InitialDataFlange{}, fmt.Errorf("failed to get size. error: %w", err)
 	}
@@ -888,7 +1044,7 @@ func (s *CalcFlangeService) getDataFlange(
 
 	dataFlange.Tf = s.typeFlangesTF[typeFlange] * temp
 
-	if flange.Type == moment_proto.FlangeData_free {
+	if flange.Type == moment_api.FlangeData_free {
 		dataFlange.Tk = s.typeFlangesTK[typeFlange] * temp
 
 		//TODO тут неправильная марка указана
@@ -927,12 +1083,12 @@ func (s *CalcFlangeService) getDataFlange(
 // расчеты
 func (s *CalcFlangeService) getCalculatedData(
 	ctx context.Context,
-	flange *moment_proto.FlangeData,
+	flange *moment_api.FlangeData,
 	data models.InitialDataFlange,
 	Dcp float64,
 ) (models.CalculatedData, error) {
 	var calculated models.CalculatedData
-	if flange.Type != moment_proto.FlangeData_free {
+	if flange.Type != moment_api.FlangeData_free {
 		calculated.B = 0.5 * (data.D6 - Dcp)
 	} else {
 		calculated.Ds = 0.5 * (data.DOut + data.Dk + 2*data.H)
@@ -940,7 +1096,7 @@ func (s *CalcFlangeService) getCalculatedData(
 		calculated.B = 0.5 * (data.Ds - Dcp)
 	}
 
-	if flange.Type != moment_proto.FlangeData_welded {
+	if flange.Type != moment_api.FlangeData_welded {
 		calculated.Se = data.S0
 	} else {
 		calculated.X = data.L / (math.Sqrt(data.D * data.S0))
@@ -968,7 +1124,7 @@ func (s *CalcFlangeService) getCalculatedData(
 	divider = math.Pow(calculated.K, 2) - 1
 	calculated.BettaZ = dividend / divider
 
-	if flange.Type == moment_proto.FlangeData_welded && data.S0 != data.S1 {
+	if flange.Type == moment_api.FlangeData_welded && data.S0 != data.S1 {
 		betta := data.S1 / data.S0
 		x := data.L / calculated.L0
 
@@ -985,12 +1141,12 @@ func (s *CalcFlangeService) getCalculatedData(
 		+(calculated.BettaV*math.Pow(data.H, 3))/(calculated.BettaU*calculated.L0*math.Pow(data.S0, 2))
 	calculated.Yf = (0.91 * calculated.BettaV) / (data.EpsilonAt20 * calculated.Lymda * math.Pow(data.S0, 2) * calculated.L0)
 
-	if flange.Type == moment_proto.FlangeData_free {
+	if flange.Type == moment_api.FlangeData_free {
 		calculated.Psik = 1.28 * (math.Log(data.Dnk/data.Dk) / math.Log(10))
 		calculated.Yk = 1 / (data.EpsilonKAt20 * math.Pow(data.Hk, 3) * calculated.Psik)
 	}
 
-	if flange.Type != moment_proto.FlangeData_free {
+	if flange.Type != moment_api.FlangeData_free {
 		calculated.Yfn = math.Pow(math.Pi/4, 3) * (data.D6 / (data.EpsilonAt20 * data.DOut * math.Pow(data.H, 3)))
 	} else {
 		calculated.Yfn = math.Pow(math.Pi/4, 3) * (data.Ds / (data.EpsilonAt20 * data.DOut * math.Pow(data.H, 3)))
@@ -1004,7 +1160,7 @@ func (s *CalcFlangeService) getCalculatedData(
 func (s *CalcFlangeService) getCalculatedStrength(
 	flange models.InitialDataFlange,
 	res models.CalculatedData,
-	type1 moment_proto.FlangeData_Type,
+	type1 moment_api.FlangeData_Type,
 	M, Pressure, Qd, Dcp, SigmaB, Pbm, Pbr, QFM float64,
 	AxialForce, BendingMoment int32,
 ) models.CalculatedStrength {
@@ -1026,7 +1182,7 @@ func (s *CalcFlangeService) getCalculatedStrength(
 	strength.Cf = Cf1
 	var Dzv1 float64
 
-	if type1 == moment_proto.FlangeData_welded && flange.D <= 20*flange.S1 {
+	if type1 == moment_api.FlangeData_welded && flange.D <= 20*flange.S1 {
 		// if flange1.D > 20 * flange1.S1 {
 		// 	Dzv1 = flange1.D
 		// } else {
@@ -1043,12 +1199,12 @@ func (s *CalcFlangeService) getCalculatedStrength(
 	MM1 := Cf1 * Pbm * res.B
 	Mp1 := Cf1 * math.Max(Pbr*res.B+(Qd+QFM)*res.E, math.Abs(Qd+QFM)*res.E)
 	var MMk1, Mpk, sigmaM1, sigmaM0 float64
-	if type1 == moment_proto.FlangeData_free {
+	if type1 == moment_api.FlangeData_free {
 		MMk1 = Cf1 * Pbm * res.A
 		Mpk = Cf1 * Pbr * res.A
 	}
 
-	if type1 == moment_proto.FlangeData_welded && flange.S1 != flange.S0 {
+	if type1 == moment_api.FlangeData_welded && flange.S1 != flange.S0 {
 		sigmaM1 = MM1 / (res.Lymda * math.Pow(flange.S1-flange.C, 2) * Dzv1)
 		sigmaM0 = res.F * sigmaM1
 	} else {
@@ -1063,11 +1219,11 @@ func (s *CalcFlangeService) getCalculatedStrength(
 	strength.SigmaT = sigmaT
 
 	var sigmaK, sigmaP1, sigmaP0, sigmaMp, sigmaMpm float64
-	if type1 == moment_proto.FlangeData_free {
+	if type1 == moment_api.FlangeData_free {
 		sigmaK = res.BettaY * MMk1 / (math.Pow(flange.Hk, 2) * flange.Dk)
 	}
 
-	if type1 == moment_proto.FlangeData_welded && flange.S1 != flange.S0 {
+	if type1 == moment_api.FlangeData_welded && flange.S1 != flange.S0 {
 		sigmaP1 = Mp1 / (res.Lymda * math.Pow(flange.S1-flange.C, 2) * Dzv1)
 		sigmaP0 = res.F * sigmaP1
 	} else {
@@ -1075,7 +1231,7 @@ func (s *CalcFlangeService) getCalculatedStrength(
 		sigmaP0 = sigmaP1
 	}
 
-	if type1 == moment_proto.FlangeData_welded {
+	if type1 == moment_api.FlangeData_welded {
 		temp := math.Pi * (flange.D + flange.S1) * (flange.S1 - flange.C)
 		//rTODO формула изменилась (ф. 37)
 		// sigmaMp = (Qd + float64(AxialForce) + 4*math.Abs(float64(BendingMoment)/Dcp)) / temp
@@ -1098,11 +1254,11 @@ func (s *CalcFlangeService) getCalculatedStrength(
 	sigmaTp := res.BettaY*Mp1/(math.Pow(flange.H, 2)*flange.D) - res.BettaZ*sigmaRp
 
 	var sigmaKp float64
-	if type1 == moment_proto.FlangeData_free {
+	if type1 == moment_api.FlangeData_free {
 		sigmaKp = res.BettaY * Mp1 / (math.Pow(flange.Hk, 2) * flange.Dk)
 	}
 
-	if type1 == moment_proto.FlangeData_welded {
+	if type1 == moment_api.FlangeData_welded {
 		if flange.D <= constants.MinD {
 			strength.DTeta = constants.MinDTetta
 		} else if flange.D > constants.MaxD {
@@ -1117,14 +1273,14 @@ func (s *CalcFlangeService) getCalculatedStrength(
 
 	strength.Teta = Mp1 * res.Yf * flange.EpsilonAt20 / flange.Epsilon
 
-	if type1 == moment_proto.FlangeData_free {
+	if type1 == moment_api.FlangeData_free {
 		//strength.DTetaK = 0.002
 		strength.DTetaK = 0.02
 		strength.TetaK = Mpk * res.Yk * flange.EpsilonKAt20 / flange.EpsilonK
 	}
 
 	var max1, max2, max3, max4, max5, max6, max7, max8, max9, max10, max11 float64
-	if type1 == moment_proto.FlangeData_welded && flange.S1 != flange.S0 {
+	if type1 == moment_api.FlangeData_welded && flange.S1 != flange.S0 {
 		max1 = math.Max(math.Abs(sigmaM1+sigmaR), math.Abs(sigmaM1+sigmaT))
 
 		t1 := math.Max(math.Abs(sigmaP1-sigmaMp+sigmaRp), math.Abs(sigmaP1-sigmaMpm+sigmaRp))
@@ -1161,7 +1317,7 @@ func (s *CalcFlangeService) getCalculatedStrength(
 	max8 = math.Max(math.Abs(sigmaR), math.Abs(sigmaT))
 	max9 = math.Max(math.Abs(sigmaRp), math.Abs(sigmaTp))
 
-	if type1 == moment_proto.FlangeData_free {
+	if type1 == moment_api.FlangeData_free {
 		max10 = sigmaK
 		max11 = sigmaKp
 	}

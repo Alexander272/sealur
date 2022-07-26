@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/user_service/internal/models"
-	proto_user "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -22,7 +22,7 @@ func NewUserRepo(db *sqlx.DB, tableName string) *UserRepo {
 	return &UserRepo{db: db, tableName: tableName}
 }
 
-func (r *UserRepo) Get(ctx context.Context, req *proto_user.GetUserRequest) (user models.User, err error) {
+func (r *UserRepo) Get(ctx context.Context, req *user_api.GetUserRequest) (user models.User, err error) {
 	var query, param string
 	if req.Login != "" {
 		query = fmt.Sprintf("SELECT id, email, password FROM %s WHERE login = $1 AND confirmed=true", r.tableName)
@@ -41,7 +41,7 @@ func (r *UserRepo) Get(ctx context.Context, req *proto_user.GetUserRequest) (use
 	return user, nil
 }
 
-func (r *UserRepo) GetAll(ctx context.Context, req *proto_user.GetAllUserRequest) (users []models.User, err error) {
+func (r *UserRepo) GetAll(ctx context.Context, req *user_api.GetAllUserRequest) (users []models.User, err error) {
 	query := fmt.Sprintf(`SELECT id, organization, name, email, city, position, phone, login FROM %s WHERE confirmed=true 
 		ORDER BY organization, name, id`, r.tableName)
 
@@ -51,7 +51,7 @@ func (r *UserRepo) GetAll(ctx context.Context, req *proto_user.GetAllUserRequest
 	return users, nil
 }
 
-func (r *UserRepo) GetNew(ctx context.Context, req *proto_user.GetNewUserRequest) (users []models.User, err error) {
+func (r *UserRepo) GetNew(ctx context.Context, req *user_api.GetNewUserRequest) (users []models.User, err error) {
 	query := fmt.Sprintf("SELECT id, organization, name, email, city, position, phone FROM %s WHERE confirmed=false ORDER BY date_reg", r.tableName)
 
 	if err := r.db.Select(&users, query); err != nil {
@@ -60,7 +60,7 @@ func (r *UserRepo) GetNew(ctx context.Context, req *proto_user.GetNewUserRequest
 	return users, nil
 }
 
-func (r *UserRepo) Create(ctx context.Context, user *proto_user.CreateUserRequest) error {
+func (r *UserRepo) Create(ctx context.Context, user *user_api.CreateUserRequest) error {
 	query := fmt.Sprintf(`INSERT INTO %s (id, organization, name, email, city, "position", phone) VALUES ($1, $2, $3, $4, $5, $6, $7)`, r.tableName)
 	id := uuid.New()
 
@@ -72,7 +72,7 @@ func (r *UserRepo) Create(ctx context.Context, user *proto_user.CreateUserReques
 	return nil
 }
 
-func (r *UserRepo) Confirm(ctx context.Context, user *proto_user.ConfirmUserRequest) (models.ConfirmUser, error) {
+func (r *UserRepo) Confirm(ctx context.Context, user *user_api.ConfirmUserRequest) (models.ConfirmUser, error) {
 	query := fmt.Sprintf("UPDATE %s SET login=$1, password=$2, confirmed=true WHERE id=$3 RETURNING name, email", r.tableName)
 	row := r.db.QueryRow(query, user.Login, user.Password, user.Id)
 
@@ -88,7 +88,7 @@ func (r *UserRepo) Confirm(ctx context.Context, user *proto_user.ConfirmUserRequ
 	return u, nil
 }
 
-func (r *UserRepo) Update(ctx context.Context, user *proto_user.UpdateUserRequest) error {
+func (r *UserRepo) Update(ctx context.Context, user *user_api.UpdateUserRequest) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1
@@ -136,7 +136,7 @@ func (r *UserRepo) Update(ctx context.Context, user *proto_user.UpdateUserReques
 	return nil
 }
 
-func (r *UserRepo) Delete(ctx context.Context, user *proto_user.DeleteUserRequest) (models.DeleteUser, error) {
+func (r *UserRepo) Delete(ctx context.Context, user *user_api.DeleteUserRequest) (models.DeleteUser, error) {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1 RETURNING name, email", r.tableName)
 	row := r.db.QueryRow(query, user.Id)
 

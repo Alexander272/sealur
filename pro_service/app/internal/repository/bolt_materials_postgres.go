@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -17,7 +17,7 @@ func NewBoltMatRepo(db *sqlx.DB) *BoltMatRepo {
 	return &BoltMatRepo{db: db}
 }
 
-func (r *BoltMatRepo) GetAll(*proto.GetBoltMaterialsRequest) (mats []models.BoltMaterials, err error) {
+func (r *BoltMatRepo) GetAll(*pro_api.GetBoltMaterialsRequest) (mats []models.BoltMaterials, err error) {
 	query := fmt.Sprintf("SELECT id, title FROM %s ORDER BY id", BoltsTable)
 
 	if err = r.db.Select(&mats, query); err != nil {
@@ -26,7 +26,7 @@ func (r *BoltMatRepo) GetAll(*proto.GetBoltMaterialsRequest) (mats []models.Bolt
 	return mats, nil
 }
 
-func (r *BoltMatRepo) Create(mat *proto.CreateBoltMaterialsRequest) (id string, err error) {
+func (r *BoltMatRepo) Create(mat *pro_api.CreateBoltMaterialsRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title, flange_id) VALUES ($1, $2) RETURNING id", BoltsTable)
 	row := r.db.QueryRow(query, mat.Title, mat.FlangeId)
 
@@ -37,7 +37,7 @@ func (r *BoltMatRepo) Create(mat *proto.CreateBoltMaterialsRequest) (id string, 
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *BoltMatRepo) Update(mat *proto.UpdateBoltMaterialsRequest) error {
+func (r *BoltMatRepo) Update(mat *pro_api.UpdateBoltMaterialsRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET title=$1, flange_id=$2 WHERE id=$3", BoltsTable)
 
 	id, err := strconv.Atoi(mat.Id)
@@ -52,7 +52,7 @@ func (r *BoltMatRepo) Update(mat *proto.UpdateBoltMaterialsRequest) error {
 	return nil
 }
 
-func (r *BoltMatRepo) Delete(mat *proto.DeleteBoltMaterialsRequest) error {
+func (r *BoltMatRepo) Delete(mat *pro_api.DeleteBoltMaterialsRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", BoltsTable)
 
 	id, err := strconv.Atoi(mat.Id)

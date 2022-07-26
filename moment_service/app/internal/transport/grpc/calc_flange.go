@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/Alexander272/sealur/moment_service/internal/service"
-	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
 type CalcFlangeHandlers struct {
 	service service.CalcFlange
+	moment_api.UnimplementedCalcFlangeServiceServer
 }
 
 func NewCalcFlangeHandlers(service service.CalcFlange) *CalcFlangeHandlers {
@@ -17,7 +18,7 @@ func NewCalcFlangeHandlers(service service.CalcFlange) *CalcFlangeHandlers {
 	}
 }
 
-func (h *CalcFlangeHandlers) CalculateFlange(ctx context.Context, req *moment_proto.FlangeRequest) (*moment_proto.FlangeResponse, error) {
+func (h *CalcFlangeHandlers) CalculateFlange(ctx context.Context, req *moment_api.CalcFlangeRequest) (*moment_api.FlangeResponse, error) {
 	res, err := h.service.Calculation(ctx, req)
 	if err != nil {
 		return nil, err

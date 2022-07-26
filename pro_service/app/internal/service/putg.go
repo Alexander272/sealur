@@ -7,7 +7,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 )
 
 type PutgService struct {
@@ -18,64 +18,64 @@ func NewPutgService(repo repository.Putg) *PutgService {
 	return &PutgService{repo: repo}
 }
 
-func (s *PutgService) Get(req *proto.GetPutgRequest) (putg []*proto.Putg, err error) {
+func (s *PutgService) Get(req *pro_api.GetPutgRequest) (putg []*pro_api.Putg, err error) {
 	data, err := s.repo.Get(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get putg. error: %w", err)
 	}
 
 	for _, d := range data {
-		var construction []*proto.PutgConstructions
+		var construction []*pro_api.PutgConstructions
 		constrs := strings.Split(d.Construction, ";")
 
 		for _, v := range constrs {
 			grap := strings.Split(v, "&")[0]
 			temp := strings.Split(v, "&")[1]
 
-			var Temps []*proto.ConTemp
+			var Temps []*pro_api.ConTemp
 			tmp := strings.Split(temp, "@")
 			for _, t := range tmp {
 				temp := strings.Split(t, ">")[0]
 				constr := strings.Split(t, ">")[1]
 
-				var constrs []*proto.Constr
+				var constrs []*pro_api.Constr
 				tmp := strings.Split(constr, "*")
 				for _, c := range tmp {
 					short := strings.Split(c, "<")[0]
 					obts := strings.Split(c, "<")[1]
 
-					var obt []*proto.PutgObt
+					var obt []*pro_api.PutgObt
 					tmp := strings.Split(obts, ",")
 					for _, o := range tmp {
 						short := strings.Split(o, "=")[0]
 						url := strings.Split(o, "=")[1]
-						obt = append(obt, &proto.PutgObt{Short: short, ImageUrl: url})
+						obt = append(obt, &pro_api.PutgObt{Short: short, ImageUrl: url})
 					}
 
 					if len(obts) == 0 {
 						continue
 					}
 
-					constrs = append(constrs, &proto.Constr{Short: short, Obturators: obt})
+					constrs = append(constrs, &pro_api.Constr{Short: short, Obturators: obt})
 				}
 
 				if len(constr) == 0 {
 					continue
 				}
 
-				Temps = append(Temps, &proto.ConTemp{Temp: temp, Constructions: constrs})
+				Temps = append(Temps, &pro_api.ConTemp{Temp: temp, Constructions: constrs})
 			}
 
 			if len(Temps) == 0 {
 				continue
 			}
 
-			construction = append(construction, &proto.PutgConstructions{
+			construction = append(construction, &pro_api.PutgConstructions{
 				Grap: grap, Temperatures: Temps,
 			})
 		}
 
-		var temperatures []*proto.PutgTemp
+		var temperatures []*pro_api.PutgTemp
 		tmp := strings.Split(d.Temperatures, ";")
 
 		for _, v := range tmp {
@@ -86,7 +86,7 @@ func (s *PutgService) Get(req *proto.GetPutgRequest) (putg []*proto.Putg, err er
 				continue
 			}
 
-			var Temps []*proto.Temp
+			var Temps []*pro_api.Temp
 
 			temps := strings.Split(tmp, "@")
 			for _, t := range temps {
@@ -97,33 +97,33 @@ func (s *PutgService) Get(req *proto.GetPutgRequest) (putg []*proto.Putg, err er
 				if len(mods) == 0 {
 					continue
 				}
-				Temps = append(Temps, &proto.Temp{Id: id, Mods: mods})
+				Temps = append(Temps, &pro_api.Temp{Id: id, Mods: mods})
 			}
 
-			temperatures = append(temperatures, &proto.PutgTemp{
+			temperatures = append(temperatures, &pro_api.PutgTemp{
 				Grap: grap, Temps: Temps,
 			})
 		}
 
-		var reinforce, obturator, iLimiter, oLimiter = &proto.PutgMaterials{}, &proto.PutgMaterials{}, &proto.PutgMaterials{}, &proto.PutgMaterials{}
+		var reinforce, obturator, iLimiter, oLimiter = &pro_api.PutgMaterials{}, &pro_api.PutgMaterials{}, &pro_api.PutgMaterials{}, &pro_api.PutgMaterials{}
 		tmp = strings.Split(d.Reinforce, "&")
 		if len(tmp) > 1 {
-			reinforce = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
+			reinforce = &pro_api.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
 		}
 		tmp = strings.Split(d.Obturator, "&")
 		if len(tmp) > 1 {
-			obturator = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
+			obturator = &pro_api.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
 		}
 		tmp = strings.Split(d.ILimiter, "&")
 		if len(tmp) > 1 {
-			iLimiter = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
+			iLimiter = &pro_api.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
 		}
 		tmp = strings.Split(d.OLimiter, "&")
 		if len(tmp) > 1 {
-			oLimiter = &proto.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
+			oLimiter = &pro_api.PutgMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1], Obturators: strings.Split(tmp[2], ";")}
 		}
 
-		p := proto.Putg{
+		p := pro_api.Putg{
 			Id:           d.Id,
 			TypeFlId:     d.TypeFlId,
 			TypePr:       d.TypePr,
@@ -144,7 +144,7 @@ func (s *PutgService) Get(req *proto.GetPutgRequest) (putg []*proto.Putg, err er
 	return putg, nil
 }
 
-func (s *PutgService) Create(dto *proto.CreatePutgRequest) (*proto.IdResponse, error) {
+func (s *PutgService) Create(dto *pro_api.CreatePutgRequest) (*pro_api.IdResponse, error) {
 	var constructions string
 	for i, c := range dto.Construction {
 		if i > 0 {
@@ -230,10 +230,10 @@ func (s *PutgService) Create(dto *proto.CreatePutgRequest) (*proto.IdResponse, e
 	if err != nil {
 		return nil, fmt.Errorf("failed to create putg. error: %w", err)
 	}
-	return &proto.IdResponse{Id: id}, nil
+	return &pro_api.IdResponse{Id: id}, nil
 }
 
-func (s *PutgService) Update(dto *proto.UpdatePutgRequest) error {
+func (s *PutgService) Update(dto *pro_api.UpdatePutgRequest) error {
 	var constructions string
 	for i, c := range dto.Construction {
 		if i > 0 {
@@ -322,7 +322,7 @@ func (s *PutgService) Update(dto *proto.UpdatePutgRequest) error {
 	return nil
 }
 
-func (s *PutgService) Delete(putg *proto.DeletePutgRequest) error {
+func (s *PutgService) Delete(putg *pro_api.DeletePutgRequest) error {
 	if err := s.repo.Delete(putg); err != nil {
 		return fmt.Errorf("failed to delete putg. error: %w", err)
 	}
@@ -530,7 +530,7 @@ func (s *PutgService) DeleteMod(id string) error {
 	return nil
 }
 
-func (s *PutgService) DeleteMat(id string, materials []*proto.AddMaterials) error {
+func (s *PutgService) DeleteMat(id string, materials []*pro_api.AddMaterials) error {
 	var wg sync.WaitGroup
 	putg, err := s.repo.GetByCondition(fmt.Sprintf(`obturator like '%%%s%%' OR i_limiter like '%%%s%%' OR o_limiter like '%%%s%%'`, id, id, id))
 	if err != nil {

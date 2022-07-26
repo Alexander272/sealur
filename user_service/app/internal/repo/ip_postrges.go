@@ -8,7 +8,7 @@ import (
 
 	"github.com/Alexander272/sealur/user_service/internal/config"
 	"github.com/Alexander272/sealur/user_service/internal/models"
-	proto_user "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -26,7 +26,7 @@ func NewIpRepo(db *sqlx.DB, tableName string, conf config.IPConfig) *IpRepo {
 	}
 }
 
-func (r *IpRepo) GetAll(ctx context.Context, req *proto_user.GetAllIpRequest) (ips []models.Ip, err error) {
+func (r *IpRepo) GetAll(ctx context.Context, req *user_api.GetAllIpRequest) (ips []models.Ip, err error) {
 	query := fmt.Sprintf("SELECT ip, date, user_id FROM %s ORDER BY user_id", r.tableName)
 
 	if err := r.db.Select(&ips, query); err != nil {
@@ -35,7 +35,7 @@ func (r *IpRepo) GetAll(ctx context.Context, req *proto_user.GetAllIpRequest) (i
 	return ips, nil
 }
 
-func (r *IpRepo) Add(ctx context.Context, ip *proto_user.AddIpRequest) error {
+func (r *IpRepo) Add(ctx context.Context, ip *user_api.AddIpRequest) error {
 	var count models.Count
 	query := fmt.Sprintf("SELECT COUNT(ip) as count FROM %s GROUP BY user_id HAVING user_id=$1", r.tableName)
 	if err := r.db.Get(&count, query, ip.UserId); err != nil {

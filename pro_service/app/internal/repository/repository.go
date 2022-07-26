@@ -2,44 +2,44 @@ package repository
 
 import (
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
 type Stand interface {
-	GetAll(stand *proto.GetStandsRequest) ([]*proto.Stand, error)
-	GetByTitle(title string) ([]*proto.Stand, error)
-	Create(stand *proto.CreateStandRequest) (id string, err error)
-	Update(stand *proto.UpdateStandRequest) error
-	Delete(stand *proto.DeleteStandRequest) error
+	GetAll(stand *pro_api.GetStandsRequest) ([]*pro_api.Stand, error)
+	GetByTitle(title string) ([]*pro_api.Stand, error)
+	Create(stand *pro_api.CreateStandRequest) (id string, err error)
+	Update(stand *pro_api.UpdateStandRequest) error
+	Delete(stand *pro_api.DeleteStandRequest) error
 }
 
 type Flange interface {
-	GetAll() ([]*proto.Flange, error)
-	GetByTitle(title, short string) ([]*proto.Flange, error)
-	Create(*proto.CreateFlangeRequest) (id string, err error)
-	Update(*proto.UpdateFlangeRequest) error
-	Delete(*proto.DeleteFlangeRequest) error
+	GetAll() ([]*pro_api.Flange, error)
+	GetByTitle(title, short string) ([]*pro_api.Flange, error)
+	Create(*pro_api.CreateFlangeRequest) (id string, err error)
+	Update(*pro_api.UpdateFlangeRequest) error
+	Delete(*pro_api.DeleteFlangeRequest) error
 }
 
 type StFl interface {
-	Get() ([]*proto.StFl, error)
-	Create(*proto.CreateStFlRequest) (string, error)
-	Update(*proto.UpdateStFlRequest) error
-	Delete(*proto.DeleteStFlRequest) error
+	Get() ([]*pro_api.StFl, error)
+	Create(*pro_api.CreateStFlRequest) (string, error)
+	Update(*pro_api.UpdateStFlRequest) error
+	Delete(*pro_api.DeleteStFlRequest) error
 }
 
 type TypeFl interface {
-	Get() ([]*proto.TypeFl, error)
-	GetAll() ([]*proto.TypeFl, error)
-	Create(*proto.CreateTypeFlRequest) (string, error)
-	Update(*proto.UpdateTypeFlRequest) error
-	Delete(*proto.DeleteTypeFlRequest) error
+	Get() ([]*pro_api.TypeFl, error)
+	GetAll() ([]*pro_api.TypeFl, error)
+	Create(*pro_api.CreateTypeFlRequest) (string, error)
+	Update(*pro_api.UpdateTypeFlRequest) error
+	Delete(*pro_api.DeleteTypeFlRequest) error
 }
 
 type Addit interface {
 	GetAll() ([]models.Addit, error)
-	Create(*proto.CreateAddRequest) error
+	Create(*pro_api.CreateAddRequest) error
 	UpdateMat(models.UpdateMat) error
 	UpdateMod(models.UpdateMod) error
 	UpdateTemp(models.UpdateTemp) error
@@ -55,97 +55,97 @@ type Addit interface {
 }
 
 type Size interface {
-	Get(req *proto.GetSizesRequest) ([]*proto.Size, error)
-	GetAll(req *proto.GetSizesRequest) ([]*proto.Size, error)
-	Create(size *proto.CreateSizeRequest) (id string, err error)
-	Update(size *proto.UpdateSizeRequest) error
-	Delete(size *proto.DeleteSizeRequest) error
-	DeleteAll(size *proto.DeleteAllSizeRequest) error
+	Get(req *pro_api.GetSizesRequest) ([]*pro_api.Size, error)
+	GetAll(req *pro_api.GetSizesRequest) ([]*pro_api.Size, error)
+	Create(size *pro_api.CreateSizeRequest) (id string, err error)
+	Update(size *pro_api.UpdateSizeRequest) error
+	Delete(size *pro_api.DeleteSizeRequest) error
+	DeleteAll(size *pro_api.DeleteAllSizeRequest) error
 }
 
 type SNP interface {
-	Get(req *proto.GetSNPRequest) ([]models.SNP, error)
+	Get(req *pro_api.GetSNPRequest) ([]models.SNP, error)
 	Create(snp models.SnpDTO) (id string, err error)
 	Update(snp models.SnpDTO) error
-	Delete(snp *proto.DeleteSNPRequest) error
+	Delete(snp *pro_api.DeleteSNPRequest) error
 
 	GetByCondition(cond string) ([]models.SNP, error)
 	UpdateAddit(snp models.UpdateAdditDTO) error
 }
 
 type PutgImage interface {
-	Get(req *proto.GetPutgImageRequest) ([]*proto.PutgImage, error)
-	Create(image *proto.CreatePutgImageRequest) (id string, err error)
-	Update(image *proto.UpdatePutgImageRequest) error
-	Delete(image *proto.DeletePutgImageRequest) error
+	Get(req *pro_api.GetPutgImageRequest) ([]*pro_api.PutgImage, error)
+	Create(image *pro_api.CreatePutgImageRequest) (id string, err error)
+	Update(image *pro_api.UpdatePutgImageRequest) error
+	Delete(image *pro_api.DeletePutgImageRequest) error
 }
 
 type Putg interface {
-	Get(req *proto.GetPutgRequest) ([]models.Putg, error)
+	Get(req *pro_api.GetPutgRequest) ([]models.Putg, error)
 	Create(putg models.PutgDTO) (id string, err error)
 	Update(putg models.PutgDTO) error
-	Delete(putg *proto.DeletePutgRequest) error
+	Delete(putg *pro_api.DeletePutgRequest) error
 
 	GetByCondition(cond string) ([]models.Putg, error)
 	UpdateAddit(putg models.UpdateAdditDTO) error
 }
 
 type PutgmImage interface {
-	Get(req *proto.GetPutgmImageRequest) ([]*proto.PutgmImage, error)
-	Create(image *proto.CreatePutgmImageRequest) (id string, err error)
-	Update(image *proto.UpdatePutgmImageRequest) error
-	Delete(image *proto.DeletePutgmImageRequest) error
+	Get(req *pro_api.GetPutgmImageRequest) ([]*pro_api.PutgmImage, error)
+	Create(image *pro_api.CreatePutgmImageRequest) (id string, err error)
+	Update(image *pro_api.UpdatePutgmImageRequest) error
+	Delete(image *pro_api.DeletePutgmImageRequest) error
 }
 
 type Putgm interface {
-	Get(req *proto.GetPutgmRequest) ([]models.Putgm, error)
+	Get(req *pro_api.GetPutgmRequest) ([]models.Putgm, error)
 	Create(putg models.PutgmDTO) (id string, err error)
 	Update(putg models.PutgmDTO) error
-	Delete(putg *proto.DeletePutgmRequest) error
+	Delete(putg *pro_api.DeletePutgmRequest) error
 
 	GetByCondition(cond string) ([]models.Putgm, error)
 	UpdateAddit(putgm models.UpdateAdditDTO) error
 }
 
 type Materials interface {
-	GetAll(*proto.GetMaterialsRequest) ([]models.Materials, error)
-	Create(*proto.CreateMaterialsRequest) (string, error)
-	Update(*proto.UpdateMaterialsRequest) error
-	Delete(*proto.DeleteMaterialsRequest) error
+	GetAll(*pro_api.GetMaterialsRequest) ([]models.Materials, error)
+	Create(*pro_api.CreateMaterialsRequest) (string, error)
+	Update(*pro_api.UpdateMaterialsRequest) error
+	Delete(*pro_api.DeleteMaterialsRequest) error
 }
 
 type BoltMaterials interface {
-	GetAll(*proto.GetBoltMaterialsRequest) ([]models.BoltMaterials, error)
-	Create(*proto.CreateBoltMaterialsRequest) (string, error)
-	Update(*proto.UpdateBoltMaterialsRequest) error
-	Delete(*proto.DeleteBoltMaterialsRequest) error
+	GetAll(*pro_api.GetBoltMaterialsRequest) ([]models.BoltMaterials, error)
+	Create(*pro_api.CreateBoltMaterialsRequest) (string, error)
+	Update(*pro_api.UpdateBoltMaterialsRequest) error
+	Delete(*pro_api.DeleteBoltMaterialsRequest) error
 }
 
 type SizeInt interface {
-	Get(*proto.GetSizesIntRequest) ([]models.SizeInterview, error)
-	GetAll(*proto.GetAllSizeIntRequest) ([]models.SizeInterview, error)
-	Create(*proto.CreateSizeIntRequest) (id string, err error)
-	Update(*proto.UpdateSizeIntRequest) error
-	Delete(*proto.DeleteSizeIntRequest) error
-	DeleteAll(*proto.DeleteAllSizeIntRequest) error
+	Get(*pro_api.GetSizesIntRequest) ([]models.SizeInterview, error)
+	GetAll(*pro_api.GetAllSizeIntRequest) ([]models.SizeInterview, error)
+	Create(*pro_api.CreateSizeIntRequest) (id string, err error)
+	Update(*pro_api.UpdateSizeIntRequest) error
+	Delete(*pro_api.DeleteSizeIntRequest) error
+	DeleteAll(*pro_api.DeleteAllSizeIntRequest) error
 }
 
 type Order interface {
-	GetAll(*proto.GetAllOrdersRequest) ([]models.Order, error)
-	GetCur(req *proto.GetCurOrderRequest) (order models.Order, err error)
-	Create(*proto.CreateOrderRequest) error
-	Copy(*proto.CopyOrderRequest) error
-	Delete(*proto.DeleteOrderRequest) error
-	Save(*proto.SaveOrderRequest) error
-	GetPositions(*proto.GetPositionsRequest) ([]models.Position, error)
+	GetAll(*pro_api.GetAllOrdersRequest) ([]models.Order, error)
+	GetCur(req *pro_api.GetCurOrderRequest) (order models.Order, err error)
+	Create(*pro_api.CreateOrderRequest) error
+	Copy(*pro_api.CopyOrderRequest) error
+	Delete(*pro_api.DeleteOrderRequest) error
+	Save(*pro_api.SaveOrderRequest) error
+	GetPositions(*pro_api.GetPositionsRequest) ([]models.Position, error)
 }
 
 type OrderPosition interface {
-	Get(*proto.GetPositionsRequest) ([]models.Position, error)
-	GetCur(*proto.GetCurPositionsRequest) ([]models.Position, error)
-	Add(*proto.AddPositionRequest) (id string, err error)
-	Update(*proto.UpdatePositionRequest) error
-	Remove(*proto.RemovePositionRequest) (string, error)
+	Get(*pro_api.GetPositionsRequest) ([]models.Position, error)
+	GetCur(*pro_api.GetCurPositionsRequest) ([]models.Position, error)
+	Add(*pro_api.AddPositionRequest) (id string, err error)
+	Update(*pro_api.UpdatePositionRequest) error
+	Remove(*pro_api.RemovePositionRequest) (string, error)
 }
 
 type Repositories struct {

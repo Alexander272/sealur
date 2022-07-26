@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -37,13 +38,13 @@ func (h *Handler) initAdditRoutes(api *gin.RouterGroup) {
 // @ModuleID getAddit
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=[]proto.Additional}
+// @Success 200 {object} models.DataResponse{data=[]pro_api.Additional}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals [get]
 func (h *Handler) getAddit(c *gin.Context) {
-	add, err := h.proClient.GetAllAdditional(c, &proto.GetAllAddRequest{})
+	add, err := h.proClient.GetAllAdditional(c, &pro_api.GetAllAddRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -59,20 +60,20 @@ func (h *Handler) getAddit(c *gin.Context) {
 // @ModuleID createAddit
 // @Accept json
 // @Produce json
-// @Param data body models.CreateAdditDTO true "addit info"
+// @Param data body pro_model.CreateAdditDTO true "addit info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals [post]
 func (h *Handler) createAddit(c *gin.Context) {
-	var dto models.CreateAdditDTO
+	var dto pro_model.CreateAdditDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.proClient.CreateAdditional(c, &proto.CreateAddRequest{
+	_, err := h.proClient.CreateAdditional(c, &pro_api.CreateAddRequest{
 		Materials:    dto.Materials,
 		Mod:          dto.Mod,
 		Temperature:  dto.Temperature,
@@ -101,7 +102,7 @@ func (h *Handler) createAddit(c *gin.Context) {
 // @ModuleID updateMat
 // @Accept json
 // @Produce json
-// @Param data body models.UpdateMatDTO true "additional materials info"
+// @Param data body pro_model.UpdateMatDTO true "additional materials info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -109,7 +110,7 @@ func (h *Handler) createAddit(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/mat [patch]
 func (h *Handler) updateMat(c *gin.Context) {
-	var dto models.UpdateMatDTO
+	var dto pro_model.UpdateMatDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -121,7 +122,7 @@ func (h *Handler) updateMat(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateMat(c, &proto.UpdateAddMatRequest{Id: id, Materials: dto.Materials, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdateMat(c, &pro_api.UpdateAddMatRequest{Id: id, Materials: dto.Materials, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -137,7 +138,7 @@ func (h *Handler) updateMat(c *gin.Context) {
 // @ModuleID updateMod
 // @Accept json
 // @Produce json
-// @Param data body models.UpdateModDTO true "additional modification info"
+// @Param data body pro_model.UpdateModDTO true "additional modification info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -145,7 +146,7 @@ func (h *Handler) updateMat(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/mod [patch]
 func (h *Handler) updateMod(c *gin.Context) {
-	var dto models.UpdateModDTO
+	var dto pro_model.UpdateModDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -157,7 +158,7 @@ func (h *Handler) updateMod(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateMod(c, &proto.UpdateAddModRequest{Id: id, Mod: dto.Mod, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdateMod(c, &pro_api.UpdateAddModRequest{Id: id, Mod: dto.Mod, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -173,7 +174,7 @@ func (h *Handler) updateMod(c *gin.Context) {
 // @ModuleID updateTemp
 // @Accept json
 // @Produce json
-// @Param data body models.UpdateTempDTO true "additional temperature info"
+// @Param data body pro_model.UpdateTempDTO true "additional temperature info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -181,7 +182,7 @@ func (h *Handler) updateMod(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/temp [patch]
 func (h *Handler) updateTemp(c *gin.Context) {
-	var dto models.UpdateTempDTO
+	var dto pro_model.UpdateTempDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -193,7 +194,7 @@ func (h *Handler) updateTemp(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateTemp(c, &proto.UpdateAddTemRequest{Id: id, Temperature: dto.Temperature, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdateTemp(c, &pro_api.UpdateAddTemRequest{Id: id, Temperature: dto.Temperature, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -209,7 +210,7 @@ func (h *Handler) updateTemp(c *gin.Context) {
 // @ModuleID updateMoun
 // @Accept json
 // @Produce json
-// @Param data body models.UpdateMounDTO true "additional mounting info"
+// @Param data body pro_model.UpdateMounDTO true "additional mounting info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -217,7 +218,7 @@ func (h *Handler) updateTemp(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/moun [patch]
 func (h *Handler) updateMoun(c *gin.Context) {
-	var dto models.UpdateMounDTO
+	var dto pro_model.UpdateMounDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -229,7 +230,7 @@ func (h *Handler) updateMoun(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateMoun(c, &proto.UpdateAddMounRequest{Id: id, Mounting: dto.Mounting, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdateMoun(c, &pro_api.UpdateAddMounRequest{Id: id, Mounting: dto.Mounting, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -245,7 +246,7 @@ func (h *Handler) updateMoun(c *gin.Context) {
 // @ModuleID updateGrap
 // @Accept json
 // @Produce json
-// @Param data body models.UpdateGrapDTO true "additional graphite info"
+// @Param data body pro_model.UpdateGrapDTO true "additional graphite info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -253,7 +254,7 @@ func (h *Handler) updateMoun(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/grap [patch]
 func (h *Handler) updateGrap(c *gin.Context) {
-	var dto models.UpdateGrapDTO
+	var dto pro_model.UpdateGrapDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -265,7 +266,7 @@ func (h *Handler) updateGrap(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateGrap(c, &proto.UpdateAddGrapRequest{Id: id, Graphite: dto.Graphite, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdateGrap(c, &pro_api.UpdateAddGrapRequest{Id: id, Graphite: dto.Graphite, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -281,7 +282,7 @@ func (h *Handler) updateGrap(c *gin.Context) {
 // @ModuleID updateFillers
 // @Accept json
 // @Produce json
-// @Param data body models.UpdateFillersDTO true "additional fillers info"
+// @Param data body pro_model.UpdateFillersDTO true "additional fillers info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -289,7 +290,7 @@ func (h *Handler) updateGrap(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/fil [patch]
 func (h *Handler) updateFillers(c *gin.Context) {
-	var dto models.UpdateFillersDTO
+	var dto pro_model.UpdateFillersDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -301,7 +302,7 @@ func (h *Handler) updateFillers(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateFillers(c, &proto.UpdateAddFillersRequest{Id: id, Fillers: dto.Fillers, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdateFillers(c, &pro_api.UpdateAddFillersRequest{Id: id, Fillers: dto.Fillers, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -317,7 +318,7 @@ func (h *Handler) updateFillers(c *gin.Context) {
 // @ModuleID updateCoating
 // @Accept json
 // @Produce json
-// @Param data body models.UpdateCoatingDTO true "additional coating info"
+// @Param data body pro_model.UpdateCoatingDTO true "additional coating info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -325,7 +326,7 @@ func (h *Handler) updateFillers(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/coat [patch]
 func (h *Handler) updateCoating(c *gin.Context) {
-	var dto models.UpdateCoatingDTO
+	var dto pro_model.UpdateCoatingDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -337,7 +338,7 @@ func (h *Handler) updateCoating(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateCoating(c, &proto.UpdateAddCoatingRequest{Id: id, Coating: dto.Coating, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdateCoating(c, &pro_api.UpdateAddCoatingRequest{Id: id, Coating: dto.Coating, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -353,7 +354,7 @@ func (h *Handler) updateCoating(c *gin.Context) {
 // @ModuleID updateConstruction
 // @Accept json
 // @Produce json
-// @Param data body models.UpdateConstrDTO true "additional construction info"
+// @Param data body pro_model.UpdateConstrDTO true "additional construction info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -361,7 +362,7 @@ func (h *Handler) updateCoating(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/constr [patch]
 func (h *Handler) updateConstruction(c *gin.Context) {
-	var dto models.UpdateConstrDTO
+	var dto pro_model.UpdateConstrDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -373,7 +374,7 @@ func (h *Handler) updateConstruction(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateConstruction(c, &proto.UpdateAddConstructionRequest{Id: id, Constr: dto.Constr, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdateConstruction(c, &pro_api.UpdateAddConstructionRequest{Id: id, Constr: dto.Constr, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -389,7 +390,7 @@ func (h *Handler) updateConstruction(c *gin.Context) {
 // @ModuleID updateObturator
 // @Accept json
 // @Produce json
-// @Param data body models.UpdateObturatorDTO true "additional obturation info"
+// @Param data body pro_model.UpdateObturatorDTO true "additional obturation info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -397,7 +398,7 @@ func (h *Handler) updateConstruction(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/obt [patch]
 func (h *Handler) updateObturator(c *gin.Context) {
-	var dto models.UpdateObturatorDTO
+	var dto pro_model.UpdateObturatorDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -409,7 +410,7 @@ func (h *Handler) updateObturator(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateObturator(c, &proto.UpdateAddObturatorRequest{Id: id, Obturator: dto.Obt, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdateObturator(c, &pro_api.UpdateAddObturatorRequest{Id: id, Obturator: dto.Obt, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -425,7 +426,7 @@ func (h *Handler) updateObturator(c *gin.Context) {
 // @ModuleID updateBasis
 // @Accept json
 // @Produce json
-// @Param data body models.UpdateBasisDTO true "additional basis info"
+// @Param data body pro_model.UpdateBasisDTO true "additional basis info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -433,7 +434,7 @@ func (h *Handler) updateObturator(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/basis [patch]
 func (h *Handler) updateBasis(c *gin.Context) {
-	var dto models.UpdateBasisDTO
+	var dto pro_model.UpdateBasisDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -445,7 +446,7 @@ func (h *Handler) updateBasis(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateBasis(c, &proto.UpdateAddBasisRequest{Id: id, Basis: dto.Basis, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdateBasis(c, &pro_api.UpdateAddBasisRequest{Id: id, Basis: dto.Basis, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -461,7 +462,7 @@ func (h *Handler) updateBasis(c *gin.Context) {
 // @ModuleID updatePObturator
 // @Accept json
 // @Produce json
-// @Param data body models.UpdatePObtDTO true "additional p_obturator info"
+// @Param data body pro_model.UpdatePObtDTO true "additional p_obturator info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -469,7 +470,7 @@ func (h *Handler) updateBasis(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/pobt [patch]
 func (h *Handler) updatePObturator(c *gin.Context) {
-	var dto models.UpdatePObtDTO
+	var dto pro_model.UpdatePObtDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -481,7 +482,7 @@ func (h *Handler) updatePObturator(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdatePObturator(c, &proto.UpdateAddPObturatorRequest{Id: id, PObturator: dto.Obturator, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdatePObturator(c, &pro_api.UpdateAddPObturatorRequest{Id: id, PObturator: dto.Obturator, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -497,7 +498,7 @@ func (h *Handler) updatePObturator(c *gin.Context) {
 // @ModuleID updateSealant
 // @Accept json
 // @Produce json
-// @Param data body models.UpdateSealantDTO true "additional sealant info"
+// @Param data body pro_model.UpdateSealantDTO true "additional sealant info"
 // @Param id path string true "addit id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -505,7 +506,7 @@ func (h *Handler) updatePObturator(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/additionals/{id}/seal [patch]
 func (h *Handler) updateSealant(c *gin.Context) {
-	var dto models.UpdateSealantDTO
+	var dto pro_model.UpdateSealantDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -517,7 +518,7 @@ func (h *Handler) updateSealant(c *gin.Context) {
 		return
 	}
 
-	_, err := h.proClient.UpdateSealant(c, &proto.UpdateAddSealantRequest{Id: id, Sealant: dto.Sealant, TypeCh: dto.TypeCh, Change: dto.Change})
+	_, err := h.proClient.UpdateSealant(c, &pro_api.UpdateAddSealantRequest{Id: id, Sealant: dto.Sealant, TypeCh: dto.TypeCh, Change: dto.Change})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

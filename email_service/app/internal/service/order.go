@@ -7,8 +7,8 @@ import (
 	"io"
 
 	"github.com/Alexander272/sealur/email_service/internal/config"
-	proto_email "github.com/Alexander272/sealur/email_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/email_service/pkg/email"
+	"github.com/Alexander272/sealur_proto/api/email_api"
 )
 
 type OrderService struct {
@@ -23,7 +23,7 @@ func NewOrderService(sender email.Sender, conf config.RecipientsConfig) *OrderSe
 	}
 }
 
-func (s *OrderService) SendOrder(data *proto_email.OrderData, file *bytes.Buffer) error {
+func (s *OrderService) SendOrder(data *email_api.OrderData, file *bytes.Buffer) error {
 	input := email.SendEmailInput{
 		Subject: s.conf.OrderSubject,
 		To:      []string{s.conf.Order},

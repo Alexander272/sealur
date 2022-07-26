@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -17,7 +17,7 @@ func NewPutgRepo(db *sqlx.DB) *PutgRepo {
 	return &PutgRepo{db: db}
 }
 
-func (r *PutgRepo) Get(req *proto.GetPutgRequest) (putg []models.Putg, err error) {
+func (r *PutgRepo) Get(req *pro_api.GetPutgRequest) (putg []models.Putg, err error) {
 	query := fmt.Sprintf(`SELECT id, type_fl_id, type_pr, form, construction, temperatures, reinforce, obturator, i_limiter, o_limiter, 
 		coating, mounting, graphite FROM %s WHERE form=$1 AND flange_id=$2 ORDER BY type_fl_id`, PutgTable)
 
@@ -70,7 +70,7 @@ func (r *PutgRepo) Update(putg models.PutgDTO) error {
 	return nil
 }
 
-func (r *PutgRepo) Delete(putg *proto.DeletePutgRequest) error {
+func (r *PutgRepo) Delete(putg *pro_api.DeletePutgRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", PutgTable)
 
 	id, err := strconv.Atoi(putg.Id)

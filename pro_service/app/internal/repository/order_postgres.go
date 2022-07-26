@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -19,7 +19,7 @@ func NewOrderRepo(db *sqlx.DB) *OrderRepo {
 	return &OrderRepo{db: db}
 }
 
-func (r *OrderRepo) GetAll(req *proto.GetAllOrdersRequest) (orders []models.Order, err error) {
+func (r *OrderRepo) GetAll(req *pro_api.GetAllOrdersRequest) (orders []models.Order, err error) {
 	query := fmt.Sprintf("SELECT id, date, count_position FROM %s WHERE user_id=$1 AND date IS NOT NULL", OrdersTable)
 
 	if err = r.db.Select(&orders, query, req.UserId); err != nil {
@@ -28,7 +28,7 @@ func (r *OrderRepo) GetAll(req *proto.GetAllOrdersRequest) (orders []models.Orde
 	return orders, nil
 }
 
-func (r *OrderRepo) GetCur(req *proto.GetCurOrderRequest) (order models.Order, err error) {
+func (r *OrderRepo) GetCur(req *pro_api.GetCurOrderRequest) (order models.Order, err error) {
 	query := fmt.Sprintf("SELECT id, count_position FROM %s WHERE user_id=$1 AND date IS NULL", OrdersTable)
 
 	if err = r.db.Get(&order, query, req.UserId); err != nil {
@@ -40,7 +40,7 @@ func (r *OrderRepo) GetCur(req *proto.GetCurOrderRequest) (order models.Order, e
 	return order, nil
 }
 
-func (r *OrderRepo) Create(order *proto.CreateOrderRequest) error {
+func (r *OrderRepo) Create(order *pro_api.CreateOrderRequest) error {
 	query := fmt.Sprintf("INSERT INTO %s (id, user_id, count_position) VALUES ($1, $2, $3)", OrdersTable)
 
 	_, err := r.db.Exec(query, order.OrderId, order.UserId, order.Count)
@@ -50,7 +50,7 @@ func (r *OrderRepo) Create(order *proto.CreateOrderRequest) error {
 	return nil
 }
 
-func (r *OrderRepo) Copy(order *proto.CopyOrderRequest) error {
+func (r *OrderRepo) Copy(order *pro_api.CopyOrderRequest) error {
 	query := fmt.Sprintf(`INSERT INTO %s (designation, description, count, sizes, drawing, order_id) 
 		SELECT designation, description, count, sizes, drawing, $1 FROM %s WHERE order_id=$2 ORDER BY id`, OrderPositionTable, OrderPositionTable)
 
@@ -60,7 +60,7 @@ func (r *OrderRepo) Copy(order *proto.CopyOrderRequest) error {
 	return nil
 }
 
-func (r *OrderRepo) Delete(order *proto.DeleteOrderRequest) error {
+func (r *OrderRepo) Delete(order *pro_api.DeleteOrderRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", OrdersTable)
 
 	_, err := r.db.Exec(query, order.OrderId)
@@ -70,7 +70,7 @@ func (r *OrderRepo) Delete(order *proto.DeleteOrderRequest) error {
 	return nil
 }
 
-func (r *OrderRepo) Save(order *proto.SaveOrderRequest) error {
+func (r *OrderRepo) Save(order *pro_api.SaveOrderRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET date=$1 WHERE id=$2", OrdersTable)
 
 	_, err := r.db.Exec(query, time.Now().UnixMilli(), order.OrderId)
@@ -81,7 +81,7 @@ func (r *OrderRepo) Save(order *proto.SaveOrderRequest) error {
 	return nil
 }
 
-func (r *OrderRepo) GetPositions(req *proto.GetPositionsRequest) (position []models.Position, err error) {
+func (r *OrderRepo) GetPositions(req *pro_api.GetPositionsRequest) (position []models.Position, err error) {
 	query := fmt.Sprintf("SELECT id, designation, description, count, sizes, drawing FROM %s WHERE order_id=$1 ORDER BY id", OrderPositionTable)
 
 	if err = r.db.Select(&position, query, req.OrderId); err != nil {

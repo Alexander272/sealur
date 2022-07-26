@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -16,7 +16,7 @@ func NewStandRepo(db *sqlx.DB) *StandRepo {
 	return &StandRepo{db: db}
 }
 
-func (r *StandRepo) GetAll(stand *proto.GetStandsRequest) (stands []*proto.Stand, err error) {
+func (r *StandRepo) GetAll(stand *pro_api.GetStandsRequest) (stands []*pro_api.Stand, err error) {
 	query := fmt.Sprintf("SELECT id, title FROM %s", StandTable)
 
 	if err = r.db.Select(&stands, query); err != nil {
@@ -25,7 +25,7 @@ func (r *StandRepo) GetAll(stand *proto.GetStandsRequest) (stands []*proto.Stand
 	return stands, nil
 }
 
-func (r *StandRepo) GetByTitle(title string) (stand []*proto.Stand, err error) {
+func (r *StandRepo) GetByTitle(title string) (stand []*pro_api.Stand, err error) {
 	query := fmt.Sprintf("SELECT id, title FROM %s WHERE lower(title)=lower($1) limit 1", StandTable)
 
 	if err = r.db.Select(&stand, query, title); err != nil {
@@ -34,7 +34,7 @@ func (r *StandRepo) GetByTitle(title string) (stand []*proto.Stand, err error) {
 	return stand, nil
 }
 
-func (r *StandRepo) Create(stand *proto.CreateStandRequest) (id string, err error) {
+func (r *StandRepo) Create(stand *pro_api.CreateStandRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", StandTable)
 	row := r.db.QueryRow(query, stand.Title)
 
@@ -46,7 +46,7 @@ func (r *StandRepo) Create(stand *proto.CreateStandRequest) (id string, err erro
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *StandRepo) Update(stand *proto.UpdateStandRequest) error {
+func (r *StandRepo) Update(stand *pro_api.UpdateStandRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET title=$1 WHERE id=$2", StandTable)
 
 	id, err := strconv.Atoi(stand.Id)
@@ -62,7 +62,7 @@ func (r *StandRepo) Update(stand *proto.UpdateStandRequest) error {
 	return nil
 }
 
-func (r *StandRepo) Delete(stand *proto.DeleteStandRequest) error {
+func (r *StandRepo) Delete(stand *pro_api.DeleteStandRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", StandTable)
 
 	id, err := strconv.Atoi(stand.Id)

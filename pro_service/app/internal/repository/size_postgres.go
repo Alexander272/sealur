@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -18,7 +18,7 @@ func NewSizesRepo(db *sqlx.DB) *SizesRepo {
 	return &SizesRepo{db: db}
 }
 
-func (r *SizesRepo) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, err error) {
+func (r *SizesRepo) Get(req *pro_api.GetSizesRequest) (sizes []*pro_api.Size, err error) {
 	var query string
 	if strings.Contains(strings.ToLower(req.TypePr), "путг") {
 		query = fmt.Sprintf(`SELECT id, dn, pn, d4, d3, d2, d1, h, s2, s3, type_pr, type_fl_id FROM size_%s WHERE LOWER(type_pr) = LOWER('%s') 
@@ -34,14 +34,26 @@ func (r *SizesRepo) Get(req *proto.GetSizesRequest) (sizes []*proto.Size, err er
 	}
 
 	for _, d := range data {
-		s := proto.Size(d)
-		sizes = append(sizes, &s)
+		sizes = append(sizes, &pro_api.Size{
+			Id:       d.Id,
+			Dn:       d.Dn,
+			Pn:       d.Pn,
+			D4:       d.D4,
+			D3:       d.D3,
+			D2:       d.D2,
+			D1:       d.D1,
+			H:        d.H,
+			S2:       d.S2,
+			S3:       d.S3,
+			TypePr:   d.TypePr,
+			TypeFlId: d.TypeFlId,
+		})
 	}
 
 	return sizes, nil
 }
 
-func (r *SizesRepo) GetAll(req *proto.GetSizesRequest) (sizes []*proto.Size, err error) {
+func (r *SizesRepo) GetAll(req *pro_api.GetSizesRequest) (sizes []*pro_api.Size, err error) {
 	var query string
 	if strings.Contains(strings.ToLower(req.TypePr), "путг") {
 		query = fmt.Sprintf(`SELECT id, dn, pn, d4, d3, d2, d1, h, s2, s3, type_pr, type_fl_id FROM size_%s WHERE LOWER(type_pr) like LOWER('%s%%') 
@@ -54,14 +66,26 @@ func (r *SizesRepo) GetAll(req *proto.GetSizesRequest) (sizes []*proto.Size, err
 	}
 
 	for _, d := range data {
-		s := proto.Size(d)
-		sizes = append(sizes, &s)
+		sizes = append(sizes, &pro_api.Size{
+			Id:       d.Id,
+			Dn:       d.Dn,
+			Pn:       d.Pn,
+			D4:       d.D4,
+			D3:       d.D3,
+			D2:       d.D2,
+			D1:       d.D1,
+			H:        d.H,
+			S2:       d.S2,
+			S3:       d.S3,
+			TypePr:   d.TypePr,
+			TypeFlId: d.TypeFlId,
+		})
 	}
 
 	return sizes, nil
 }
 
-func (r *SizesRepo) Create(size *proto.CreateSizeRequest) (id string, err error) {
+func (r *SizesRepo) Create(size *pro_api.CreateSizeRequest) (id string, err error) {
 	query := fmt.Sprintf(`INSERT INTO size_%s (count, dn, pn, type_fl_id, type_pr, stand_id, d4, d3, d2, d1, h, s2, s3) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, size.Flange)
 
@@ -92,7 +116,7 @@ func (r *SizesRepo) Create(size *proto.CreateSizeRequest) (id string, err error)
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *SizesRepo) Update(size *proto.UpdateSizeRequest) error {
+func (r *SizesRepo) Update(size *pro_api.UpdateSizeRequest) error {
 	query := fmt.Sprintf(`UPDATE size_%s SET dn=$1, pn=$2, type_pr=$3, stand_id=$4, d4=$5, d3=$6, d2=$7, d1=$8, h=$9, type_fl_id=$10,
 		s2=$11, s3=$12 WHERE id=$13`, size.Flange)
 
@@ -114,7 +138,7 @@ func (r *SizesRepo) Update(size *proto.UpdateSizeRequest) error {
 	return nil
 }
 
-func (r *SizesRepo) Delete(size *proto.DeleteSizeRequest) error {
+func (r *SizesRepo) Delete(size *pro_api.DeleteSizeRequest) error {
 	query := fmt.Sprintf("DELETE FROM size_%s WHERE id=$1", size.Flange)
 
 	id, err := strconv.Atoi(size.Id)
@@ -129,7 +153,7 @@ func (r *SizesRepo) Delete(size *proto.DeleteSizeRequest) error {
 	return nil
 }
 
-func (r *SizesRepo) DeleteAll(size *proto.DeleteAllSizeRequest) error {
+func (r *SizesRepo) DeleteAll(size *pro_api.DeleteAllSizeRequest) error {
 	query := fmt.Sprintf("DELETE FROM size_%s WHERE LOWER(type_pr) LIKE LOWER('%%%s%%')", size.Flange, size.TypePr)
 
 	_, err := r.db.Exec(query)

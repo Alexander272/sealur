@@ -7,8 +7,8 @@ import (
 
 	"github.com/Alexander272/sealur/email_service/internal/config"
 	"github.com/Alexander272/sealur/email_service/internal/models"
-	proto_email "github.com/Alexander272/sealur/email_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/email_service/pkg/email"
+	"github.com/Alexander272/sealur_proto/api/email_api"
 )
 
 type UserService struct {
@@ -23,7 +23,7 @@ func NewUserService(sender email.Sender, conf config.RecipientsConfig) *UserServ
 	}
 }
 
-func (s *UserService) SendConfirm(ctx context.Context, req *proto_email.ConfirmUserRequest) error {
+func (s *UserService) SendConfirm(ctx context.Context, req *email_api.ConfirmUserRequest) error {
 	input := email.SendEmailInput{
 		Subject: s.conf.ConfirmSubject,
 		To:      []string{s.conf.Confirm},
@@ -47,7 +47,7 @@ func (s *UserService) SendConfirm(ctx context.Context, req *proto_email.ConfirmU
 	return s.sender.Send(input)
 }
 
-func (s *UserService) SendReject(ctx context.Context, req *proto_email.RejectUserRequest) error {
+func (s *UserService) SendReject(ctx context.Context, req *email_api.RejectUserRequest) error {
 	input := email.SendEmailInput{
 		Subject: s.conf.RejectSubject,
 		To:      []string{req.Email},
@@ -65,7 +65,7 @@ func (s *UserService) SendReject(ctx context.Context, req *proto_email.RejectUse
 	return s.sender.Send(input)
 }
 
-func (s *UserService) SendJoin(ctx context.Context, user *proto_email.JoinUserRequest) error {
+func (s *UserService) SendJoin(ctx context.Context, user *email_api.JoinUserRequest) error {
 	input := email.SendEmailInput{
 		Subject: s.conf.JoinSubject,
 		To:      []string{user.Email},

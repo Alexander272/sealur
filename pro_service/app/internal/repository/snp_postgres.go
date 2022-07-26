@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -17,7 +17,7 @@ func NewSNPRepo(db *sqlx.DB) *SNPRepo {
 	return &SNPRepo{db: db}
 }
 
-func (r *SNPRepo) Get(req *proto.GetSNPRequest) (snp []models.SNP, err error) {
+func (r *SNPRepo) Get(req *pro_api.GetSNPRequest) (snp []models.SNP, err error) {
 	query := fmt.Sprintf(`SELECT id, type_fl_id, type_pr, filler, frame, in_ring, ou_ring, mounting, graphite 
 		FROM %s WHERE stand_id=$1 AND flange_id=$2 ORDER BY type_pr DESC`, SNPTable)
 
@@ -77,7 +77,7 @@ func (r *SNPRepo) Update(snp models.SnpDTO) error {
 	return nil
 }
 
-func (r *SNPRepo) Delete(snp *proto.DeleteSNPRequest) error {
+func (r *SNPRepo) Delete(snp *pro_api.DeleteSNPRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", SNPTable)
 
 	id, err := strconv.Atoi(snp.Id)

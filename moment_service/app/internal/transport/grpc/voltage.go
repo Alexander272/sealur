@@ -3,28 +3,28 @@ package grpc
 import (
 	"context"
 
-	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
-func (h *MaterialsHandlers) CreateVoltage(ctx context.Context, voltage *moment_proto.CreateVoltageRequest) (*moment_proto.Response, error) {
+func (h *MaterialsHandlers) CreateVoltage(ctx context.Context, voltage *moment_api.CreateVoltageRequest) (*moment_api.Response, error) {
 	err := h.service.CreateVoltage(ctx, voltage)
 	if err != nil {
 		return nil, err
 	}
 
-	return &moment_proto.Response{}, nil
+	return &moment_api.Response{}, nil
 }
 
-func (h *MaterialsHandlers) UpdateVoltage(ctx context.Context, voltage *moment_proto.UpdateVoltageRequest) (*moment_proto.Response, error) {
+func (h *MaterialsHandlers) UpdateVoltage(ctx context.Context, voltage *moment_api.UpdateVoltageRequest) (*moment_api.Response, error) {
 	if err := h.service.UpdateVoltage(ctx, voltage); err != nil {
 		return nil, err
 	}
-	return &moment_proto.Response{}, nil
+	return &moment_api.Response{}, nil
 }
 
-func (h *MaterialsHandlers) DeleteVoltage(ctx context.Context, voltage *moment_proto.DeleteVoltageRequest) (*moment_proto.Response, error) {
+func (h *MaterialsHandlers) DeleteVoltage(ctx context.Context, voltage *moment_api.DeleteVoltageRequest) (*moment_api.Response, error) {
 	if err := h.service.DeleteVoltage(ctx, voltage); err != nil {
 		return nil, err
 	}
-	return &moment_proto.Response{}, nil
+	return &moment_api.Response{}, nil
 }

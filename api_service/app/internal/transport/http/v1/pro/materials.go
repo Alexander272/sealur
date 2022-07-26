@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,13 +29,13 @@ func (h *Handler) initMaterialsRoutes(api *gin.RouterGroup) {
 // @ModuleID getMaterials
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=[]proto.Materials}
+// @Success 200 {object} models.DataResponse{data=[]pro_api.Materials}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/materials [get]
 func (h *Handler) getMaterials(c *gin.Context) {
-	mats, err := h.proClient.GetMaterials(c, &proto.GetMaterialsRequest{})
+	mats, err := h.proClient.GetMaterials(c, &pro_api.GetMaterialsRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -50,20 +51,20 @@ func (h *Handler) getMaterials(c *gin.Context) {
 // @ModuleID createMaterials
 // @Accept json
 // @Produce json
-// @Param data body models.MaterialsDTO true "materials info"
+// @Param data body pro_model.MaterialsDTO true "materials info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/materials [post]
 func (h *Handler) createMaterials(c *gin.Context) {
-	var dto models.MaterialsDTO
+	var dto pro_model.MaterialsDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	mat, err := h.proClient.CreateMaterials(c, &proto.CreateMaterialsRequest{
+	mat, err := h.proClient.CreateMaterials(c, &pro_api.CreateMaterialsRequest{
 		Title:   dto.Title,
 		TypeMat: dto.TypeMat,
 	})
@@ -83,7 +84,7 @@ func (h *Handler) createMaterials(c *gin.Context) {
 // @ModuleID updateMaterials
 // @Accept json
 // @Produce json
-// @Param data body models.MaterialsDTO true "material info"
+// @Param data body pro_model.MaterialsDTO true "material info"
 // @Param id path string true "material id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -91,7 +92,7 @@ func (h *Handler) createMaterials(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/materials/{id} [put]
 func (h *Handler) updateMaterials(c *gin.Context) {
-	var dto models.MaterialsDTO
+	var dto pro_model.MaterialsDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -103,7 +104,7 @@ func (h *Handler) updateMaterials(c *gin.Context) {
 		return
 	}
 
-	mat, err := h.proClient.UpdateMaterials(c, &proto.UpdateMaterialsRequest{
+	mat, err := h.proClient.UpdateMaterials(c, &pro_api.UpdateMaterialsRequest{
 		Id:      matId,
 		Title:   dto.Title,
 		TypeMat: dto.TypeMat,
@@ -136,7 +137,7 @@ func (h *Handler) deleteMaterials(c *gin.Context) {
 		return
 	}
 
-	mat, err := h.proClient.DeleteMaterials(c, &proto.DeleteMaterialsRequest{Id: id})
+	mat, err := h.proClient.DeleteMaterials(c, &pro_api.DeleteMaterialsRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

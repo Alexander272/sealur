@@ -5,16 +5,16 @@ import (
 	"time"
 
 	"github.com/Alexander272/sealur/api_service/internal/repository"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
 	"github.com/Alexander272/sealur/api_service/pkg/auth"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 )
 
 type Session interface {
-	SignIn(ctx context.Context, user *proto_user.User) (token string, err error)
+	SignIn(ctx context.Context, user *user_api.User) (token string, err error)
 	SingOut(ctx context.Context, userId string) error
 	// Refresh(ctx context.Context, token) (*domain.Token, error)
-	CheckSession(ctx context.Context, u *proto_user.User, token string) (isRefresh bool, err error)
-	TokenParse(token string) (*proto_user.User, error)
+	CheckSession(ctx context.Context, u *user_api.User, token string) (isRefresh bool, err error)
+	TokenParse(token string) (*user_api.User, error)
 }
 
 type Services struct {

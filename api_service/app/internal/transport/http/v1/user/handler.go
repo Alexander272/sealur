@@ -7,15 +7,15 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/service"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 type Handler struct {
-	userClient proto_user.UserServiceClient
+	userClient user_api.UserServiceClient
 	auth       config.AuthConfig
 	services   *service.Services
 	middleware *middleware.Middleware
@@ -58,7 +58,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		logger.Fatalf("failed connection to pro service. error: %w", err)
 	}
 
-	userClient := proto_user.NewUserServiceClient(connect)
+	userClient := user_api.NewUserServiceClient(connect)
 	h.userClient = userClient
 
 	users := api.Group("/")
@@ -70,7 +70,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 }
 
 func (h *Handler) pingUsers(c *gin.Context) {
-	res, err := h.userClient.Ping(c, &proto_user.PingRequest{})
+	res, err := h.userClient.Ping(c, &user_api.PingRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

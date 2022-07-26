@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -17,7 +17,7 @@ func NewStFlRepo(db *sqlx.DB) *StFlRepo {
 	return &StFlRepo{db: db}
 }
 
-func (r *StFlRepo) Get() (st []*proto.StFl, err error) {
+func (r *StFlRepo) Get() (st []*pro_api.StFl, err error) {
 	query := fmt.Sprintf(`SELECT st_fl.id, stand_id, stand.title AS stand, coalesce(fl_id, 0) as fl_id, coalesce(flange.title, '') AS flange, 
 		coalesce(short, '') as short FROM %s LEFT JOIN %s ON (stand_id = stand.id) LEFT JOIN %s ON (fl_id = flange.id)`,
 		StFLTable, StandTable, FlangeTable)
@@ -28,14 +28,20 @@ func (r *StFlRepo) Get() (st []*proto.StFl, err error) {
 	}
 
 	for _, d := range data {
-		s := proto.StFl(d)
-		st = append(st, &s)
+		st = append(st, &pro_api.StFl{
+			Id:       d.Id,
+			StandId:  d.StandId,
+			Stand:    d.Stand,
+			FlangeId: d.FlangeId,
+			Flange:   d.Flange,
+			Short:    d.Short,
+		})
 	}
 
 	return st, nil
 }
 
-func (r *StFlRepo) Create(st *proto.CreateStFlRequest) (string, error) {
+func (r *StFlRepo) Create(st *pro_api.CreateStFlRequest) (string, error) {
 	query := fmt.Sprintf("INSERT INTO %s (stand_id, fl_id) VALUES ($1, $2) RETURNING id", StFLTable)
 
 	standId, err := strconv.Atoi(st.StandId)
@@ -57,7 +63,7 @@ func (r *StFlRepo) Create(st *proto.CreateStFlRequest) (string, error) {
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *StFlRepo) Update(st *proto.UpdateStFlRequest) error {
+func (r *StFlRepo) Update(st *pro_api.UpdateStFlRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET stand_id=$1, fl_id=$2 WHERE id=$3", StFLTable)
 
 	id, err := strconv.Atoi(st.Id)
@@ -73,7 +79,7 @@ func (r *StFlRepo) Update(st *proto.UpdateStFlRequest) error {
 	return nil
 }
 
-func (r *StFlRepo) Delete(st *proto.DeleteStFlRequest) error {
+func (r *StFlRepo) Delete(st *pro_api.DeleteStFlRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", StFLTable)
 
 	id, err := strconv.Atoi(st.Id)

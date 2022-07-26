@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -17,7 +17,7 @@ func NewMatRepo(db *sqlx.DB) *MatRepo {
 	return &MatRepo{db: db}
 }
 
-func (r *MatRepo) GetAll(*proto.GetMaterialsRequest) (mats []models.Materials, err error) {
+func (r *MatRepo) GetAll(*pro_api.GetMaterialsRequest) (mats []models.Materials, err error) {
 	query := fmt.Sprintf("SELECT id, title, type_mat FROM %s ORDER BY id", MaterialsTable)
 
 	if err = r.db.Select(&mats, query); err != nil {
@@ -26,7 +26,7 @@ func (r *MatRepo) GetAll(*proto.GetMaterialsRequest) (mats []models.Materials, e
 	return mats, nil
 }
 
-func (r *MatRepo) Create(mat *proto.CreateMaterialsRequest) (id string, err error) {
+func (r *MatRepo) Create(mat *pro_api.CreateMaterialsRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title, type_mat) VALUES ($1, $2) RETURNING id", MaterialsTable)
 	row := r.db.QueryRow(query, mat.Title, mat.TypeMat)
 
@@ -37,7 +37,7 @@ func (r *MatRepo) Create(mat *proto.CreateMaterialsRequest) (id string, err erro
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *MatRepo) Update(mat *proto.UpdateMaterialsRequest) error {
+func (r *MatRepo) Update(mat *pro_api.UpdateMaterialsRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET title=$1, type_mat=$2 WHERE id=$3", MaterialsTable)
 
 	id, err := strconv.Atoi(mat.Id)
@@ -52,7 +52,7 @@ func (r *MatRepo) Update(mat *proto.UpdateMaterialsRequest) error {
 	return nil
 }
 
-func (r *MatRepo) Delete(mat *proto.DeleteMaterialsRequest) error {
+func (r *MatRepo) Delete(mat *pro_api.DeleteMaterialsRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", MaterialsTable)
 
 	id, err := strconv.Atoi(mat.Id)

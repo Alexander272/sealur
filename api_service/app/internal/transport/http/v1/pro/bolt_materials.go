@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,13 +29,13 @@ func (h *Handler) initBoltMaterialsRoutes(api *gin.RouterGroup) {
 // @ModuleID getBoltMaterials
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=[]proto.BoltMaterials}
+// @Success 200 {object} models.DataResponse{data=[]pro_api.BoltMaterials}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/bolt-materials [get]
 func (h *Handler) getBoltMaterials(c *gin.Context) {
-	mats, err := h.proClient.GetBoltMaterials(c, &proto.GetBoltMaterialsRequest{})
+	mats, err := h.proClient.GetBoltMaterials(c, &pro_api.GetBoltMaterialsRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -50,20 +51,20 @@ func (h *Handler) getBoltMaterials(c *gin.Context) {
 // @ModuleID createBoltMaterials
 // @Accept json
 // @Produce json
-// @Param data body models.BoltMaterialsDTO true "bolt materials info"
+// @Param data body pro_model.BoltMaterialsDTO true "bolt materials info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/bolt-materials [post]
 func (h *Handler) createBoltMaterials(c *gin.Context) {
-	var dto models.BoltMaterialsDTO
+	var dto pro_model.BoltMaterialsDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	mat, err := h.proClient.CreateBoltMaterials(c, &proto.CreateBoltMaterialsRequest{
+	mat, err := h.proClient.CreateBoltMaterials(c, &pro_api.CreateBoltMaterialsRequest{
 		Title:    dto.Title,
 		FlangeId: dto.FlangeId,
 	})
@@ -83,7 +84,7 @@ func (h *Handler) createBoltMaterials(c *gin.Context) {
 // @ModuleID updateBoltMaterials
 // @Accept json
 // @Produce json
-// @Param data body models.BoltMaterialsDTO true "bolt material info"
+// @Param data body pro_model.BoltMaterialsDTO true "bolt material info"
 // @Param id path string true "bolt material id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -91,7 +92,7 @@ func (h *Handler) createBoltMaterials(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/bolt-materials/{id} [put]
 func (h *Handler) updateBoltMaterials(c *gin.Context) {
-	var dto models.BoltMaterialsDTO
+	var dto pro_model.BoltMaterialsDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -103,7 +104,7 @@ func (h *Handler) updateBoltMaterials(c *gin.Context) {
 		return
 	}
 
-	mat, err := h.proClient.UpdateBoltMaterials(c, &proto.UpdateBoltMaterialsRequest{
+	mat, err := h.proClient.UpdateBoltMaterials(c, &pro_api.UpdateBoltMaterialsRequest{
 		Id:       matId,
 		Title:    dto.Title,
 		FlangeId: dto.FlangeId,
@@ -136,7 +137,7 @@ func (h *Handler) deleteBoltMaterials(c *gin.Context) {
 		return
 	}
 
-	mat, err := h.proClient.DeleteBoltMaterials(c, &proto.DeleteBoltMaterialsRequest{Id: id})
+	mat, err := h.proClient.DeleteBoltMaterials(c, &pro_api.DeleteBoltMaterialsRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

@@ -9,9 +9,9 @@ import (
 
 	"github.com/Alexander272/sealur/user_service/internal/models"
 	"github.com/Alexander272/sealur/user_service/internal/repo"
-	proto_user "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto"
-	proto_email "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto/email"
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
+	"github.com/Alexander272/sealur_proto/api/email_api"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 )
 
 type UserService struct {
@@ -19,10 +19,10 @@ type UserService struct {
 	userRepo repo.Users
 	roleRepo repo.Role
 	ipRepo   repo.IP
-	email    proto_email.EmailServiceClient
+	email    email_api.EmailServiceClient
 }
 
-func NewUserService(user repo.Users, role repo.Role, ip repo.IP, hasher hasher.PasswordHasher, email proto_email.EmailServiceClient) *UserService {
+func NewUserService(user repo.Users, role repo.Role, ip repo.IP, hasher hasher.PasswordHasher, email email_api.EmailServiceClient) *UserService {
 	return &UserService{
 		userRepo: user,
 		roleRepo: role,
@@ -32,7 +32,7 @@ func NewUserService(user repo.Users, role repo.Role, ip repo.IP, hasher hasher.P
 	}
 }
 
-func (s *UserService) Get(ctx context.Context, req *proto_user.GetUserRequest) (u *proto_user.User, err error) {
+func (s *UserService) Get(ctx context.Context, req *user_api.GetUserRequest) (u *user_api.User, err error) {
 	user, err := s.userRepo.Get(ctx, req)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -53,14 +53,14 @@ func (s *UserService) Get(ctx context.Context, req *proto_user.GetUserRequest) (
 		}
 	}
 
-	roles, err := s.roleRepo.Get(ctx, &proto_user.GetRolesRequest{UserId: user.Id})
+	roles, err := s.roleRepo.Get(ctx, &user_api.GetRolesRequest{UserId: user.Id})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get roles. error: %w", err)
 	}
 
-	var userRoles []*proto_user.Role
+	var userRoles []*user_api.Role
 	for _, r := range roles {
-		ur := proto_user.Role{
+		ur := user_api.Role{
 			Id:      r.Id,
 			Service: r.Service,
 			Role:    r.Role,
@@ -68,7 +68,7 @@ func (s *UserService) Get(ctx context.Context, req *proto_user.GetUserRequest) (
 		userRoles = append(userRoles, &ur)
 	}
 
-	u = &proto_user.User{
+	u = &user_api.User{
 		Id:           user.Id,
 		Organization: user.Organization,
 		Name:         user.Name,
@@ -82,7 +82,7 @@ func (s *UserService) Get(ctx context.Context, req *proto_user.GetUserRequest) (
 	return u, nil
 }
 
-func (s *UserService) GetAll(ctx context.Context, req *proto_user.GetAllUserRequest) ([]*proto_user.User, error) {
+func (s *UserService) GetAll(ctx context.Context, req *user_api.GetAllUserRequest) ([]*user_api.User, error) {
 	users, err := s.userRepo.GetAll(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all users. error: %w", err)
@@ -92,22 +92,22 @@ func (s *UserService) GetAll(ctx context.Context, req *proto_user.GetAllUserRequ
 		return nil, models.ErrUsersEmpty
 	}
 
-	roles, err := s.roleRepo.GetAll(ctx, &proto_user.GetAllRolesRequest{})
+	roles, err := s.roleRepo.GetAll(ctx, &user_api.GetAllRolesRequest{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all roles. error: %w", err)
 	}
 
-	ips, err := s.ipRepo.GetAll(ctx, &proto_user.GetAllIpRequest{})
+	ips, err := s.ipRepo.GetAll(ctx, &user_api.GetAllIpRequest{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all ip. error: %w", err)
 	}
 
-	var u []*proto_user.User
+	var u []*user_api.User
 	for i, item := range users {
-		var userRoles []*proto_user.Role
+		var userRoles []*user_api.Role
 		for j := i; j < len(roles); j++ {
 			if roles[j].UserId == item.Id {
-				ur := proto_user.Role{
+				ur := user_api.Role{
 					Id:      roles[j].Id,
 					Service: roles[j].Service,
 					Role:    roles[j].Role,
@@ -116,10 +116,10 @@ func (s *UserService) GetAll(ctx context.Context, req *proto_user.GetAllUserRequ
 			}
 		}
 
-		var userIp []*proto_user.Ip
+		var userIp []*user_api.Ip
 		for j := 0; j < len(ips); j++ {
 			if ips[j].UserId == item.Id {
-				ip := proto_user.Ip{
+				ip := user_api.Ip{
 					Ip:   ips[j].Ip,
 					Date: ips[j].Date,
 				}
@@ -127,7 +127,7 @@ func (s *UserService) GetAll(ctx context.Context, req *proto_user.GetAllUserRequ
 			}
 		}
 
-		user := proto_user.User{
+		user := user_api.User{
 			Id:           item.Id,
 			Organization: item.Organization,
 			Name:         item.Name,
@@ -145,19 +145,19 @@ func (s *UserService) GetAll(ctx context.Context, req *proto_user.GetAllUserRequ
 	return u, nil
 }
 
-func (s *UserService) GetNew(ctx context.Context, req *proto_user.GetNewUserRequest) ([]*proto_user.User, error) {
+func (s *UserService) GetNew(ctx context.Context, req *user_api.GetNewUserRequest) ([]*user_api.User, error) {
 	users, err := s.userRepo.GetNew(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get new users. error: %w", err)
 	}
 
 	if len(users) == 0 {
-		return []*proto_user.User{}, nil
+		return []*user_api.User{}, nil
 	}
 
-	var u []*proto_user.User
+	var u []*user_api.User
 	for _, item := range users {
-		user := proto_user.User{
+		user := user_api.User{
 			Id:           item.Id,
 			Organization: item.Organization,
 			Name:         item.Name,
@@ -172,12 +172,12 @@ func (s *UserService) GetNew(ctx context.Context, req *proto_user.GetNewUserRequ
 	return u, nil
 }
 
-func (s *UserService) Create(ctx context.Context, user *proto_user.CreateUserRequest) (*proto_user.SuccessResponse, error) {
+func (s *UserService) Create(ctx context.Context, user *user_api.CreateUserRequest) (*user_api.SuccessResponse, error) {
 	if err := s.userRepo.Create(ctx, user); err != nil {
 		return nil, fmt.Errorf("failed to create user. error: %w", err)
 	}
 
-	_, err := s.email.SendConfirm(ctx, &proto_email.ConfirmUserRequest{
+	_, err := s.email.SendConfirm(ctx, &email_api.ConfirmUserRequest{
 		Organization: user.Organization,
 		Name:         user.Name,
 		Position:     user.Position,
@@ -186,11 +186,11 @@ func (s *UserService) Create(ctx context.Context, user *proto_user.CreateUserReq
 		return nil, fmt.Errorf("failed to send email. error: %w", err)
 	}
 
-	return &proto_user.SuccessResponse{Success: true}, nil
+	return &user_api.SuccessResponse{Success: true}, nil
 }
 
-func (s *UserService) Confirm(ctx context.Context, user *proto_user.ConfirmUserRequest) (*proto_user.SuccessResponse, error) {
-	candidate, err := s.userRepo.Get(ctx, &proto_user.GetUserRequest{Login: user.Login})
+func (s *UserService) Confirm(ctx context.Context, user *user_api.ConfirmUserRequest) (*user_api.SuccessResponse, error) {
+	candidate, err := s.userRepo.Get(ctx, &user_api.GetUserRequest{Login: user.Login})
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, fmt.Errorf("failed to get user. error: %w", err)
 	}
@@ -216,10 +216,10 @@ func (s *UserService) Confirm(ctx context.Context, user *proto_user.ConfirmUserR
 	}
 
 	services := make([]string, 0, len(user.Roles))
-	var roles []*proto_user.CreateRoleRequest
+	var roles []*user_api.CreateRoleRequest
 
 	for _, item := range user.Roles {
-		role := proto_user.CreateRoleRequest{
+		role := user_api.CreateRoleRequest{
 			UserId:  user.Id,
 			Service: item.Service,
 			Role:    item.Role,
@@ -238,7 +238,7 @@ func (s *UserService) Confirm(ctx context.Context, user *proto_user.ConfirmUserR
 		return nil, fmt.Errorf("failed to create roles. error: %w", err)
 	}
 
-	_, err = s.email.SendJoin(ctx, &proto_email.JoinUserRequest{
+	_, err = s.email.SendJoin(ctx, &email_api.JoinUserRequest{
 		Name:     confirmUser.Name,
 		Login:    user.Login,
 		Password: origPas,
@@ -249,10 +249,10 @@ func (s *UserService) Confirm(ctx context.Context, user *proto_user.ConfirmUserR
 		return nil, fmt.Errorf("failed to send email. error: %w", err)
 	}
 
-	return &proto_user.SuccessResponse{Success: true}, nil
+	return &user_api.SuccessResponse{Success: true}, nil
 }
 
-func (s *UserService) Update(ctx context.Context, user *proto_user.UpdateUserRequest) error {
+func (s *UserService) Update(ctx context.Context, user *user_api.UpdateUserRequest) error {
 	if user.Password != "" {
 		salt, err := s.hasher.GenerateSalt()
 		if err != nil {
@@ -272,7 +272,7 @@ func (s *UserService) Update(ctx context.Context, user *proto_user.UpdateUserReq
 	return nil
 }
 
-func (s *UserService) Delete(ctx context.Context, user *proto_user.DeleteUserRequest) error {
+func (s *UserService) Delete(ctx context.Context, user *user_api.DeleteUserRequest) error {
 	if _, err := s.userRepo.Delete(ctx, user); err != nil {
 		return fmt.Errorf("failed to delete user. error: %w", err)
 	}
@@ -280,13 +280,13 @@ func (s *UserService) Delete(ctx context.Context, user *proto_user.DeleteUserReq
 	return nil
 }
 
-func (s *UserService) Reject(ctx context.Context, user *proto_user.DeleteUserRequest) error {
+func (s *UserService) Reject(ctx context.Context, user *user_api.DeleteUserRequest) error {
 	deleteUser, err := s.userRepo.Delete(ctx, user)
 	if err != nil {
 		return fmt.Errorf("failed to delete user. error: %w", err)
 	}
 
-	_, err = s.email.SendReject(ctx, &proto_email.RejectUserRequest{
+	_, err = s.email.SendReject(ctx, &email_api.RejectUserRequest{
 		Name:  deleteUser.Name,
 		Email: deleteUser.Email,
 	})

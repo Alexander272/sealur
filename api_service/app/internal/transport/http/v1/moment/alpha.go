@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,26 +25,28 @@ func (h *Handler) initAlphaRoutes(api *gin.RouterGroup) {
 // @ModuleID createAlpha
 // @Accept json
 // @Produce json
-// @Param alpha body models.CreateAlphaDTO true "alpha info"
+// @Param alpha body moment_model.CreateAlphaDTO true "alpha info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/materials/alpha/ [post]
 func (h *Handler) createAlpha(c *gin.Context) {
-	var dto models.CreateAlphaDTO
+	var dto moment_model.CreateAlphaDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	alpha := make([]*moment_proto.Alpha, 0, len(dto.Alpha))
+	alpha := make([]*moment_api.Alpha, 0, len(dto.Alpha))
 	for _, v := range dto.Alpha {
-		item := moment_proto.Alpha(v)
-		alpha = append(alpha, &item)
+		alpha = append(alpha, &moment_api.Alpha{
+			Temperature: v.Temperature,
+			Alpha:       v.Alpha,
+		})
 	}
 
-	_, err := h.materialsClient.CreateAlpha(c, &moment_proto.CreateAlphaRequest{
+	_, err := h.materialsClient.CreateAlpha(c, &moment_api.CreateAlphaRequest{
 		MarkId: dto.MarkId,
 		Alpha:  alpha,
 	})
@@ -63,7 +66,7 @@ func (h *Handler) createAlpha(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "alpha id"
-// @Param alpha body models.UpdateAlphaDTO true "alpha info"
+// @Param alpha body moment_model.UpdateAlphaDTO true "alpha info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -76,13 +79,13 @@ func (h *Handler) updateAlpha(c *gin.Context) {
 		return
 	}
 
-	var dto models.UpdateAlphaDTO
+	var dto moment_model.UpdateAlphaDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.materialsClient.UpdateAlpha(c, &moment_proto.UpdateAlphaRequest{
+	_, err := h.materialsClient.UpdateAlpha(c, &moment_api.UpdateAlphaRequest{
 		Id:          id,
 		MarkId:      dto.MarkId,
 		Temperature: dto.Temperature,
@@ -116,7 +119,7 @@ func (h *Handler) deleteAlpha(c *gin.Context) {
 		return
 	}
 
-	_, err := h.materialsClient.DeleteAlpha(c, &moment_proto.DeleteAlphaRequest{Id: id})
+	_, err := h.materialsClient.DeleteAlpha(c, &moment_api.DeleteAlphaRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

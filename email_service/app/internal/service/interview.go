@@ -7,8 +7,8 @@ import (
 	"io"
 
 	"github.com/Alexander272/sealur/email_service/internal/config"
-	proto_email "github.com/Alexander272/sealur/email_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/email_service/pkg/email"
+	"github.com/Alexander272/sealur_proto/api/email_api"
 )
 
 type InterviewService struct {
@@ -23,7 +23,7 @@ func NewInterviewService(sender email.Sender, conf config.RecipientsConfig) *Int
 	}
 }
 
-func (s *InterviewService) SendInterview(data *proto_email.InterviewData, file *bytes.Buffer) error {
+func (s *InterviewService) SendInterview(data *email_api.InterviewData, file *bytes.Buffer) error {
 	input := email.SendEmailInput{
 		Subject: s.conf.InterviewSubject,
 		To:      []string{s.conf.Interview},

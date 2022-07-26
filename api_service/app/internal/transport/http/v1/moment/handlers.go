@@ -6,8 +6,8 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -15,11 +15,11 @@ import (
 
 type Handler struct {
 	middleware       *middleware.Middleware
-	pingClient       moment_proto.PingServiceClient
-	gasketClient     moment_proto.GasketServiceClient
-	materialsClient  moment_proto.MaterialsServiceClient
-	flangeClient     moment_proto.FlangeServiceClient
-	calcFlangeClient moment_proto.CalcFlangeServiceClient
+	pingClient       moment_api.PingServiceClient
+	gasketClient     moment_api.GasketServiceClient
+	materialsClient  moment_api.MaterialsServiceClient
+	flangeClient     moment_api.FlangeServiceClient
+	calcFlangeClient moment_api.CalcFlangeServiceClient
 }
 
 func NewHandler(middleware *middleware.Middleware) *Handler {
@@ -55,11 +55,12 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		logger.Fatalf("failed connection to pro service. error: %w", err)
 	}
 
-	pingClient := moment_proto.NewPingServiceClient(connect)
-	gasketClient := moment_proto.NewGasketServiceClient(connect)
-	materialsClient := moment_proto.NewMaterialsServiceClient(connect)
-	flangeClient := moment_proto.NewFlangeServiceClient(connect)
-	calcFlangeClient := moment_proto.NewCalcFlangeServiceClient(connect)
+	//TODO у меня получилось веныести прото файлы в отдельную папку. надо это использовать
+	pingClient := moment_api.NewPingServiceClient(connect)
+	gasketClient := moment_api.NewGasketServiceClient(connect)
+	materialsClient := moment_api.NewMaterialsServiceClient(connect)
+	flangeClient := moment_api.NewFlangeServiceClient(connect)
+	calcFlangeClient := moment_api.NewCalcFlangeServiceClient(connect)
 
 	h.pingClient = pingClient
 	h.gasketClient = gasketClient
@@ -86,11 +87,13 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		h.initTypeFlangeRoutes(moment)
 		h.initStandartsRoutes(moment)
 		h.initFlangeRoutes(moment)
+
+		h.initCalcFlangeRoutes(moment)
 	}
 }
 
 func (h *Handler) pingUsers(c *gin.Context) {
-	res, err := h.pingClient.Ping(c, &moment_proto.PingRequest{})
+	res, err := h.pingClient.Ping(c, &moment_api.PingRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

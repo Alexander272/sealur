@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,13 +30,13 @@ func (h *Handler) initTypeGasketRoutes(api *gin.RouterGroup) {
 // @ModuleID getTypeGasket
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{Data=[]moment_proto.GasketType}
+// @Success 200 {object} models.DataResponse{Data=[]moment_api.GasketType}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/type-gasket/ [get]
 func (h *Handler) getTypeGasket(c *gin.Context) {
-	gasket, err := h.gasketClient.GetGasketType(c, &moment_proto.GetGasketTypeRequest{})
+	gasket, err := h.gasketClient.GetGasketType(c, &moment_api.GetGasketTypeRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -51,20 +52,20 @@ func (h *Handler) getTypeGasket(c *gin.Context) {
 // @ModuleID createTypeGasket
 // @Accept json
 // @Produce json
-// @Param typeGasket body models.TypeGasketDTO true "type-gasket info"
+// @Param typeGasket body moment_model.TypeGasketDTO true "type-gasket info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/type-gasket/ [post]
 func (h *Handler) createTypeGasket(c *gin.Context) {
-	var dto models.TypeGasketDTO
+	var dto moment_model.TypeGasketDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	gasket, err := h.gasketClient.CreateGasketType(c, &moment_proto.CreateGasketTypeRequest{Title: dto.Title})
+	gasket, err := h.gasketClient.CreateGasketType(c, &moment_api.CreateGasketTypeRequest{Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -82,7 +83,7 @@ func (h *Handler) createTypeGasket(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "type gasket id"
-// @Param typeGasket body models.TypeGasketDTO true "type gasket info"
+// @Param typeGasket body moment_model.TypeGasketDTO true "type gasket info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -95,13 +96,13 @@ func (h *Handler) updateTypeGasket(c *gin.Context) {
 		return
 	}
 
-	var dto models.GasketDTO
+	var dto moment_model.GasketDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.gasketClient.UpdateGasketType(c, &moment_proto.UpdateGasketTypeRequest{Id: id, Title: dto.Title})
+	_, err := h.gasketClient.UpdateGasketType(c, &moment_api.UpdateGasketTypeRequest{Id: id, Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -130,7 +131,7 @@ func (h *Handler) deleteTypeGasket(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.DeleteGasketType(c, &moment_proto.DeleteGasketTypeRequest{Id: id})
+	_, err := h.gasketClient.DeleteGasketType(c, &moment_api.DeleteGasketTypeRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

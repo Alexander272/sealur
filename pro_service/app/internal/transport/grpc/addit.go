@@ -3,19 +3,19 @@ package grpc
 import (
 	"context"
 
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 )
 
-func (h *Handler) GetAllAdditional(ctx context.Context, dto *proto.GetAllAddRequest) (*proto.AdditionalResponse, error) {
+func (h *Handler) GetAllAdditional(ctx context.Context, dto *pro_api.GetAllAddRequest) (*pro_api.AdditionalResponse, error) {
 	addit, err := h.service.Addit.GetAll()
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.AdditionalResponse{Additionals: addit}, nil
+	return &pro_api.AdditionalResponse{Additionals: addit}, nil
 }
 
-func (h *Handler) CreateAdditional(ctx context.Context, dto *proto.CreateAddRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) CreateAdditional(ctx context.Context, dto *pro_api.CreateAddRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.Addit.Create(dto)
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func (h *Handler) CreateAdditional(ctx context.Context, dto *proto.CreateAddRequ
 	return success, nil
 }
 
-func (h *Handler) UpdateMat(ctx context.Context, dto *proto.UpdateAddMatRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdateMat(ctx context.Context, dto *pro_api.UpdateAddMatRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.Addit.UpdateMat(dto)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (h *Handler) UpdateMat(ctx context.Context, dto *proto.UpdateAddMatRequest)
 	return success, nil
 }
 
-func (h *Handler) UpdateMod(ctx context.Context, dto *proto.UpdateAddModRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdateMod(ctx context.Context, dto *pro_api.UpdateAddModRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.Addit.UpdateMod(dto)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (h *Handler) UpdateMod(ctx context.Context, dto *proto.UpdateAddModRequest)
 	return success, nil
 }
 
-func (h *Handler) UpdateTemp(ctx context.Context, dto *proto.UpdateAddTemRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdateTemp(ctx context.Context, dto *pro_api.UpdateAddTemRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.Addit.UpdateTemp(dto)
 	if err != nil {
 		return nil, err
@@ -104,7 +104,7 @@ func (h *Handler) UpdateTemp(ctx context.Context, dto *proto.UpdateAddTemRequest
 	return success, nil
 }
 
-func (h *Handler) UpdateMoun(ctx context.Context, dto *proto.UpdateAddMounRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdateMoun(ctx context.Context, dto *pro_api.UpdateAddMounRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.Addit.UpdateMoun(dto)
 	if err != nil {
 		return nil, err
@@ -133,7 +133,7 @@ func (h *Handler) UpdateMoun(ctx context.Context, dto *proto.UpdateAddMounReques
 	return success, nil
 }
 
-func (h *Handler) UpdateGrap(ctx context.Context, dto *proto.UpdateAddGrapRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdateGrap(ctx context.Context, dto *pro_api.UpdateAddGrapRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.UpdateGrap(dto)
 	if err != nil {
 		return nil, err
@@ -162,7 +162,7 @@ func (h *Handler) UpdateGrap(ctx context.Context, dto *proto.UpdateAddGrapReques
 	return success, nil
 }
 
-func (h *Handler) UpdateFillers(ctx context.Context, dto *proto.UpdateAddFillersRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdateFillers(ctx context.Context, dto *pro_api.UpdateAddFillersRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.UpdateFillers(dto)
 	if err != nil {
 		return nil, err
@@ -177,7 +177,7 @@ func (h *Handler) UpdateFillers(ctx context.Context, dto *proto.UpdateAddFillers
 	return success, nil
 }
 
-func (h *Handler) UpdateCoating(ctx context.Context, dto *proto.UpdateAddCoatingRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdateCoating(ctx context.Context, dto *pro_api.UpdateAddCoatingRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.UpdateCoating(dto)
 	if err != nil {
 		return nil, err
@@ -196,7 +196,7 @@ func (h *Handler) UpdateCoating(ctx context.Context, dto *proto.UpdateAddCoating
 	return success, nil
 }
 
-func (h *Handler) UpdateConstruction(ctx context.Context, dto *proto.UpdateAddConstructionRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdateConstruction(ctx context.Context, dto *pro_api.UpdateAddConstructionRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.UpdateConstruction(dto)
 	if err != nil {
 		return nil, err
@@ -211,7 +211,7 @@ func (h *Handler) UpdateConstruction(ctx context.Context, dto *proto.UpdateAddCo
 	return success, nil
 }
 
-func (h *Handler) UpdateObturator(ctx context.Context, dto *proto.UpdateAddObturatorRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdateObturator(ctx context.Context, dto *pro_api.UpdateAddObturatorRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.UpdateObturator(dto)
 	if err != nil {
 		return nil, err
@@ -226,7 +226,7 @@ func (h *Handler) UpdateObturator(ctx context.Context, dto *proto.UpdateAddObtur
 	return success, nil
 }
 
-func (h *Handler) UpdateBasis(ctx context.Context, dto *proto.UpdateAddBasisRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdateBasis(ctx context.Context, dto *pro_api.UpdateAddBasisRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.UpdateBasis(dto)
 	if err != nil {
 		return nil, err
@@ -241,7 +241,7 @@ func (h *Handler) UpdateBasis(ctx context.Context, dto *proto.UpdateAddBasisRequ
 	return success, nil
 }
 
-func (h *Handler) UpdatePObturator(ctx context.Context, dto *proto.UpdateAddPObturatorRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdatePObturator(ctx context.Context, dto *pro_api.UpdateAddPObturatorRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.UpdatePObturator(dto)
 	if err != nil {
 		return nil, err
@@ -256,7 +256,7 @@ func (h *Handler) UpdatePObturator(ctx context.Context, dto *proto.UpdateAddPObt
 	return success, nil
 }
 
-func (h *Handler) UpdateSealant(ctx context.Context, dto *proto.UpdateAddSealantRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) UpdateSealant(ctx context.Context, dto *pro_api.UpdateAddSealantRequest) (*pro_api.SuccessResponse, error) {
 	success, err := h.service.UpdateSealant(dto)
 	if err != nil {
 		return nil, err

@@ -6,7 +6,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,13 +30,13 @@ func (h *Handler) initFlangeRoutes(api *gin.RouterGroup) {
 // @ModuleID getFlanges
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=[]proto.Flange}
+// @Success 200 {object} models.DataResponse{data=[]pro_api.Flange}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/flanges [get]
 func (h *Handler) getFlanges(c *gin.Context) {
-	fl, err := h.proClient.GetAllFlanges(c, &proto.GetAllFlangeRequest{})
+	fl, err := h.proClient.GetAllFlanges(c, &pro_api.GetAllFlangeRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -51,20 +52,20 @@ func (h *Handler) getFlanges(c *gin.Context) {
 // @ModuleID createFlange
 // @Accept json
 // @Produce json
-// @Param data body models.FlangeDTO true "flange info"
+// @Param data body pro_model.FlangeDTO true "flange info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/flanges [post]
 func (h *Handler) createFlange(c *gin.Context) {
-	var dto models.FlangeDTO
+	var dto pro_model.FlangeDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	fl, err := h.proClient.CreateFlange(c, &proto.CreateFlangeRequest{Title: dto.Title, Short: dto.Short})
+	fl, err := h.proClient.CreateFlange(c, &pro_api.CreateFlangeRequest{Title: dto.Title, Short: dto.Short})
 	if err != nil {
 		if errors.Is(err, models.ErrFlangeAlreadyExists) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), err.Error())
@@ -85,7 +86,7 @@ func (h *Handler) createFlange(c *gin.Context) {
 // @ModuleID updateFlange
 // @Accept json
 // @Produce json
-// @Param data body models.FlangeDTO true "flange info"
+// @Param data body pro_model.FlangeDTO true "flange info"
 // @Param id path string true "flange id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -93,7 +94,7 @@ func (h *Handler) createFlange(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/flanges/{id} [put]
 func (h *Handler) updateFlange(c *gin.Context) {
-	var dto models.FlangeDTO
+	var dto pro_model.FlangeDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -105,7 +106,7 @@ func (h *Handler) updateFlange(c *gin.Context) {
 		return
 	}
 
-	fl, err := h.proClient.UpdateFlange(c, &proto.UpdateFlangeRequest{Title: dto.Title, Short: dto.Short})
+	fl, err := h.proClient.UpdateFlange(c, &pro_api.UpdateFlangeRequest{Title: dto.Title, Short: dto.Short})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -134,7 +135,7 @@ func (h *Handler) deleteFlange(c *gin.Context) {
 		return
 	}
 
-	fl, err := h.proClient.DeleteFlange(c, &proto.DeleteFlangeRequest{Id: flId})
+	fl, err := h.proClient.DeleteFlange(c, &pro_api.DeleteFlangeRequest{Id: flId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

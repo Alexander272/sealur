@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,13 +29,13 @@ func (h *Handler) initStFlRoutes(api *gin.RouterGroup) {
 // @ModuleID getStFl
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=[]proto.StFl}
+// @Success 200 {object} models.DataResponse{data=[]pro_api.StFl}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/st-fl [get]
 func (h *Handler) getStFl(c *gin.Context) {
-	st, err := h.proClient.GetStFl(c, &proto.GetStFlRequest{})
+	st, err := h.proClient.GetStFl(c, &pro_api.GetStFlRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -50,20 +51,20 @@ func (h *Handler) getStFl(c *gin.Context) {
 // @ModuleID createStFl
 // @Accept json
 // @Produce json
-// @Param data body models.StFlDTO true "st/fl info"
+// @Param data body pro_model.StFlDTO true "st/fl info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/st-fl [post]
 func (h *Handler) createStFl(c *gin.Context) {
-	var dto models.StFlDTO
+	var dto pro_model.StFlDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	request := &proto.CreateStFlRequest{
+	request := &pro_api.CreateStFlRequest{
 		StandId:  dto.StandId,
 		FlangeId: dto.FlangeId,
 	}
@@ -86,7 +87,7 @@ func (h *Handler) createStFl(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "st/fl id"
-// @Param data body models.StFlDTO true "st/fl info"
+// @Param data body pro_model.StFlDTO true "st/fl info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -99,13 +100,13 @@ func (h *Handler) updateStFl(c *gin.Context) {
 		return
 	}
 
-	var dto models.StFlDTO
+	var dto pro_model.StFlDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	request := &proto.UpdateStFlRequest{
+	request := &pro_api.UpdateStFlRequest{
 		StandId:  dto.StandId,
 		FlangeId: dto.FlangeId,
 	}
@@ -139,7 +140,7 @@ func (h *Handler) deleteStFl(c *gin.Context) {
 		return
 	}
 
-	st, err := h.proClient.DeleteStFl(c, &proto.DeleteStFlRequest{Id: id})
+	st, err := h.proClient.DeleteStFl(c, &pro_api.DeleteStFlRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

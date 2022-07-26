@@ -9,19 +9,19 @@ import (
 	"io"
 
 	"github.com/Alexander272/sealur/file_service/internal/models"
-	proto_file "github.com/Alexander272/sealur/file_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/file_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/file_api"
 )
 
-func (h *Handler) Download(req *proto_file.FileDownloadRequest, stream proto_file.FileService_DownloadServer) error {
+func (h *Handler) Download(req *file_api.FileDownloadRequest, stream file_api.FileService_DownloadServer) error {
 	file, err := h.service.GetFile(context.Background(), req.Bucket, req.Group, req.Id, req.Name)
 	if err != nil {
 		return fmt.Errorf("error getting file %w", err)
 	}
 
-	reqMeta := &proto_file.FileDownloadResponse{
-		Response: &proto_file.FileDownloadResponse_Metadata{
-			Metadata: &proto_file.MetaData{
+	reqMeta := &file_api.FileDownloadResponse{
+		Response: &file_api.FileDownloadResponse_Metadata{
+			Metadata: &file_api.MetaData{
 				Name:  file.Name,
 				Size:  file.Size,
 				Type:  file.ContentType,
@@ -49,8 +49,8 @@ func (h *Handler) Download(req *proto_file.FileDownloadRequest, stream proto_fil
 			return fmt.Errorf("cannot read chunk to buffer %w", err)
 		}
 
-		reqChunk := &proto_file.FileDownloadResponse{
-			Response: &proto_file.FileDownloadResponse_File{File: &proto_file.File{
+		reqChunk := &file_api.FileDownloadResponse{
+			Response: &file_api.FileDownloadResponse_File{File: &file_api.File{
 				Content: buffer[:n],
 			}},
 		}
@@ -65,7 +65,7 @@ func (h *Handler) Download(req *proto_file.FileDownloadRequest, stream proto_fil
 	return nil
 }
 
-func (h *Handler) GroupDownload(req *proto_file.GroupDownloadRequest, stream proto_file.FileService_GroupDownloadServer) error {
+func (h *Handler) GroupDownload(req *file_api.GroupDownloadRequest, stream file_api.FileService_GroupDownloadServer) error {
 	files, err := h.service.GetFilesByGroup(context.Background(), req.Bucket, req.Group)
 	if err != nil {
 		return fmt.Errorf("error getting files. error: %w", err)
@@ -90,9 +90,9 @@ func (h *Handler) GroupDownload(req *proto_file.GroupDownloadRequest, stream pro
 	}
 
 	size := int64(buf.Cap())
-	reqMeta := &proto_file.FileDownloadResponse{
-		Response: &proto_file.FileDownloadResponse_Metadata{
-			Metadata: &proto_file.MetaData{
+	reqMeta := &file_api.FileDownloadResponse{
+		Response: &file_api.FileDownloadResponse_Metadata{
+			Metadata: &file_api.MetaData{
 				Name: "Чертежи.zip",
 				Size: size,
 				Type: ".zip",
@@ -118,8 +118,8 @@ func (h *Handler) GroupDownload(req *proto_file.GroupDownloadRequest, stream pro
 			return fmt.Errorf("cannot read chunk to buffer %w", err)
 		}
 
-		reqChunk := &proto_file.FileDownloadResponse{
-			Response: &proto_file.FileDownloadResponse_File{File: &proto_file.File{
+		reqChunk := &file_api.FileDownloadResponse{
+			Response: &file_api.FileDownloadResponse_File{File: &file_api.File{
 				Content: buffer[:n],
 			}},
 		}
@@ -134,7 +134,7 @@ func (h *Handler) GroupDownload(req *proto_file.GroupDownloadRequest, stream pro
 	return nil
 }
 
-func (h *Handler) Upload(stream proto_file.FileService_UploadServer) error {
+func (h *Handler) Upload(stream file_api.FileService_UploadServer) error {
 	req, err := stream.Recv()
 	if err != nil {
 		return fmt.Errorf("cannot receive image info %w", err)
@@ -179,7 +179,7 @@ func (h *Handler) Upload(stream proto_file.FileService_UploadServer) error {
 		return fmt.Errorf("failed to save file: %w", err)
 	}
 
-	return stream.SendAndClose(&proto_file.FileUploadResponse{
+	return stream.SendAndClose(&file_api.FileUploadResponse{
 		Id:       id,
 		OrigName: meta.Name,
 		Name:     fmt.Sprintf("%s_%s", id, meta.Name),
@@ -187,30 +187,30 @@ func (h *Handler) Upload(stream proto_file.FileService_UploadServer) error {
 	})
 }
 
-func (h *Handler) Copy(ctx context.Context, req *proto_file.CopyFileRequest) (*proto_file.MessageResponse, error) {
+func (h *Handler) Copy(ctx context.Context, req *file_api.CopyFileRequest) (*file_api.MessageResponse, error) {
 	if err := h.service.Copy(ctx, req.Bucket, req.Group, req.NewGroup, req.Id); err != nil {
 		return nil, err
 	}
-	return &proto_file.MessageResponse{Message: "Copied"}, nil
+	return &file_api.MessageResponse{Message: "Copied"}, nil
 }
 
-func (h *Handler) CopyGroup(ctx context.Context, req *proto_file.CopyGroupRequest) (*proto_file.MessageResponse, error) {
+func (h *Handler) CopyGroup(ctx context.Context, req *file_api.CopyGroupRequest) (*file_api.MessageResponse, error) {
 	if err := h.service.CopyGroup(ctx, req.Bucket, req.Group, req.NewGroup); err != nil {
 		return nil, err
 	}
-	return &proto_file.MessageResponse{Message: "Copied"}, nil
+	return &file_api.MessageResponse{Message: "Copied"}, nil
 }
 
-func (h *Handler) Delete(ctx context.Context, req *proto_file.FileDeleteRequest) (*proto_file.MessageResponse, error) {
+func (h *Handler) Delete(ctx context.Context, req *file_api.FileDeleteRequest) (*file_api.MessageResponse, error) {
 	if err := h.service.Delete(ctx, req.Bucket, req.Group, req.Id, req.Name); err != nil {
 		return nil, err
 	}
-	return &proto_file.MessageResponse{Message: "Removed"}, nil
+	return &file_api.MessageResponse{Message: "Removed"}, nil
 }
 
-func (h *Handler) GroupDelete(ctx context.Context, req *proto_file.GroupDeleteRequest) (*proto_file.MessageResponse, error) {
+func (h *Handler) GroupDelete(ctx context.Context, req *file_api.GroupDeleteRequest) (*file_api.MessageResponse, error) {
 	if err := h.service.DeleteGroup(ctx, req.Bucket, req.Group); err != nil {
 		return nil, err
 	}
-	return &proto_file.MessageResponse{Message: "Removed"}, nil
+	return &file_api.MessageResponse{Message: "Removed"}, nil
 }

@@ -9,8 +9,9 @@ import (
 	"strconv"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -45,7 +46,7 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 // @Accept json
 // @Produce json
 // @Param userId query string true "user id"
-// @Success 200 {object} models.DataResponse{Data=[]proto.Order}
+// @Success 200 {object} models.DataResponse{Data=[]pro_api.Order}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -57,7 +58,7 @@ func (h *Handler) getAllOrders(c *gin.Context) {
 		return
 	}
 
-	order, err := h.proClient.GetAllOrders(c, &proto.GetAllOrdersRequest{
+	order, err := h.proClient.GetAllOrders(c, &pro_api.GetAllOrdersRequest{
 		UserId: userId,
 	})
 	if err != nil {
@@ -75,14 +76,14 @@ func (h *Handler) getAllOrders(c *gin.Context) {
 // @ModuleID createOrder
 // @Accept json
 // @Produce json
-// @Param order body models.OrderDTO true "order info"
+// @Param order body pro_model.OrderDTO true "order info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/orders/ [post]
 func (h *Handler) createOrder(c *gin.Context) {
-	var dto models.OrderDTO
+	var dto pro_model.OrderDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -97,7 +98,7 @@ func (h *Handler) createOrder(c *gin.Context) {
 		dto.Id = id.String()
 	}
 
-	order, err := h.proClient.CreateOrder(c, &proto.CreateOrderRequest{
+	order, err := h.proClient.CreateOrder(c, &pro_api.CreateOrderRequest{
 		OrderId: dto.Id,
 		Count:   dto.Count,
 		UserId:  dto.UserId,
@@ -130,7 +131,7 @@ func (h *Handler) saveOrder(c *gin.Context) {
 		return
 	}
 
-	stream, err := h.proClient.SaveOrder(c, &proto.SaveOrderRequest{
+	stream, err := h.proClient.SaveOrder(c, &pro_api.SaveOrderRequest{
 		OrderId: orderId,
 	})
 	if err != nil {
@@ -202,7 +203,7 @@ func (h *Handler) sendOrder(c *gin.Context) {
 	}
 	userId, _ := c.Get(h.middleware.UserIdCtx)
 
-	_, err := h.proClient.SaveOrder(c, &proto.SaveOrderRequest{
+	_, err := h.proClient.SaveOrder(c, &pro_api.SaveOrderRequest{
 		OrderId: orderId,
 		UserId:  userId.(string),
 	})
@@ -222,7 +223,7 @@ func (h *Handler) sendOrder(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param orderId path string true "order id"
-// @Param order body models.CopyOrder true "order info"
+// @Param order body pro_model.CopyOrder true "order info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -234,13 +235,13 @@ func (h *Handler) copyOrder(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty orderId param")
 		return
 	}
-	var dto models.CopyOrder
+	var dto pro_model.CopyOrder
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.proClient.CopyOrder(c, &proto.CopyOrderRequest{OrderId: orderId, OldOrderId: dto.OldId})
+	_, err := h.proClient.CopyOrder(c, &pro_api.CopyOrderRequest{OrderId: orderId, OldOrderId: dto.OldId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -269,7 +270,7 @@ func (h *Handler) deleteOrder(c *gin.Context) {
 		return
 	}
 
-	order, err := h.proClient.DeleteOrder(c, &proto.DeleteOrderRequest{OrderId: id})
+	order, err := h.proClient.DeleteOrder(c, &pro_api.DeleteOrderRequest{OrderId: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -286,7 +287,7 @@ func (h *Handler) deleteOrder(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param orderId path string true "order id"
-// @Success 200 {object} models.DataResponse{Data=[]proto.OrderPosition}
+// @Success 200 {object} models.DataResponse{Data=[]pro_api.OrderPosition}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -298,7 +299,7 @@ func (h *Handler) getPosition(c *gin.Context) {
 		return
 	}
 
-	positions, err := h.proClient.GetPositions(c, &proto.GetPositionsRequest{
+	positions, err := h.proClient.GetPositions(c, &pro_api.GetPositionsRequest{
 		OrderId: orderId,
 	})
 	if err != nil {
@@ -317,7 +318,7 @@ func (h *Handler) getPosition(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param userId query string true "user id"
-// @Success 200 {object} models.DataResponse{Data=[]proto.OrderPosition}
+// @Success 200 {object} models.DataResponse{Data=[]pro_api.OrderPosition}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -329,7 +330,7 @@ func (h *Handler) getCurPosition(c *gin.Context) {
 		return
 	}
 
-	positions, err := h.proClient.GetCurPositions(c, &proto.GetCurPositionsRequest{
+	positions, err := h.proClient.GetCurPositions(c, &pro_api.GetCurPositionsRequest{
 		UserId: userId,
 	})
 	if err != nil {
@@ -348,7 +349,7 @@ func (h *Handler) getCurPosition(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param orderId path string true "order id"
-// @Param position body models.PositionDTO true "position info"
+// @Param position body pro_model.PositionDTO true "position info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -360,7 +361,7 @@ func (h *Handler) addPosition(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty orderId param")
 		return
 	}
-	var dto models.PositionDTO
+	var dto pro_model.PositionDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -372,7 +373,7 @@ func (h *Handler) addPosition(c *gin.Context) {
 		return
 	}
 
-	positions, err := h.proClient.AddPosition(c, &proto.AddPositionRequest{
+	positions, err := h.proClient.AddPosition(c, &pro_api.AddPositionRequest{
 		OrderId:     orderId,
 		Designation: dto.Designation,
 		Description: dto.Descriprion,
@@ -396,7 +397,7 @@ func (h *Handler) addPosition(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param orderId path string true "order id"
-// @Param position body models.CopyPosition true "position info"
+// @Param position body pro_model.CopyPosition true "position info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -408,7 +409,7 @@ func (h *Handler) copyPosition(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty orderId param")
 		return
 	}
-	var dto models.CopyPosition
+	var dto pro_model.CopyPosition
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -420,7 +421,7 @@ func (h *Handler) copyPosition(c *gin.Context) {
 		return
 	}
 
-	positions, err := h.proClient.CopyPosition(c, &proto.CopyPositionRequest{
+	positions, err := h.proClient.CopyPosition(c, &pro_api.CopyPositionRequest{
 		OrderId:     orderId,
 		Designation: dto.Designation,
 		Description: dto.Descriprion,
@@ -446,7 +447,7 @@ func (h *Handler) copyPosition(c *gin.Context) {
 // @Produce json
 // @Param orderId path string true "order id"
 // @Param id path string true "position id"
-// @Param position body models.PositionDTO true "position info"
+// @Param position body pro_model.PositionDTO true "position info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -464,7 +465,7 @@ func (h *Handler) updatePosition(c *gin.Context) {
 		return
 	}
 
-	var dto models.PositionDTO
+	var dto pro_model.PositionDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -476,7 +477,7 @@ func (h *Handler) updatePosition(c *gin.Context) {
 		return
 	}
 
-	positions, err := h.proClient.UpdatePosition(c, &proto.UpdatePositionRequest{
+	positions, err := h.proClient.UpdatePosition(c, &pro_api.UpdatePositionRequest{
 		Id:    id,
 		Count: int32(count),
 	})
@@ -514,7 +515,7 @@ func (h *Handler) removePosition(c *gin.Context) {
 		return
 	}
 
-	positions, err := h.proClient.RemovePosition(c, &proto.RemovePositionRequest{
+	positions, err := h.proClient.RemovePosition(c, &pro_api.RemovePositionRequest{
 		OrderId: orderId,
 		Id:      id,
 	})

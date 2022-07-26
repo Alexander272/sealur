@@ -36,6 +36,7 @@ require (
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
@@ -50,17 +51,17 @@ require (
 	github.com/xuri/efp v0.0.0-20220407160117-ad0f7a785be8 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	golang.org/x/crypto v0.0.0-20220408190544-5352b0902921 // indirect
+	golang.org/x/net v0.0.0-20220407224826-aac1ed45d8e3 // indirect
 	golang.org/x/tools v0.1.9 // indirect
 	google.golang.org/genproto v0.0.0-20220201184016-50beb8ab5c44 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 )
 
 require (
+	github.com/Alexander272/sealur_proto/api v0.0.0-20220726035851-87640bc1cc04
 	github.com/gin-contrib/cors v1.3.1
 	github.com/go-redis/redis/v8 v8.11.4
-	github.com/golang/protobuf v1.5.2
 	github.com/swaggo/swag v1.7.9
-	golang.org/x/net v0.0.0-20220407224826-aac1ed45d8e3
 )
 
 require (
@@ -71,5 +72,5 @@ require (
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/swaggo/gin-swagger v1.4.0
 	github.com/xuri/excelize/v2 v2.6.0
-	google.golang.org/grpc v1.44.0
+	google.golang.org/grpc v1.48.0
 )

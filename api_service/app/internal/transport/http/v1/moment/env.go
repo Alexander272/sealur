@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,13 +30,13 @@ func (h *Handler) initEnvRoutes(api *gin.RouterGroup) {
 // @ModuleID getEnv
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{Data=[]moment_proto.Env}
+// @Success 200 {object} models.DataResponse{Data=[]moment_api.Env}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/env/ [get]
 func (h *Handler) getEnv(c *gin.Context) {
-	env, err := h.gasketClient.GetEnv(c, &moment_proto.GetEnvRequest{})
+	env, err := h.gasketClient.GetEnv(c, &moment_api.GetEnvRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -51,20 +52,20 @@ func (h *Handler) getEnv(c *gin.Context) {
 // @ModuleID createEnv
 // @Accept json
 // @Produce json
-// @Param env body models.EnvDTO true "env info"
+// @Param env body moment_model.EnvDTO true "env info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/env/ [post]
 func (h *Handler) createEnv(c *gin.Context) {
-	var dto models.EnvDTO
+	var dto moment_model.EnvDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	env, err := h.gasketClient.CreateEnv(c, &moment_proto.CreateEnvRequest{Title: dto.Title})
+	env, err := h.gasketClient.CreateEnv(c, &moment_api.CreateEnvRequest{Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -82,7 +83,7 @@ func (h *Handler) createEnv(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "env id"
-// @Param env body models.EnvDTO true "env info"
+// @Param env body moment_model.EnvDTO true "env info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -95,13 +96,13 @@ func (h *Handler) updateEnv(c *gin.Context) {
 		return
 	}
 
-	var dto models.EnvDTO
+	var dto moment_model.EnvDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.gasketClient.UpdateEnv(c, &moment_proto.UpdateEnvRequest{Id: id, Title: dto.Title})
+	_, err := h.gasketClient.UpdateEnv(c, &moment_api.UpdateEnvRequest{Id: id, Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -130,7 +131,7 @@ func (h *Handler) deleteEnv(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.DeleteEnv(c, &moment_proto.DeleteEnvRequest{Id: id})
+	_, err := h.gasketClient.DeleteEnv(c, &moment_api.DeleteEnvRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

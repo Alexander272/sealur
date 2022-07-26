@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,20 +22,44 @@ func (h *Handler) initInterviewRoutes(api *gin.RouterGroup) {
 // @ModuleID sendInterview
 // @Accept json
 // @Produce json
-// @Param data body models.Interview true "interview info"
+// @Param data body pro_model.Interview true "interview info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/interview [post]
 func (h *Handler) sendInterview(c *gin.Context) {
-	var dto models.Interview
+	var dto pro_model.Interview
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.proClient.SendInterview(c, &proto.SendInterviewRequest{
+	drawing := &pro_api.Drawing{
+		Id:       dto.Drawing.Id,
+		Name:     dto.Drawing.Name,
+		OrigName: dto.Drawing.OrigName,
+		Group:    dto.Drawing.Group,
+		Link:     dto.Drawing.Link,
+	}
+
+	size := &pro_api.SizesInt{
+		Dy:        dto.Sizes.Dy,
+		Py:        dto.Sizes.Py,
+		DUp:       dto.Sizes.DUp,
+		D1:        dto.Sizes.D1,
+		D2:        dto.Sizes.D2,
+		D:         dto.Sizes.D,
+		H1:        dto.Sizes.H1,
+		H2:        dto.Sizes.H2,
+		Bolt:      dto.Sizes.Bolt,
+		CountBolt: dto.Sizes.CountBolt,
+		DIn:       dto.Sizes.DIn,
+		DOut:      dto.Sizes.DOut,
+		H:         dto.Sizes.H,
+	}
+
+	_, err := h.proClient.SendInterview(c, &pro_api.SendInterviewRequest{
 		Organization:  dto.Organization,
 		Name:          dto.Name,
 		Email:         dto.Email,
@@ -76,8 +101,8 @@ func (h *Handler) sendInterview(c *gin.Context) {
 		Penetrating:   dto.Penetrating,
 		DrawingNumber: dto.DrawingNumber,
 		Info:          dto.Info,
-		Drawing:       (*proto.Drawing)(dto.Drawing),
-		Sizes:         (*proto.SizesInt)(&dto.Sizes),
+		Drawing:       drawing,
+		Sizes:         size,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")

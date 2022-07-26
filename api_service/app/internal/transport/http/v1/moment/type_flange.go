@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,13 +29,13 @@ func (h *Handler) initTypeFlangeRoutes(api *gin.RouterGroup) {
 // @ModuleID getTypeFlange
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{Data=[]moment_proto.TypeFlange}
+// @Success 200 {object} models.DataResponse{Data=[]moment_api.TypeFlange}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/type-flange/ [get]
 func (h *Handler) getTypeFlange(c *gin.Context) {
-	tf, err := h.flangeClient.GetTypeFlange(c, &moment_proto.GetTypeFlangeRequest{})
+	tf, err := h.flangeClient.GetTypeFlange(c, &moment_api.GetTypeFlangeRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -50,20 +51,20 @@ func (h *Handler) getTypeFlange(c *gin.Context) {
 // @ModuleID createTypeFlange
 // @Accept json
 // @Produce json
-// @Param tf body models.TypeFlangeDTO true "type flange info"
+// @Param tf body pro_model.TypeFlangeDTO true "type flange info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/type-flange/ [post]
 func (h *Handler) createTypeFlange(c *gin.Context) {
-	var dto models.TypeFlangeDTO
+	var dto pro_model.TypeFlangeDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	tf, err := h.flangeClient.CreateTypeFlange(c, &moment_proto.CreateTypeFlangeRequest{Title: dto.Title})
+	tf, err := h.flangeClient.CreateTypeFlange(c, &moment_api.CreateTypeFlangeRequest{Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -80,7 +81,7 @@ func (h *Handler) createTypeFlange(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "type flange id"
-// @Param tf body models.TypeFlangeDTO true "type flange info"
+// @Param tf body pro_model.TypeFlangeDTO true "type flange info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -93,13 +94,13 @@ func (h *Handler) updateTypeFlange(c *gin.Context) {
 		return
 	}
 
-	var dto models.TypeFlangeDTO
+	var dto pro_model.TypeFlangeDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.flangeClient.UpdateTypeFlange(c, &moment_proto.UpdateTypeFlangeRequest{
+	_, err := h.flangeClient.UpdateTypeFlange(c, &moment_api.UpdateTypeFlangeRequest{
 		Id:    id,
 		Title: dto.Title,
 	})
@@ -131,7 +132,7 @@ func (h *Handler) deleteTypeFlange(c *gin.Context) {
 		return
 	}
 
-	_, err := h.flangeClient.DeleteTypeFlange(c, &moment_proto.DeleteTypeFlangeRequest{Id: id})
+	_, err := h.flangeClient.DeleteTypeFlange(c, &moment_api.DeleteTypeFlangeRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

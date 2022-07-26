@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,13 +30,13 @@ func (h *Handler) initTypeFlRoutes(api *gin.RouterGroup) {
 // @ModuleID getTypeFl
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=[]proto.TypeFl}
+// @Success 200 {object} models.DataResponse{data=[]pro_api.TypeFl}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/flange-types [get]
 func (h *Handler) getTypeFl(c *gin.Context) {
-	fl, err := h.proClient.GetTypeFl(c, &proto.GetTypeFlRequest{})
+	fl, err := h.proClient.GetTypeFl(c, &pro_api.GetTypeFlRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wront")
 		return
@@ -49,13 +50,13 @@ func (h *Handler) getTypeFl(c *gin.Context) {
 // @ModuleID getAllTypeFl
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=[]proto.TypeFl}
+// @Success 200 {object} models.DataResponse{data=[]pro_api.TypeFl}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/flange-types/all [get]
 func (h *Handler) getAllTypeFl(c *gin.Context) {
-	fl, err := h.proClient.GetAllTypeFl(c, &proto.GetTypeFlRequest{})
+	fl, err := h.proClient.GetAllTypeFl(c, &pro_api.GetTypeFlRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -70,20 +71,20 @@ func (h *Handler) getAllTypeFl(c *gin.Context) {
 // @ModuleID createTypeFl
 // @Accept json
 // @Produce json
-// @Param data body models.TypeFlDTO true "type flange info"
+// @Param data body pro_model.TypeFlDTO true "type flange info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/flange-types [post]
 func (h *Handler) createTypeFl(c *gin.Context) {
-	var dto models.TypeFlDTO
+	var dto pro_model.TypeFlDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	request := &proto.CreateTypeFlRequest{
+	request := &pro_api.CreateTypeFlRequest{
 		Title: dto.Title,
 		Descr: dto.Descr,
 		Short: dto.Short,
@@ -108,7 +109,7 @@ func (h *Handler) createTypeFl(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "type flange id"
-// @Param data body models.TypeFlDTO true "type flange info"
+// @Param data body pro_model.TypeFlDTO true "type flange info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -121,13 +122,13 @@ func (h *Handler) updateTypeFl(c *gin.Context) {
 		return
 	}
 
-	var dto models.TypeFlDTO
+	var dto pro_model.TypeFlDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	request := &proto.UpdateTypeFlRequest{
+	request := &pro_api.UpdateTypeFlRequest{
 		Id:    id,
 		Title: dto.Title,
 		Descr: dto.Descr,
@@ -164,7 +165,7 @@ func (h *Handler) deleteTypeFl(c *gin.Context) {
 		return
 	}
 
-	fl, err := h.proClient.DeleteTypeFl(c, &proto.DeleteTypeFlRequest{Id: id})
+	fl, err := h.proClient.DeleteTypeFl(c, &pro_api.DeleteTypeFlRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

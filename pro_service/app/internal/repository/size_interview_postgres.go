@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -17,7 +17,7 @@ func NewSizeIntRepo(db *sqlx.DB) *SizeIntRepo {
 	return &SizeIntRepo{db: db}
 }
 
-func (r *SizeIntRepo) Get(req *proto.GetSizesIntRequest) (sizes []models.SizeInterview, err error) {
+func (r *SizeIntRepo) Get(req *pro_api.GetSizesIntRequest) (sizes []models.SizeInterview, err error) {
 	query := fmt.Sprintf(`SELECT id, dy, py, d_up, d1, d2, d, h1, h2, bolt, count_bolt FROM %s
 		WHERE flange_id=$1 AND type_fl_id=$2 AND row_count=$3 ORDER BY count`, SizeIntrTable)
 
@@ -37,7 +37,7 @@ func (r *SizeIntRepo) Get(req *proto.GetSizesIntRequest) (sizes []models.SizeInt
 	return sizes, nil
 }
 
-func (r *SizeIntRepo) GetAll(req *proto.GetAllSizeIntRequest) (sizes []models.SizeInterview, err error) {
+func (r *SizeIntRepo) GetAll(req *pro_api.GetAllSizeIntRequest) (sizes []models.SizeInterview, err error) {
 	query := fmt.Sprintf(`SELECT id, dy, py, d_up, d1, d2, d, h1, h2, bolt, count_bolt, row_count FROM %s
 		WHERE flange_id=$1 AND type_fl_id=$2 ORDER BY count`, SizeIntrTable)
 
@@ -57,7 +57,7 @@ func (r *SizeIntRepo) GetAll(req *proto.GetAllSizeIntRequest) (sizes []models.Si
 	return sizes, nil
 }
 
-func (r *SizeIntRepo) Create(size *proto.CreateSizeIntRequest) (id string, err error) {
+func (r *SizeIntRepo) Create(size *pro_api.CreateSizeIntRequest) (id string, err error) {
 	query := fmt.Sprintf(`INSERT INTO %s (count, type_fl_id, flange_id, dy, py, d_up, d1, d2, d, h1, h2, bolt, count_bolt, row_count) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`, SizeIntrTable)
 
@@ -87,7 +87,7 @@ func (r *SizeIntRepo) Create(size *proto.CreateSizeIntRequest) (id string, err e
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *SizeIntRepo) Update(size *proto.UpdateSizeIntRequest) error {
+func (r *SizeIntRepo) Update(size *pro_api.UpdateSizeIntRequest) error {
 	query := fmt.Sprintf(`UPDATE %s SET dy=$1, py=$2, flange_id=$3, type_fl_id=$4, d_up=$5, d1=$6, d2=$7, d=$8, h1=$9, h2=$10, bolt=$11,
 		count_bolt=$12, row_count=$13 WHERE id=$14`, SizeIntrTable)
 
@@ -109,7 +109,7 @@ func (r *SizeIntRepo) Update(size *proto.UpdateSizeIntRequest) error {
 	return nil
 }
 
-func (r *SizeIntRepo) Delete(size *proto.DeleteSizeIntRequest) error {
+func (r *SizeIntRepo) Delete(size *pro_api.DeleteSizeIntRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", SizeIntrTable)
 
 	id, err := strconv.Atoi(size.Id)
@@ -124,7 +124,7 @@ func (r *SizeIntRepo) Delete(size *proto.DeleteSizeIntRequest) error {
 	return nil
 }
 
-func (r *SizeIntRepo) DeleteAll(size *proto.DeleteAllSizeIntRequest) error {
+func (r *SizeIntRepo) DeleteAll(size *pro_api.DeleteAllSizeIntRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE flange_id=$1", SizeIntrTable)
 
 	_, err := r.db.Exec(query, size.FlangeId)

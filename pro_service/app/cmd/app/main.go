@@ -12,12 +12,12 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/internal/service"
 	handlers "github.com/Alexander272/sealur/pro_service/internal/transport/grpc"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
-	proto_email "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/email"
-	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/proto_file"
-	proto_user "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/user"
 	"github.com/Alexander272/sealur/pro_service/pkg/database/postgres"
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/email_api"
+	"github.com/Alexander272/sealur_proto/api/file_api"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -69,7 +69,7 @@ func main() {
 	if err != nil {
 		logger.Fatalf("failed connection to email service. error: %w", err)
 	}
-	emailClient := proto_email.NewEmailServiceClient(connectEmail)
+	emailClient := email_api.NewEmailServiceClient(connectEmail)
 
 	//* данные для аутентификации
 	authFile := models.Authentication{
@@ -88,7 +88,7 @@ func main() {
 	if err != nil {
 		logger.Fatalf("failed connection to file service. error: %w", err)
 	}
-	fileClient := proto_file.NewFileServiceClient(connectFile)
+	fileClient := file_api.NewFileServiceClient(connectFile)
 
 	//* данные для аутентификации
 	authUser := models.Authentication{
@@ -107,7 +107,7 @@ func main() {
 	if err != nil {
 		logger.Fatalf("failed connection to user service. error: %w", err)
 	}
-	userClient := proto_user.NewUserServiceClient(connectUser)
+	userClient := user_api.NewUserServiceClient(connectUser)
 
 	//* Services, Repos & API Handlers
 
@@ -130,7 +130,7 @@ func main() {
 	}
 
 	server := grpc.NewServer(opts...)
-	proto.RegisterProServiceServer(server, handlers)
+	pro_api.RegisterProServiceServer(server, handlers)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -16,7 +16,7 @@ func NewPositionRepo(db *sqlx.DB) *PositionRepo {
 	return &PositionRepo{db: db}
 }
 
-func (r *PositionRepo) Get(req *proto.GetPositionsRequest) (position []models.Position, err error) {
+func (r *PositionRepo) Get(req *pro_api.GetPositionsRequest) (position []models.Position, err error) {
 	query := fmt.Sprintf("SELECT id, designation, description, count, sizes, drawing FROM %s WHERE order_id=$1 ORDER BY id", OrderPositionTable)
 
 	if err = r.db.Select(&position, query, req.OrderId); err != nil {
@@ -25,7 +25,7 @@ func (r *PositionRepo) Get(req *proto.GetPositionsRequest) (position []models.Po
 	return position, nil
 }
 
-func (r *PositionRepo) GetCur(req *proto.GetCurPositionsRequest) (position []models.Position, err error) {
+func (r *PositionRepo) GetCur(req *pro_api.GetCurPositionsRequest) (position []models.Position, err error) {
 	query := fmt.Sprintf(`SELECT id, designation, description, count, sizes, drawing, order_id FROM %s WHERE order_id=(
 		SELECT id FROM %s WHERE user_id=$1 AND date IS NULL
 	) ORDER BY id`, OrderPositionTable, OrdersTable)
@@ -36,7 +36,7 @@ func (r *PositionRepo) GetCur(req *proto.GetCurPositionsRequest) (position []mod
 	return position, nil
 }
 
-func (r *PositionRepo) Add(position *proto.AddPositionRequest) (id string, err error) {
+func (r *PositionRepo) Add(position *pro_api.AddPositionRequest) (id string, err error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return id, fmt.Errorf("failed to start transaction. error: %w", err)
@@ -62,7 +62,7 @@ func (r *PositionRepo) Add(position *proto.AddPositionRequest) (id string, err e
 	return fmt.Sprintf("%d", idInt), tx.Commit()
 }
 
-func (r *PositionRepo) Update(position *proto.UpdatePositionRequest) error {
+func (r *PositionRepo) Update(position *pro_api.UpdatePositionRequest) error {
 	updateQuery := fmt.Sprintf("UPDATE %s SET count=$1 WHERE id=$2", OrderPositionTable)
 	_, err := r.db.Exec(updateQuery, position.Count, position.Id)
 	if err != nil {
@@ -72,7 +72,7 @@ func (r *PositionRepo) Update(position *proto.UpdatePositionRequest) error {
 	return nil
 }
 
-func (r *PositionRepo) Remove(position *proto.RemovePositionRequest) (string, error) {
+func (r *PositionRepo) Remove(position *pro_api.RemovePositionRequest) (string, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return "", fmt.Errorf("failed to start transaction. error: %w", err)

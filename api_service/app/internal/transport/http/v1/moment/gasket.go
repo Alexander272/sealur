@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,13 +30,13 @@ func (h *Handler) initGasketRoutes(api *gin.RouterGroup) {
 // @ModuleID getGasket
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{Data=[]moment_proto.Gasket}
+// @Success 200 {object} models.DataResponse{Data=[]moment_api.Gasket}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/gasket/ [get]
 func (h *Handler) getGasket(c *gin.Context) {
-	gasket, err := h.gasketClient.GetGasket(c, &moment_proto.GetGasketRequest{})
+	gasket, err := h.gasketClient.GetGasket(c, &moment_api.GetGasketRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -51,20 +52,20 @@ func (h *Handler) getGasket(c *gin.Context) {
 // @ModuleID createGasket
 // @Accept json
 // @Produce json
-// @Param gasket body models.GasketDTO true "gasket info"
+// @Param gasket body moment_model.GasketDTO true "gasket info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/gasket/ [post]
 func (h *Handler) createGasket(c *gin.Context) {
-	var dto models.GasketDTO
+	var dto moment_model.GasketDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	gasket, err := h.gasketClient.CreateGasket(c, &moment_proto.CreateGasketRequest{Title: dto.Title})
+	gasket, err := h.gasketClient.CreateGasket(c, &moment_api.CreateGasketRequest{Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -82,7 +83,7 @@ func (h *Handler) createGasket(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "gasket id"
-// @Param gasket body models.GasketDTO true "gasket info"
+// @Param gasket body moment_model.GasketDTO true "gasket info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -95,13 +96,13 @@ func (h *Handler) updateGasket(c *gin.Context) {
 		return
 	}
 
-	var dto models.GasketDTO
+	var dto moment_model.GasketDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.gasketClient.UpdateGasket(c, &moment_proto.UpdateGasketRequest{Id: id, Title: dto.Title})
+	_, err := h.gasketClient.UpdateGasket(c, &moment_api.UpdateGasketRequest{Id: id, Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -130,7 +131,7 @@ func (h *Handler) deleteGasket(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.DeleteGasket(c, &moment_proto.DeleteGasketRequest{Id: id})
+	_, err := h.gasketClient.DeleteGasket(c, &moment_api.DeleteGasketRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

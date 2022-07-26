@@ -12,26 +12,26 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
-	proto_email "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/email"
-	proto_file "github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto/proto_file"
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/email_api"
+	"github.com/Alexander272/sealur_proto/api/file_api"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	docx "github.com/lukasjarosch/go-docx"
 )
 
 type InterviewService struct {
-	email proto_email.EmailServiceClient
-	file  proto_file.FileServiceClient
+	email email_api.EmailServiceClient
+	file  file_api.FileServiceClient
 }
 
-func NewInterviewService(email proto_email.EmailServiceClient, file proto_file.FileServiceClient) *InterviewService {
+func NewInterviewService(email email_api.EmailServiceClient, file file_api.FileServiceClient) *InterviewService {
 	return &InterviewService{
 		email: email,
 		file:  file,
 	}
 }
 
-func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInterviewRequest) error {
+func (s *InterviewService) SendInterview(ctx context.Context, req *pro_api.SendInterviewRequest) error {
 	var mounting, lubricant string
 	if req.Mounting {
 		mounting = "Да"
@@ -154,7 +154,7 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInt
 	buf := new(bytes.Buffer)
 
 	if req.Drawing != nil {
-		stream, err := s.file.Download(ctx, &proto_file.FileDownloadRequest{
+		stream, err := s.file.Download(ctx, &file_api.FileDownloadRequest{
 			Id:     req.Drawing.Id,
 			Bucket: "pro",
 			Group:  req.Drawing.Group,
@@ -233,10 +233,10 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInt
 		size = int64(buf.Cap())
 	}
 
-	data := &proto_email.SendInterviewRequest{
-		Request: &proto_email.SendInterviewRequest_Data{
-			Data: &proto_email.InterviewData{
-				User: &proto_email.User{
+	data := &email_api.SendInterviewRequest{
+		Request: &email_api.SendInterviewRequest_Data{
+			Data: &email_api.InterviewData{
+				User: &email_api.User{
 					Organization: req.Organization,
 					Name:         req.Name,
 					Email:        req.Email,
@@ -244,7 +244,7 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInt
 					Position:     req.Position,
 					City:         req.City,
 				},
-				File: &proto_email.FileData{
+				File: &email_api.FileData{
 					Name: names,
 					Type: ext,
 					Size: size,
@@ -277,7 +277,7 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *proto.SendInt
 	return nil
 }
 
-func (s *InterviewService) sendDoc(stream proto_email.EmailService_SendInterviewClient) error {
+func (s *InterviewService) sendDoc(stream email_api.EmailService_SendInterviewClient) error {
 	file, err := os.Open(path.Join("template", "Опрос.docx"))
 	if err != nil {
 		logger.Error(err)
@@ -297,9 +297,9 @@ func (s *InterviewService) sendDoc(stream proto_email.EmailService_SendInterview
 			return fmt.Errorf("cannot read chunk to buffer: %w", err)
 		}
 
-		reqChunk := &proto_email.SendInterviewRequest{
-			Request: &proto_email.SendInterviewRequest_File{
-				File: &proto_email.File{
+		reqChunk := &email_api.SendInterviewRequest{
+			Request: &email_api.SendInterviewRequest_File{
+				File: &email_api.File{
 					Content: buffer[:n],
 				},
 			},
@@ -321,7 +321,7 @@ func (s *InterviewService) sendDoc(stream proto_email.EmailService_SendInterview
 	return nil
 }
 
-func (s *InterviewService) sendZip(stream proto_email.EmailService_SendInterviewClient, buf *bytes.Buffer) error {
+func (s *InterviewService) sendZip(stream email_api.EmailService_SendInterviewClient, buf *bytes.Buffer) error {
 	reader := bufio.NewReader(buf)
 	buffer := make([]byte, 1024)
 
@@ -335,9 +335,9 @@ func (s *InterviewService) sendZip(stream proto_email.EmailService_SendInterview
 			return fmt.Errorf("cannot read chunk to buffer: %w", err)
 		}
 
-		reqChunk := &proto_email.SendInterviewRequest{
-			Request: &proto_email.SendInterviewRequest_File{
-				File: &proto_email.File{
+		reqChunk := &email_api.SendInterviewRequest{
+			Request: &email_api.SendInterviewRequest_File{
+				File: &email_api.File{
 					Content: buffer[:n],
 				},
 			},

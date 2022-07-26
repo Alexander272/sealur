@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
-func (r *GasketRepo) GetEnv(ctx context.Context, req *moment_proto.GetEnvRequest) (env []models.EnvDTO, err error) {
+func (r *GasketRepo) GetEnv(ctx context.Context, req *moment_api.GetEnvRequest) (env []models.EnvDTO, err error) {
 	query := fmt.Sprintf(`SELECT id, title FROM %s ORDER BY id`, EnvTable)
 
 	if err := r.db.Select(&env, query); err != nil {
@@ -18,7 +18,7 @@ func (r *GasketRepo) GetEnv(ctx context.Context, req *moment_proto.GetEnvRequest
 	return env, nil
 }
 
-func (r *GasketRepo) CreateEnv(ctx context.Context, env *moment_proto.CreateEnvRequest) (id string, err error) {
+func (r *GasketRepo) CreateEnv(ctx context.Context, env *moment_api.CreateEnvRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", EnvTable)
 
 	row := r.db.QueryRow(query, env.Title)
@@ -34,7 +34,7 @@ func (r *GasketRepo) CreateEnv(ctx context.Context, env *moment_proto.CreateEnvR
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *GasketRepo) UpdateEnv(ctx context.Context, env *moment_proto.UpdateEnvRequest) error {
+func (r *GasketRepo) UpdateEnv(ctx context.Context, env *moment_api.UpdateEnvRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET title=$1 WHERE id=$2", EnvTable)
 
 	_, err := r.db.Exec(query, env.Title, env.Id)
@@ -44,7 +44,7 @@ func (r *GasketRepo) UpdateEnv(ctx context.Context, env *moment_proto.UpdateEnvR
 	return nil
 }
 
-func (r *GasketRepo) DeleteEnv(ctx context.Context, env *moment_proto.DeleteEnvRequest) error {
+func (r *GasketRepo) DeleteEnv(ctx context.Context, env *moment_api.DeleteEnvRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", EnvTable)
 
 	if _, err := r.db.Exec(query, env.Id); err != nil {
@@ -55,7 +55,7 @@ func (r *GasketRepo) DeleteEnv(ctx context.Context, env *moment_proto.DeleteEnvR
 
 //---
 
-func (r *GasketRepo) CreateEnvData(ctx context.Context, data *moment_proto.CreateEnvDataRequest) error {
+func (r *GasketRepo) CreateEnvData(ctx context.Context, data *moment_api.CreateEnvDataRequest) error {
 	query := fmt.Sprintf("INSERT INTO %s (env_id, gasket_id, m, specific_pres) VALUES ($1, $2, $3, $4)", EnvDataTable)
 
 	if _, err := r.db.Exec(query, data.EnvId, data.GasketId, data.M, data.SpecificPres); err != nil {
@@ -64,7 +64,7 @@ func (r *GasketRepo) CreateEnvData(ctx context.Context, data *moment_proto.Creat
 	return nil
 }
 
-func (r *GasketRepo) UpdateEnvData(ctx context.Context, data *moment_proto.UpdateEnvDataRequest) error {
+func (r *GasketRepo) UpdateEnvData(ctx context.Context, data *moment_api.UpdateEnvDataRequest) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1
@@ -103,7 +103,7 @@ func (r *GasketRepo) UpdateEnvData(ctx context.Context, data *moment_proto.Updat
 	return nil
 }
 
-func (r *GasketRepo) DeleteEnvData(ctx context.Context, data *moment_proto.DeleteEnvDataRequest) error {
+func (r *GasketRepo) DeleteEnvData(ctx context.Context, data *moment_api.DeleteEnvDataRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", EnvDataTable)
 
 	if _, err := r.db.Exec(query, data.Id); err != nil {

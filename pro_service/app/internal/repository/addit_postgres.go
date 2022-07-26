@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -27,7 +27,7 @@ func (r *AdditRepo) GetAll() (addit []models.Addit, err error) {
 	return addit, nil
 }
 
-func (r *AdditRepo) Create(add *proto.CreateAddRequest) error {
+func (r *AdditRepo) Create(add *pro_api.CreateAddRequest) error {
 	query := fmt.Sprintf(`INSERT INTO %s (materials, mod, temperature, mounting, graphite, fillers, coating, construction, obturator, basis, 
 		p_obturator, sealant) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`, AdditionalTable)
 

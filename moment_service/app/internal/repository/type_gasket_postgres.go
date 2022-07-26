@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
-func (r *GasketRepo) GetTypeGasket(ctx context.Context, req *moment_proto.GetGasketTypeRequest) (types []models.TypeGasketDTO, err error) {
+func (r *GasketRepo) GetTypeGasket(ctx context.Context, req *moment_api.GetGasketTypeRequest) (types []models.TypeGasketDTO, err error) {
 	query := fmt.Sprintf(`SELECT id, title FROM %s ORDER BY id`, TypeGasketTable)
 
 	if err := r.db.Select(&types, query); err != nil {
@@ -17,7 +17,7 @@ func (r *GasketRepo) GetTypeGasket(ctx context.Context, req *moment_proto.GetGas
 	return types, nil
 }
 
-func (r *GasketRepo) CreateTypeGasket(ctx context.Context, typeGasket *moment_proto.CreateGasketTypeRequest) (id string, err error) {
+func (r *GasketRepo) CreateTypeGasket(ctx context.Context, typeGasket *moment_api.CreateGasketTypeRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", TypeGasketTable)
 
 	row := r.db.QueryRow(query, typeGasket.Title)
@@ -33,7 +33,7 @@ func (r *GasketRepo) CreateTypeGasket(ctx context.Context, typeGasket *moment_pr
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *GasketRepo) UpdateTypeGasket(ctx context.Context, typeGasket *moment_proto.UpdateGasketTypeRequest) error {
+func (r *GasketRepo) UpdateTypeGasket(ctx context.Context, typeGasket *moment_api.UpdateGasketTypeRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET title=$1 WHERE id=$2", TypeGasketTable)
 
 	_, err := r.db.Exec(query, typeGasket.Title, typeGasket.Id)
@@ -43,7 +43,7 @@ func (r *GasketRepo) UpdateTypeGasket(ctx context.Context, typeGasket *moment_pr
 	return nil
 }
 
-func (r *GasketRepo) DeleteTypeGasket(ctx context.Context, typeGasket *moment_proto.DeleteGasketTypeRequest) error {
+func (r *GasketRepo) DeleteTypeGasket(ctx context.Context, typeGasket *moment_api.DeleteGasketTypeRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", TypeGasketTable)
 
 	if _, err := r.db.Exec(query, typeGasket.Id); err != nil {

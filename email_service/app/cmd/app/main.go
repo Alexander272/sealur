@@ -10,9 +10,9 @@ import (
 	"github.com/Alexander272/sealur/email_service/internal/config"
 	"github.com/Alexander272/sealur/email_service/internal/service"
 	handlers "github.com/Alexander272/sealur/email_service/internal/transport/grpc"
-	proto_email "github.com/Alexander272/sealur/email_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/email_service/pkg/email/smtp"
 	"github.com/Alexander272/sealur/email_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/email_api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -49,7 +49,7 @@ func main() {
 	}
 
 	server := grpc.NewServer(opts...)
-	proto_email.RegisterEmailServiceServer(server, handlers)
+	email_api.RegisterEmailServiceServer(server, handlers)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {

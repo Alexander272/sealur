@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
-func (r *MaterialsRepo) CreateVoltage(ctx context.Context, voltage *moment_proto.CreateVoltageRequest) error {
+func (r *MaterialsRepo) CreateVoltage(ctx context.Context, voltage *moment_api.CreateVoltageRequest) error {
 	query := fmt.Sprintf("INSERT INTO %s (mark_id, temperature, voltage) VALUES ($1, $2, $3)", VoltageTable)
 
 	args := make([]interface{}, 0)
@@ -28,7 +28,7 @@ func (r *MaterialsRepo) CreateVoltage(ctx context.Context, voltage *moment_proto
 	return nil
 }
 
-func (r *MaterialsRepo) UpdateVoltage(ctx context.Context, voltage *moment_proto.UpdateVoltageRequest) error {
+func (r *MaterialsRepo) UpdateVoltage(ctx context.Context, voltage *moment_api.UpdateVoltageRequest) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1
@@ -64,7 +64,7 @@ func (r *MaterialsRepo) UpdateVoltage(ctx context.Context, voltage *moment_proto
 	return nil
 }
 
-func (r *MaterialsRepo) DeleteVoltage(ctx context.Context, voltage *moment_proto.DeleteVoltageRequest) error {
+func (r *MaterialsRepo) DeleteVoltage(ctx context.Context, voltage *moment_api.DeleteVoltageRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", VoltageTable)
 
 	if _, err := r.db.Exec(query, voltage.Id); err != nil {

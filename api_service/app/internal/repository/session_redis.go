@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 	"github.com/go-redis/redis/v8"
 )
 
@@ -15,7 +15,7 @@ type SessionData struct {
 	UserId       string
 	AccessToken  string
 	RefreshToken string
-	Roles        []*proto_user.Role
+	Roles        []*user_api.Role
 	Exp          time.Duration
 }
 

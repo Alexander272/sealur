@@ -12,11 +12,11 @@ import (
 	"github.com/Alexander272/sealur/user_service/internal/repo"
 	"github.com/Alexander272/sealur/user_service/internal/service"
 	handlers "github.com/Alexander272/sealur/user_service/internal/transport/grpc"
-	proto_user "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto"
-	proto_email "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto/email"
 	"github.com/Alexander272/sealur/user_service/pkg/database/postgres"
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
 	"github.com/Alexander272/sealur/user_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/email_api"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -70,7 +70,7 @@ func main() {
 	if err != nil {
 		logger.Fatalf("failed connection to email service. error: %w", err)
 	}
-	emailClient := proto_email.NewEmailServiceClient(connectEmail)
+	emailClient := email_api.NewEmailServiceClient(connectEmail)
 
 	//* Services, Repos & API Handlers
 
@@ -95,7 +95,7 @@ func main() {
 	}
 
 	server := grpc.NewServer(opts...)
-	proto_user.RegisterUserServiceServer(server, handlers)
+	user_api.RegisterUserServiceServer(server, handlers)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {

@@ -6,15 +6,15 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_file"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 type Handler struct {
-	fileClient proto_file.FileServiceClient
+	fileClient file_api.FileServiceClient
 	middleware *middleware.Middleware
 }
 
@@ -49,7 +49,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		logger.Fatalf("failed connection to pro service. error: %w", err)
 	}
 
-	fileClient := proto_file.NewFileServiceClient(connect)
+	fileClient := file_api.NewFileServiceClient(connect)
 	h.fileClient = fileClient
 
 	files := api.Group("/files")
@@ -61,7 +61,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 }
 
 func (h *Handler) pingPro(c *gin.Context) {
-	res, err := h.fileClient.Ping(c, &proto_file.PingRequest{})
+	res, err := h.fileClient.Ping(c, &file_api.PingRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

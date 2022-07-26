@@ -11,9 +11,9 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/repository"
 	"github.com/Alexander272/sealur/moment_service/internal/service"
 	handlers "github.com/Alexander272/sealur/moment_service/internal/transport/grpc"
-	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/moment_service/pkg/database/postgres"
 	"github.com/Alexander272/sealur/moment_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -62,11 +62,11 @@ func main() {
 	}
 
 	server := grpc.NewServer(opts...)
-	moment_proto.RegisterPingServiceServer(server, handlers.Ping)
-	moment_proto.RegisterCalcFlangeServiceServer(server, handlers.CalcFlange)
-	moment_proto.RegisterMaterialsServiceServer(server, handlers.Materials)
-	moment_proto.RegisterGasketServiceServer(server, handlers.Gasket)
-	moment_proto.RegisterFlangeServiceServer(server, handlers.Flange)
+	moment_api.RegisterPingServiceServer(server, handlers.Ping)
+	moment_api.RegisterCalcFlangeServiceServer(server, handlers.CalcFlange)
+	moment_api.RegisterMaterialsServiceServer(server, handlers.Materials)
+	moment_api.RegisterGasketServiceServer(server, handlers.Gasket)
+	moment_api.RegisterFlangeServiceServer(server, handlers.Flange)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {

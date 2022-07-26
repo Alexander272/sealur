@@ -4,8 +4,9 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
+	"github.com/Alexander272/sealur/api_service/internal/models/user_model"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,20 +16,20 @@ import (
 // @ModuleID signIn
 // @Accept json
 // @Produce json
-// @Param data body models.SignIn true "credentials"
-// @Success 200 {object} models.DataResponse{data=proto_user.User}
+// @Param data body user_model.SignIn true "credentials"
+// @Success 200 {object} models.DataResponse{data=user_api.User}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /auth/sign-in [post]
 func (h *Handler) signIn(c *gin.Context) {
-	var dto models.SignIn
+	var dto user_model.SignIn
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	user, err := h.userClient.GetUser(c, &proto_user.GetUserRequest{Login: dto.Login, Password: dto.Password})
+	user, err := h.userClient.GetUser(c, &user_api.GetUserRequest{Login: dto.Login, Password: dto.Password})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -46,7 +47,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	_, err = h.userClient.AddIp(c, &proto_user.AddIpRequest{
+	_, err = h.userClient.AddIp(c, &user_api.AddIpRequest{
 		UserId: user.User.Id,
 		Ip:     c.ClientIP(),
 	})
@@ -64,20 +65,20 @@ func (h *Handler) signIn(c *gin.Context) {
 // @ModuleID singUp
 // @Accept json
 // @Produce json
-// @Param data body models.SignUp true "user info"
+// @Param data body user_model.SignUp true "user info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /auth/sign-up [post]
 func (h *Handler) singUp(c *gin.Context) {
-	var dto models.SignUp
+	var dto user_model.SignUp
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	req := proto_user.CreateUserRequest{
+	req := user_api.CreateUserRequest{
 		Organization: dto.Organization,
 		Name:         dto.Name,
 		Email:        dto.Email,
@@ -138,7 +139,7 @@ func (h *Handler) signOut(c *gin.Context) {
 // @ModuleID refresh
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=proto_user.UserResponse}
+// @Success 200 {object} models.DataResponse{data=user_api.UserResponse}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse

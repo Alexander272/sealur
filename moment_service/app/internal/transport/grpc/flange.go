@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/Alexander272/sealur/moment_service/internal/service"
-	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
 type FlangeHandlers struct {
 	service service.Flange
+	moment_api.UnimplementedFlangeServiceServer
 }
 
 func NewFlangeHandlers(service service.Flange) *FlangeHandlers {
@@ -17,23 +18,23 @@ func NewFlangeHandlers(service service.Flange) *FlangeHandlers {
 	}
 }
 
-func (h *FlangeHandlers) CreateFlangeSize(ctx context.Context, size *moment_proto.CreateFlangeSizeRequest) (*moment_proto.Response, error) {
+func (h *FlangeHandlers) CreateFlangeSize(ctx context.Context, size *moment_api.CreateFlangeSizeRequest) (*moment_api.Response, error) {
 	if err := h.service.CreateFlangeSize(ctx, size); err != nil {
 		return nil, err
 	}
-	return &moment_proto.Response{}, nil
+	return &moment_api.Response{}, nil
 }
 
-func (h *FlangeHandlers) UpdateFlangeSize(ctx context.Context, size *moment_proto.UpdateFlangeSizeRequest) (*moment_proto.Response, error) {
+func (h *FlangeHandlers) UpdateFlangeSize(ctx context.Context, size *moment_api.UpdateFlangeSizeRequest) (*moment_api.Response, error) {
 	if err := h.service.UpdateFlangeSize(ctx, size); err != nil {
 		return nil, err
 	}
-	return &moment_proto.Response{}, nil
+	return &moment_api.Response{}, nil
 }
 
-func (h *FlangeHandlers) DeleteFlangeSize(ctx context.Context, size *moment_proto.DeleteFlangeSizeRequest) (*moment_proto.Response, error) {
+func (h *FlangeHandlers) DeleteFlangeSize(ctx context.Context, size *moment_api.DeleteFlangeSizeRequest) (*moment_api.Response, error) {
 	if err := h.service.DeleteFlangeSize(ctx, size); err != nil {
 		return nil, err
 	}
-	return &moment_proto.Response{}, nil
+	return &moment_api.Response{}, nil
 }

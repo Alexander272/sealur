@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,7 +31,7 @@ func (h *Handler) initPutgRoutes(api *gin.RouterGroup) {
 // @Produce json
 // @Param form query string true "form"
 // @Param flangeId query string true "flange id"
-// @Success 200 {object} models.DataResponse{data=[]proto.Putg}
+// @Success 200 {object} models.DataResponse{data=[]pro_api.Putg}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -47,7 +48,7 @@ func (h *Handler) getPutg(c *gin.Context) {
 		return
 	}
 
-	putg, err := h.proClient.GetPutg(c, &proto.GetPutgRequest{
+	putg, err := h.proClient.GetPutg(c, &pro_api.GetPutgRequest{
 		Form:     form,
 		FlangeId: flangeId,
 	})
@@ -66,20 +67,20 @@ func (h *Handler) getPutg(c *gin.Context) {
 // @ModuleID createPutg
 // @Accept json
 // @Produce json
-// @Param data body models.PutgDTO true "putg info"
+// @Param data body pro_model.PutgDTO true "putg info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/putg [post]
 func (h *Handler) createPutg(c *gin.Context) {
-	var dto models.PutgDTO
+	var dto pro_model.PutgDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	putg, err := h.proClient.CreatePutg(c, &proto.CreatePutgRequest{
+	putg, err := h.proClient.CreatePutg(c, &pro_api.CreatePutgRequest{
 		FlangeId:     dto.FlangeId,
 		TypeFlId:     dto.TypeFlId,
 		TypePr:       dto.TypePr,
@@ -110,7 +111,7 @@ func (h *Handler) createPutg(c *gin.Context) {
 // @ModuleID updatePutg
 // @Accept json
 // @Produce json
-// @Param data body models.PutgDTO true "putg info"
+// @Param data body pro_model.PutgDTO true "putg info"
 // @Param id path string true "putg id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -118,7 +119,7 @@ func (h *Handler) createPutg(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/putg/{id} [put]
 func (h *Handler) updatePutg(c *gin.Context) {
-	var dto models.PutgDTO
+	var dto pro_model.PutgDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -130,7 +131,7 @@ func (h *Handler) updatePutg(c *gin.Context) {
 		return
 	}
 
-	putg, err := h.proClient.UpdatePutg(c, &proto.UpdatePutgRequest{
+	putg, err := h.proClient.UpdatePutg(c, &pro_api.UpdatePutgRequest{
 		Id:           id,
 		FlangeId:     dto.FlangeId,
 		TypeFlId:     dto.TypeFlId,
@@ -174,7 +175,7 @@ func (h *Handler) deletePutg(c *gin.Context) {
 		return
 	}
 
-	putg, err := h.proClient.DeletePutg(c, &proto.DeletePutgRequest{Id: id})
+	putg, err := h.proClient.DeletePutg(c, &pro_api.DeletePutgRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

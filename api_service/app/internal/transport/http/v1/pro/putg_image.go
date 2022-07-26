@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +32,7 @@ func (h *Handler) initPutgImageRoutes(api *gin.RouterGroup) {
 // @Accept json
 // @Produce json
 // @Param form query string true "form"
-// @Success 200 {object} models.DataResponse{data=[]proto.PutgImage}
+// @Success 200 {object} models.DataResponse{data=[]pro_api.PutgImage}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -43,7 +44,7 @@ func (h *Handler) getPutgImage(c *gin.Context) {
 		return
 	}
 
-	images, err := h.proClient.GetPutgImage(c, &proto.GetPutgImageRequest{Form: form})
+	images, err := h.proClient.GetPutgImage(c, &pro_api.GetPutgImageRequest{Form: form})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -60,14 +61,14 @@ func (h *Handler) getPutgImage(c *gin.Context) {
 // @Accept multipart/form-data
 // @Accept json
 // @Produce json
-// @Param data body models.PutgImageDTO true "putg image info"
+// @Param data body pro_model.PutgImageDTO true "putg image info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/putg-image [post]
 func (h *Handler) createPutgImage(c *gin.Context) {
-	var dto models.PutgImageDTO
+	var dto pro_model.PutgImageDTO
 
 	if c.Request.FormValue("gasket") != "" {
 		dto.Gasket = c.Request.FormValue("gasket")
@@ -93,7 +94,7 @@ func (h *Handler) createPutgImage(c *gin.Context) {
 		return
 	}
 
-	request := &proto.CreatePutgImageRequest{
+	request := &pro_api.CreatePutgImageRequest{
 		Form:   dto.Form,
 		Gasket: dto.Gasket,
 		Url:    dto.Url,
@@ -117,7 +118,7 @@ func (h *Handler) createPutgImage(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "putg image id"
-// @Param data body models.PutgImageDTO true "putg image info"
+// @Param data body pro_model.PutgImageDTO true "putg image info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -130,13 +131,13 @@ func (h *Handler) updatePutgImage(c *gin.Context) {
 		return
 	}
 
-	var dto models.PutgImageDTO
+	var dto pro_model.PutgImageDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	request := &proto.UpdatePutgImageRequest{
+	request := &pro_api.UpdatePutgImageRequest{
 		Id:     id,
 		Form:   dto.Form,
 		Gasket: dto.Gasket,
@@ -180,7 +181,7 @@ func (h *Handler) deletePutgImage(c *gin.Context) {
 	}
 	os.Remove(filepath.Join("images", file))
 
-	image, err := h.proClient.DeletePutgImage(c, &proto.DeletePutgImageRequest{Id: id})
+	image, err := h.proClient.DeletePutgImage(c, &pro_api.DeletePutgImageRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

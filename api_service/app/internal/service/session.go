@@ -8,8 +8,8 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/repository"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
 	"github.com/Alexander272/sealur/api_service/pkg/auth"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 )
 
 type SessionService struct {
@@ -28,7 +28,7 @@ func NewSessionService(repo repository.Session, manager auth.TokenManager, acces
 	}
 }
 
-func (s *SessionService) SignIn(ctx context.Context, user *proto_user.User) (string, error) {
+func (s *SessionService) SignIn(ctx context.Context, user *user_api.User) (string, error) {
 	_, accessToken, err := s.tokenManager.NewJWT(user.Id, user.Email, user.Roles, s.accessTokenTTL)
 	if err != nil {
 		return "", err
@@ -76,7 +76,7 @@ func (s *SessionService) SingOut(ctx context.Context, userId string) error {
 	return nil
 }
 
-// func (s *SessionService) Refresh(ctx context.Context, user *proto_user.User) (string, error) {
+// func (s *SessionService) Refresh(ctx context.Context, user *user_api.User) (string, error) {
 // 	_, accessToken, err := s.tokenManager.NewJWT(user.Id, user.Email, user.Roles, s.accessTokenTTL)
 // 	if err != nil {
 // 		return "", err
@@ -110,7 +110,7 @@ func (s *SessionService) SingOut(ctx context.Context, userId string) error {
 // 	return accessToken, nil
 // }
 
-func (s *SessionService) CheckSession(ctx context.Context, u *proto_user.User, token string) (bool, error) {
+func (s *SessionService) CheckSession(ctx context.Context, u *user_api.User, token string) (bool, error) {
 	user, err := s.repo.Get(ctx, u.Id)
 	if err != nil && !errors.Is(err, models.ErrSessionEmpty) {
 		return false, fmt.Errorf("failed to get session. error: %w", err)
@@ -131,24 +131,24 @@ func (s *SessionService) CheckSession(ctx context.Context, u *proto_user.User, t
 	return false, nil
 }
 
-func (s *SessionService) TokenParse(token string) (user *proto_user.User, err error) {
+func (s *SessionService) TokenParse(token string) (user *user_api.User, err error) {
 	claims, err := s.tokenManager.Parse(token)
 	if err != nil {
 		return nil, err
 	}
 
-	var roles []*proto_user.Role
+	var roles []*user_api.Role
 	r := claims["roles"].([]interface{})
 	for _, v := range r {
 		m := v.(map[string]interface{})
-		roles = append(roles, &proto_user.Role{
+		roles = append(roles, &user_api.Role{
 			Id:      m["id"].(string),
 			Service: m["service"].(string),
 			Role:    m["role"].(string),
 		})
 	}
 
-	user = &proto_user.User{
+	user = &user_api.User{
 		Id:    claims["userId"].(string),
 		Email: claims["email"].(string),
 		Roles: roles,

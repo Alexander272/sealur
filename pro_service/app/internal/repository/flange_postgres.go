@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -16,7 +16,7 @@ func NewFlangeRepo(db *sqlx.DB) *FlangeRepo {
 	return &FlangeRepo{db: db}
 }
 
-func (r *FlangeRepo) GetAll() (flanges []*proto.Flange, err error) {
+func (r *FlangeRepo) GetAll() (flanges []*pro_api.Flange, err error) {
 	query := fmt.Sprintf("SELECT id, title, short FROM %s", FlangeTable)
 
 	if err = r.db.Select(&flanges, query); err != nil {
@@ -25,7 +25,7 @@ func (r *FlangeRepo) GetAll() (flanges []*proto.Flange, err error) {
 	return flanges, nil
 }
 
-func (r *FlangeRepo) GetByTitle(title, short string) (flange []*proto.Flange, err error) {
+func (r *FlangeRepo) GetByTitle(title, short string) (flange []*pro_api.Flange, err error) {
 	query := fmt.Sprintf("SELECT id, title, short from %s WHERE lower(title)=lower($1) OR lower(short)=lower($2)", FlangeTable)
 
 	if err := r.db.Select(&flange, query, title, short); err != nil {
@@ -34,7 +34,7 @@ func (r *FlangeRepo) GetByTitle(title, short string) (flange []*proto.Flange, er
 	return flange, nil
 }
 
-func (r *FlangeRepo) Create(fl *proto.CreateFlangeRequest) (id string, err error) {
+func (r *FlangeRepo) Create(fl *pro_api.CreateFlangeRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title, short) VALUES ($1, $2) RETURNING id", FlangeTable)
 	row := r.db.QueryRow(query, fl.Title, fl.Short)
 
@@ -67,7 +67,7 @@ func (r *FlangeRepo) Create(fl *proto.CreateFlangeRequest) (id string, err error
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *FlangeRepo) Update(fl *proto.UpdateFlangeRequest) error {
+func (r *FlangeRepo) Update(fl *pro_api.UpdateFlangeRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET title=$1, short=$2 WHERE id=$3", FlangeTable)
 
 	id, err := strconv.Atoi(fl.Id)
@@ -82,7 +82,7 @@ func (r *FlangeRepo) Update(fl *proto.UpdateFlangeRequest) error {
 	return nil
 }
 
-func (r *FlangeRepo) Delete(fl *proto.DeleteFlangeRequest) error {
+func (r *FlangeRepo) Delete(fl *pro_api.DeleteFlangeRequest) error {
 	id, err := strconv.Atoi(fl.Id)
 	if err != nil {
 		return fmt.Errorf("failed to convert string to int. error: %w", err)

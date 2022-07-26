@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,7 +30,7 @@ func (h *Handler) initStandartsRoutes(api *gin.RouterGroup) {
 // @Accept json
 // @Produce json
 // @Param typeId query string true "type id"
-// @Success 200 {object} models.DataResponse{Data=[]moment_proto.Standart}
+// @Success 200 {object} models.DataResponse{Data=[]moment_api.Standart}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -41,7 +42,7 @@ func (h *Handler) getStandarts(c *gin.Context) {
 		return
 	}
 
-	standarts, err := h.flangeClient.GetStandarts(c, &moment_proto.GetStandartsRequest{TypeId: typeId})
+	standarts, err := h.flangeClient.GetStandarts(c, &moment_api.GetStandartsRequest{TypeId: typeId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -57,20 +58,20 @@ func (h *Handler) getStandarts(c *gin.Context) {
 // @ModuleID createStandart
 // @Accept json
 // @Produce json
-// @Param standart body models.MomentStandartDTO true "standart info"
+// @Param standart body moment_model.MomentStandartDTO true "standart info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/standarts/ [post]
 func (h *Handler) createStandart(c *gin.Context) {
-	var dto models.MomentStandartDTO
+	var dto moment_model.StandartDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	stand, err := h.flangeClient.CreateStandart(c, &moment_proto.CreateStandartRequest{
+	stand, err := h.flangeClient.CreateStandart(c, &moment_api.CreateStandartRequest{
 		Title:  dto.Title,
 		TypeId: dto.TypeId,
 	})
@@ -90,7 +91,7 @@ func (h *Handler) createStandart(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "standart id"
-// @Param standart body models.MomentStandartDTO true "standart info"
+// @Param standart body moment_model.StandartDTO true "standart info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -103,13 +104,13 @@ func (h *Handler) updateStandart(c *gin.Context) {
 		return
 	}
 
-	var dto models.MomentStandartDTO
+	var dto moment_model.StandartDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.flangeClient.UpdateStandart(c, &moment_proto.UpdateStandartRequest{
+	_, err := h.flangeClient.UpdateStandart(c, &moment_api.UpdateStandartRequest{
 		Id:     id,
 		Title:  dto.Title,
 		TypeId: dto.TypeId,
@@ -142,7 +143,7 @@ func (h *Handler) deleteStandart(c *gin.Context) {
 		return
 	}
 
-	_, err := h.flangeClient.DeleteStandart(c, &moment_proto.DeleteStandartRequest{Id: id})
+	_, err := h.flangeClient.DeleteStandart(c, &moment_api.DeleteStandartRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

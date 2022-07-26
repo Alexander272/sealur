@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,13 +32,13 @@ func (h *Handler) initMaterialsRoutes(api *gin.RouterGroup) {
 // @ModuleID getMaterials
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{Data=[]moment_proto.Material}
+// @Success 200 {object} models.DataResponse{Data=[]moment_api.Material}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/materials/ [get]
 func (h *Handler) getMaterials(c *gin.Context) {
-	materials, err := h.materialsClient.GetMaterials(c, &moment_proto.GetMaterialsRequest{})
+	materials, err := h.materialsClient.GetMaterials(c, &moment_api.GetMaterialsRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -53,13 +54,13 @@ func (h *Handler) getMaterials(c *gin.Context) {
 // @ModuleID getMaterialsWithIsEmpty
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{Data=[]moment_proto.MaterialWithIsEmpty}
+// @Success 200 {object} models.DataResponse{Data=[]moment_api.MaterialWithIsEmpty}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/materials/empty [get]
 func (h *Handler) getMaterialsWithIsEmpty(c *gin.Context) {
-	materials, err := h.materialsClient.GetMaterialsWithIsEmpty(c, &moment_proto.GetMaterialsRequest{})
+	materials, err := h.materialsClient.GetMaterialsWithIsEmpty(c, &moment_api.GetMaterialsRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -75,7 +76,7 @@ func (h *Handler) getMaterialsWithIsEmpty(c *gin.Context) {
 // @ModuleID getMaterialsData
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{Data=moment_proto.MaterialsDataResponse}
+// @Success 200 {object} models.DataResponse{Data=moment_api.MaterialsDataResponse}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -87,7 +88,7 @@ func (h *Handler) getMaterialsData(c *gin.Context) {
 		return
 	}
 
-	materials, err := h.materialsClient.GetMaterialsData(c, &moment_proto.GetMaterialsDataRequest{MarkId: id})
+	materials, err := h.materialsClient.GetMaterialsData(c, &moment_api.GetMaterialsDataRequest{MarkId: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -103,20 +104,20 @@ func (h *Handler) getMaterialsData(c *gin.Context) {
 // @ModuleID createMaterial
 // @Accept json
 // @Produce json
-// @Param material body models.MomentMaterialsDTO true "material info"
+// @Param material body moment_model.MaterialsDTO true "material info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/materials/ [post]
 func (h *Handler) createMaterial(c *gin.Context) {
-	var dto models.MomentMaterialsDTO
+	var dto moment_model.MaterialsDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	material, err := h.materialsClient.CreateMaterial(c, &moment_proto.CreateMaterialRequest{Title: dto.Title})
+	material, err := h.materialsClient.CreateMaterial(c, &moment_api.CreateMaterialRequest{Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -134,7 +135,7 @@ func (h *Handler) createMaterial(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "material id"
-// @Param material body models.MomentMaterialsDTO true "material info"
+// @Param material body moment_model.MaterialsDTO true "material info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -147,13 +148,13 @@ func (h *Handler) updateMaterial(c *gin.Context) {
 		return
 	}
 
-	var dto models.MomentMaterialsDTO
+	var dto moment_model.MaterialsDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.materialsClient.UpdateMaterial(c, &moment_proto.UpdateMaterialRequest{Id: id, Title: dto.Title})
+	_, err := h.materialsClient.UpdateMaterial(c, &moment_api.UpdateMaterialRequest{Id: id, Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -182,7 +183,7 @@ func (h *Handler) deleteMaterial(c *gin.Context) {
 		return
 	}
 
-	_, err := h.materialsClient.DeleteMaterial(c, &moment_proto.DeleteMaterialRequest{Id: id})
+	_, err := h.materialsClient.DeleteMaterial(c, &moment_api.DeleteMaterialRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

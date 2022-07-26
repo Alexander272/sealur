@@ -3,28 +3,28 @@ package grpc
 import (
 	"context"
 
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 )
 
-func (h *Handler) GetSizeInt(ctx context.Context, req *proto.GetSizesIntRequest) (*proto.SizeIntResponse, error) {
+func (h *Handler) GetSizeInt(ctx context.Context, req *pro_api.GetSizesIntRequest) (*pro_api.SizeIntResponse, error) {
 	sizes, dn, err := h.service.SizeInt.Get(req)
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.SizeIntResponse{Sizes: sizes, Dn: dn}, nil
+	return &pro_api.SizeIntResponse{Sizes: sizes, Dn: dn}, nil
 }
 
-func (h *Handler) GetAllSizeInt(ctx context.Context, req *proto.GetAllSizeIntRequest) (*proto.SizeIntResponse, error) {
+func (h *Handler) GetAllSizeInt(ctx context.Context, req *pro_api.GetAllSizeIntRequest) (*pro_api.SizeIntResponse, error) {
 	sizes, dn, err := h.service.SizeInt.GetAll(req)
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.SizeIntResponse{Sizes: sizes, Dn: dn}, nil
+	return &pro_api.SizeIntResponse{Sizes: sizes, Dn: dn}, nil
 }
 
-func (h *Handler) CreateSizeInt(ctx context.Context, size *proto.CreateSizeIntRequest) (*proto.IdResponse, error) {
+func (h *Handler) CreateSizeInt(ctx context.Context, size *pro_api.CreateSizeIntRequest) (*pro_api.IdResponse, error) {
 	id, err := h.service.SizeInt.Create(size)
 	if err != nil {
 		return nil, err
@@ -33,35 +33,35 @@ func (h *Handler) CreateSizeInt(ctx context.Context, size *proto.CreateSizeIntRe
 	return id, err
 }
 
-func (h *Handler) CreateManySizesInt(ctx context.Context, dto *proto.CreateSizesIntRequest) (*proto.IdResponse, error) {
+func (h *Handler) CreateManySizesInt(ctx context.Context, dto *pro_api.CreateSizesIntRequest) (*pro_api.IdResponse, error) {
 	err := h.service.SizeInt.CreateMany(dto)
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.IdResponse{Id: ""}, nil
+	return &pro_api.IdResponse{Id: ""}, nil
 }
 
-func (h *Handler) UpdateSizeInt(ctx context.Context, size *proto.UpdateSizeIntRequest) (*proto.IdResponse, error) {
+func (h *Handler) UpdateSizeInt(ctx context.Context, size *pro_api.UpdateSizeIntRequest) (*pro_api.IdResponse, error) {
 	if err := h.service.SizeInt.Update(size); err != nil {
 		return nil, err
 	}
 
-	return &proto.IdResponse{Id: size.Id}, nil
+	return &pro_api.IdResponse{Id: size.Id}, nil
 }
 
-func (h *Handler) DeleteSizeInt(ctx context.Context, size *proto.DeleteSizeIntRequest) (*proto.IdResponse, error) {
+func (h *Handler) DeleteSizeInt(ctx context.Context, size *pro_api.DeleteSizeIntRequest) (*pro_api.IdResponse, error) {
 	if err := h.service.SizeInt.Delete(size); err != nil {
 		return nil, err
 	}
 
-	return &proto.IdResponse{Id: size.Id}, nil
+	return &pro_api.IdResponse{Id: size.Id}, nil
 }
 
-func (h *Handler) DeleteAllSizeInt(ctx context.Context, size *proto.DeleteAllSizeIntRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) DeleteAllSizeInt(ctx context.Context, size *pro_api.DeleteAllSizeIntRequest) (*pro_api.SuccessResponse, error) {
 	if err := h.service.SizeInt.DeleteAll(size); err != nil {
 		return nil, err
 	}
 
-	return &proto.SuccessResponse{Success: true}, nil
+	return &pro_api.SuccessResponse{Success: true}, nil
 }

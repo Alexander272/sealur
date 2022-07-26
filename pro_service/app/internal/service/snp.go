@@ -7,7 +7,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 )
 
 type SNPService struct {
@@ -18,21 +18,21 @@ func NewSNPService(repo repository.SNP) *SNPService {
 	return &SNPService{repo: repo}
 }
 
-func (s *SNPService) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error) {
+func (s *SNPService) Get(req *pro_api.GetSNPRequest) (snp []*pro_api.SNP, err error) {
 	data, err := s.repo.Get(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get snp. error: %w", err)
 	}
 
 	for _, d := range data {
-		var fillers []*proto.Filler
+		var fillers []*pro_api.Filler
 		fil := strings.Split(d.Fillers, ";")
 
 		for _, v := range fil {
 			id := strings.Split(v, "&")[0]
 			tmp := strings.Split(v, "&")[1]
 
-			var Temps []*proto.Temp
+			var Temps []*pro_api.Temp
 
 			temps := strings.Split(tmp, "@")
 			for _, t := range temps {
@@ -40,29 +40,29 @@ func (s *SNPService) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error)
 				tmp := strings.Split(t, ">")[1]
 
 				mods := strings.Split(tmp, ",")
-				Temps = append(Temps, &proto.Temp{Id: id, Mods: mods})
+				Temps = append(Temps, &pro_api.Temp{Id: id, Mods: mods})
 			}
 
-			fillers = append(fillers, &proto.Filler{
+			fillers = append(fillers, &pro_api.Filler{
 				Id: id, Temps: Temps,
 			})
 		}
 
-		var frame, ir, or = &proto.SnpMaterials{}, &proto.SnpMaterials{}, &proto.SnpMaterials{}
+		var frame, ir, or = &pro_api.SnpMaterials{}, &pro_api.SnpMaterials{}, &pro_api.SnpMaterials{}
 		tmp := strings.Split(d.Frame, "&")
 		if len(tmp) > 1 {
-			frame = &proto.SnpMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+			frame = &pro_api.SnpMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
 		}
 		tmp = strings.Split(d.Ir, "&")
 		if len(tmp) > 1 {
-			ir = &proto.SnpMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+			ir = &pro_api.SnpMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
 		}
 		tmp = strings.Split(d.Or, "&")
 		if len(tmp) > 1 {
-			or = &proto.SnpMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
+			or = &pro_api.SnpMaterials{Values: strings.Split(tmp[0], ";"), Default: tmp[1]}
 		}
 
-		s := proto.SNP{
+		s := pro_api.SNP{
 			Id:       d.Id,
 			TypeFlId: d.TypeFlId,
 			TypePr:   d.TypePr,
@@ -79,7 +79,7 @@ func (s *SNPService) Get(req *proto.GetSNPRequest) (snp []*proto.SNP, err error)
 	return snp, nil
 }
 
-func (s *SNPService) Create(dto *proto.CreateSNPRequest) (*proto.IdResponse, error) {
+func (s *SNPService) Create(dto *pro_api.CreateSNPRequest) (*pro_api.IdResponse, error) {
 	var fillers string
 	for i, f := range dto.Fillers {
 		if i > 0 {
@@ -125,10 +125,10 @@ func (s *SNPService) Create(dto *proto.CreateSNPRequest) (*proto.IdResponse, err
 	if err != nil {
 		return nil, fmt.Errorf("failed to create snp. error: %w", err)
 	}
-	return &proto.IdResponse{Id: id}, nil
+	return &pro_api.IdResponse{Id: id}, nil
 }
 
-func (s *SNPService) Update(dto *proto.UpdateSNPRequest) error {
+func (s *SNPService) Update(dto *pro_api.UpdateSNPRequest) error {
 	var fillers string
 	for i, f := range dto.Fillers {
 		if i > 0 {
@@ -177,7 +177,7 @@ func (s *SNPService) Update(dto *proto.UpdateSNPRequest) error {
 	return nil
 }
 
-func (s *SNPService) Delete(snp *proto.DeleteSNPRequest) error {
+func (s *SNPService) Delete(snp *pro_api.DeleteSNPRequest) error {
 	if err := s.repo.Delete(snp); err != nil {
 		return fmt.Errorf("failed to delete snp. error: %w", err)
 	}
@@ -235,7 +235,7 @@ func (s *SNPService) AddMat(id string) error {
 	return nil
 }
 
-func (s *SNPService) DeleteMat(id string, materials []*proto.AddMaterials) error {
+func (s *SNPService) DeleteMat(id string, materials []*pro_api.AddMaterials) error {
 	var wg sync.WaitGroup
 	snp, err := s.repo.GetByCondition(fmt.Sprintf(`frame like '%%%s%%' OR in_ring like '%%%s%%' OR ou_ring like '%%%s%%'`, id, id, id))
 	if err != nil {

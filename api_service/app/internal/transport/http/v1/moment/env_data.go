@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,20 +25,20 @@ func (h *Handler) initEnvDataRoutes(api *gin.RouterGroup) {
 // @ModuleID createEnvData
 // @Accept json
 // @Produce json
-// @Param env body models.EnvDataDTO true "env data info"
+// @Param env body moment_model.EnvDataDTO true "env data info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/env-data/ [post]
 func (h *Handler) createEnvData(c *gin.Context) {
-	var dto models.EnvDataDTO
+	var dto moment_model.EnvDataDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.gasketClient.CreateEnvData(c, &moment_proto.CreateEnvDataRequest{
+	_, err := h.gasketClient.CreateEnvData(c, &moment_api.CreateEnvDataRequest{
 		EnvId:        dto.EnvId,
 		GasketId:     dto.GasketId,
 		M:            dto.M,
@@ -59,7 +60,7 @@ func (h *Handler) createEnvData(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "env data id"
-// @Param env body models.EnvDataDTO true "env data info"
+// @Param env body moment_model.EnvDataDTO true "env data info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -72,13 +73,13 @@ func (h *Handler) updateEnvData(c *gin.Context) {
 		return
 	}
 
-	var dto models.EnvDataDTO
+	var dto moment_model.EnvDataDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.gasketClient.UpdateEnvData(c, &moment_proto.UpdateEnvDataRequest{
+	_, err := h.gasketClient.UpdateEnvData(c, &moment_api.UpdateEnvDataRequest{
 		Id:           id,
 		EnvId:        dto.EnvId,
 		GasketId:     dto.GasketId,
@@ -113,7 +114,7 @@ func (h *Handler) deleteEnvData(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.DeleteEnvData(c, &moment_proto.DeleteEnvDataRequest{Id: id})
+	_, err := h.gasketClient.DeleteEnvData(c, &moment_api.DeleteEnvDataRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

@@ -19,7 +19,7 @@ services:
 
     api_service:
         restart: on-failure:5
-        image: sealur/api_service:1.0.3
+        image: sealur/api_service:1.2.0
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images
@@ -29,23 +29,25 @@ services:
             - pro_service
             - file_service
             - user_service
+            - moment_service
         env_file:
             - .env
         links:
             - pro_service
             - file_service
             - user_service
+            - moment_service
 
     moment_service:
         restart: on-failure:5
-        image: sealur/moment_service:0.3.0
+        image: sealur/moment_service:0.4.0
         container_name: dev-moment_service
         env_file:
             - .env
 
     pro_service:
         restart: on-failure:5
-        image: sealur/pro_service:1.0.0
+        image: sealur/pro_service:1.2.0
         container_name: dev-pro_service
         env_file:
             - .env
@@ -56,7 +58,7 @@ services:
 
     user_service:
         restart: on-failure:5
-        image: sealur/user_service:1.0.0
+        image: sealur/user_service:1.1.0
         container_name: dev-user_service
         env_file:
             - .env
@@ -65,7 +67,7 @@ services:
 
     email_service:
         restart: on-failure:5
-        image: sealur/email_service:1.0.0
+        image: sealur/email_service:1.1.0
         container_name: dev-email_service
         volumes:
             - ./email_service/app/template:/template
@@ -76,7 +78,7 @@ services:
 
     file_service:
         restart: on-failure:5
-        image: sealur/file_service:1.0.0
+        image: sealur/file_service:1.1.0
         container_name: dev-file_service
         env_file:
             - .env

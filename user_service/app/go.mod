@@ -3,6 +3,7 @@ module github.com/Alexander272/sealur/user_service
 go 1.17
 
 require (
+	github.com/Alexander272/sealur_proto/api v0.0.0-20220725100247-fe5e487f12e0
 	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.1.2
 	github.com/jmoiron/sqlx v1.3.5
@@ -11,7 +12,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.12.0
 	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2
-	google.golang.org/grpc v1.46.2
+	google.golang.org/grpc v1.48.0
 )
 
 require (

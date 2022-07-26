@@ -3,13 +3,14 @@ module github.com/Alexander272/sealur/email_service
 go 1.17
 
 require (
+	github.com/Alexander272/sealur_proto/api v0.0.0-20220725100247-fe5e487f12e0
 	github.com/golang/protobuf v1.5.2
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.12.0
 	github.com/xhit/go-simple-mail/v2 v2.11.0
 	golang.org/x/net v0.0.0-20220614195744-fb05da6f9022
-	google.golang.org/grpc v1.47.0
+	google.golang.org/grpc v1.48.0
 )
 
 require (

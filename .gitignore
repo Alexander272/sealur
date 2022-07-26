@@ -2,7 +2,7 @@
 *config.yaml
 *.build
 *.data
-
+*vendor
 
 /storage
 /build

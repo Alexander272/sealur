@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -17,7 +17,7 @@ func NewMaterialsRepo(db *sqlx.DB) *MaterialsRepo {
 	return &MaterialsRepo{db: db}
 }
 
-func (r *MaterialsRepo) GetMaterials(ctx context.Context, req *moment_proto.GetMaterialsRequest) (materials []models.MaterialsDTO, err error) {
+func (r *MaterialsRepo) GetMaterials(ctx context.Context, req *moment_api.GetMaterialsRequest) (materials []models.MaterialsDTO, err error) {
 	query := fmt.Sprintf(`SELECT id, title FROM %s WHERE 
 			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) > 0 AND
 			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) > 0 AND
@@ -30,12 +30,12 @@ func (r *MaterialsRepo) GetMaterials(ctx context.Context, req *moment_proto.GetM
 	return materials, nil
 }
 
-func (r *MaterialsRepo) GetMaterialsWithIsEmpty(ctx context.Context, req *moment_proto.GetMaterialsRequest,
+func (r *MaterialsRepo) GetMaterialsWithIsEmpty(ctx context.Context, req *moment_api.GetMaterialsRequest,
 ) (materials []models.MaterialsWithIsEmpty, err error) {
 	query := fmt.Sprintf(`SELECT id, title, 
-			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0 as is_empty_elasticity, 
-			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0 as is_empty_voltage, 
-			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0 as is_empty_alpha
+			COALESCE((SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0, true) as is_empty_elasticity, 
+			COALESCE((SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0, true) as is_empty_voltage, 
+			COALESCE((SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0, true) as is_empty_alpha
 		FROM %s ORDER BY id`, ElasticityTable, MaterialsTable, VoltageTable, MaterialsTable, AlphaTable, MaterialsTable, MaterialsTable)
 
 	if err := r.db.Select(&materials, query); err != nil {
@@ -44,7 +44,7 @@ func (r *MaterialsRepo) GetMaterialsWithIsEmpty(ctx context.Context, req *moment
 	return materials, nil
 }
 
-func (r *MaterialsRepo) GetAllData(ctx context.Context, req *moment_proto.GetMaterialsDataRequest) (materials models.MaterialsAll, err error) {
+func (r *MaterialsRepo) GetAllData(ctx context.Context, req *moment_api.GetMaterialsDataRequest) (materials models.MaterialsAll, err error) {
 	voltageQuery := fmt.Sprintf("SELECT id, temperature, voltage FROM %s WHERE mark_id=$1 ORDER BY temperature", VoltageTable)
 	var voltage []models.Voltage
 
@@ -73,7 +73,7 @@ func (r *MaterialsRepo) GetAllData(ctx context.Context, req *moment_proto.GetMat
 	return materials, nil
 }
 
-func (r *MaterialsRepo) CreateMaterial(ctx context.Context, material *moment_proto.CreateMaterialRequest) (id string, err error) {
+func (r *MaterialsRepo) CreateMaterial(ctx context.Context, material *moment_api.CreateMaterialRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", MaterialsTable)
 
 	row := r.db.QueryRow(query, material.Title)
@@ -89,7 +89,7 @@ func (r *MaterialsRepo) CreateMaterial(ctx context.Context, material *moment_pro
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *MaterialsRepo) UpdateMaterial(ctx context.Context, material *moment_proto.UpdateMaterialRequest) error {
+func (r *MaterialsRepo) UpdateMaterial(ctx context.Context, material *moment_api.UpdateMaterialRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET title=$1 WHERE id=$2", MaterialsTable)
 
 	_, err := r.db.Exec(query, material.Title, material.Id)
@@ -99,7 +99,7 @@ func (r *MaterialsRepo) UpdateMaterial(ctx context.Context, material *moment_pro
 	return nil
 }
 
-func (r *MaterialsRepo) DeleteMaterial(ctx context.Context, material *moment_proto.DeleteMaterialRequest) error {
+func (r *MaterialsRepo) DeleteMaterial(ctx context.Context, material *moment_api.DeleteMaterialRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", MaterialsTable)
 
 	if _, err := r.db.Exec(query, material.Id); err != nil {

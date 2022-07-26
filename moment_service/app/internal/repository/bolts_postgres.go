@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	moment_proto "github.com/Alexander272/sealur/moment_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
-func (r *FlangeRepo) GetBolts(ctx context.Context, req *moment_proto.GetBoltsRequest) (bolts []models.BoltsDTO, err error) {
+func (r *FlangeRepo) GetBolts(ctx context.Context, req *moment_api.GetBoltsRequest) (bolts []models.BoltsDTO, err error) {
 	query := fmt.Sprintf(`SELECT id, title, diameter, area FROM %s ORDER BY title`, BoltsTable)
 
 	if err := r.db.Select(&bolts, query); err != nil {
@@ -18,7 +18,7 @@ func (r *FlangeRepo) GetBolts(ctx context.Context, req *moment_proto.GetBoltsReq
 	return bolts, nil
 }
 
-func (r *FlangeRepo) CreateBolt(ctx context.Context, bolt *moment_proto.CreateBoltRequest) error {
+func (r *FlangeRepo) CreateBolt(ctx context.Context, bolt *moment_api.CreateBoltRequest) error {
 	query := fmt.Sprintf("INSERT INTO %s (title, diameter, area) VALUES ($1, $2, $3)", BoltsTable)
 
 	if _, err := r.db.Exec(query, bolt.Title, bolt.Diameter, bolt.Area); err != nil {
@@ -27,7 +27,7 @@ func (r *FlangeRepo) CreateBolt(ctx context.Context, bolt *moment_proto.CreateBo
 	return nil
 }
 
-func (r *FlangeRepo) UpdateBolt(ctx context.Context, bolt *moment_proto.UpdateBoltRequest) error {
+func (r *FlangeRepo) UpdateBolt(ctx context.Context, bolt *moment_api.UpdateBoltRequest) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1
@@ -61,7 +61,7 @@ func (r *FlangeRepo) UpdateBolt(ctx context.Context, bolt *moment_proto.UpdateBo
 	return nil
 }
 
-func (r *FlangeRepo) DeleteBolt(ctx context.Context, bolt *moment_proto.DeleteBoltRequest) error {
+func (r *FlangeRepo) DeleteBolt(ctx context.Context, bolt *moment_api.DeleteBoltRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", BoltsTable)
 
 	if _, err := r.db.Exec(query, bolt.Id); err != nil {

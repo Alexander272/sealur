@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -16,7 +16,7 @@ func NewPutgImageRepo(db *sqlx.DB) *PutgImageRepo {
 	return &PutgImageRepo{db: db}
 }
 
-func (r *PutgImageRepo) Get(req *proto.GetPutgImageRequest) (images []*proto.PutgImage, err error) {
+func (r *PutgImageRepo) Get(req *pro_api.GetPutgImageRequest) (images []*pro_api.PutgImage, err error) {
 	query := fmt.Sprintf("SELECT id, form, gasket, url FROM %s WHERE form=$1", PUTGImageTable)
 
 	if err = r.db.Select(&images, query, req.Form); err != nil {
@@ -25,7 +25,7 @@ func (r *PutgImageRepo) Get(req *proto.GetPutgImageRequest) (images []*proto.Put
 	return images, nil
 }
 
-func (r *PutgImageRepo) Create(image *proto.CreatePutgImageRequest) (id string, err error) {
+func (r *PutgImageRepo) Create(image *pro_api.CreatePutgImageRequest) (id string, err error) {
 	query := fmt.Sprintf(`INSERT INTO %s (form, gasket, url) VALUES ($1, $2, $3)  RETURNING id`, PUTGImageTable)
 
 	row := r.db.QueryRow(query, image.Form, image.Gasket, image.Url)
@@ -38,7 +38,7 @@ func (r *PutgImageRepo) Create(image *proto.CreatePutgImageRequest) (id string, 
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *PutgImageRepo) Update(image *proto.UpdatePutgImageRequest) error {
+func (r *PutgImageRepo) Update(image *pro_api.UpdatePutgImageRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET form=$1, gasket=$2, url=$3 WHERE id=$4", PUTGImageTable)
 
 	id, err := strconv.Atoi(image.Id)
@@ -54,7 +54,7 @@ func (r *PutgImageRepo) Update(image *proto.UpdatePutgImageRequest) error {
 	return nil
 }
 
-func (r *PutgImageRepo) Delete(image *proto.DeletePutgImageRequest) error {
+func (r *PutgImageRepo) Delete(image *pro_api.DeletePutgImageRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", PUTGImageTable)
 
 	id, err := strconv.Atoi(image.Id)

@@ -3,19 +3,19 @@ package grpc
 import (
 	"context"
 
-	proto_user "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 )
 
-func (h *Handler) GetRoles(ctx context.Context, req *proto_user.GetRolesRequest) (*proto_user.RolesResponse, error) {
+func (h *Handler) GetRoles(ctx context.Context, req *user_api.GetRolesRequest) (*user_api.RolesResponse, error) {
 	roles, err := h.service.Role.Get(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto_user.RolesResponse{Roles: roles}, nil
+	return &user_api.RolesResponse{Roles: roles}, nil
 }
 
-func (h *Handler) CreateRole(ctx context.Context, role *proto_user.CreateRoleRequest) (*proto_user.SuccessResponse, error) {
+func (h *Handler) CreateRole(ctx context.Context, role *user_api.CreateRoleRequest) (*user_api.SuccessResponse, error) {
 	success, err := h.service.Role.Create(ctx, role)
 	if err != nil {
 		return nil, err
@@ -24,18 +24,18 @@ func (h *Handler) CreateRole(ctx context.Context, role *proto_user.CreateRoleReq
 	return success, nil
 }
 
-func (h *Handler) UpdateRole(ctx context.Context, role *proto_user.UpdateRoleRequest) (*proto_user.IdResponse, error) {
+func (h *Handler) UpdateRole(ctx context.Context, role *user_api.UpdateRoleRequest) (*user_api.IdResponse, error) {
 	if err := h.service.Role.Update(ctx, role); err != nil {
 		return nil, err
 	}
 
-	return &proto_user.IdResponse{Id: role.Id}, nil
+	return &user_api.IdResponse{Id: role.Id}, nil
 }
 
-func (h *Handler) DeleteRole(ctx context.Context, role *proto_user.DeleteRoleRequest) (*proto_user.IdResponse, error) {
+func (h *Handler) DeleteRole(ctx context.Context, role *user_api.DeleteRoleRequest) (*user_api.IdResponse, error) {
 	if err := h.service.Role.Delete(ctx, role); err != nil {
 		return nil, err
 	}
 
-	return &proto_user.IdResponse{Id: role.Id}, nil
+	return &user_api.IdResponse{Id: role.Id}, nil
 }

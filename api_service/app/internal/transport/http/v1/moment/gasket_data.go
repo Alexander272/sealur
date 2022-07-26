@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,20 +25,20 @@ func (h *Handler) initGasketDataRoutes(api *gin.RouterGroup) {
 // @ModuleID createGasketData
 // @Accept json
 // @Produce json
-// @Param gasketData body models.GasketDataDTO true "gasket data info"
+// @Param gasketData body moment_model.GasketDataDTO true "gasket data info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/gasket-data/ [post]
 func (h *Handler) createGasketData(c *gin.Context) {
-	var dto models.GasketDataDTO
+	var dto moment_model.GasketDataDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.gasketClient.CreateGasketData(c, &moment_proto.CreateGasketDataRequest{
+	_, err := h.gasketClient.CreateGasketData(c, &moment_api.CreateGasketDataRequest{
 		GasketId:        dto.GasketId,
 		PermissiblePres: dto.PermissiblePres,
 		Compression:     dto.Compression,
@@ -61,7 +62,7 @@ func (h *Handler) createGasketData(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "gasket data id"
-// @Param gasketData body models.GasketDataDTO true "gasket data info"
+// @Param gasketData body moment_model.GasketDataDTO true "gasket data info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -74,13 +75,13 @@ func (h *Handler) updateGasketData(c *gin.Context) {
 		return
 	}
 
-	var dto models.GasketDataDTO
+	var dto moment_model.GasketDataDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.gasketClient.UpdateGasketData(c, &moment_proto.UpdateGasketDataRequest{
+	_, err := h.gasketClient.UpdateGasketData(c, &moment_api.UpdateGasketDataRequest{
 		Id:              id,
 		GasketId:        dto.GasketId,
 		PermissiblePres: dto.PermissiblePres,
@@ -117,7 +118,7 @@ func (h *Handler) deleteGasketData(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.DeleteGasketData(c, &moment_proto.DeleteGasketDataRequest{Id: id})
+	_, err := h.gasketClient.DeleteGasketData(c, &moment_api.DeleteGasketDataRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

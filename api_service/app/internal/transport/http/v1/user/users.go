@@ -5,8 +5,9 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
+	"github.com/Alexander272/sealur/api_service/internal/models/user_model"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,13 +18,13 @@ import (
 // @ModuleID getAllUser
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=[]proto_user.User}
+// @Success 200 {object} models.DataResponse{data=[]user_api.User}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /users/all [get]
 func (h *Handler) getAllUsers(c *gin.Context) {
-	users, err := h.userClient.GetAllUsers(c, &proto_user.GetAllUserRequest{})
+	users, err := h.userClient.GetAllUsers(c, &user_api.GetAllUserRequest{})
 	if err != nil {
 		logger.Debug("err: ", err.Error())
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -40,13 +41,13 @@ func (h *Handler) getAllUsers(c *gin.Context) {
 // @ModuleID getNewUsers
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=[]proto_user.User}
+// @Success 200 {object} models.DataResponse{data=[]user_api.User}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /users/new [get]
 func (h *Handler) getNewUsers(c *gin.Context) {
-	users, err := h.userClient.GetNewUsers(c, &proto_user.GetNewUserRequest{})
+	users, err := h.userClient.GetNewUsers(c, &user_api.GetNewUserRequest{})
 	if err != nil {
 		logger.Debug("err: ", err.Error())
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -64,7 +65,7 @@ func (h *Handler) getNewUsers(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "user id"
-// @Success 200 {object} models.DataResponse{data=proto_user.User}
+// @Success 200 {object} models.DataResponse{data=user_api.User}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -76,7 +77,7 @@ func (h *Handler) getUser(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userClient.GetUser(c, &proto_user.GetUserRequest{Id: id})
+	user, err := h.userClient.GetUser(c, &user_api.GetUserRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -92,28 +93,28 @@ func (h *Handler) getUser(c *gin.Context) {
 // @ModuleID confirmUser
 // @Accept json
 // @Produce json
-// @Param user body models.ConfirmUser true "user info"
+// @Param user body user_model.ConfirmUser true "user info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /users/confirm [post]
 func (h *Handler) confirmUser(c *gin.Context) {
-	var dto models.ConfirmUser
+	var dto user_model.ConfirmUser
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	var roles []*proto_user.Role
+	var roles []*user_api.Role
 	for _, ur := range dto.Roles {
-		roles = append(roles, &proto_user.Role{
+		roles = append(roles, &user_api.Role{
 			Service: ur.Service,
 			Role:    ur.Role,
 		})
 	}
 
-	req := proto_user.ConfirmUserRequest{
+	req := user_api.ConfirmUserRequest{
 		Id:       dto.Id,
 		Login:    dto.Login,
 		Password: dto.Password,
@@ -158,7 +159,7 @@ func (h *Handler) rejectUser(c *gin.Context) {
 		return
 	}
 
-	req := proto_user.DeleteUserRequest{
+	req := user_api.DeleteUserRequest{
 		Id: id,
 	}
 
@@ -184,7 +185,7 @@ func (h *Handler) rejectUser(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "user id"
-// @Param user body models.UpdateUser true "user info"
+// @Param user body user_model.UpdateUser true "user info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -196,13 +197,13 @@ func (h *Handler) updateUser(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
 		return
 	}
-	var dto models.UpdateUser
+	var dto user_model.UpdateUser
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	req := proto_user.UpdateUserRequest{
+	req := user_api.UpdateUserRequest{
 		Id:       id,
 		Name:     dto.Name,
 		Email:    dto.Email,
@@ -246,7 +247,7 @@ func (h *Handler) deleteUser(c *gin.Context) {
 		return
 	}
 
-	_, err := h.userClient.DeleteUser(c, &proto_user.DeleteUserRequest{Id: id})
+	_, err := h.userClient.DeleteUser(c, &user_api.DeleteUserRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

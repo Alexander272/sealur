@@ -5,12 +5,13 @@ import (
 
 	"github.com/Alexander272/sealur/file_service/internal/config"
 	"github.com/Alexander272/sealur/file_service/internal/service"
-	proto_file "github.com/Alexander272/sealur/file_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/file_api"
 )
 
 type Handler struct {
 	service *service.Service
 	conf    config.ApiConfig
+	file_api.UnimplementedFileServiceServer
 }
 
 func NewHandler(service *service.Service, conf config.ApiConfig) *Handler {
@@ -20,6 +21,6 @@ func NewHandler(service *service.Service, conf config.ApiConfig) *Handler {
 	}
 }
 
-func (h *Handler) Ping(ctx context.Context, req *proto_file.PingRequest) (*proto_file.PingResponse, error) {
-	return &proto_file.PingResponse{Ping: "pong"}, nil
+func (h *Handler) Ping(ctx context.Context, req *file_api.PingRequest) (*file_api.PingResponse, error) {
+	return &file_api.PingResponse{Ping: "pong"}, nil
 }

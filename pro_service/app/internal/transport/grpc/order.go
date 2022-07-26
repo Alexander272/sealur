@@ -6,19 +6,19 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/Alexander272/sealur/pro_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 )
 
-func (h *Handler) GetAllOrders(ctx context.Context, req *proto.GetAllOrdersRequest) (*proto.OrderResponse, error) {
+func (h *Handler) GetAllOrders(ctx context.Context, req *pro_api.GetAllOrdersRequest) (*pro_api.OrderResponse, error) {
 	orders, err := h.service.Order.GetAll(req)
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.OrderResponse{Orders: orders}, nil
+	return &pro_api.OrderResponse{Orders: orders}, nil
 }
 
-func (h *Handler) CreateOrder(ctx context.Context, order *proto.CreateOrderRequest) (*proto.IdResponse, error) {
+func (h *Handler) CreateOrder(ctx context.Context, order *pro_api.CreateOrderRequest) (*pro_api.IdResponse, error) {
 	id, err := h.service.Order.Create(order)
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func (h *Handler) CreateOrder(ctx context.Context, order *proto.CreateOrderReque
 	return id, nil
 }
 
-func (h *Handler) DeleteOrder(ctx context.Context, order *proto.DeleteOrderRequest) (*proto.IdResponse, error) {
+func (h *Handler) DeleteOrder(ctx context.Context, order *pro_api.DeleteOrderRequest) (*pro_api.IdResponse, error) {
 	id, err := h.service.Order.Delete(order)
 	if err != nil {
 		return nil, err
@@ -34,15 +34,15 @@ func (h *Handler) DeleteOrder(ctx context.Context, order *proto.DeleteOrderReque
 	return id, nil
 }
 
-func (h *Handler) SaveOrder(order *proto.SaveOrderRequest, stream proto.ProService_SaveOrderServer) error {
+func (h *Handler) SaveOrder(order *pro_api.SaveOrderRequest, stream pro_api.ProService_SaveOrderServer) error {
 	file, err := h.service.Order.Save(context.Background(), order)
 	if err != nil {
 		return err
 	}
 
-	reqMeta := &proto.FileDownloadResponse{
-		Response: &proto.FileDownloadResponse_Metadata{
-			Metadata: &proto.MetaData{
+	reqMeta := &pro_api.FileDownloadResponse{
+		Response: &pro_api.FileDownloadResponse_Metadata{
+			Metadata: &pro_api.MetaData{
 				Name: "Order.zip",
 				Size: int64(file.Cap()),
 				Type: "application/zip",
@@ -66,8 +66,8 @@ func (h *Handler) SaveOrder(order *proto.SaveOrderRequest, stream proto.ProServi
 			return fmt.Errorf("cannot read chunk to buffer %w", err)
 		}
 
-		reqChunk := &proto.FileDownloadResponse{
-			Response: &proto.FileDownloadResponse_File{File: &proto.File{
+		reqChunk := &pro_api.FileDownloadResponse{
+			Response: &pro_api.FileDownloadResponse_File{File: &pro_api.File{
 				Content: buffer[:n],
 			}},
 		}
@@ -81,39 +81,39 @@ func (h *Handler) SaveOrder(order *proto.SaveOrderRequest, stream proto.ProServi
 	return nil
 }
 
-func (h *Handler) SendOrder(ctx context.Context, order *proto.SaveOrderRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) SendOrder(ctx context.Context, order *pro_api.SaveOrderRequest) (*pro_api.SuccessResponse, error) {
 	if err := h.service.Order.Send(ctx, order); err != nil {
 		return nil, err
 	}
-	return &proto.SuccessResponse{Success: true}, nil
+	return &pro_api.SuccessResponse{Success: true}, nil
 }
 
-func (h *Handler) CopyOrder(ctx context.Context, order *proto.CopyOrderRequest) (*proto.SuccessResponse, error) {
+func (h *Handler) CopyOrder(ctx context.Context, order *pro_api.CopyOrderRequest) (*pro_api.SuccessResponse, error) {
 	if err := h.service.Order.Copy(order); err != nil {
 		return nil, err
 	}
-	return &proto.SuccessResponse{Success: true}, nil
+	return &pro_api.SuccessResponse{Success: true}, nil
 }
 
-func (h *Handler) GetPositions(ctx context.Context, req *proto.GetPositionsRequest) (*proto.OrderPositionResponse, error) {
+func (h *Handler) GetPositions(ctx context.Context, req *pro_api.GetPositionsRequest) (*pro_api.OrderPositionResponse, error) {
 	positions, err := h.service.OrderPosition.Get(req)
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.OrderPositionResponse{Positions: positions}, nil
+	return &pro_api.OrderPositionResponse{Positions: positions}, nil
 }
 
-func (h *Handler) GetCurPositions(ctx context.Context, req *proto.GetCurPositionsRequest) (*proto.OrderPositionResponse, error) {
+func (h *Handler) GetCurPositions(ctx context.Context, req *pro_api.GetCurPositionsRequest) (*pro_api.OrderPositionResponse, error) {
 	positions, err := h.service.OrderPosition.GetCur(req)
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.OrderPositionResponse{Positions: positions}, nil
+	return &pro_api.OrderPositionResponse{Positions: positions}, nil
 }
 
-func (h *Handler) AddPosition(ctx context.Context, position *proto.AddPositionRequest) (*proto.IdResponse, error) {
+func (h *Handler) AddPosition(ctx context.Context, position *pro_api.AddPositionRequest) (*pro_api.IdResponse, error) {
 	id, err := h.service.OrderPosition.Add(position)
 	if err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func (h *Handler) AddPosition(ctx context.Context, position *proto.AddPositionRe
 	return id, nil
 }
 
-func (h *Handler) CopyPosition(ctx context.Context, position *proto.CopyPositionRequest) (*proto.IdResponse, error) {
+func (h *Handler) CopyPosition(ctx context.Context, position *pro_api.CopyPositionRequest) (*pro_api.IdResponse, error) {
 	id, err := h.service.OrderPosition.Copy(position)
 	if err != nil {
 		return nil, err
@@ -129,7 +129,7 @@ func (h *Handler) CopyPosition(ctx context.Context, position *proto.CopyPosition
 	return id, nil
 }
 
-func (h *Handler) UpdatePosition(ctx context.Context, position *proto.UpdatePositionRequest) (*proto.IdResponse, error) {
+func (h *Handler) UpdatePosition(ctx context.Context, position *pro_api.UpdatePositionRequest) (*pro_api.IdResponse, error) {
 	id, err := h.service.OrderPosition.Update(position)
 	if err != nil {
 		return nil, err
@@ -137,7 +137,7 @@ func (h *Handler) UpdatePosition(ctx context.Context, position *proto.UpdatePosi
 	return id, nil
 }
 
-func (h *Handler) RemovePosition(ctx context.Context, position *proto.RemovePositionRequest) (*proto.IdResponse, error) {
+func (h *Handler) RemovePosition(ctx context.Context, position *pro_api.RemovePositionRequest) (*pro_api.IdResponse, error) {
 	id, err := h.service.OrderPosition.Remove(position)
 	if err != nil {
 		return nil, err

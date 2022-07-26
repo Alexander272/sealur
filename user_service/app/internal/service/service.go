@@ -4,31 +4,31 @@ import (
 	"context"
 
 	"github.com/Alexander272/sealur/user_service/internal/repo"
-	proto_user "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto"
-	proto_email "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto/email"
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
+	"github.com/Alexander272/sealur_proto/api/email_api"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 )
 
 type User interface {
-	Get(context.Context, *proto_user.GetUserRequest) (*proto_user.User, error)
-	GetAll(context.Context, *proto_user.GetAllUserRequest) ([]*proto_user.User, error)
-	GetNew(context.Context, *proto_user.GetNewUserRequest) ([]*proto_user.User, error)
-	Create(context.Context, *proto_user.CreateUserRequest) (*proto_user.SuccessResponse, error)
-	Confirm(context.Context, *proto_user.ConfirmUserRequest) (*proto_user.SuccessResponse, error)
-	Update(context.Context, *proto_user.UpdateUserRequest) error
-	Delete(context.Context, *proto_user.DeleteUserRequest) error
-	Reject(ctx context.Context, user *proto_user.DeleteUserRequest) error
+	Get(context.Context, *user_api.GetUserRequest) (*user_api.User, error)
+	GetAll(context.Context, *user_api.GetAllUserRequest) ([]*user_api.User, error)
+	GetNew(context.Context, *user_api.GetNewUserRequest) ([]*user_api.User, error)
+	Create(context.Context, *user_api.CreateUserRequest) (*user_api.SuccessResponse, error)
+	Confirm(context.Context, *user_api.ConfirmUserRequest) (*user_api.SuccessResponse, error)
+	Update(context.Context, *user_api.UpdateUserRequest) error
+	Delete(context.Context, *user_api.DeleteUserRequest) error
+	Reject(ctx context.Context, user *user_api.DeleteUserRequest) error
 }
 
 type Role interface {
-	Get(context.Context, *proto_user.GetRolesRequest) ([]*proto_user.Role, error)
-	Create(context.Context, *proto_user.CreateRoleRequest) (*proto_user.SuccessResponse, error)
-	Update(context.Context, *proto_user.UpdateRoleRequest) error
-	Delete(context.Context, *proto_user.DeleteRoleRequest) error
+	Get(context.Context, *user_api.GetRolesRequest) ([]*user_api.Role, error)
+	Create(context.Context, *user_api.CreateRoleRequest) (*user_api.SuccessResponse, error)
+	Update(context.Context, *user_api.UpdateRoleRequest) error
+	Delete(context.Context, *user_api.DeleteRoleRequest) error
 }
 
 type IP interface {
-	Add(ctx context.Context, ip *proto_user.AddIpRequest) error
+	Add(ctx context.Context, ip *user_api.AddIpRequest) error
 }
 
 type Services struct {
@@ -39,7 +39,7 @@ type Services struct {
 
 type Deps struct {
 	Repos  *repo.Repo
-	Email  proto_email.EmailServiceClient
+	Email  email_api.EmailServiceClient
 	Hasher hasher.PasswordHasher
 }
 

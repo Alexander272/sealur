@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,26 +25,28 @@ func (h *Handler) initVoltageRoutes(api *gin.RouterGroup) {
 // @ModuleID createVoltage
 // @Accept json
 // @Produce json
-// @Param voltage body models.CreateVoltageDTO true "voltage info"
+// @Param voltage body moment_model.CreateVoltageDTO true "voltage info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/materials/voltage/ [post]
 func (h *Handler) createVoltage(c *gin.Context) {
-	var dto models.CreateVoltageDTO
+	var dto moment_model.CreateVoltageDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	voltage := make([]*moment_proto.Voltage, 0, len(dto.Voltage))
+	voltage := make([]*moment_api.Voltage, 0, len(dto.Voltage))
 	for _, v := range dto.Voltage {
-		item := moment_proto.Voltage(v)
-		voltage = append(voltage, &item)
+		voltage = append(voltage, &moment_api.Voltage{
+			Temperature: v.Temperature,
+			Voltage:     v.Voltage,
+		})
 	}
 
-	_, err := h.materialsClient.CreateVoltage(c, &moment_proto.CreateVoltageRequest{
+	_, err := h.materialsClient.CreateVoltage(c, &moment_api.CreateVoltageRequest{
 		MarkId:  dto.MarkId,
 		Voltage: voltage,
 	})
@@ -63,7 +66,7 @@ func (h *Handler) createVoltage(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "voltage id"
-// @Param voltage body models.UpdateVoltageDTO true "voltage info"
+// @Param voltage body moment_model.UpdateVoltageDTO true "voltage info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -76,13 +79,13 @@ func (h *Handler) updateVoltage(c *gin.Context) {
 		return
 	}
 
-	var dto models.UpdateVoltageDTO
+	var dto moment_model.UpdateVoltageDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.materialsClient.UpdateVoltage(c, &moment_proto.UpdateVoltageRequest{
+	_, err := h.materialsClient.UpdateVoltage(c, &moment_api.UpdateVoltageRequest{
 		Id:          id,
 		MarkId:      dto.MarkId,
 		Temperature: dto.Temperature,
@@ -116,7 +119,7 @@ func (h *Handler) deleteVoltage(c *gin.Context) {
 		return
 	}
 
-	_, err := h.materialsClient.DeleteVoltage(c, &moment_proto.DeleteVoltageRequest{Id: id})
+	_, err := h.materialsClient.DeleteVoltage(c, &moment_api.DeleteVoltageRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

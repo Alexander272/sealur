@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +32,7 @@ func (h *Handler) initSNPRoutes(api *gin.RouterGroup) {
 // @Produce json
 // @Param standId query string true "stand id"
 // @Param flangeId query string true "flange id"
-// @Success 200 {object} models.DataResponse{data=[]proto.SNP}
+// @Success 200 {object} models.DataResponse{data=[]pro_api.SNP}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -48,7 +49,7 @@ func (h *Handler) getSNP(c *gin.Context) {
 		return
 	}
 
-	snp, err := h.proClient.GetSNP(c, &proto.GetSNPRequest{
+	snp, err := h.proClient.GetSNP(c, &pro_api.GetSNPRequest{
 		StandId:  standId,
 		FlangeId: flangeId,
 	})
@@ -66,19 +67,19 @@ func (h *Handler) getSNP(c *gin.Context) {
 // @ModuleID getDefault
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=models.DefResponse}
+// @Success 200 {object} models.DataResponse{data=pro_model.DefResponse}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/snp/default [get]
 func (h *Handler) getDefault(c *gin.Context) {
-	flangeType, err := h.proClient.GetTypeFl(c, &proto.GetTypeFlRequest{})
+	flangeType, err := h.proClient.GetTypeFl(c, &pro_api.GetTypeFlRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
-	snp, err := h.proClient.GetSNP(c, &proto.GetSNPRequest{
+	snp, err := h.proClient.GetSNP(c, &pro_api.GetSNPRequest{
 		StandId:  "1",
 		FlangeId: "1",
 	})
@@ -87,13 +88,13 @@ func (h *Handler) getDefault(c *gin.Context) {
 		return
 	}
 
-	size, err := h.proClient.GetSizes(c, &proto.GetSizesRequest{Flange: "33259", TypeFlId: flangeType.TypeFl[0].Id, TypePr: snp.Snp[0].TypePr, StandId: "1"})
+	size, err := h.proClient.GetSizes(c, &pro_api.GetSizesRequest{Flange: "33259", TypeFlId: flangeType.TypeFl[0].Id, TypePr: snp.Snp[0].TypePr, StandId: "1"})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
-	data := models.DefResponse{
+	data := pro_model.DefResponse{
 		TypeFl: flangeType.TypeFl,
 		Snp:    snp.Snp,
 		Sizes:  size,
@@ -109,20 +110,20 @@ func (h *Handler) getDefault(c *gin.Context) {
 // @ModuleID createSNP
 // @Accept json
 // @Produce json
-// @Param data body models.SNPDTO true "snp info"
+// @Param data body pro_model.SNPDTO true "snp info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/snp [post]
 func (h *Handler) createSNP(c *gin.Context) {
-	var dto models.SNPDTO
+	var dto pro_model.SNPDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	snp, err := h.proClient.CreateSNP(c, &proto.CreateSNPRequest{
+	snp, err := h.proClient.CreateSNP(c, &pro_api.CreateSNPRequest{
 		StandId:  dto.StandId,
 		FlangeId: dto.FlangeId,
 		TypeFlId: dto.TypeFlId,
@@ -150,7 +151,7 @@ func (h *Handler) createSNP(c *gin.Context) {
 // @ModuleID updateSNP
 // @Accept json
 // @Produce json
-// @Param data body models.SNPDTO true "snp info"
+// @Param data body pro_model.SNPDTO true "snp info"
 // @Param id path string true "snp id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -158,7 +159,7 @@ func (h *Handler) createSNP(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/snp/{id} [put]
 func (h *Handler) updateSNP(c *gin.Context) {
-	var dto models.SNPDTO
+	var dto pro_model.SNPDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -170,7 +171,7 @@ func (h *Handler) updateSNP(c *gin.Context) {
 		return
 	}
 
-	snp, err := h.proClient.UpdateSNP(c, &proto.UpdateSNPRequest{
+	snp, err := h.proClient.UpdateSNP(c, &pro_api.UpdateSNPRequest{
 		Id:       id,
 		StandId:  dto.StandId,
 		FlangeId: dto.FlangeId,
@@ -211,7 +212,7 @@ func (h *Handler) deleteSNP(c *gin.Context) {
 		return
 	}
 
-	snp, err := h.proClient.DeleteSNP(c, &proto.DeleteSNPRequest{Id: id})
+	snp, err := h.proClient.DeleteSNP(c, &pro_api.DeleteSNPRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

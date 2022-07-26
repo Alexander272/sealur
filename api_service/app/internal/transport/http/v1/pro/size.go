@@ -6,8 +6,9 @@ import (
 	"strconv"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"
 )
@@ -38,7 +39,7 @@ func (h *Handler) initSizeRoutes(api *gin.RouterGroup) {
 // @Param typeFlId query string true "flange type id"
 // @Param standId query string true "standarts id"
 // @Param typePr query string true "type"
-// @Success 200 {object} models.DataResponse{data=proto.SizeResponse}
+// @Success 200 {object} models.DataResponse{data=pro_api.SizeResponse}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -65,7 +66,7 @@ func (h *Handler) getSizes(c *gin.Context) {
 		return
 	}
 
-	sizes, err := h.proClient.GetSizes(c, &proto.GetSizesRequest{
+	sizes, err := h.proClient.GetSizes(c, &pro_api.GetSizesRequest{
 		Flange:   flange,
 		TypeFlId: typeFlId,
 		TypePr:   typePr,
@@ -89,7 +90,7 @@ func (h *Handler) getSizes(c *gin.Context) {
 // @Param typeFlId query string true "flange type id"
 // @Param standId query string true "standarts id"
 // @Param typePr query string true "type"
-// @Success 200 {object} models.DataResponse{data=proto.SizeResponse}
+// @Success 200 {object} models.DataResponse{data=pro_api.SizeResponse}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -116,7 +117,7 @@ func (h *Handler) getAllSizes(c *gin.Context) {
 		return
 	}
 
-	sizes, err := h.proClient.GetAllSizes(c, &proto.GetSizesRequest{
+	sizes, err := h.proClient.GetAllSizes(c, &pro_api.GetSizesRequest{
 		Flange:   flange,
 		TypeFlId: typeFlId,
 		TypePr:   typePr,
@@ -137,20 +138,20 @@ func (h *Handler) getAllSizes(c *gin.Context) {
 // @ModuleID createSize
 // @Accept json
 // @Produce json
-// @Param data body models.SizesDTO true "size info"
+// @Param data body pro_model.SizesDTO true "size info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/sizes [post]
 func (h *Handler) createSize(c *gin.Context) {
-	var dto models.SizesDTO
+	var dto pro_model.SizesDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	size, err := h.proClient.CreateSize(c, &proto.CreateSizeRequest{
+	size, err := h.proClient.CreateSize(c, &pro_api.CreateSizeRequest{
 		Flange:   dto.Flange,
 		TypeFlId: dto.TypeFlId,
 		Dn:       dto.Dn,
@@ -209,7 +210,7 @@ func (h *Handler) createSizeFromFile(c *gin.Context) {
 
 	sheetName := f.GetSheetName(f.GetActiveSheetIndex())
 
-	req := make([]*proto.CreateSizeRequest, 0, 50)
+	req := make([]*pro_api.CreateSizeRequest, 0, 50)
 
 	rows, err := f.Rows(sheetName)
 	if err != nil {
@@ -241,7 +242,7 @@ func (h *Handler) createSizeFromFile(c *gin.Context) {
 			s3 = row[13]
 		}
 
-		req = append(req, &proto.CreateSizeRequest{
+		req = append(req, &pro_api.CreateSizeRequest{
 			Number:   int32(count),
 			Flange:   row[1],
 			Dn:       row[2],
@@ -262,7 +263,7 @@ func (h *Handler) createSizeFromFile(c *gin.Context) {
 		logger.Error(err)
 	}
 
-	_, err = h.proClient.CreateManySizes(c, &proto.CreateSizesRequest{Sizes: req})
+	_, err = h.proClient.CreateManySizes(c, &pro_api.CreateSizesRequest{Sizes: req})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -278,7 +279,7 @@ func (h *Handler) createSizeFromFile(c *gin.Context) {
 // @ModuleID updateSize
 // @Accept json
 // @Produce json
-// @Param data body models.SizesDTO true "size info"
+// @Param data body pro_model.SizesDTO true "size info"
 // @Param id path string true "size id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -286,7 +287,7 @@ func (h *Handler) createSizeFromFile(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/sizes/{id} [put]
 func (h *Handler) updateSize(c *gin.Context) {
-	var dto models.SizesDTO
+	var dto pro_model.SizesDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -298,7 +299,7 @@ func (h *Handler) updateSize(c *gin.Context) {
 		return
 	}
 
-	size, err := h.proClient.UpdateSize(c, &proto.UpdateSizeRequest{
+	size, err := h.proClient.UpdateSize(c, &pro_api.UpdateSizeRequest{
 		Id:       id,
 		Flange:   dto.Flange,
 		TypeFlId: dto.TypeFlId,
@@ -349,7 +350,7 @@ func (h *Handler) deleteSize(c *gin.Context) {
 		return
 	}
 
-	size, err := h.proClient.DeleteSize(c, &proto.DeleteSizeRequest{
+	size, err := h.proClient.DeleteSize(c, &pro_api.DeleteSizeRequest{
 		Id:     id,
 		Flange: flange,
 	})
@@ -388,7 +389,7 @@ func (h *Handler) deleteAllSize(c *gin.Context) {
 		return
 	}
 
-	size, err := h.proClient.DeleteAllSize(c, &proto.DeleteAllSizeRequest{
+	size, err := h.proClient.DeleteAllSize(c, &pro_api.DeleteAllSizeRequest{
 		Flange: flange,
 		TypePr: typePr,
 	})

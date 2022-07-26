@@ -5,6 +5,7 @@ go 1.17
 require github.com/spf13/viper v1.10.1
 
 require (
+	github.com/Alexander272/sealur_proto/api v0.0.0-20220726035851-87640bc1cc04
 	github.com/lukasjarosch/go-docx v0.4.4
 	github.com/xuri/excelize/v2 v2.6.0
 )
@@ -28,7 +29,7 @@ require (
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	golang.org/x/crypto v0.0.0-20220408190544-5352b0902921 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -46,5 +47,5 @@ require (
 	github.com/lib/pq v1.10.4
 	golang.org/x/net v0.0.0-20220407224826-aac1ed45d8e3
 	google.golang.org/genproto v0.0.0-20220201184016-50beb8ab5c44 // indirect
-	google.golang.org/grpc v1.44.0
+	google.golang.org/grpc v1.48.0
 )

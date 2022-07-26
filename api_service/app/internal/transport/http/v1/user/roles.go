@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_user"
+	"github.com/Alexander272/sealur/api_service/internal/models/user_model"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,14 +16,14 @@ import (
 // @ModuleID createRole
 // @Accept json
 // @Produce json
-// @Param role body models.UserRole true "role info"
+// @Param role body user_model.UserRole true "role info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /users/roles [post]
 func (h *Handler) createRole(c *gin.Context) {
-	var dto models.UserRole
+	var dto user_model.UserRole
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -32,7 +33,7 @@ func (h *Handler) createRole(c *gin.Context) {
 		return
 	}
 
-	req := proto_user.CreateRoleRequest{
+	req := user_api.CreateRoleRequest{
 		UserId:  dto.UserId,
 		Service: dto.Service,
 		Role:    dto.Role,
@@ -55,7 +56,7 @@ func (h *Handler) createRole(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "role id"
-// @Param role body models.UserRole true "role info"
+// @Param role body user_model.UserRole true "role info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -68,7 +69,7 @@ func (h *Handler) updateRole(c *gin.Context) {
 		return
 	}
 
-	var dto models.UserRole
+	var dto user_model.UserRole
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -79,7 +80,7 @@ func (h *Handler) updateRole(c *gin.Context) {
 		return
 	}
 
-	req := proto_user.UpdateRoleRequest{
+	req := user_api.UpdateRoleRequest{
 		Id:      id,
 		Service: dto.Service,
 		Role:    dto.Role,
@@ -126,7 +127,7 @@ func (h *Handler) deleteRole(c *gin.Context) {
 		return
 	}
 
-	role, err := h.userClient.DeleteRole(c, &proto_user.DeleteRoleRequest{Id: id})
+	role, err := h.userClient.DeleteRole(c, &user_api.DeleteRoleRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

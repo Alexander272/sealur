@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io"
 
-	proto_email "github.com/Alexander272/sealur/email_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/email_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/email_api"
 )
 
-func (h *Handler) SendInterview(stream proto_email.EmailService_SendInterviewServer) error {
+func (h *Handler) SendInterview(stream email_api.EmailService_SendInterviewServer) error {
 	req, err := stream.Recv()
 	if err != nil {
 		return fmt.Errorf("cannot receive image info %w", err)
@@ -43,5 +43,5 @@ func (h *Handler) SendInterview(stream proto_email.EmailService_SendInterviewSer
 		return fmt.Errorf("failed to send interview email. err: %w", err)
 	}
 
-	return stream.SendAndClose(&proto_email.SuccessResponse{Success: true})
+	return stream.SendAndClose(&email_api.SuccessResponse{Success: true})
 }

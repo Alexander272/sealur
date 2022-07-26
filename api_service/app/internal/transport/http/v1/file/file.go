@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/proto_file"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -62,7 +62,7 @@ func (h *Handler) getDrawing(c *gin.Context) {
 		return
 	}
 
-	stream, err := h.fileClient.Download(c, &proto_file.FileDownloadRequest{
+	stream, err := h.fileClient.Download(c, &file_api.FileDownloadRequest{
 		Id:     id,
 		Name:   name,
 		Bucket: bucket,
@@ -158,9 +158,9 @@ func (h *Handler) createDrawing(c *gin.Context) {
 
 	fileType := file.Header.Get("Content-Type")
 
-	reqMeta := &proto_file.FileUploadRequest{
-		Request: &proto_file.FileUploadRequest_Metadata{
-			Metadata: &proto_file.MetaData{
+	reqMeta := &file_api.FileUploadRequest{
+		Request: &file_api.FileUploadRequest_Metadata{
+			Metadata: &file_api.MetaData{
 				Name:   file.Filename,
 				Type:   fileType,
 				Size:   file.Size,
@@ -197,9 +197,9 @@ func (h *Handler) createDrawing(c *gin.Context) {
 			return
 		}
 
-		reqChunk := &proto_file.FileUploadRequest{
-			Request: &proto_file.FileUploadRequest_File{
-				File: &proto_file.File{
+		reqChunk := &file_api.FileUploadRequest{
+			Request: &file_api.FileUploadRequest_File{
+				File: &file_api.File{
 					Content: buffer[:n],
 				},
 			},
@@ -269,7 +269,7 @@ func (h *Handler) deleteDrawing(c *gin.Context) {
 		return
 	}
 
-	_, err := h.fileClient.Delete(c, &proto_file.FileDeleteRequest{
+	_, err := h.fileClient.Delete(c, &file_api.FileDeleteRequest{
 		Id:     id,
 		Name:   name,
 		Bucket: bucket,

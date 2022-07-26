@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Alexander272/sealur/user_service/internal/repo"
-	proto_user "github.com/Alexander272/sealur/user_service/internal/transport/grpc/proto"
+	"github.com/Alexander272/sealur_proto/api/user_api"
 )
 
 type IpService struct {
@@ -16,7 +16,7 @@ func NewIpService(repo repo.IP) *IpService {
 	return &IpService{repo: repo}
 }
 
-func (s *IpService) Add(ctx context.Context, ip *proto_user.AddIpRequest) error {
+func (s *IpService) Add(ctx context.Context, ip *user_api.AddIpRequest) error {
 	if err := s.repo.Add(ctx, ip); err != nil {
 		return fmt.Errorf("failed to add ip. error: %w", err)
 	}

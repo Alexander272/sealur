@@ -6,15 +6,15 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 type Handler struct {
-	proClient  proto.ProServiceClient
+	proClient  pro_api.ProServiceClient
 	middleware *middleware.Middleware
 }
 
@@ -48,7 +48,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	if err != nil {
 		logger.Fatalf("failed connection to pro service. error: %w", err)
 	}
-	proClient := proto.NewProServiceClient(connect)
+	proClient := pro_api.NewProServiceClient(connect)
 	h.proClient = proClient
 
 	pro := api.Group("/sealur-pro")
@@ -76,7 +76,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 }
 
 func (h *Handler) pingPro(c *gin.Context) {
-	res, err := h.proClient.Ping(c, &proto.PingRequest{})
+	res, err := h.proClient.Ping(c, &pro_api.PingRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

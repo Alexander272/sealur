@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto/moment_proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
+	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,20 +25,20 @@ func (h *Handler) initFlangeRoutes(api *gin.RouterGroup) {
 // @ModuleID createFlangeSize
 // @Accept json
 // @Produce json
-// @Param size body models.FlangeSizeDTO true "size info"
+// @Param size body moment_model.FlangeSizeDTO true "size info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/flange-sizes/ [post]
 func (h *Handler) createFlangeSize(c *gin.Context) {
-	var dto models.FlangeSizeDTO
+	var dto moment_model.FlangeSizeDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.flangeClient.CreateFlangeSize(c, &moment_proto.CreateFlangeSizeRequest{
+	_, err := h.flangeClient.CreateFlangeSize(c, &moment_api.CreateFlangeSizeRequest{
 		StandId: dto.StandId,
 		Pn:      dto.Pn,
 		D:       dto.D,
@@ -66,7 +67,7 @@ func (h *Handler) createFlangeSize(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "size id"
-// @Param size body models.FlangeSizeDTO true "size info"
+// @Param size body moment_model.FlangeSizeDTO true "size info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -79,13 +80,13 @@ func (h *Handler) updateFlangeSize(c *gin.Context) {
 		return
 	}
 
-	var dto models.FlangeSizeDTO
+	var dto moment_model.FlangeSizeDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
-	_, err := h.flangeClient.UpdateFlangeSize(c, &moment_proto.UpdateFlangeSizeRequest{
+	_, err := h.flangeClient.UpdateFlangeSize(c, &moment_api.UpdateFlangeSizeRequest{
 		Id:      id,
 		StandId: dto.StandId,
 		Pn:      dto.Pn,
@@ -127,7 +128,7 @@ func (h *Handler) deleteFlangeSize(c *gin.Context) {
 		return
 	}
 
-	_, err := h.flangeClient.DeleteFlangeSize(c, &moment_proto.DeleteFlangeSizeRequest{Id: id})
+	_, err := h.flangeClient.DeleteFlangeSize(c, &moment_api.DeleteFlangeSizeRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

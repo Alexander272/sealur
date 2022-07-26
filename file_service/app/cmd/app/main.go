@@ -16,10 +16,10 @@ import (
 	"github.com/Alexander272/sealur/file_service/internal/server"
 	"github.com/Alexander272/sealur/file_service/internal/service"
 	transport "github.com/Alexander272/sealur/file_service/internal/transport/grpc"
-	proto_file "github.com/Alexander272/sealur/file_service/internal/transport/grpc/proto"
 	transport_http "github.com/Alexander272/sealur/file_service/internal/transport/http"
 	"github.com/Alexander272/sealur/file_service/pkg/logger"
 	"github.com/Alexander272/sealur/file_service/pkg/storage"
+	"github.com/Alexander272/sealur_proto/api/file_api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -60,7 +60,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer(opts...)
-	proto_file.RegisterFileServiceServer(grpcServer, handlers)
+	file_api.RegisterFileServiceServer(grpcServer, handlers)
 
 	listener, err := net.Listen("tcp", ":"+conf.Tcp.Port)
 	if err != nil {

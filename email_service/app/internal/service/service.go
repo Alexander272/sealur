@@ -5,26 +5,26 @@ import (
 	"context"
 
 	"github.com/Alexander272/sealur/email_service/internal/config"
-	proto_email "github.com/Alexander272/sealur/email_service/internal/transport/grpc/proto"
 	"github.com/Alexander272/sealur/email_service/pkg/email"
+	"github.com/Alexander272/sealur_proto/api/email_api"
 )
 
 type Interview interface {
-	SendInterview(*proto_email.InterviewData, *bytes.Buffer) error
+	SendInterview(*email_api.InterviewData, *bytes.Buffer) error
 }
 
 type Order interface {
-	SendOrder(*proto_email.OrderData, *bytes.Buffer) error
+	SendOrder(*email_api.OrderData, *bytes.Buffer) error
 }
 
 type User interface {
-	SendConfirm(ctx context.Context, req *proto_email.ConfirmUserRequest) error
-	SendReject(ctx context.Context, req *proto_email.RejectUserRequest) error
-	SendJoin(ctx context.Context, user *proto_email.JoinUserRequest) error
+	SendConfirm(ctx context.Context, req *email_api.ConfirmUserRequest) error
+	SendReject(ctx context.Context, req *email_api.RejectUserRequest) error
+	SendJoin(ctx context.Context, user *email_api.JoinUserRequest) error
 }
 
 type Test interface {
-	SendEmail(*proto_email.SendTestRequest) error
+	SendEmail(*email_api.SendTestRequest) error
 }
 
 type Services struct {

@@ -6,7 +6,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/proto"
+	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,13 +30,13 @@ func (h *Handler) initStandRoutes(api *gin.RouterGroup) {
 // @ModuleID getStands
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{data=[]proto.Stand}
+// @Success 200 {object} models.DataResponse{data=[]pro_api.Stand}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/standards [get]
 func (h *Handler) getStands(c *gin.Context) {
-	st, err := h.proClient.GetAllStands(c, &proto.GetStandsRequest{})
+	st, err := h.proClient.GetAllStands(c, &pro_api.GetStandsRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -50,20 +51,20 @@ func (h *Handler) getStands(c *gin.Context) {
 // @ModuleID createStand
 // @Accept json
 // @Produce json
-// @Param data body models.StandDTO true "standard info"
+// @Param data body pro_model.StandDTO true "standard info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/standards [post]
 func (h *Handler) createStand(c *gin.Context) {
-	var dto models.StandDTO
+	var dto pro_model.StandDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data sent")
 		return
 	}
 
-	id, err := h.proClient.CreateStand(c, &proto.CreateStandRequest{Title: dto.Title})
+	id, err := h.proClient.CreateStand(c, &pro_api.CreateStandRequest{Title: dto.Title})
 	if err != nil {
 		if errors.Is(err, models.ErrStandAlreadyExists) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), err.Error())
@@ -84,7 +85,7 @@ func (h *Handler) createStand(c *gin.Context) {
 // @ModuleID updateStand
 // @Accept json
 // @Produce json
-// @Param data body models.StandDTO true "standard info"
+// @Param data body pro_model.StandDTO true "standard info"
 // @Param id path string true "standard id"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
@@ -92,7 +93,7 @@ func (h *Handler) createStand(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-pro/standards/{id} [put]
 func (h *Handler) updateStand(c *gin.Context) {
-	var dto models.StandDTO
+	var dto pro_model.StandDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -103,7 +104,7 @@ func (h *Handler) updateStand(c *gin.Context) {
 		return
 	}
 
-	st, err := h.proClient.UpdateStand(c, &proto.UpdateStandRequest{Id: stId, Title: dto.Title})
+	st, err := h.proClient.UpdateStand(c, &pro_api.UpdateStandRequest{Id: stId, Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -132,7 +133,7 @@ func (h *Handler) deleteStand(c *gin.Context) {
 		return
 	}
 
-	st, err := h.proClient.DeleteStand(c, &proto.DeleteStandRequest{Id: stId})
+	st, err := h.proClient.DeleteStand(c, &pro_api.DeleteStandRequest{Id: stId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

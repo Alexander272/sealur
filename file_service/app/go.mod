@@ -3,6 +3,7 @@ module github.com/Alexander272/sealur/file_service
 go 1.17
 
 require (
+	github.com/Alexander272/sealur_proto/api v0.0.0-20220725100247-fe5e487f12e0
 	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.1.2
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -10,7 +11,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2
 	golang.org/x/text v0.3.7
-	google.golang.org/grpc v1.46.2
+	google.golang.org/grpc v1.48.0
 )
 
 require (
