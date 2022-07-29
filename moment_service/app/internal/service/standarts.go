@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
@@ -17,6 +18,7 @@ func (s *FlangeService) GetTypeFlange(ctx context.Context, req *moment_api.GetTy
 		typeFlange = append(typeFlange, &moment_api.TypeFlange{
 			Id:    item.Id,
 			Title: item.Title,
+			Label: item.Label,
 		})
 	}
 
@@ -54,9 +56,45 @@ func (s *FlangeService) GetStandarts(ctx context.Context, req *moment_api.GetSta
 
 	for _, item := range data {
 		standarts = append(standarts, &moment_api.Standart{
-			Id:     item.Id,
-			Title:  item.Title,
-			TypeId: item.TypeId,
+			Id:        item.Id,
+			Title:     item.Title,
+			TypeId:    item.TypeId,
+			TitleDn:   item.TitleDn,
+			TitlePn:   item.TitlePn,
+			IsNeedRow: item.IsNeedRow,
+			Rows:      strings.Split(item.Rows, "; "),
+		})
+	}
+
+	return standarts, nil
+}
+
+func (s *FlangeService) GetStandartsWithSize(ctx context.Context, req *moment_api.GetStandartsRequest) (standarts []*moment_api.StandartWithSize, err error) {
+	data, err := s.repo.GetStandarts(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get standarts. error: %w", err)
+	}
+
+	for _, item := range data {
+		sizes, err := s.GetBasisFlangeSize(ctx, &moment_api.GetBasisFlangeSizeRequest{IsUseRow: item.IsNeedRow, StandId: item.Id})
+		if err != nil {
+			return nil, err
+		}
+
+		var rows []string
+		if item.Rows != "" {
+			rows = strings.Split(item.Rows, "; ")
+		}
+
+		standarts = append(standarts, &moment_api.StandartWithSize{
+			Id:        item.Id,
+			Title:     item.Title,
+			TypeId:    item.TypeId,
+			TitleDn:   item.TitleDn,
+			TitlePn:   item.TitlePn,
+			IsNeedRow: item.IsNeedRow,
+			Rows:      rows,
+			Sizes:     sizes,
 		})
 	}
 

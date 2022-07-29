@@ -14,6 +14,7 @@ type CalcFlange interface {
 
 type Flange interface {
 	GetFlangeSize(context.Context, *moment_api.GetFlangeSizeRequest) (models.FlangeSize, error)
+	GetBasisFlangeSize(context.Context, *moment_api.GetBasisFlangeSizeRequest) (*moment_api.BasisFlangeSizeResponse, error)
 	CreateFlangeSize(context.Context, *moment_api.CreateFlangeSizeRequest) error
 	UpdateFlangeSize(context.Context, *moment_api.UpdateFlangeSizeRequest) error
 	DeleteFlangeSize(context.Context, *moment_api.DeleteFlangeSizeRequest) error
@@ -29,6 +30,7 @@ type Flange interface {
 	DeleteTypeFlange(context.Context, *moment_api.DeleteTypeFlangeRequest) error
 
 	GetStandarts(context.Context, *moment_api.GetStandartsRequest) ([]*moment_api.Standart, error)
+	GetStandartsWithSize(context.Context, *moment_api.GetStandartsRequest) ([]*moment_api.StandartWithSize, error)
 	CreateStandart(context.Context, *moment_api.CreateStandartRequest) (id string, err error)
 	UpdateStandart(context.Context, *moment_api.UpdateStandartRequest) error
 	DeleteStandart(context.Context, *moment_api.DeleteStandartRequest) error
@@ -61,6 +63,7 @@ type Gasket interface {
 	GetFullData(context.Context, models.GetGasket) (models.FullDataGasket, error)
 
 	GetGasket(context.Context, *moment_api.GetGasketRequest) ([]*moment_api.Gasket, error)
+	GetGasketWithThick(ctx context.Context, req *moment_api.GetGasketRequest) (gasket []*moment_api.GasketWithThick, err error)
 	CreateGasket(context.Context, *moment_api.CreateGasketRequest) (id string, err error)
 	UpdateGasket(context.Context, *moment_api.UpdateGasketRequest) error
 	DeleteGasket(context.Context, *moment_api.DeleteGasketRequest) error
@@ -91,12 +94,17 @@ type Graphic interface {
 	CalculateMkp(diameter int32, sigma float64) float64
 }
 
+type Read interface {
+	GetFlange(ctx context.Context, req *moment_api.GetFlangeRequest) (*moment_api.GetFlangeResponse, error)
+}
+
 type Services struct {
 	CalcFlange
 	Flange
 	Materials
 	Gasket
 	Graphic
+	Read
 }
 
 func NewServices(repos *repository.Repositories) *Services {
@@ -111,5 +119,6 @@ func NewServices(repos *repository.Repositories) *Services {
 		Materials:  materials,
 		Gasket:     gasket,
 		Graphic:    graphic,
+		Read:       NewReadService(flange, materials, gasket),
 	}
 }

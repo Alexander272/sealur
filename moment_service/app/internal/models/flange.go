@@ -33,4 +33,11 @@ type FlangeSizeDTO struct {
 type TypeFlangeDTO struct {
 	Id    string `db:"id"`
 	Title string `db:"title"`
+	Label string `db:"label"`
+}
+
+type GetBasisSize struct {
+	IsUseRow bool
+	StandId  string `db:"stand_id"`
+	Row      string `db:"row"`
 }

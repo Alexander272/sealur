@@ -17,7 +17,7 @@ func (h *Handler) initTypeGasketRoutes(api *gin.RouterGroup) {
 		gasket = gasket.Group("/", h.middleware.AccessForMomentAdmin)
 		{
 			gasket.POST("/", h.createTypeGasket)
-			gasket.PUT("/:id", h.updateTypeGasket)
+			gasket.PATCH("/:id", h.updateTypeGasket)
 			gasket.DELETE("/:id", h.deleteTypeGasket)
 		}
 	}

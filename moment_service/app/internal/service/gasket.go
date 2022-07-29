@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"math"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur/moment_service/internal/repository"
@@ -38,6 +39,30 @@ func (s *GasketService) GetGasket(ctx context.Context, req *moment_api.GetGasket
 			Id:    item.Id,
 			Title: item.Title,
 		})
+	}
+
+	return gasket, nil
+}
+
+func (s *GasketService) GetGasketWithThick(ctx context.Context, req *moment_api.GetGasketRequest) (gasket []*moment_api.GasketWithThick, err error) {
+	data, err := s.repo.GetGasketWithThick(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get gasket. error: %w", err)
+	}
+
+	curId := ""
+	for _, item := range data {
+		item.Thickness = math.Round(item.Thickness*1000) / 1000
+		if item.Id != curId {
+			curId = item.Id
+			gasket = append(gasket, &moment_api.GasketWithThick{
+				Id:    item.Id,
+				Title: item.Title,
+			})
+			gasket[len(gasket)-1].Thickness = append(gasket[len(gasket)-1].Thickness, item.Thickness)
+		} else {
+			gasket[len(gasket)-1].Thickness = append(gasket[len(gasket)-1].Thickness, item.Thickness)
+		}
 	}
 
 	return gasket, nil

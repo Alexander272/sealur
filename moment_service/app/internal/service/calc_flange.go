@@ -94,9 +94,11 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		return nil, err
 	}
 	//? я использую температуру фланца. хз верно илил нет. возможно
-	washer1, err = s.materials.GetMatFotCalculate(ctx, data.Washer[0].MarkId, flange1.Tf)
-	if err != nil {
-		return nil, err
+	if data.IsUseWasher {
+		washer1, err = s.materials.GetMatFotCalculate(ctx, data.Washer[0].MarkId, flange1.Tf)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	result.Flanges = append(result.Flanges, &moment_api.FlangeResult{
@@ -140,9 +142,11 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		if err != nil {
 			return nil, err
 		}
-		washer2, err = s.materials.GetMatFotCalculate(ctx, data.Washer[1].MarkId, flange2.Tf)
-		if err != nil {
-			return nil, err
+		if data.IsUseWasher {
+			washer2, err = s.materials.GetMatFotCalculate(ctx, data.Washer[1].MarkId, flange2.Tf)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		// res := moment_api.FlangeResult(flange2)
@@ -483,6 +487,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		Kyz := s.Kyz[data.Condition.String()]
 		Kyt := constants.NoLoadKyt
 
+		//TODO расчеты не верные
 		result.Calc.Strength.FDSigmaM = 1.2 * Kyp * Kyz * Kyt * boltMat.SigmaAt20
 		result.Calc.Strength.FDSigmaR = Kyp * Kyz * Kyt * boltMat.Sigma
 
@@ -639,11 +644,12 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		af2 := strconv.FormatFloat(flange2.AlphaF, 'f', -1, 64)
 		h2 := strconv.FormatFloat(flange2.H, 'f', -1, 64)
 		tf2 := strconv.FormatFloat(flange2.Tf, 'f', -1, 64)
-		w1 := strconv.FormatFloat(washer1.AlphaF, 'f', -1, 64)
-		th := strconv.FormatFloat(data.Washer[0].Thickness, 'f', -1, 64)
-		w2 := strconv.FormatFloat(washer1.AlphaF, 'f', -1, 64)
 
 		if data.IsUseWasher {
+			w1 := strconv.FormatFloat(washer1.AlphaF, 'f', -1, 64)
+			th := strconv.FormatFloat(data.Washer[0].Thickness, 'f', -1, 64)
+			w2 := strconv.FormatFloat(washer2.AlphaF, 'f', -1, 64)
+
 			tF1 = fmt.Sprintf("(%s*%s + %s*%s) * (%s-20) + (%s*%s + %s*%s) * (%s-20)", af1, h1, w1, th, tf1, af2, h2, w2, th, tf2)
 		} else {
 			tF1 = fmt.Sprintf("%s * %s * (%s-20) + %s * %s * (%s-20)", af1, h1, tf1, af2, h2, tf2)

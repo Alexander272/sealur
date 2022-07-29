@@ -5,7 +5,8 @@ type GasketDTO struct {
 }
 
 type TypeGasketDTO struct {
-	Title string `json:"title" binding:"required"`
+	Title string `json:"title"`
+	Label string `json:"label"`
 }
 
 type GasketDataDTO struct {

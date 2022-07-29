@@ -25,6 +25,7 @@ type FileResponse struct {
 
 type ErrorResponse struct {
 	Message string `json:"message"`
+	Code    string `json:"code"`
 }
 
 type StatusResponse struct {
@@ -38,5 +39,10 @@ type ZipResponse struct {
 
 func NewErrorResponse(c *gin.Context, statusCode int, err, message string) {
 	logger.Errorf("Url: %s | ClientIp: %s | ErrorResponse: %s", c.Request.URL, c.ClientIP(), err)
-	c.AbortWithStatusJSON(statusCode, ErrorResponse{message})
+	c.AbortWithStatusJSON(statusCode, ErrorResponse{Message: message})
+}
+
+func NewErrorResponseWithCode(c *gin.Context, statusCode int, err, message, code string) {
+	logger.Errorf("Url: %s | ClientIp: %s | ErrorResponse: %s", c.Request.URL, c.ClientIP(), err)
+	c.AbortWithStatusJSON(statusCode, ErrorResponse{Message: message, Code: code})
 }

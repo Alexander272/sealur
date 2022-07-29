@@ -28,6 +28,87 @@ func (s *FlangeService) GetFlangeSize(ctx context.Context, req *moment_api.GetFl
 	return size, nil
 }
 
+func (s *FlangeService) GetBasisFlangeSize(ctx context.Context, req *moment_api.GetBasisFlangeSizeRequest) (*moment_api.BasisFlangeSizeResponse, error) {
+	res := &moment_api.BasisFlangeSizeResponse{}
+
+	if req.IsUseRow {
+		reqSize1 := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: "0"}
+		sizes1, err := s.repo.GetBasisFlangeSizes(ctx, reqSize1)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get size. error: %w", err)
+		}
+
+		sizeRow := []*moment_api.BasisFlangeSize{}
+
+		curD := math.Inf(-1)
+		for _, fs := range sizes1 {
+			fs.Pn = math.Round(fs.Pn*1000) / 1000
+			if curD != fs.D {
+				curD = fs.D
+				sizeRow = append(sizeRow, &moment_api.BasisFlangeSize{
+					Dn: fs.D,
+				})
+				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
+			} else {
+				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
+			}
+		}
+
+		res.SizeRow1 = sizeRow
+
+		reqSize2 := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: ""}
+		sizes2, err := s.repo.GetBasisFlangeSizes(ctx, reqSize2)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get size. error: %w", err)
+		}
+
+		sizeRow = []*moment_api.BasisFlangeSize{}
+
+		curD = math.Inf(-1)
+		for _, fs := range sizes2 {
+			fs.Pn = math.Round(fs.Pn*1000) / 1000
+			if curD != fs.D {
+				curD = fs.D
+				sizeRow = append(sizeRow, &moment_api.BasisFlangeSize{
+					Dn: fs.D,
+				})
+				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
+			} else {
+				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
+			}
+		}
+
+		res.SizeRow2 = sizeRow
+	} else {
+		reqSize := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: ""}
+		sizes, err := s.repo.GetBasisFlangeSizes(ctx, reqSize)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get size. error: %w", err)
+		}
+
+		sizeRow := []*moment_api.BasisFlangeSize{}
+
+		curD := math.Inf(-1)
+		for _, fs := range sizes {
+			fs.Pn = math.Round(fs.Pn*1000) / 1000
+			if curD != fs.D {
+				curD = fs.D
+				sizeRow = append(sizeRow, &moment_api.BasisFlangeSize{
+					// Id: fs.Id,
+					Dn: fs.D,
+				})
+				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
+			} else {
+				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
+			}
+		}
+
+		res.SizeRow1 = sizeRow
+	}
+
+	return res, nil
+}
+
 func (s *FlangeService) CreateFlangeSize(ctx context.Context, size *moment_api.CreateFlangeSizeRequest) error {
 	if err := s.repo.CreateFlangeSize(ctx, size); err != nil {
 		return fmt.Errorf("failed to create flange size. error: %w", err)

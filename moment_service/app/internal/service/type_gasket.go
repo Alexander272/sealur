@@ -17,6 +17,7 @@ func (s *GasketService) GetTypeGasket(ctx context.Context, req *moment_api.GetGa
 		gasket = append(gasket, &moment_api.GasketType{
 			Id:    item.Id,
 			Title: item.Title,
+			Label: item.Label,
 		})
 	}
 

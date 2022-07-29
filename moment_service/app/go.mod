@@ -3,18 +3,21 @@ module github.com/Alexander272/sealur/moment_service
 go 1.17
 
 require (
-	github.com/golang/protobuf v1.5.2
+	github.com/Alexander272/sealur_proto/api v0.0.0-20220728121933-ae95734a406d
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.6
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.12.0
-	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2
 	google.golang.org/grpc v1.48.0
 )
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20220725055038-e9e75d68d35b
+	github.com/golang/protobuf v1.5.2 // indirect
+	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
+)
+
+require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect

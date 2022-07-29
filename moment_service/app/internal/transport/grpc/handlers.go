@@ -26,6 +26,10 @@ type Flange interface {
 	moment_api.FlangeServiceServer
 }
 
+type Read interface {
+	moment_api.ReadServiceServer
+}
+
 type Handler struct {
 	service *service.Services
 	conf    config.ApiConfig
@@ -34,6 +38,7 @@ type Handler struct {
 	Materials
 	Gasket
 	Flange
+	Read
 }
 
 func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
@@ -45,5 +50,6 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		Materials:  NewMaterialsHandlers(service.Materials),
 		Gasket:     NewGasketService(service.Gasket),
 		Flange:     NewFlangeHandlers(service.Flange),
+		Read:       NewReadHandlers(service.Read),
 	}
 }

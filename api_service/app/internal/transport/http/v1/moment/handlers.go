@@ -19,6 +19,7 @@ type Handler struct {
 	gasketClient     moment_api.GasketServiceClient
 	materialsClient  moment_api.MaterialsServiceClient
 	flangeClient     moment_api.FlangeServiceClient
+	readClient       moment_api.ReadServiceClient
 	calcFlangeClient moment_api.CalcFlangeServiceClient
 }
 
@@ -55,17 +56,18 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		logger.Fatalf("failed connection to pro service. error: %w", err)
 	}
 
-	//TODO у меня получилось веныести прото файлы в отдельную папку. надо это использовать
 	pingClient := moment_api.NewPingServiceClient(connect)
 	gasketClient := moment_api.NewGasketServiceClient(connect)
 	materialsClient := moment_api.NewMaterialsServiceClient(connect)
 	flangeClient := moment_api.NewFlangeServiceClient(connect)
+	readClient := moment_api.NewReadServiceClient(connect)
 	calcFlangeClient := moment_api.NewCalcFlangeServiceClient(connect)
 
 	h.pingClient = pingClient
 	h.gasketClient = gasketClient
 	h.materialsClient = materialsClient
 	h.flangeClient = flangeClient
+	h.readClient = readClient
 	h.calcFlangeClient = calcFlangeClient
 
 	moment := api.Group("/sealur-moment")
@@ -87,6 +89,8 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		h.initTypeFlangeRoutes(moment)
 		h.initStandartsRoutes(moment)
 		h.initFlangeRoutes(moment)
+
+		h.initReadRoutes(moment)
 
 		h.initCalcFlangeRoutes(moment)
 	}

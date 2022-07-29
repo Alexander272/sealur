@@ -42,6 +42,17 @@ func (r *GasketRepo) GetGasket(ctx context.Context, req *moment_api.GetGasketReq
 	return gasket, nil
 }
 
+func (r *GasketRepo) GetGasketWithThick(ctx context.Context, req *moment_api.GetGasketRequest) (gasket []models.GasketWithThick, err error) {
+	query := fmt.Sprintf(`SELECT %s.id, title, thickness FROM %s
+		INNER JOIN %s ON %s.id = %s.gasket_id ORDER BY id`,
+		GasketTable, GasketTable, GasketDataTable, GasketTable, GasketDataTable)
+
+	if err := r.db.Select(&gasket, query); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return gasket, nil
+}
+
 func (r *GasketRepo) CreateGasket(ctx context.Context, gasket *moment_api.CreateGasketRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", GasketTable)
 

@@ -10,6 +10,7 @@ import (
 
 type Flange interface {
 	GetFlangeSize(context.Context, *moment_api.GetFlangeSizeRequest) (models.FlangeSize, error)
+	GetBasisFlangeSizes(context.Context, models.GetBasisSize) ([]models.FlangeSize, error)
 	CreateFlangeSize(context.Context, *moment_api.CreateFlangeSizeRequest) error
 	UpdateFlangeSize(context.Context, *moment_api.UpdateFlangeSizeRequest) error
 	DeleteFlangeSize(context.Context, *moment_api.DeleteFlangeSizeRequest) error
@@ -56,6 +57,7 @@ type Gasket interface {
 	GetFullData(context.Context, models.GetGasket) (models.FullDataGasket, error)
 
 	GetGasket(context.Context, *moment_api.GetGasketRequest) ([]models.GasketDTO, error)
+	GetGasketWithThick(ctx context.Context, req *moment_api.GetGasketRequest) (gasket []models.GasketWithThick, err error)
 	CreateGasket(context.Context, *moment_api.CreateGasketRequest) (id string, err error)
 	UpdateGasket(context.Context, *moment_api.UpdateGasketRequest) error
 	DeleteGasket(context.Context, *moment_api.DeleteGasketRequest) error

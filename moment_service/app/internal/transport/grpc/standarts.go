@@ -47,6 +47,16 @@ func (h *FlangeHandlers) GetStandarts(ctx context.Context, req *moment_api.GetSt
 	return &moment_api.StandartsResponse{Standarts: stands}, nil
 }
 
+func (h *FlangeHandlers) GetStandartsWithSize(ctx context.Context, req *moment_api.GetStandartsRequest,
+) (*moment_api.StandartsWithSizeResponse, error) {
+	stands, err := h.service.GetStandartsWithSize(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &moment_api.StandartsWithSizeResponse{Standarts: stands}, nil
+}
+
 func (h *FlangeHandlers) CreateStandart(ctx context.Context, stand *moment_api.CreateStandartRequest) (*moment_api.IdResponse, error) {
 	id, err := h.service.CreateStandart(ctx, stand)
 	if err != nil {

@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +16,7 @@ func (h *Handler) initTypeFlangeRoutes(api *gin.RouterGroup) {
 		typeFlnage = typeFlnage.Group("/", h.middleware.AccessForMomentAdmin)
 		{
 			typeFlnage.POST("/", h.createTypeFlange)
-			typeFlnage.PUT("/:id", h.updateTypeFlange)
+			typeFlnage.PATCH("/:id", h.updateTypeFlange)
 			typeFlnage.DELETE("/:id", h.deleteTypeFlange)
 		}
 	}
@@ -51,14 +51,14 @@ func (h *Handler) getTypeFlange(c *gin.Context) {
 // @ModuleID createTypeFlange
 // @Accept json
 // @Produce json
-// @Param tf body pro_model.TypeFlangeDTO true "type flange info"
+// @Param tf body moment_model.TypeFlangeDTO true "type flange info"
 // @Success 201 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/type-flange/ [post]
 func (h *Handler) createTypeFlange(c *gin.Context) {
-	var dto pro_model.TypeFlangeDTO
+	var dto moment_model.TypeFlangeDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -81,7 +81,7 @@ func (h *Handler) createTypeFlange(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "type flange id"
-// @Param tf body pro_model.TypeFlangeDTO true "type flange info"
+// @Param tf body moment_model.TypeFlangeDTO true "type flange info"
 // @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -94,7 +94,7 @@ func (h *Handler) updateTypeFlange(c *gin.Context) {
 		return
 	}
 
-	var dto pro_model.TypeFlangeDTO
+	var dto moment_model.TypeFlangeDTO
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return

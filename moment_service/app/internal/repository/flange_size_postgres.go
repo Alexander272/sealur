@@ -29,6 +29,24 @@ func (r *FlangeRepo) GetFlangeSize(ctx context.Context, req *moment_api.GetFlang
 	return size, nil
 }
 
+func (r *FlangeRepo) GetBasisFlangeSizes(ctx context.Context, req models.GetBasisSize) (sizes []models.FlangeSize, err error) {
+	args := make([]interface{}, 0)
+	args = append(args, req.StandId)
+
+	var query string
+	if req.IsUseRow {
+		query = fmt.Sprintf(`SELECT id, pn, d FROM %s WHERE stand_id=$1 AND row=$2 ORDER BY d, pn`, FlangeSizeTable)
+		args = append(args, req.Row)
+	} else {
+		query = fmt.Sprintf(`SELECT id, pn, d FROM %s WHERE stand_id=$1 ORDER BY d, pn`, FlangeSizeTable)
+	}
+
+	if err := r.db.Select(&sizes, query, args...); err != nil {
+		return sizes, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return sizes, nil
+}
+
 func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_api.CreateFlangeSizeRequest) error {
 	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, d, d6, d_out, h, s0, s1, length, count, bolt_id)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, FlangeSizeTable)

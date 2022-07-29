@@ -10,7 +10,7 @@ import (
 )
 
 func (r *FlangeRepo) GetTypeFlange(ctx context.Context, req *moment_api.GetTypeFlangeRequest) (typeFlange []models.TypeFlangeDTO, err error) {
-	query := fmt.Sprintf(`SELECT id, title FROM %s ORDER BY id`, TypeFlangeTable)
+	query := fmt.Sprintf(`SELECT id, title, label FROM %s ORDER BY id`, TypeFlangeTable)
 
 	if err := r.db.Select(&typeFlange, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -19,9 +19,9 @@ func (r *FlangeRepo) GetTypeFlange(ctx context.Context, req *moment_api.GetTypeF
 }
 
 func (r *FlangeRepo) CreateTypeFlange(ctx context.Context, typeFlange *moment_api.CreateTypeFlangeRequest) (id string, err error) {
-	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", TypeFlangeTable)
+	query := fmt.Sprintf("INSERT INTO %s (title, label) VALUES ($1, $2) RETURNING id", TypeFlangeTable)
 
-	row := r.db.QueryRow(query, typeFlange.Title)
+	row := r.db.QueryRow(query, typeFlange.Title, typeFlange.Label)
 	if row.Err() != nil {
 		return "", fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -35,12 +35,30 @@ func (r *FlangeRepo) CreateTypeFlange(ctx context.Context, typeFlange *moment_ap
 }
 
 func (r *FlangeRepo) UpdateTypeFlange(ctx context.Context, typeFlange *moment_api.UpdateTypeFlangeRequest) error {
-	query := fmt.Sprintf("UPDATE %s SET title=$1 WHERE id=$2", TypeFlangeTable)
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
 
-	_, err := r.db.Exec(query, typeFlange.Title, typeFlange.Id)
+	if typeFlange.Title != "" {
+		setValues = append(setValues, fmt.Sprintf("title=$%d", argId))
+		args = append(args, typeFlange.Title)
+		argId++
+	}
+	if typeFlange.Label != "" {
+		setValues = append(setValues, fmt.Sprintf("label=$%d", argId))
+		args = append(args, typeFlange.Label)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", TypeFlangeTable, setQuery, argId)
+
+	args = append(args, typeFlange.Id)
+	_, err := r.db.Exec(query, args...)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
+
 	return nil
 }
 
@@ -54,7 +72,7 @@ func (r *FlangeRepo) DeleteTypeFlange(ctx context.Context, typeFlange *moment_ap
 }
 
 func (r *FlangeRepo) GetStandarts(ctx context.Context, req *moment_api.GetStandartsRequest) (standarts []models.StandartDTO, err error) {
-	query := fmt.Sprintf("SELECT id, title, type_id FROM %s WHERE type_id=$1 ORDER BY id", StandartsTable)
+	query := fmt.Sprintf("SELECT id, title, type_id, title_dn, title_pn, is_need_row, rows FROM %s WHERE type_id=$1 ORDER BY id", StandartsTable)
 
 	if err := r.db.Select(&standarts, query, req.TypeId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -63,9 +81,10 @@ func (r *FlangeRepo) GetStandarts(ctx context.Context, req *moment_api.GetStanda
 }
 
 func (r *FlangeRepo) CreateStandart(ctx context.Context, stand *moment_api.CreateStandartRequest) (id string, err error) {
-	query := fmt.Sprintf("INSERT INTO %s (title, type_id) VALUES ($1, $2) RETURNING id", StandartsTable)
+	query := fmt.Sprintf(`INSERT INTO %s (title, type_id, title_dn, title_pn, is_need_row, rows) 
+		VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, StandartsTable)
 
-	row := r.db.QueryRow(query, stand.Title, stand.TypeId)
+	row := r.db.QueryRow(query, stand.Title, stand.TypeId, stand.TitleDn, stand.TitlePn, stand.IsNeedRow, strings.Join(stand.Rows, "; "))
 	if row.Err() != nil {
 		return "", fmt.Errorf("failed to execute query. error: %w", row.Err())
 	}
@@ -88,12 +107,32 @@ func (r *FlangeRepo) UpdateStandart(ctx context.Context, stand *moment_api.Updat
 		args = append(args, stand.Title)
 		argId++
 	}
-
 	if stand.TypeId != "" {
 		setValues = append(setValues, fmt.Sprintf("type_id=$%d", argId))
 		args = append(args, stand.TypeId)
 		argId++
 	}
+	if stand.TitleDn != "" {
+		setValues = append(setValues, fmt.Sprintf("title_dn=$%d", argId))
+		args = append(args, stand.TitleDn)
+		argId++
+	}
+	if stand.TitlePn != "" {
+		setValues = append(setValues, fmt.Sprintf("title_pn=$%d", argId))
+		args = append(args, stand.TitlePn)
+		argId++
+	}
+	if stand.IsNeedRow {
+		setValues = append(setValues, fmt.Sprintf("is_need_row=$%d", argId))
+		args = append(args, stand.IsNeedRow)
+		argId++
+	}
+	if stand.Rows != nil {
+		setValues = append(setValues, fmt.Sprintf("rows=$%d", argId))
+		args = append(args, strings.Join(stand.Rows, "; "))
+		argId++
+	}
+
 	setQuery := strings.Join(setValues, ", ")
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", StandartsTable, setQuery, argId)
 

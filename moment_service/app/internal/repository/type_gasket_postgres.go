@@ -3,13 +3,14 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
 func (r *GasketRepo) GetTypeGasket(ctx context.Context, req *moment_api.GetGasketTypeRequest) (types []models.TypeGasketDTO, err error) {
-	query := fmt.Sprintf(`SELECT id, title FROM %s ORDER BY id`, TypeGasketTable)
+	query := fmt.Sprintf(`SELECT id, title, label FROM %s ORDER BY id`, TypeGasketTable)
 
 	if err := r.db.Select(&types, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -18,9 +19,9 @@ func (r *GasketRepo) GetTypeGasket(ctx context.Context, req *moment_api.GetGaske
 }
 
 func (r *GasketRepo) CreateTypeGasket(ctx context.Context, typeGasket *moment_api.CreateGasketTypeRequest) (id string, err error) {
-	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", TypeGasketTable)
+	query := fmt.Sprintf("INSERT INTO %s (title, label) VALUES ($1, $2) RETURNING id", TypeGasketTable)
 
-	row := r.db.QueryRow(query, typeGasket.Title)
+	row := r.db.QueryRow(query, typeGasket.Title, typeGasket.Label)
 	if row.Err() != nil {
 		return "", fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -34,12 +35,30 @@ func (r *GasketRepo) CreateTypeGasket(ctx context.Context, typeGasket *moment_ap
 }
 
 func (r *GasketRepo) UpdateTypeGasket(ctx context.Context, typeGasket *moment_api.UpdateGasketTypeRequest) error {
-	query := fmt.Sprintf("UPDATE %s SET title=$1 WHERE id=$2", TypeGasketTable)
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
 
-	_, err := r.db.Exec(query, typeGasket.Title, typeGasket.Id)
+	if typeGasket.Title != "" {
+		setValues = append(setValues, fmt.Sprintf("title=$%d", argId))
+		args = append(args, typeGasket.Title)
+		argId++
+	}
+	if typeGasket.Label != "" {
+		setValues = append(setValues, fmt.Sprintf("label=$%d", argId))
+		args = append(args, typeGasket.Label)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", TypeGasketTable, setQuery, argId)
+
+	args = append(args, typeGasket.Id)
+	_, err := r.db.Exec(query, args...)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
+
 	return nil
 }
 

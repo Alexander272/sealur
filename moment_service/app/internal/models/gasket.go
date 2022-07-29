@@ -11,6 +11,12 @@ type GasketDTO struct {
 	Title string `db:"title"`
 }
 
+type GasketWithThick struct {
+	Id        string  `db:"id"`
+	Title     string  `db:"title"`
+	Thickness float64 `db:"thickness"`
+}
+
 type GasketDataDTO struct {
 	Id              string  `db:"id"`
 	GasketId        string  `db:"gasket_id"`
@@ -24,6 +30,7 @@ type GasketDataDTO struct {
 type TypeGasketDTO struct {
 	Id    string `db:"id"`
 	Title string `db:"title"`
+	Label string `db:"label"`
 }
 
 type FullDataGasket struct {

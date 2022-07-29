@@ -67,6 +67,7 @@ func main() {
 	moment_api.RegisterMaterialsServiceServer(server, handlers.Materials)
 	moment_api.RegisterGasketServiceServer(server, handlers.Gasket)
 	moment_api.RegisterFlangeServiceServer(server, handlers.Flange)
+	moment_api.RegisterReadServiceServer(server, handlers.Read)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {

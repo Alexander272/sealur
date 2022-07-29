@@ -13,6 +13,7 @@ func (h *Handler) initStandartsRoutes(api *gin.RouterGroup) {
 	standarts := api.Group("/standarts", h.middleware.UserIdentity)
 	{
 		standarts.GET("/", h.getStandarts)
+		standarts.GET("/size", h.getStandartsWithSize)
 		standarts = standarts.Group("/", h.middleware.AccessForMomentAdmin)
 		{
 			standarts.POST("/", h.createStandart)
@@ -51,6 +52,36 @@ func (h *Handler) getStandarts(c *gin.Context) {
 	c.JSON(http.StatusOK, models.DataResponse{Data: standarts.Standarts, Count: len(standarts.Standarts)})
 }
 
+// @Summary Get Standarts With Size
+// @Tags Sealur Moment -> standarts
+// @Security ApiKeyAuth
+// @Description получение стандартов
+// @ModuleID getStandartsWithSize
+// @Accept json
+// @Produce json
+// @Param typeId query string true "type id"
+// @Success 200 {object} models.DataResponse{Data=[]moment_api.StandartWithSize}
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-moment/standarts/size [get]
+func (h *Handler) getStandartsWithSize(c *gin.Context) {
+	typeId := c.Query("typeId")
+	if typeId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty typeId param")
+		return
+	}
+
+	//? путь где лежат файлы с расчетами. smb://martynov@192.168.5.24/documents/ИМЕННЫЕ%20ПАПКИ/Холкин%20В.А/Работа/Сервис-Газификация/Расчеты
+	standarts, err := h.flangeClient.GetStandartsWithSize(c, &moment_api.GetStandartsRequest{TypeId: typeId})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: standarts.Standarts, Count: len(standarts.Standarts)})
+}
+
 // @Summary Create Standart
 // @Tags Sealur Moment -> standarts
 // @Security ApiKeyAuth
@@ -72,8 +103,12 @@ func (h *Handler) createStandart(c *gin.Context) {
 	}
 
 	stand, err := h.flangeClient.CreateStandart(c, &moment_api.CreateStandartRequest{
-		Title:  dto.Title,
-		TypeId: dto.TypeId,
+		Title:     dto.Title,
+		TypeId:    dto.TypeId,
+		TitleDn:   dto.TitleDn,
+		TitlePn:   dto.TitlePn,
+		IsNeedRow: dto.IsNeedRow,
+		Rows:      dto.Rows,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -111,9 +146,13 @@ func (h *Handler) updateStandart(c *gin.Context) {
 	}
 
 	_, err := h.flangeClient.UpdateStandart(c, &moment_api.UpdateStandartRequest{
-		Id:     id,
-		Title:  dto.Title,
-		TypeId: dto.TypeId,
+		Id:        id,
+		Title:     dto.Title,
+		TypeId:    dto.TypeId,
+		TitleDn:   dto.TitleDn,
+		TitlePn:   dto.TitlePn,
+		IsNeedRow: dto.IsNeedRow,
+		Rows:      dto.Rows,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")

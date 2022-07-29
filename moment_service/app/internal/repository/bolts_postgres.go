@@ -10,7 +10,7 @@ import (
 )
 
 func (r *FlangeRepo) GetBolts(ctx context.Context, req *moment_api.GetBoltsRequest) (bolts []models.BoltsDTO, err error) {
-	query := fmt.Sprintf(`SELECT id, title, diameter, area FROM %s ORDER BY title`, BoltsTable)
+	query := fmt.Sprintf(`SELECT id, title, diameter, area FROM %s ORDER BY diameter`, BoltsTable)
 
 	if err := r.db.Select(&bolts, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
