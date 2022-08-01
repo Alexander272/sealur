@@ -41,3 +41,12 @@ type GetBasisSize struct {
 	StandId  string `db:"stand_id"`
 	Row      string `db:"row"`
 }
+
+type Data struct {
+	Work       string
+	Flanges    string
+	SameFlange string
+	Embedded   string
+	Type       string
+	Condition  string
+}

@@ -93,10 +93,13 @@ func (h *Handler) calculate(c *gin.Context) {
 		return
 	}
 
-	washer, err := dto.Washer.NewWasher()
-	if err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
-		return
+	var washer []*moment_api.WasherData
+	if dto.IsUseWasher {
+		washer, err = dto.Washer.NewWasher()
+		if err != nil {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+			return
+		}
 	}
 
 	data := &moment_api.CalcFlangeRequest{

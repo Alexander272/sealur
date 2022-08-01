@@ -45,6 +45,12 @@ func (r *MaterialsRepo) GetMaterialsWithIsEmpty(ctx context.Context, req *moment
 }
 
 func (r *MaterialsRepo) GetAllData(ctx context.Context, req *moment_api.GetMaterialsDataRequest) (materials models.MaterialsAll, err error) {
+	query := fmt.Sprintf(`SELECT title FROM %s WHERE id=$1`, MaterialsTable)
+
+	if err := r.db.Get(&materials, query, req.MarkId); err != nil {
+		return materials, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
 	voltageQuery := fmt.Sprintf("SELECT id, temperature, voltage FROM %s WHERE mark_id=$1 ORDER BY temperature", VoltageTable)
 	var voltage []models.Voltage
 

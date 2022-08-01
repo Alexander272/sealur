@@ -29,8 +29,6 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 	epsilonAt20 = math.Round(mats.Elasticity[0].Elasticity*1000) / 1000 * math.Pow10(5)
 	sigmaAt20 = math.Round(mats.Voltage[0].Voltage*1000) / 1000
 
-	//TODO лучше возвращать не id (прокладки и среды) а текст (не нужно будет искать текст на клиенте)
-
 	if temp < mats.Alpha[0].Temperature {
 		alphaF = math.Round(mats.Alpha[0].Alpha*1000) / 1000 * math.Pow10(-6)
 	} else if temp > mats.Alpha[len(mats.Alpha)-1].Temperature {
@@ -92,6 +90,7 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 	}
 
 	res := models.MaterialsResult{
+		Title:       mats.Title,
 		AlphaF:      alphaF,
 		EpsilonAt20: epsilonAt20,
 		Epsilon:     epsilon,

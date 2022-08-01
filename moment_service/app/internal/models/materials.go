@@ -19,6 +19,7 @@ type Alpha struct {
 }
 
 type MaterialsAll struct {
+	Title      string `db:"title"`
 	Alpha      []Alpha
 	Elasticity []Elasticity
 	Voltage    []Voltage
@@ -59,6 +60,7 @@ type AlphaDTO struct {
 }
 
 type MaterialsResult struct {
+	Title       string
 	AlphaF      float64
 	EpsilonAt20 float64
 	Epsilon     float64

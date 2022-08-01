@@ -74,7 +74,21 @@ func NewCalcFlangeService(flange *FlangeService, materials *MaterialsService, ga
 
 //? можно расчет по основным формулам вынести в отдельный пакет, а потом просто использовать (должно сделать код более понятным)
 func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.CalcFlangeRequest) (*moment_api.FlangeResponse, error) {
+	initData := s.formatInitData(data)
+
 	result := moment_api.FlangeResponse{
+		Data: &moment_api.DataResult{
+			Pressure:      data.Pressure,
+			BendingMoment: data.BendingMoment,
+			AxialForce:    data.AxialForce,
+			Temp:          data.Temp,
+			Work:          initData.Work,
+			Flanges:       initData.Flanges,
+			SameFlange:    initData.SameFlange,
+			Embedded:      initData.Embedded,
+			Type:          initData.Type,
+			Condition:     initData.Condition,
+		},
 		IsSameFlange: data.IsSameFlange,
 		Bolt:         &moment_api.BoltResult{},
 		Calc: &moment_api.CalculatedFlange{
@@ -101,6 +115,8 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		}
 	}
 
+	//TODO добавить h0 и использовать ее для расчетов
+	//TODO добавить dnk, dk, ds, hk
 	result.Flanges = append(result.Flanges, &moment_api.FlangeResult{
 		DOut:         flange1.DOut,
 		D:            flange1.D,
@@ -131,6 +147,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		SigmaR:       flange1.SigmaR,
 		SigmaRAt20:   flange1.SigmaRAt20,
 		Material:     flange1.Material,
+		RingMaterial: flange1.RingMaterial,
 	})
 
 	type1 := data.FlangesData[0].Type
@@ -180,6 +197,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 			SigmaR:       flange2.SigmaR,
 			SigmaRAt20:   flange2.SigmaRAt20,
 			Material:     flange2.Material,
+			RingMaterial: flange2.RingMaterial,
 		})
 		type2 = data.FlangesData[1].Type
 	} else {
@@ -210,6 +228,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		Epsilon:     boltMat.Epsilon,
 		SigmaAt20:   boltMat.SigmaAt20,
 		Sigma:       boltMat.Sigma,
+		Material:    boltMat.Title,
 	}
 
 	//TODO учесть ввод данных для прокладки (все значения заносятся ручками)
@@ -231,7 +250,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 
 	var detMat models.MaterialsResult
 	if data.IsEmbedded {
-		//* тут было получиние прокладки еще раз, но входные данные не менялись, так что я это убрал
+		//* тут было получение прокладки еще раз, но входные данные не менялись, так что я это убрал
 		Lb0 += gasket.Thickness
 		Lb0 += data.Embed.Thickness
 
@@ -240,8 +259,9 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 			return nil, err
 		}
 
+		//TODO заменить марку на название
 		result.Embed = &moment_api.EmbedResult{
-			MarkId:    data.Embed.MarkId,
+			Material:  detMat.Title,
 			Thickness: data.Embed.Thickness,
 			Alpfa:     detMat.AlphaF,
 			Temp:      data.Temp,
@@ -251,8 +271,9 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 	bp := (data.Gasket.DOut - data.Gasket.DIn) / 2
 
 	result.Gasket = &moment_api.GasketResult{
-		GasketId:        data.Gasket.GasketId,
-		EnvId:           data.Gasket.EnvId,
+		Gasket:          gasket.Gasket,
+		Env:             gasket.Env,
+		Type:            gasket.Type,
 		Thickness:       data.Gasket.Thickness,
 		DOut:            data.Gasket.DOut,
 		Width:           bp,
@@ -487,7 +508,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		Kyz := s.Kyz[data.Condition.String()]
 		Kyt := constants.NoLoadKyt
 
-		//TODO расчеты не верные
+		//TODO расчеты не верные (но это не точно)
 		result.Calc.Strength.FDSigmaM = 1.2 * Kyp * Kyz * Kyt * boltMat.SigmaAt20
 		result.Calc.Strength.FDSigmaR = Kyp * Kyz * Kyt * boltMat.Sigma
 
@@ -1022,6 +1043,42 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 	return &result, nil
 }
 
+func (s *CalcFlangeService) formatInitData(data *moment_api.CalcFlangeRequest) models.Data {
+	work := map[bool]string{
+		true:  "Рабочие условия",
+		false: "Условия испытаний",
+	}
+	flanges := map[string]string{
+		"isolated":    "Изолированные фланцы",
+		"nonIsolated": "Неизолированные фланцы",
+		"manually":    "Задается вручную",
+	}
+	sameFlange := map[bool]string{
+		true:  "Да",
+		false: "Нет",
+	}
+	typeD := map[string]string{
+		"pin":  "Шпилька",
+		"bolt": "Болт",
+	}
+	condition := map[string]string{
+		"uncontrollable":  "Неконтролируемая затяжка",
+		"controllable":    "Контроль по крутящему моменту",
+		"controllablePin": "Контроль по вытяжке шпилек",
+	}
+
+	res := models.Data{
+		Work:       work[data.IsWork],
+		Flanges:    flanges[data.Flanges.String()],
+		SameFlange: sameFlange[data.IsSameFlange],
+		Embedded:   sameFlange[data.IsEmbedded],
+		Type:       typeD[data.Type.String()],
+		Condition:  condition[data.Condition.String()],
+	}
+
+	return res
+}
+
 // Функция для получения данных необходимых для расчетов
 func (s *CalcFlangeService) getDataFlange(
 	ctx context.Context,
@@ -1053,13 +1110,12 @@ func (s *CalcFlangeService) getDataFlange(
 	if flange.Type == moment_api.FlangeData_free {
 		dataFlange.Tk = s.typeFlangesTK[typeFlange] * temp
 
-		//TODO тут неправильная марка указана
-		//? при свободных фланцах еще один материал добавляется (пока он у меня не учитывается)
-		mat, err := s.materials.GetMatFotCalculate(ctx, flange.MarkId, dataFlange.Tk)
+		//? при свободных фланцах добавляется еще один материал
+		mat, err := s.materials.GetMatFotCalculate(ctx, flange.RingMarkId, dataFlange.Tk)
 		if err != nil {
 			return models.InitialDataFlange{}, err
 		}
-
+		dataFlange.RingMaterial = mat.Title
 		dataFlange.AlphaK = mat.AlphaF
 		dataFlange.EpsilonKAt20 = mat.EpsilonAt20
 		dataFlange.EpsilonK = mat.Epsilon
@@ -1072,6 +1128,7 @@ func (s *CalcFlangeService) getDataFlange(
 		return models.InitialDataFlange{}, err
 	}
 
+	dataFlange.Material = mat.Title
 	dataFlange.AlphaF = mat.AlphaF
 	dataFlange.EpsilonAt20 = mat.EpsilonAt20
 	dataFlange.Epsilon = mat.Epsilon
@@ -1097,7 +1154,7 @@ func (s *CalcFlangeService) getCalculatedData(
 	if flange.Type != moment_api.FlangeData_free {
 		calculated.B = 0.5 * (data.D6 - Dcp)
 	} else {
-		calculated.Ds = 0.5 * (data.DOut + data.Dk + 2*data.H)
+		calculated.Ds = 0.5 * (data.DOut + data.Dk + 2*data.H0)
 		calculated.A = 0.5 * (data.D6 - data.Ds)
 		calculated.B = 0.5 * (data.Ds - Dcp)
 	}

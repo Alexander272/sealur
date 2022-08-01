@@ -7,6 +7,7 @@ type InitialDataFlange struct {
 	Dnk          float64
 	Ds           float64
 	H            float64
+	H0           float64
 	Hk           float64
 	S0           float64
 	S1           float64
@@ -30,6 +31,7 @@ type InitialDataFlange struct {
 	SigmaR       float64
 	SigmaRAt20   float64
 	Material     string
+	RingMaterial string
 	Count        int32
 	Diameter     int32
 	Area         float64

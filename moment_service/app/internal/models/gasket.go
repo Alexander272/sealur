@@ -35,8 +35,8 @@ type TypeGasketDTO struct {
 
 type FullDataGasket struct {
 	Id              string  `db:"id"`
-	GasketId        string  `db:"gasket_id"`
-	EnvId           string  `db:"env_id"`
+	Gasket          string  `db:"gasket_title"`
+	Env             string  `db:"env_title"`
 	M               float64 `db:"m"`
 	SpecificPres    float64 `db:"specific_pres"`
 	PermissiblePres float64 `db:"permissible_pres"`

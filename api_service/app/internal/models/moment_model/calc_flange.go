@@ -110,6 +110,11 @@ type FlangeSize struct {
 	S1   string `json:"s1"`
 	L    string `json:"l"`
 	D6   string `json:"d6"`
+	Dnk  string `json:"dnk"`
+	Dk   string `json:"dk"`
+	Ds   string `json:"ds"`
+	H0   string `json:"h0"`
+	Hk   string `json:"hk"`
 }
 
 func (m *MaterialData) NewMaterial() (mat *moment_api.MaterialData, err error) {
@@ -167,13 +172,48 @@ func (s *FlangeSize) NewSize() (size *moment_api.FlangeData_Size, err error) {
 	if err != nil {
 		return nil, err
 	}
-	s1, err := strconv.ParseFloat(s.S1, 64)
-	if err != nil {
-		return nil, err
+	var s1, l, dnk, dk, ds, h0, hk float64
+	if s.S1 != "" {
+		s1, err = strconv.ParseFloat(s.S1, 64)
+		if err != nil {
+			return nil, err
+		}
 	}
-	l, err := strconv.ParseFloat(s.L, 64)
-	if err != nil {
-		return nil, err
+	if s.L != "" {
+		l, err = strconv.ParseFloat(s.L, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if s.Dnk != "" {
+		dnk, err = strconv.ParseFloat(s.Dnk, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if s.Dk != "" {
+		dk, err = strconv.ParseFloat(s.Dk, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if s.Ds != "" {
+		ds, err = strconv.ParseFloat(s.Ds, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if s.H0 != "" {
+		h0, err = strconv.ParseFloat(s.H0, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if s.Hk != "" {
+		hk, err = strconv.ParseFloat(s.Hk, 64)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	size = &moment_api.FlangeData_Size{
@@ -184,6 +224,11 @@ func (s *FlangeSize) NewSize() (size *moment_api.FlangeData_Size, err error) {
 		S1:   s1,
 		L:    l,
 		D6:   d6,
+		Dnk:  dnk,
+		Dk:   dk,
+		Ds:   ds,
+		H0:   h0,
+		Hk:   hk,
 	}
 
 	return size, nil
