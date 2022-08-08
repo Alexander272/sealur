@@ -43,5 +43,6 @@ type FullDataGasket struct {
 	Compression     float64 `db:"compression"`
 	Epsilon         float64 `db:"epsilon"`
 	Thickness       float64 `db:"thickness"`
-	Type            string  `db:"type_title"`
+	TypeTitle       string  `db:"type_title"`
+	Type            string  `db:"type_label"`
 }

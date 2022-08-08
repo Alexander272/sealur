@@ -29,9 +29,9 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 	epsilonAt20 = math.Round(mats.Elasticity[0].Elasticity*1000) / 1000 * math.Pow10(5)
 	sigmaAt20 = math.Round(mats.Voltage[0].Voltage*1000) / 1000
 
-	if temp < mats.Alpha[0].Temperature {
+	if temp <= mats.Alpha[0].Temperature {
 		alphaF = math.Round(mats.Alpha[0].Alpha*1000) / 1000 * math.Pow10(-6)
-	} else if temp > mats.Alpha[len(mats.Alpha)-1].Temperature {
+	} else if temp >= mats.Alpha[len(mats.Alpha)-1].Temperature {
 		alphaF = math.Round(mats.Alpha[len(mats.Alpha)-1].Alpha*1000) / 1000 * math.Pow10(-6)
 	} else {
 		for i, m := range mats.Alpha {
@@ -49,9 +49,9 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 		}
 	}
 
-	if temp < mats.Elasticity[0].Temperature {
+	if temp <= mats.Elasticity[0].Temperature {
 		epsilon = math.Round(mats.Elasticity[0].Elasticity*1000) / 1000 * math.Pow10(5)
-	} else if temp > mats.Elasticity[len(mats.Elasticity)-1].Temperature {
+	} else if temp >= mats.Elasticity[len(mats.Elasticity)-1].Temperature {
 		epsilon = math.Round(mats.Elasticity[len(mats.Elasticity)-1].Elasticity*1000) / 1000 * math.Pow10(5)
 	} else {
 		for i, m := range mats.Elasticity {
@@ -69,9 +69,9 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 		}
 	}
 
-	if temp < mats.Voltage[0].Temperature {
+	if temp <= mats.Voltage[0].Temperature {
 		sigma = math.Round(mats.Voltage[0].Voltage*1000) / 1000
-	} else if temp > mats.Voltage[len(mats.Voltage)-1].Temperature {
+	} else if temp >= mats.Voltage[len(mats.Voltage)-1].Temperature {
 		sigma = math.Round(mats.Voltage[len(mats.Voltage)-1].Voltage*1000) / 1000
 	} else {
 		for i, m := range mats.Voltage {

@@ -20,15 +20,17 @@ func NewGasketRepo(db *sqlx.DB) *GasketRepo {
 
 func (r *GasketRepo) GetFullData(ctx context.Context, req models.GetGasket) (data models.FullDataGasket, err error) {
 	query := fmt.Sprintf(`SELECT %s.id, %s.title as gasket_title, %s.title as env_title, permissible_pres, compression, epsilon, thickness, m, specific_pres, 
-		(SELECT title FROM %s WHERE id = type_id) as type_title
+		%s.title as type_title, %s.label as type_label
 		FROM %s
+		INNER JOIN %s ON %s.type_id = %s.id
 		INNER JOIN %s ON %s.gasket_id = %s.gasket_id
 		INNER JOIN %s ON %s.gasket_id = %s.id
 		INNER JOIN %s ON %s.env_id = %s.id
 		WHERE %s.gasket_id=$1 AND env_id=$2 AND thickness=$3`,
 		GasketDataTable, GasketTable, EnvTable,
-		TypeGasketTable,
+		TypeGasketTable, TypeGasketTable,
 		GasketDataTable,
+		TypeGasketTable, GasketDataTable, TypeGasketTable,
 		EnvDataTable, GasketDataTable, EnvDataTable,
 		GasketTable, GasketDataTable, GasketTable,
 		EnvTable, EnvDataTable, EnvTable, GasketDataTable,

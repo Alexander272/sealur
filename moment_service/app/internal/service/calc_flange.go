@@ -8,6 +8,7 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
+	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
@@ -103,20 +104,31 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 
 	var washer1, washer2 models.MaterialsResult
 
-	flange1, err := s.getDataFlange(ctx, data.FlangesData[0], data.Flanges.String(), data.Temp)
+	flange1, err := s.getDataFlange(ctx, data.FlangesData[0], data.Bolts, data.Flanges.String(), data.Temp)
 	if err != nil {
 		return nil, err
 	}
-	//? я использую температуру фланца. хз верно илил нет. возможно
+	//? я использую температуру фланца. хз верно илил нет.
 	if data.IsUseWasher {
-		washer1, err = s.materials.GetMatFotCalculate(ctx, data.Washer[0].MarkId, flange1.Tf)
-		if err != nil {
-			return nil, err
+		if data.Washer[0].MarkId != "another" {
+			washer1, err = s.materials.GetMatFotCalculate(ctx, data.Washer[0].MarkId, flange1.Tf)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			washer1 = models.MaterialsResult{
+				Title:  data.Washer[0].Material.Title,
+				AlphaF: data.Washer[0].Material.AlphaF,
+			}
 		}
+		result.Washers = append(result.Washers, &moment_api.WasherResult{
+			Material:  washer1.Title,
+			Thickness: data.Washer[0].Thickness,
+			Alpfa:     washer1.AlphaF,
+			Temp:      flange1.Tf,
+		})
 	}
 
-	//TODO добавить h0 и использовать ее для расчетов
-	//TODO добавить dnk, dk, ds, hk
 	result.Flanges = append(result.Flanges, &moment_api.FlangeResult{
 		DOut:         flange1.DOut,
 		D:            flange1.D,
@@ -124,6 +136,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		Dnk:          flange1.Dnk,
 		Ds:           flange1.Ds,
 		H:            flange1.H,
+		H0:           flange1.H0,
 		Hk:           flange1.Hk,
 		S0:           flange1.S0,
 		S1:           flange1.S1,
@@ -148,6 +161,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		SigmaRAt20:   flange1.SigmaRAt20,
 		Material:     flange1.Material,
 		RingMaterial: flange1.RingMaterial,
+		Type:         data.FlangesData[0].Type.String(),
 	})
 
 	type1 := data.FlangesData[0].Type
@@ -155,15 +169,28 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 
 	var flange2 models.InitialDataFlange
 	if len(data.FlangesData) > 1 {
-		flange2, err = s.getDataFlange(ctx, data.FlangesData[1], data.Flanges.String(), data.Temp)
+		flange2, err = s.getDataFlange(ctx, data.FlangesData[1], data.Bolts, data.Flanges.String(), data.Temp)
 		if err != nil {
 			return nil, err
 		}
 		if data.IsUseWasher {
-			washer2, err = s.materials.GetMatFotCalculate(ctx, data.Washer[1].MarkId, flange2.Tf)
-			if err != nil {
-				return nil, err
+			if data.Washer[1].MarkId != "another" {
+				washer2, err = s.materials.GetMatFotCalculate(ctx, data.Washer[1].MarkId, flange2.Tf)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				washer1 = models.MaterialsResult{
+					Title:  data.Washer[1].Material.Title,
+					AlphaF: data.Washer[1].Material.AlphaF,
+				}
 			}
+			result.Washers = append(result.Washers, &moment_api.WasherResult{
+				Material:  washer2.Title,
+				Thickness: data.Washer[0].Thickness,
+				Alpfa:     washer2.AlphaF,
+				Temp:      flange2.Tf,
+			})
 		}
 
 		// res := moment_api.FlangeResult(flange2)
@@ -174,6 +201,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 			Dnk:          flange2.Dnk,
 			Ds:           flange2.Ds,
 			H:            flange2.H,
+			H0:           flange2.H0,
 			Hk:           flange2.Hk,
 			S0:           flange2.S0,
 			S1:           flange2.S1,
@@ -198,6 +226,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 			SigmaRAt20:   flange2.SigmaRAt20,
 			Material:     flange2.Material,
 			RingMaterial: flange2.RingMaterial,
+			Type:         data.FlangesData[1].Type.String(),
 		})
 		type2 = data.FlangesData[1].Type
 	} else {
@@ -211,12 +240,24 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 	if data.FlangesData[0].Type == moment_api.FlangeData_free {
 		Tb = s.typeFlangesTB[data.Flanges.String()+"-free"] * data.Temp
 	}
-	//TODO учитывать возможность ввода вручную
 
-	boltMat, err := s.materials.GetMatFotCalculate(ctx, data.Bolts.MarkId, Tb)
-	if err != nil {
-		return nil, err
+	var boltMat models.MaterialsResult
+	if data.Bolts.MarkId != "another" {
+		boltMat, err = s.materials.GetMatFotCalculate(ctx, data.Bolts.MarkId, Tb)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		boltMat = models.MaterialsResult{
+			Title:       data.Bolts.Title,
+			AlphaF:      data.Bolts.Material.AlphaF,
+			EpsilonAt20: data.Bolts.Material.EpsilonAt20,
+			Epsilon:     data.Bolts.Material.Epsilon,
+			SigmaAt20:   data.Bolts.Material.SigmaAt20,
+			Sigma:       data.Bolts.Material.Sigma,
+		}
 	}
+
 	result.Bolt = &moment_api.BoltResult{
 		Diameter:    flange1.Diameter,
 		Area:        flange1.Area,
@@ -231,11 +272,31 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		Material:    boltMat.Title,
 	}
 
-	//TODO учесть ввод данных для прокладки (все значения заносятся ручками)
-	g := models.GetGasket{GasketId: data.Gasket.GasketId, EnvId: data.Gasket.EnvId, Thickness: data.Gasket.Thickness}
-	gasket, err := s.gasket.GetFullData(ctx, g)
-	if err != nil {
-		return nil, err
+	var gasket models.FullDataGasket
+	if data.Gasket.GasketId != "another" {
+		g := models.GetGasket{GasketId: data.Gasket.GasketId, EnvId: data.Gasket.EnvId, Thickness: data.Gasket.Thickness}
+		gasket, err = s.gasket.GetFullData(ctx, g)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		//? наверное это не лучшее решение
+		titles := map[string]string{
+			"Soft":  "Мягкая",
+			"Oval":  "Восьмигранная",
+			"Metal": "Металлическая",
+		}
+		gasket = models.FullDataGasket{
+			Gasket:          data.Gasket.Data.Title,
+			M:               data.Gasket.Data.M,
+			SpecificPres:    data.Gasket.Data.Qo,
+			PermissiblePres: data.Gasket.Data.PermissiblePres,
+			Compression:     data.Gasket.Data.Compression,
+			Epsilon:         data.Gasket.Data.Epsilon,
+			Thickness:       data.Gasket.Thickness,
+			TypeTitle:       titles[data.Gasket.Data.Type.String()],
+			Type:            data.Gasket.Data.Type.String(),
+		}
 	}
 
 	Lb0 := gasket.Thickness
@@ -254,12 +315,18 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		Lb0 += gasket.Thickness
 		Lb0 += data.Embed.Thickness
 
-		detMat, err = s.materials.GetMatFotCalculate(ctx, data.Embed.MarkId, data.Temp)
-		if err != nil {
-			return nil, err
+		if data.Embed.MarkId != "another" {
+			detMat, err = s.materials.GetMatFotCalculate(ctx, data.Embed.MarkId, data.Temp)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			detMat = models.MaterialsResult{
+				Title:  data.Embed.Material.Title,
+				AlphaF: data.Embed.Material.AlphaF,
+			}
 		}
 
-		//TODO заменить марку на название
 		result.Embed = &moment_api.EmbedResult{
 			Material:  detMat.Title,
 			Thickness: data.Embed.Thickness,
@@ -273,7 +340,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 	result.Gasket = &moment_api.GasketResult{
 		Gasket:          gasket.Gasket,
 		Env:             gasket.Env,
-		Type:            gasket.Type,
+		Type:            gasket.TypeTitle,
 		Thickness:       data.Gasket.Thickness,
 		DOut:            data.Gasket.DOut,
 		Width:           bp,
@@ -286,6 +353,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 
 	var b0, Dcp float64
 
+	//? может все таки сделать тип в прото или enum в модели
 	if gasket.Type == "Oval" {
 		// фомула 4
 		b0 = bp / 4
@@ -456,7 +524,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		if data.IsNeedFormulas {
 			dcp := strconv.FormatFloat(Dcp, 'f', -1, 64)
 			b0 := strconv.FormatFloat(b0, 'f', -1, 64)
-			p := strconv.FormatFloat(math.Abs(gasket.SpecificPres), 'f', -1, 64)
+			p := strconv.FormatFloat(math.Abs(data.Pressure), 'f', -1, 64)
 			m := strconv.FormatFloat(gasket.M, 'f', -1, 64)
 
 			// result.Formulas.Rp = fmt.Sprintf("%f * %s * %s * %s * %s", math.Pi, dcp, b0, m, p)
@@ -479,7 +547,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		p := strconv.FormatFloat(data.Pressure, 'f', -1, 64)
 
 		result.Formulas.Qd = fmt.Sprintf("0.785 * %s^2 * %s", dcp, p)
-		result.Formulas.Qfm = fmt.Sprintf("max((%d + 4*|%d/%s|);(%d - 4*|%d/%s|))",
+		result.Formulas.Qfm = fmt.Sprintf("max((%d + 4*|%d|/%s);(%d - 4*|%d|/%s))",
 			data.AxialForce, data.BendingMoment, dcp, data.AxialForce, data.BendingMoment, dcp)
 	}
 
@@ -488,11 +556,12 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 	result.Calc.Qd = Qd
 	result.Calc.Qfm = QFM
 
-	Pb2 := math.Max(Pobg, 0.4*Ab*boltMat.SigmaAt20)
+	minB := 0.4 * Ab * boltMat.SigmaAt20
+	Pb2 := math.Max(Pobg, minB)
 	Pb1 := alpha*(Qd+float64(data.AxialForce)) + Rp + 4*alphaM*math.Abs(float64(data.BendingMoment))/Dcp
 
-	// if ($Moment != 1)
 	if data.Calculation != moment_api.CalcFlangeRequest_basis {
+		result.Calc.Strength.MinB = minB
 		result.Calc.Strength.FPb1 = Pb1
 		result.Calc.Strength.FPb2 = Pb2
 
@@ -671,7 +740,8 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 			th := strconv.FormatFloat(data.Washer[0].Thickness, 'f', -1, 64)
 			w2 := strconv.FormatFloat(washer2.AlphaF, 'f', -1, 64)
 
-			tF1 = fmt.Sprintf("(%s*%s + %s*%s) * (%s-20) + (%s*%s + %s*%s) * (%s-20)", af1, h1, w1, th, tf1, af2, h2, w2, th, tf2)
+			tF1 = fmt.Sprintf("(%s*%s + %s*%s) * (%s-20) + (%s*%s + %s*%s) * (%s-20)",
+				af1, h1, w1, th, tf1, af2, h2, w2, th, tf2)
 		} else {
 			tF1 = fmt.Sprintf("%s * %s * (%s-20) + %s * %s * (%s-20)", af1, h1, tf1, af2, h2, tf2)
 		}
@@ -763,6 +833,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 	}
 
 	if data.Calculation == moment_api.CalcFlangeRequest_basis {
+		result.Calc.Basis.MinB = minB
 		result.Calc.Basis.Pb1 = Pb1
 		result.Calc.Basis.Pb2 = Pb2
 		result.Calc.Basis.Pbr = Pbr
@@ -780,6 +851,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 			ab := strconv.FormatFloat(Ab, 'f', -1, 64)
 			bs20 := strconv.FormatFloat(boltMat.SigmaAt20, 'f', -1, 64)
 			bs := strconv.FormatFloat(boltMat.Sigma, 'f', -1, 64)
+			bp := strconv.FormatFloat(bp, 'f', -1, 64)
 
 			a := strconv.FormatFloat(alpha, 'f', -1, 64)
 			qd := strconv.FormatFloat(Qd, 'f', -1, 64)
@@ -798,18 +870,20 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 			kyt := strconv.FormatFloat(Kyt, 'f', -1, 64)
 
 			pb1 := fmt.Sprintf("%s * (%s + %d) + %s + 4 * %s * |%d|/%s", a, qd, data.AxialForce, rp, am, data.BendingMoment, dcp)
-			result.Formulas.Basis.Pb2 = fmt.Sprintf("max(%s;0,4 * %s * %s)", po, ab, bs20)
+			result.Formulas.Basis.Pb2 = fmt.Sprintf("max(%s;0.4 * %s * %s)", po, ab, bs20)
 			result.Formulas.Basis.Pb1 = fmt.Sprintf("max(%s; %s-%s)", pb1, pb1, qt)
 			result.Formulas.Basis.Pb = fmt.Sprintf("max(%s;%s)", pb1R, pb2)
 			result.Formulas.Basis.Pbr = fmt.Sprintf("%s + (1-%s) * (%s + %d) + %s + 4 * (1-%s) * |%d|/%s",
 				pbm, a, qd, data.AxialForce, qt, am, data.BendingMoment, dcp)
 			result.Formulas.Basis.SigmaB1 = fmt.Sprintf("%s / %s", pbm, ab)
 			result.Formulas.Basis.SigmaB2 = fmt.Sprintf("%s / %s", pbr, ab)
-			result.Formulas.Basis.DSigmaM = fmt.Sprintf("1,2 * %s * %s * %s * %s", kyp, kyz, kyt, bs20)
+			result.Formulas.Basis.DSigmaM = fmt.Sprintf("1.2 * %s * %s * %s * %s", kyp, kyz, kyt, bs20)
 			result.Formulas.Basis.DSigmaR = fmt.Sprintf("%s * %s * %s * %s", kyp, kyz, kyt, bs)
+			result.Formulas.Basis.Q = fmt.Sprintf("max(%s; %s) / %f * %s *%s", pbm, pbr, math.Pi, dcp, bp)
 		}
 
-		if (v_sigmab1 && v_sigmab2 && gasket.Type != "Soft") || (v_sigmab1 && v_sigmab2 && qmax <= float64(gasket.PermissiblePres) && gasket.Type == "Soft") {
+		if (v_sigmab1 && v_sigmab2 && gasket.Type != "Soft") ||
+			(v_sigmab1 && v_sigmab2 && qmax <= float64(gasket.PermissiblePres) && gasket.Type == "Soft") {
 			// var Mkp float64
 			if result.Calc.Basis.SigmaB1 > constants.MaxSigmaB && flange1.Diameter >= constants.MinDiameter && flange1.Diameter <= constants.MaxDiameter {
 				result.Calc.Basis.Mkp = s.graphic.CalculateMkp(flange1.Diameter, result.Calc.Basis.SigmaB1)
@@ -1083,26 +1157,54 @@ func (s *CalcFlangeService) formatInitData(data *moment_api.CalcFlangeRequest) m
 func (s *CalcFlangeService) getDataFlange(
 	ctx context.Context,
 	flange *moment_api.FlangeData,
+	bolt *moment_api.BoltData,
 	typeFlange string,
 	temp float64,
 ) (models.InitialDataFlange, error) {
-	size, err := s.flange.GetFlangeSize(ctx, &moment_api.GetFlangeSizeRequest{D: float64(flange.Dy), Pn: flange.Py, StandId: flange.StandartId})
-	if err != nil {
-		return models.InitialDataFlange{}, fmt.Errorf("failed to get size. error: %w", err)
-	}
+	var dataFlange models.InitialDataFlange
 
-	dataFlange := models.InitialDataFlange{
-		DOut:     size.DOut,
-		D:        size.D,
-		H:        size.H,
-		S0:       size.S0,
-		S1:       size.S1,
-		L:        size.Length,
-		D6:       size.D6,
-		Diameter: size.Diameter,
-		Count:    size.Count,
-		Area:     size.Area,
-		C:        flange.Corrosion,
+	if flange.StandartId == "another" {
+		dataFlange = models.InitialDataFlange{
+			DOut:     flange.Size.DOut,
+			D:        flange.Size.D,
+			Dk:       flange.Size.Dk,
+			Dnk:      flange.Size.Dnk,
+			Ds:       flange.Size.Ds,
+			H:        flange.Size.H,
+			H0:       flange.Size.H0,
+			Hk:       flange.Size.Hk,
+			S0:       flange.Size.S0,
+			S1:       flange.Size.S1,
+			L:        flange.Size.L,
+			D6:       flange.Size.D6,
+			Diameter: bolt.Diameter,
+			Count:    bolt.Count,
+			Area:     bolt.Area,
+			C:        flange.Corrosion,
+		}
+	} else {
+		size, err := s.flange.GetFlangeSize(ctx, &moment_api.GetFlangeSizeRequest{
+			D:       float64(flange.Dy),
+			Pn:      flange.Py,
+			StandId: flange.StandartId,
+		})
+		if err != nil {
+			return models.InitialDataFlange{}, fmt.Errorf("failed to get size. error: %w", err)
+		}
+
+		dataFlange = models.InitialDataFlange{
+			DOut:     size.DOut,
+			D:        size.D,
+			H:        size.H,
+			S0:       size.S0,
+			S1:       size.S1,
+			L:        size.Length,
+			D6:       size.D6,
+			Diameter: size.Diameter,
+			Count:    size.Count,
+			Area:     size.Area,
+			C:        flange.Corrosion,
+		}
 	}
 
 	dataFlange.Tf = s.typeFlangesTF[typeFlange] * temp
@@ -1111,9 +1213,22 @@ func (s *CalcFlangeService) getDataFlange(
 		dataFlange.Tk = s.typeFlangesTK[typeFlange] * temp
 
 		//? при свободных фланцах добавляется еще один материал
-		mat, err := s.materials.GetMatFotCalculate(ctx, flange.RingMarkId, dataFlange.Tk)
-		if err != nil {
-			return models.InitialDataFlange{}, err
+		var mat models.MaterialsResult
+		if flange.RingMarkId != "another" {
+			var err error
+			mat, err = s.materials.GetMatFotCalculate(ctx, flange.RingMarkId, dataFlange.Tk)
+			if err != nil {
+				return models.InitialDataFlange{}, err
+			}
+		} else {
+			mat = models.MaterialsResult{
+				Title:       flange.RingMaterial.Title,
+				AlphaF:      flange.RingMaterial.AlphaF,
+				EpsilonAt20: flange.RingMaterial.EpsilonAt20,
+				Epsilon:     flange.RingMaterial.Epsilon,
+				SigmaAt20:   flange.RingMaterial.SigmaAt20,
+				Sigma:       flange.RingMaterial.Sigma,
+			}
 		}
 		dataFlange.RingMaterial = mat.Title
 		dataFlange.AlphaK = mat.AlphaF
@@ -1123,10 +1238,26 @@ func (s *CalcFlangeService) getDataFlange(
 		dataFlange.SigmaK = mat.Sigma
 	}
 
-	mat, err := s.materials.GetMatFotCalculate(ctx, flange.MarkId, dataFlange.Tf)
-	if err != nil {
-		return models.InitialDataFlange{}, err
+	var mat models.MaterialsResult
+	if flange.MarkId != "another" {
+		var err error
+		mat, err = s.materials.GetMatFotCalculate(ctx, flange.MarkId, dataFlange.Tf)
+		if err != nil {
+			return models.InitialDataFlange{}, err
+		}
+	} else {
+		mat = models.MaterialsResult{
+			Title:       flange.Material.Title,
+			AlphaF:      flange.Material.AlphaF,
+			EpsilonAt20: flange.Material.EpsilonAt20,
+			Epsilon:     flange.Material.Epsilon,
+			SigmaAt20:   flange.Material.SigmaAt20,
+			Sigma:       flange.Material.Sigma,
+		}
 	}
+
+	logger.Debug(mat)
+	logger.Debug(mat.AlphaF)
 
 	dataFlange.Material = mat.Title
 	dataFlange.AlphaF = mat.AlphaF
