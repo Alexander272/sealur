@@ -45,7 +45,7 @@ func (h *Handler) createEnvData(c *gin.Context) {
 		SpecificPres: dto.SpecificPres,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -87,7 +87,7 @@ func (h *Handler) updateEnvData(c *gin.Context) {
 		SpecificPres: dto.SpecificPres,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -116,7 +116,7 @@ func (h *Handler) deleteEnvData(c *gin.Context) {
 
 	_, err := h.gasketClient.DeleteEnvData(c, &moment_api.DeleteEnvDataRequest{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

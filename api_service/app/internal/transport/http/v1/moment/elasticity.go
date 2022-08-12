@@ -51,7 +51,7 @@ func (h *Handler) createElasticity(c *gin.Context) {
 		Elasticity: elasticity,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -92,7 +92,7 @@ func (h *Handler) updateElasticity(c *gin.Context) {
 		Elasticity:  dto.Elasticity,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -121,7 +121,7 @@ func (h *Handler) deleteElasticity(c *gin.Context) {
 
 	_, err := h.materialsClient.DeleteElasticity(c, &moment_api.DeleteElasticityRequest{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

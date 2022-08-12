@@ -37,7 +37,7 @@ func (h *Handler) initBoltsRoutes(api *gin.RouterGroup) {
 func (h *Handler) getBolts(c *gin.Context) {
 	bolts, err := h.flangeClient.GetBolts(c, &moment_api.GetBoltsRequest{})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -70,7 +70,7 @@ func (h *Handler) createBolt(c *gin.Context) {
 		Area:     dto.Area,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -111,7 +111,7 @@ func (h *Handler) updateBolt(c *gin.Context) {
 		Area:     dto.Area,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

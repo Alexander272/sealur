@@ -18,7 +18,7 @@ func (h *Handler) initReadRoutes(api *gin.RouterGroup) {
 func (h *Handler) getDefFlange(c *gin.Context) {
 	data, err := h.readClient.GetFlange(c, &moment_api.GetFlangeRequest{})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

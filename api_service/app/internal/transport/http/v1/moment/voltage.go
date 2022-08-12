@@ -51,7 +51,7 @@ func (h *Handler) createVoltage(c *gin.Context) {
 		Voltage: voltage,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -92,7 +92,7 @@ func (h *Handler) updateVoltage(c *gin.Context) {
 		Voltage:     dto.Voltage,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -121,7 +121,7 @@ func (h *Handler) deleteVoltage(c *gin.Context) {
 
 	_, err := h.materialsClient.DeleteVoltage(c, &moment_api.DeleteVoltageRequest{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

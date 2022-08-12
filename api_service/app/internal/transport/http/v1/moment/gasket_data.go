@@ -47,7 +47,7 @@ func (h *Handler) createGasketData(c *gin.Context) {
 		TypeId:          dto.TypeId,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -91,7 +91,7 @@ func (h *Handler) updateGasketData(c *gin.Context) {
 		TypeId:          dto.TypeId,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -120,7 +120,7 @@ func (h *Handler) deleteGasketData(c *gin.Context) {
 
 	_, err := h.gasketClient.DeleteGasketData(c, &moment_api.DeleteGasketDataRequest{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

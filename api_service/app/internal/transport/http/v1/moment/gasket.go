@@ -38,7 +38,7 @@ func (h *Handler) initGasketRoutes(api *gin.RouterGroup) {
 func (h *Handler) getGasket(c *gin.Context) {
 	gasket, err := h.gasketClient.GetGasket(c, &moment_api.GetGasketRequest{})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -67,7 +67,7 @@ func (h *Handler) createGasket(c *gin.Context) {
 
 	gasket, err := h.gasketClient.CreateGasket(c, &moment_api.CreateGasketRequest{Title: dto.Title})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -104,7 +104,7 @@ func (h *Handler) updateGasket(c *gin.Context) {
 
 	_, err := h.gasketClient.UpdateGasket(c, &moment_api.UpdateGasketRequest{Id: id, Title: dto.Title})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -133,7 +133,7 @@ func (h *Handler) deleteGasket(c *gin.Context) {
 
 	_, err := h.gasketClient.DeleteGasket(c, &moment_api.DeleteGasketRequest{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

@@ -3,7 +3,6 @@ module github.com/Alexander272/sealur/moment_service
 go 1.17
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20220804115129-836d3f3d9925
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.6
@@ -18,6 +17,7 @@ require (
 )
 
 require (
+	github.com/Alexander272/sealur_proto/api v0.0.0-20220811083839-218da7d199f0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect

@@ -37,7 +37,7 @@ func (h *Handler) initTypeFlangeRoutes(api *gin.RouterGroup) {
 func (h *Handler) getTypeFlange(c *gin.Context) {
 	tf, err := h.flangeClient.GetTypeFlange(c, &moment_api.GetTypeFlangeRequest{})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -66,7 +66,7 @@ func (h *Handler) createTypeFlange(c *gin.Context) {
 
 	tf, err := h.flangeClient.CreateTypeFlange(c, &moment_api.CreateTypeFlangeRequest{Title: dto.Title})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -105,7 +105,7 @@ func (h *Handler) updateTypeFlange(c *gin.Context) {
 		Title: dto.Title,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -134,7 +134,7 @@ func (h *Handler) deleteTypeFlange(c *gin.Context) {
 
 	_, err := h.flangeClient.DeleteTypeFlange(c, &moment_api.DeleteTypeFlangeRequest{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

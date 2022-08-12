@@ -51,7 +51,7 @@ func (h *Handler) createAlpha(c *gin.Context) {
 		Alpha:  alpha,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -92,7 +92,7 @@ func (h *Handler) updateAlpha(c *gin.Context) {
 		Alpha:       dto.Alpha,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -121,7 +121,7 @@ func (h *Handler) deleteAlpha(c *gin.Context) {
 
 	_, err := h.materialsClient.DeleteAlpha(c, &moment_api.DeleteAlphaRequest{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

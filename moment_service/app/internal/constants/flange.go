@@ -42,6 +42,14 @@ const (
 	MinDTetta float64 = 0.006
 	MaxDTetta float64 = 0.013
 
+	MinKs float64 = 1
+	MaxKs float64 = 1.2
+	MinK  float64 = 1.4
+	MaxK  float64 = 2
+
+	TempKt float64 = 1.3
+	Kt     float64 = 1
+
 	WorkTeta float64 = 1
 	TestTeta float64 = 1.3
 )

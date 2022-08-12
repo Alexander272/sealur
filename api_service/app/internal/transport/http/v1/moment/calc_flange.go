@@ -3,7 +3,6 @@ package moment
 import (
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
@@ -30,7 +29,7 @@ func (h *Handler) initCalcFlangeRoutes(api *gin.RouterGroup) {
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /sealur-moment/flange-sizes/ [post]
+// @Router /sealur-moment/calc/flange/ [post]
 func (h *Handler) calculate(c *gin.Context) {
 	var dto moment_model.CalcFlange
 	if err := c.BindJSON(&dto); err != nil {
@@ -124,14 +123,7 @@ func (h *Handler) calculate(c *gin.Context) {
 
 	res, err := h.calcFlangeClient.CalculateFlange(c, data)
 	if err != nil {
-		code := "U001"
-		if strings.Contains(err.Error(), "execute query") {
-			code = "MD001"
-		} else if strings.Contains(err.Error(), "EOF") {
-			code = "E001"
-		}
-
-		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong", code)
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

@@ -38,7 +38,7 @@ func (h *Handler) initEnvRoutes(api *gin.RouterGroup) {
 func (h *Handler) getEnv(c *gin.Context) {
 	env, err := h.gasketClient.GetEnv(c, &moment_api.GetEnvRequest{})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -67,7 +67,7 @@ func (h *Handler) createEnv(c *gin.Context) {
 
 	env, err := h.gasketClient.CreateEnv(c, &moment_api.CreateEnvRequest{Title: dto.Title})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -104,7 +104,7 @@ func (h *Handler) updateEnv(c *gin.Context) {
 
 	_, err := h.gasketClient.UpdateEnv(c, &moment_api.UpdateEnvRequest{Id: id, Title: dto.Title})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -133,7 +133,7 @@ func (h *Handler) deleteEnv(c *gin.Context) {
 
 	_, err := h.gasketClient.DeleteEnv(c, &moment_api.DeleteEnvRequest{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

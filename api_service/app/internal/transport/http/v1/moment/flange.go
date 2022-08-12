@@ -52,7 +52,7 @@ func (h *Handler) createFlangeSize(c *gin.Context) {
 		BoltId:  dto.BoltId,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -101,7 +101,7 @@ func (h *Handler) updateFlangeSize(c *gin.Context) {
 		BoltId:  dto.BoltId,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -130,7 +130,7 @@ func (h *Handler) deleteFlangeSize(c *gin.Context) {
 
 	_, err := h.flangeClient.DeleteFlangeSize(c, &moment_api.DeleteFlangeSizeRequest{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

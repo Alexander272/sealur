@@ -40,7 +40,7 @@ func (h *Handler) initMaterialsRoutes(api *gin.RouterGroup) {
 func (h *Handler) getMaterials(c *gin.Context) {
 	materials, err := h.materialsClient.GetMaterials(c, &moment_api.GetMaterialsRequest{})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -62,7 +62,7 @@ func (h *Handler) getMaterials(c *gin.Context) {
 func (h *Handler) getMaterialsWithIsEmpty(c *gin.Context) {
 	materials, err := h.materialsClient.GetMaterialsWithIsEmpty(c, &moment_api.GetMaterialsRequest{})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -90,7 +90,7 @@ func (h *Handler) getMaterialsData(c *gin.Context) {
 
 	materials, err := h.materialsClient.GetMaterialsData(c, &moment_api.GetMaterialsDataRequest{MarkId: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -119,7 +119,7 @@ func (h *Handler) createMaterial(c *gin.Context) {
 
 	material, err := h.materialsClient.CreateMaterial(c, &moment_api.CreateMaterialRequest{Title: dto.Title})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -156,7 +156,7 @@ func (h *Handler) updateMaterial(c *gin.Context) {
 
 	_, err := h.materialsClient.UpdateMaterial(c, &moment_api.UpdateMaterialRequest{Id: id, Title: dto.Title})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -185,7 +185,7 @@ func (h *Handler) deleteMaterial(c *gin.Context) {
 
 	_, err := h.materialsClient.DeleteMaterial(c, &moment_api.DeleteMaterialRequest{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

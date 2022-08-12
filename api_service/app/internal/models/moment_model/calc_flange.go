@@ -1,6 +1,7 @@
 package moment_model
 
 import (
+	"math"
 	"strconv"
 
 	"github.com/Alexander272/sealur_proto/api/moment_api"
@@ -122,6 +123,7 @@ func (m *MaterialData) NewMaterial() (mat *moment_api.MaterialData, err error) {
 	if err != nil {
 		return nil, err
 	}
+	alpha = alpha * math.Pow(10, -6)
 	eAt20, err := strconv.ParseFloat(m.EpsilonAt20, 64)
 	if err != nil {
 		return nil, err

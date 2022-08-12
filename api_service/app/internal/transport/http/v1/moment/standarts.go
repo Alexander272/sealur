@@ -45,7 +45,7 @@ func (h *Handler) getStandarts(c *gin.Context) {
 
 	standarts, err := h.flangeClient.GetStandarts(c, &moment_api.GetStandartsRequest{TypeId: typeId})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -75,7 +75,7 @@ func (h *Handler) getStandartsWithSize(c *gin.Context) {
 	//? путь где лежат файлы с расчетами. smb://martynov@192.168.5.24/documents/ИМЕННЫЕ%20ПАПКИ/Холкин%20В.А/Работа/Сервис-Газификация/Расчеты
 	standarts, err := h.flangeClient.GetStandartsWithSize(c, &moment_api.GetStandartsRequest{TypeId: typeId})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -111,7 +111,7 @@ func (h *Handler) createStandart(c *gin.Context) {
 		Rows:      dto.Rows,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -155,7 +155,7 @@ func (h *Handler) updateStandart(c *gin.Context) {
 		Rows:      dto.Rows,
 	})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
@@ -184,7 +184,7 @@ func (h *Handler) deleteStandart(c *gin.Context) {
 
 	_, err := h.flangeClient.DeleteStandart(c, &moment_api.DeleteStandartRequest{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 

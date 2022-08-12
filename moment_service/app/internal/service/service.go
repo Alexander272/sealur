@@ -88,8 +88,8 @@ type Gasket interface {
 }
 
 type Graphic interface {
-	CalculateBettaF(betta, x float64) float64
-	CalculateBettaV(betta, x float64) float64
+	CalculateBetaF(betta, x float64) float64
+	CalculateBetaV(betta, x float64) float64
 	CalculateF(betta, x float64) float64
 	CalculateMkp(diameter int32, sigma float64) float64
 }
@@ -112,9 +112,11 @@ func NewServices(repos *repository.Repositories) *Services {
 	materials := NewMaterialsService(repos.Materials)
 	gasket := NewGasketService(repos.Gasket)
 	graphic := NewGraphicService()
+	data := NewDataService(flange, materials, gasket, graphic)
+	formulas := NewFormulasService()
 
 	return &Services{
-		CalcFlange: NewCalcFlangeService(flange, materials, gasket, graphic),
+		CalcFlange: NewCalcFlangeService(graphic, data, formulas),
 		Flange:     flange,
 		Materials:  materials,
 		Gasket:     gasket,
