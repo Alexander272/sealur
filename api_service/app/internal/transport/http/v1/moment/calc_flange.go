@@ -92,6 +92,15 @@ func (h *Handler) calculate(c *gin.Context) {
 		return
 	}
 
+	var embed *moment_api.EmbedData
+	if dto.IsEmbedded {
+		embed, err = dto.Embed.NewEmbed()
+		if err != nil {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+			return
+		}
+	}
+
 	var washer []*moment_api.WasherData
 	if dto.IsUseWasher {
 		washer, err = dto.Washer.NewWasher()
@@ -119,6 +128,7 @@ func (h *Handler) calculate(c *gin.Context) {
 		Bolts:          bolts,
 		Gasket:         gasket,
 		Washer:         washer,
+		Embed:          embed,
 	}
 
 	res, err := h.calcFlangeClient.CalculateFlange(c, data)

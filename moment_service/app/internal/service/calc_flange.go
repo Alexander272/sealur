@@ -59,7 +59,6 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		Flanges:      []*moment_api.FlangeResult{d.Flange1},
 		Embed:        d.Embed,
 		Gasket:       d.Gasket,
-		Formulas:     &moment_api.CalcFormulas{},
 	}
 
 	if data.IsUseWasher {
@@ -415,7 +414,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 			result.Calc.Strength.VTetaK1 = true
 		}
 
-		if data.IsSameFlange {
+		if !data.IsSameFlange {
 			if strength2.Teta <= strength2.DTeta {
 				result.Calc.Strength.VTeta2 = true
 			}
@@ -437,7 +436,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 			(v_sigmab1 && v_sigmab2 && qmax <= float64(d.Gasket.PermissiblePres) && d.TypeGasket == "Soft") {
 			ok := false
 
-			if data.IsSameFlange {
+			if !data.IsSameFlange {
 				commonCond := result.Calc.Strength.VTeta1 && result.Calc.Strength.VTeta2
 				cond1 := commonCond && d.Type1 != moment_api.FlangeData_free && d.Type2 != moment_api.FlangeData_free
 				cond2 := commonCond && d.Type1 == moment_api.FlangeData_free && d.Type2 != moment_api.FlangeData_free && result.Calc.Strength.VTetaK1

@@ -385,3 +385,25 @@ func (w *WasherData) NewWasher() (washers []*moment_api.WasherData, err error) {
 
 	return washers, nil
 }
+
+func (e *EmbedData) NewEmbed() (embed *moment_api.EmbedData, err error) {
+	thickness, err := strconv.ParseFloat(e.Thickness, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	var material *moment_api.MaterialData
+	if e.MarkId == "another" {
+		material, err = e.Material.NewMaterial()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	embed = &moment_api.EmbedData{
+		MarkId:    e.MarkId,
+		Thickness: thickness,
+		Material:  material,
+	}
+	return embed, nil
+}

@@ -103,9 +103,9 @@ func (s *UserService) GetAll(ctx context.Context, req *user_api.GetAllUserReques
 	}
 
 	var u []*user_api.User
-	for i, item := range users {
+	for _, item := range users {
 		var userRoles []*user_api.Role
-		for j := i; j < len(roles); j++ {
+		for j := 0; j < len(roles); j++ {
 			if roles[j].UserId == item.Id {
 				ur := user_api.Role{
 					Id:      roles[j].Id,
