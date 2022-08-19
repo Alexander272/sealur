@@ -55,6 +55,11 @@ func (s *FlangeService) GetStandarts(ctx context.Context, req *moment_api.GetSta
 	}
 
 	for _, item := range data {
+		var rows []string
+		if item.Rows != "" {
+			rows = strings.Split(item.Rows, "; ")
+		}
+
 		standarts = append(standarts, &moment_api.Standart{
 			Id:        item.Id,
 			Title:     item.Title,
@@ -62,7 +67,7 @@ func (s *FlangeService) GetStandarts(ctx context.Context, req *moment_api.GetSta
 			TitleDn:   item.TitleDn,
 			TitlePn:   item.TitlePn,
 			IsNeedRow: item.IsNeedRow,
-			Rows:      strings.Split(item.Rows, "; "),
+			Rows:      rows,
 		})
 	}
 

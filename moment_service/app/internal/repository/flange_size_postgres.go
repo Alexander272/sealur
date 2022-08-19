@@ -19,6 +19,7 @@ func NewFlangeRepo(db *sqlx.DB) *FlangeRepo {
 }
 
 func (r *FlangeRepo) GetFlangeSize(ctx context.Context, req *moment_api.GetFlangeSizeRequest) (size models.FlangeSize, err error) {
+	//TODO похоже надо добваить зависимоcть от ряда
 	query := fmt.Sprintf(`SELECT %s.id, pn, d, d6, d_out, h, s0, s1, length, count, diameter, area FROM %s
 		INNER JOIN %s on bolt_id=%s.id WHERE stand_id=$1 AND d=$2 AND pn=$3`,
 		FlangeSizeTable, FlangeSizeTable, BoltsTable, BoltsTable)
@@ -45,6 +46,16 @@ func (r *FlangeRepo) GetBasisFlangeSizes(ctx context.Context, req models.GetBasi
 		return sizes, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return sizes, nil
+}
+
+func (r *FlangeRepo) GetFullFlangeSize(ctx context.Context, req *moment_api.GetFullFlangeSizeRequest, row int32) (size []models.FlangeSizeDTO, err error) {
+	query := fmt.Sprintf(`SELECT id, stand_id, pn, d, d6, d_out, h, s0, s1, length, count, bolt_id FROM %s WHERE stand_id=$1 AND row=$2`,
+		FlangeSizeTable)
+
+	if err := r.db.Select(&size, query, req.StandId, row); err != nil {
+		return size, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return size, nil
 }
 
 func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_api.CreateFlangeSizeRequest) error {

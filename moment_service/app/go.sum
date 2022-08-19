@@ -76,6 +76,16 @@ github.com/Alexander272/sealur_proto/api v0.0.0-20220810112148-ab75dea633f7 h1:4
 github.com/Alexander272/sealur_proto/api v0.0.0-20220810112148-ab75dea633f7/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
 github.com/Alexander272/sealur_proto/api v0.0.0-20220811083839-218da7d199f0 h1:Eg6LvLDjBflBcD5qwfjVfZpfi0hCs9n6/5tEvEwEOyE=
 github.com/Alexander272/sealur_proto/api v0.0.0-20220811083839-218da7d199f0/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
+github.com/Alexander272/sealur_proto/api v0.0.0-20220818050745-ee1e2fcbd3a6 h1:uUGT7ECe4Keax2YlXvqVefn9H/9uKOxmZwgUUAZ6mkU=
+github.com/Alexander272/sealur_proto/api v0.0.0-20220818050745-ee1e2fcbd3a6/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
+github.com/Alexander272/sealur_proto/api v0.0.0-20220818055344-253417006d96 h1:6Ys9P/zYXiZFMBTw4XNFm+oTv4c6PnseX3fjIhabrWo=
+github.com/Alexander272/sealur_proto/api v0.0.0-20220818055344-253417006d96/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
+github.com/Alexander272/sealur_proto/api v0.0.0-20220818060828-679a0ee98190 h1:yJI0n0xzFogVWbDSDZWKyLWc0YbGC/CdmWjGsuGAIBA=
+github.com/Alexander272/sealur_proto/api v0.0.0-20220818060828-679a0ee98190/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
+github.com/Alexander272/sealur_proto/api v0.0.0-20220819043814-f774c86ff624 h1:kDoMTZdvSS/0dowJkZlpxzF0f/Gq4PuUPwiZZyusvoI=
+github.com/Alexander272/sealur_proto/api v0.0.0-20220819043814-f774c86ff624/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
+github.com/Alexander272/sealur_proto/api v0.0.0-20220819062839-3a12a16a3d2d h1:UyJCaVHrZHhvRP5/EJeFYAtBryu6pReOdTCxetiXTsE=
+github.com/Alexander272/sealur_proto/api v0.0.0-20220819062839-3a12a16a3d2d/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=

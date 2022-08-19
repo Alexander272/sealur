@@ -32,7 +32,7 @@ func (s *FlangeService) GetBasisFlangeSize(ctx context.Context, req *moment_api.
 	res := &moment_api.BasisFlangeSizeResponse{}
 
 	if req.IsUseRow {
-		reqSize1 := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: "0"}
+		reqSize1 := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: 0}
 		sizes1, err := s.repo.GetBasisFlangeSizes(ctx, reqSize1)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get size. error: %w", err)
@@ -56,7 +56,7 @@ func (s *FlangeService) GetBasisFlangeSize(ctx context.Context, req *moment_api.
 
 		res.SizeRow1 = sizeRow
 
-		reqSize2 := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: ""}
+		reqSize2 := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: 1}
 		sizes2, err := s.repo.GetBasisFlangeSizes(ctx, reqSize2)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get size. error: %w", err)
@@ -80,7 +80,7 @@ func (s *FlangeService) GetBasisFlangeSize(ctx context.Context, req *moment_api.
 
 		res.SizeRow2 = sizeRow
 	} else {
-		reqSize := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: ""}
+		reqSize := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: 0}
 		sizes, err := s.repo.GetBasisFlangeSizes(ctx, reqSize)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get size. error: %w", err)
@@ -104,6 +104,60 @@ func (s *FlangeService) GetBasisFlangeSize(ctx context.Context, req *moment_api.
 		}
 
 		res.SizeRow1 = sizeRow
+	}
+
+	return res, nil
+}
+
+func (s *FlangeService) GetFullFlangeSize(ctx context.Context, size *moment_api.GetFullFlangeSizeRequest) (*moment_api.FullFlangeSizeResponse, error) {
+	sizes1, err := s.repo.GetFullFlangeSize(ctx, size, 0)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get size for row 0. error: %w", err)
+	}
+	sizes2, err := s.repo.GetFullFlangeSize(ctx, size, 1)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get size for row 1. error: %w", err)
+	}
+
+	sizeRow1, sizeRow2 := []*moment_api.FullFlangeSize{}, []*moment_api.FullFlangeSize{}
+	for _, fsd := range sizes1 {
+		sizeRow1 = append(sizeRow1, &moment_api.FullFlangeSize{
+			Id:      fsd.Id,
+			StandId: fsd.StandId,
+			Pn:      fsd.Pn,
+			D:       fsd.D,
+			D6:      fsd.D6,
+			DOut:    fsd.DOut,
+			H:       fsd.H,
+			S0:      fsd.S0,
+			S1:      fsd.S1,
+			Length:  fsd.Length,
+			Count:   fsd.Count,
+			BoltId:  fsd.BoltId,
+		})
+	}
+	if len(sizes2) > 0 {
+		for _, fsd := range sizes2 {
+			sizeRow2 = append(sizeRow2, &moment_api.FullFlangeSize{
+				Id:      fsd.Id,
+				StandId: fsd.StandId,
+				Pn:      fsd.Pn,
+				D:       fsd.D,
+				D6:      fsd.D6,
+				DOut:    fsd.DOut,
+				H:       fsd.H,
+				S0:      fsd.S0,
+				S1:      fsd.S1,
+				Length:  fsd.Length,
+				Count:   fsd.Count,
+				BoltId:  fsd.BoltId,
+			})
+		}
+	}
+
+	res := &moment_api.FullFlangeSizeResponse{
+		SizeRow1: sizeRow1,
+		SizeRow2: sizeRow2,
 	}
 
 	return res, nil

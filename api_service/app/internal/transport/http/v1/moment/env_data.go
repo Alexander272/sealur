@@ -13,6 +13,7 @@ func (h *Handler) initEnvDataRoutes(api *gin.RouterGroup) {
 	env := api.Group("/env-data", h.middleware.UserIdentity, h.middleware.AccessForMomentAdmin)
 	{
 		env.POST("/", h.createEnvData)
+		env.POST("/many", h.createManyEnvData)
 		env.PUT("/:id", h.updateEnvData)
 		env.DELETE("/:id", h.deleteEnvData)
 	}
@@ -43,6 +44,47 @@ func (h *Handler) createEnvData(c *gin.Context) {
 		GasketId:     dto.GasketId,
 		M:            dto.M,
 		SpecificPres: dto.SpecificPres,
+	})
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusCreated, models.IdResponse{Message: "Created"})
+}
+
+// @Summary Create Env Data
+// @Tags Sealur Moment -> env-data
+// @Security ApiKeyAuth
+// @Description создание данных среды
+// @ModuleID createEnvData
+// @Accept json
+// @Produce json
+// @Param env body moment_model.EnvDataDTO true "env data info"
+// @Success 201 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-moment/env-data/many [post]
+func (h *Handler) createManyEnvData(c *gin.Context) {
+	var dto moment_model.ManyEnvDataDTO
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	data := []*moment_api.CreateManyEnvDataRequest_Data{}
+	for _, mgdd := range dto.Data {
+		data = append(data, &moment_api.CreateManyEnvDataRequest_Data{
+			SpecificPres: mgdd.SpecificPres,
+			M:            mgdd.M,
+			EnvId:        mgdd.EnvId,
+		})
+	}
+
+	_, err := h.gasketClient.CreateManyEnvData(c, &moment_api.CreateManyEnvDataRequest{
+		GasketId: dto.GasketId,
+		Data:     data,
 	})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")

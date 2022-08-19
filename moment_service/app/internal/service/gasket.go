@@ -28,6 +28,74 @@ func (s *GasketService) GetFullData(ctx context.Context, gasket models.GetGasket
 	return g, nil
 }
 
+func (s *GasketService) GetData(ctx context.Context, gasket *moment_api.GetFullDataRequest) (*moment_api.FullDataResponse, error) {
+	gasketData, err := s.repo.GetGasketData(ctx, gasket.GasketId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get gasket data. error: %w", err)
+	}
+	GasketData := []*moment_api.Full_GasketData{}
+	for _, gdd := range gasketData {
+		GasketData = append(GasketData, &moment_api.Full_GasketData{
+			Id:              gdd.Id,
+			GasketId:        gdd.GasketId,
+			PermissiblePres: gdd.PermissiblePres,
+			Compression:     gdd.Compression,
+			Epsilon:         gdd.Epsilon,
+			Thickness:       gdd.Thickness,
+			TypeId:          gdd.TypeId,
+		})
+	}
+
+	gasketType, err := s.repo.GetTypeGasket(ctx, &moment_api.GetGasketTypeRequest{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get type gasket. error: %w", err)
+	}
+	GasketType := []*moment_api.GasketType{}
+	for _, tgd := range gasketType {
+		GasketType = append(GasketType, &moment_api.GasketType{
+			Id:    tgd.Id,
+			Title: tgd.Title,
+			Label: tgd.Label,
+		})
+	}
+
+	envData, err := s.repo.GetEnvData(ctx, gasket.GasketId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get env data. error: %w", err)
+	}
+	EnvData := []*moment_api.Full_EnvData{}
+	for _, edd := range envData {
+		EnvData = append(EnvData, &moment_api.Full_EnvData{
+			Id:           edd.Id,
+			GasketId:     edd.GasketId,
+			EnvId:        edd.EnvId,
+			M:            edd.M,
+			SpecificPres: edd.SpecificPres,
+		})
+	}
+
+	envType, err := s.repo.GetEnv(ctx, &moment_api.GetEnvRequest{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get type env. error: %w", err)
+	}
+	EnvType := []*moment_api.Env{}
+	for _, tgd := range envType {
+		EnvType = append(EnvType, &moment_api.Env{
+			Id:    tgd.Id,
+			Title: tgd.Title,
+		})
+	}
+
+	data := moment_api.FullDataResponse{
+		GasketData: GasketData,
+		GasketType: GasketType,
+		EnvData:    EnvData,
+		EnvType:    EnvType,
+	}
+
+	return &data, nil
+}
+
 func (s *GasketService) GetGasket(ctx context.Context, req *moment_api.GetGasketRequest) (gasket []*moment_api.Gasket, err error) {
 	data, err := s.repo.GetGasket(ctx, req)
 	if err != nil {
@@ -91,6 +159,12 @@ func (s *GasketService) DeleteGasket(ctx context.Context, gasket *moment_api.Del
 }
 
 //---
+func (s *GasketService) CreateManyGasketData(ctx context.Context, data *moment_api.CreateManyGasketDataRequest) error {
+	if err := s.repo.CreateManyGasketData(ctx, data); err != nil {
+		return fmt.Errorf("failed to create many gasket data. error: %w", err)
+	}
+	return nil
+}
 
 func (s *GasketService) CreateGasketData(ctx context.Context, data *moment_api.CreateGasketDataRequest) error {
 	if err := s.repo.CreateGasketData(ctx, data); err != nil {
@@ -101,6 +175,13 @@ func (s *GasketService) CreateGasketData(ctx context.Context, data *moment_api.C
 
 func (s *GasketService) UpdateGasketData(ctx context.Context, data *moment_api.UpdateGasketDataRequest) error {
 	if err := s.repo.UpdateGasketData(ctx, data); err != nil {
+		return fmt.Errorf("failed to update gasket data. error: %w", err)
+	}
+	return nil
+}
+
+func (s *GasketService) UpdateGasketTypeId(ctx context.Context, data *moment_api.UpdateGasketTypeIdRequest) error {
+	if err := s.repo.UpdateGasketTypeId(ctx, data); err != nil {
 		return fmt.Errorf("failed to update gasket data. error: %w", err)
 	}
 	return nil

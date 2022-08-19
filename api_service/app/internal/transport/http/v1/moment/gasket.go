@@ -14,6 +14,7 @@ func (h *Handler) initGasketRoutes(api *gin.RouterGroup) {
 	gasket := api.Group("/gasket", h.middleware.UserIdentity)
 	{
 		gasket.GET("/", h.getGasket)
+		gasket.GET("/full-data", h.getFullData)
 		gasket = gasket.Group("/", h.middleware.AccessForMomentAdmin)
 		{
 			gasket.POST("/", h.createGasket)
@@ -43,6 +44,35 @@ func (h *Handler) getGasket(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, models.DataResponse{Data: gasket.Gasket, Count: len(gasket.Gasket)})
+}
+
+// @Summary Get Full Data
+// @Tags Sealur Moment -> gasket
+// @Security ApiKeyAuth
+// @Description получение данных для прокладки
+// @ModuleID getFullData
+// @Accept json
+// @Produce json
+// @Param gasketId query string true "gasket id"
+// @Success 200 {object} models.DataResponse{Data=[]moment_api.Gasket}
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-moment/gasket/full-data [get]
+func (h *Handler) getFullData(c *gin.Context) {
+	id := c.Query("gasketId")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	data, err := h.gasketClient.GetFullData(c, &moment_api.GetFullDataRequest{GasketId: id})
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: data})
 }
 
 // @Summary Create Gasket

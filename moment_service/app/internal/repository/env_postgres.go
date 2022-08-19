@@ -54,6 +54,34 @@ func (r *GasketRepo) DeleteEnv(ctx context.Context, env *moment_api.DeleteEnvReq
 }
 
 //---
+func (r *GasketRepo) GetEnvData(ctx context.Context, gasketId string) (env []models.EnvDataDTO, err error) {
+	query := fmt.Sprintf(`SELECT id, env_id, gasket_id, m, specific_pres FROM %s WHERE gasket_id=$1 ORDER BY env_id`, EnvDataTable)
+
+	if err := r.db.Select(&env, query, gasketId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return env, nil
+}
+
+func (r *GasketRepo) CreateManyEnvData(ctx context.Context, data *moment_api.CreateManyEnvDataRequest) error {
+	query := fmt.Sprintf("INSERT INTO %s (env_id, gasket_id, m, specific_pres) VALUES ($1, $2, $3, $4)", EnvDataTable)
+
+	args := make([]interface{}, 0)
+	args = append(args, data.Data[0].EnvId, data.GasketId, data.Data[0].M, data.Data[0].SpecificPres)
+
+	for i, d := range data.Data {
+		if i > 0 {
+			query += fmt.Sprintf(", ($%d, $%d, $%d, $%d)", i*4+1, i*4+2, i*4+3, i*4+4)
+			args = append(args, d.EnvId, data.GasketId, d.M, d.SpecificPres)
+		}
+	}
+
+	_, err := r.db.Exec(query, args...)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
 
 func (r *GasketRepo) CreateEnvData(ctx context.Context, data *moment_api.CreateEnvDataRequest) error {
 	query := fmt.Sprintf("INSERT INTO %s (env_id, gasket_id, m, specific_pres) VALUES ($1, $2, $3, $4)", EnvDataTable)

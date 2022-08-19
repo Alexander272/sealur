@@ -46,6 +46,12 @@ func (s *GasketService) DeleteEnv(ctx context.Context, env *moment_api.DeleteEnv
 }
 
 //---
+func (s *GasketService) CreateManyEnvData(ctx context.Context, data *moment_api.CreateManyEnvDataRequest) error {
+	if err := s.repo.CreateManyEnvData(ctx, data); err != nil {
+		return fmt.Errorf("failed to create many env data. error: %w", err)
+	}
+	return nil
+}
 
 func (s *GasketService) CreateEnvData(ctx context.Context, data *moment_api.CreateEnvDataRequest) error {
 	if err := s.repo.CreateEnvData(ctx, data); err != nil {

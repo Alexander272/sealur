@@ -98,6 +98,36 @@ func (r *GasketRepo) DeleteGasket(ctx context.Context, gasket *moment_api.Delete
 }
 
 //---
+func (r *GasketRepo) GetGasketData(ctx context.Context, gasketId string) (gasket []models.GasketDataDTO, err error) {
+	query := fmt.Sprintf(`SELECT id, gasket_id, permissible_pres, compression, epsilon, thickness, type_id FROM %s 
+		WHERE gasket_id=$1 ORDER BY thickness`, GasketDataTable)
+
+	if err := r.db.Select(&gasket, query, gasketId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return gasket, nil
+}
+
+func (r *GasketRepo) CreateManyGasketData(ctx context.Context, data *moment_api.CreateManyGasketDataRequest) error {
+	query := fmt.Sprintf(`INSERT INTO %s (gasket_id, permissible_pres, compression, epsilon, thickness, type_id)
+		VALUES ($1, $2, $3, $4, $5, $6)`, GasketDataTable)
+
+	args := make([]interface{}, 0)
+	args = append(args, data.GasketId, data.Data[0].PermissiblePres, data.Data[0].Compression, data.Data[0].Epsilon, data.Data[0].Thickness, data.TypeId)
+
+	for i, d := range data.Data {
+		if i > 0 {
+			query += fmt.Sprintf(", ($%d, $%d, $%d, $%d, $%d, $%d)", i*6+1, i*6+2, i*6+3, i*6+4, i*6+5, i*6+6)
+			args = append(args, data.GasketId, d.PermissiblePres, d.Compression, d.Epsilon, d.Thickness, data.TypeId)
+		}
+	}
+
+	_, err := r.db.Exec(query, args...)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
 
 func (r *GasketRepo) CreateGasketData(ctx context.Context, data *moment_api.CreateGasketDataRequest) error {
 	query := fmt.Sprintf(`INSERT INTO %s (gasket_id, permissible_pres, compression, epsilon, thickness, type_id)
@@ -155,6 +185,16 @@ func (r *GasketRepo) UpdateGasketData(ctx context.Context, data *moment_api.Upda
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
+	return nil
+}
+
+func (r *GasketRepo) UpdateGasketTypeId(ctx context.Context, data *moment_api.UpdateGasketTypeIdRequest) error {
+	query := fmt.Sprintf("UPDATE %s SET type_id=$1 WHERE gasket_id=$2", GasketDataTable)
+
+	_, err := r.db.Exec(query, data.TypeId, data.GasketId)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
 	return nil
 }
 

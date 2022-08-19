@@ -12,10 +12,42 @@ import (
 func (h *Handler) initFlangeRoutes(api *gin.RouterGroup) {
 	flange := api.Group("/flange-sizes", h.middleware.UserIdentity, h.middleware.AccessForMomentAdmin)
 	{
+		flange.GET("/", h.getFlangeSize)
 		flange.POST("/", h.createFlangeSize)
 		flange.PATCH("/:id", h.updateFlangeSize)
 		flange.DELETE("/:id", h.deleteFlangeSize)
 	}
+}
+
+// @Summary Create Flange Size
+// @Tags Sealur Moment -> flange-sizes
+// @Security ApiKeyAuth
+// @Description создание размеров
+// @ModuleID createFlangeSize
+// @Accept json
+// @Produce json
+// @Param standartId query string true "standart Id"
+// @Success 201 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-moment/flange-sizes/ [get]
+func (h *Handler) getFlangeSize(c *gin.Context) {
+	id := c.Query("standartId")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	sizes, err := h.flangeClient.GetFlangeSize(c, &moment_api.GetFullFlangeSizeRequest{
+		StandId: id,
+	})
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: sizes})
 }
 
 // @Summary Create Flange Size

@@ -11,6 +11,7 @@ import (
 type Flange interface {
 	GetFlangeSize(context.Context, *moment_api.GetFlangeSizeRequest) (models.FlangeSize, error)
 	GetBasisFlangeSizes(context.Context, models.GetBasisSize) ([]models.FlangeSize, error)
+	GetFullFlangeSize(context.Context, *moment_api.GetFullFlangeSizeRequest, int32) ([]models.FlangeSizeDTO, error)
 	CreateFlangeSize(context.Context, *moment_api.CreateFlangeSizeRequest) error
 	UpdateFlangeSize(context.Context, *moment_api.UpdateFlangeSizeRequest) error
 	DeleteFlangeSize(context.Context, *moment_api.DeleteFlangeSizeRequest) error
@@ -72,11 +73,16 @@ type Gasket interface {
 	UpdateEnv(context.Context, *moment_api.UpdateEnvRequest) error
 	DeleteEnv(context.Context, *moment_api.DeleteEnvRequest) error
 
+	CreateManyEnvData(context.Context, *moment_api.CreateManyEnvDataRequest) error
+	GetEnvData(context.Context, string) ([]models.EnvDataDTO, error)
 	CreateEnvData(context.Context, *moment_api.CreateEnvDataRequest) error
 	UpdateEnvData(context.Context, *moment_api.UpdateEnvDataRequest) error
 	DeleteEnvData(context.Context, *moment_api.DeleteEnvDataRequest) error
 
+	CreateManyGasketData(context.Context, *moment_api.CreateManyGasketDataRequest) error
+	GetGasketData(context.Context, string) ([]models.GasketDataDTO, error)
 	CreateGasketData(context.Context, *moment_api.CreateGasketDataRequest) error
+	UpdateGasketTypeId(context.Context, *moment_api.UpdateGasketTypeIdRequest) error
 	UpdateGasketData(context.Context, *moment_api.UpdateGasketDataRequest) error
 	DeleteGasketData(context.Context, *moment_api.DeleteGasketDataRequest) error
 }

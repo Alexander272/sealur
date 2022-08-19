@@ -28,6 +28,7 @@ type FlangeSizeDTO struct {
 	Length  float64 `db:"length"`
 	Count   int32   `db:"count"`
 	BoltId  string  `db:"bolt_id"`
+	Row     int32   `db:"row"`
 }
 
 type TypeFlangeDTO struct {
@@ -39,7 +40,7 @@ type TypeFlangeDTO struct {
 type GetBasisSize struct {
 	IsUseRow bool
 	StandId  string `db:"stand_id"`
-	Row      string `db:"row"`
+	Row      int32  `db:"row"`
 }
 
 type Data struct {

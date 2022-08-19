@@ -27,7 +27,7 @@ type FileResponse struct {
 
 type ErrorResponse struct {
 	Message string `json:"message"`
-	Code    string `json:"code"`
+	Code    string `json:"code,omitempty"`
 }
 
 type StatusResponse struct {

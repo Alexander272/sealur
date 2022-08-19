@@ -18,6 +18,14 @@ func NewFlangeHandlers(service service.Flange) *FlangeHandlers {
 	}
 }
 
+func (h *FlangeHandlers) GetFlangeSize(ctx context.Context, size *moment_api.GetFullFlangeSizeRequest) (*moment_api.FullFlangeSizeResponse, error) {
+	sizes, err := h.service.GetFullFlangeSize(ctx, size)
+	if err != nil {
+		return nil, err
+	}
+	return sizes, nil
+}
+
 func (h *FlangeHandlers) CreateFlangeSize(ctx context.Context, size *moment_api.CreateFlangeSizeRequest) (*moment_api.Response, error) {
 	if err := h.service.CreateFlangeSize(ctx, size); err != nil {
 		return nil, err

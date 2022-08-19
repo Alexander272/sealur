@@ -3,7 +3,7 @@ version: '3.4'
 services:
     nginx_service:
         restart: on-failure:5
-        image: nginx_service:0.7.3
+        image: nginx_service:0.7.4b
         container_name: dev-nginx_service
         volumes:
             - ./build:/usr/app
@@ -19,7 +19,7 @@ services:
 
     api_service:
         restart: on-failure:5
-        image: sealur/api_service:1.3.0
+        image: sealur/api_service:1.3.3
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images
@@ -40,7 +40,7 @@ services:
 
     moment_service:
         restart: on-failure:5
-        image: sealur/moment_service:0.5.2
+        image: sealur/moment_service:0.5.5
         container_name: dev-moment_service
         env_file:
             - .env

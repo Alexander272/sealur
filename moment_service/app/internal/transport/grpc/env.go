@@ -39,6 +39,12 @@ func (h *GasketHandlers) DeleteEnv(ctx context.Context, env *moment_api.DeleteEn
 }
 
 //---
+func (h *GasketHandlers) CreateManyEnvData(ctx context.Context, data *moment_api.CreateManyEnvDataRequest) (*moment_api.Response, error) {
+	if err := h.service.CreateManyEnvData(ctx, data); err != nil {
+		return nil, err
+	}
+	return &moment_api.Response{}, nil
+}
 
 func (h *GasketHandlers) CreateEnvData(ctx context.Context, data *moment_api.CreateEnvDataRequest) (*moment_api.Response, error) {
 	if err := h.service.CreateEnvData(ctx, data); err != nil {

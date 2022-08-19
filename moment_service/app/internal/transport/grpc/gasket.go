@@ -16,6 +16,15 @@ func NewGasketService(service service.Gasket) *GasketHandlers {
 	return &GasketHandlers{service: service}
 }
 
+func (h *GasketHandlers) GetFullData(ctx context.Context, req *moment_api.GetFullDataRequest) (*moment_api.FullDataResponse, error) {
+	data, err := h.service.GetData(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
 func (h *GasketHandlers) GetGasket(ctx context.Context, req *moment_api.GetGasketRequest) (*moment_api.GasketResponse, error) {
 	gasket, err := h.service.GetGasket(ctx, req)
 	if err != nil {
@@ -49,6 +58,12 @@ func (h *GasketHandlers) DeleteGasket(ctx context.Context, gasket *moment_api.De
 }
 
 //---
+func (h *GasketHandlers) CreateManyGasketData(ctx context.Context, data *moment_api.CreateManyGasketDataRequest) (*moment_api.Response, error) {
+	if err := h.service.CreateManyGasketData(ctx, data); err != nil {
+		return nil, err
+	}
+	return &moment_api.Response{}, nil
+}
 
 func (h *GasketHandlers) CreateGasketData(ctx context.Context, data *moment_api.CreateGasketDataRequest) (*moment_api.Response, error) {
 	if err := h.service.CreateGasketData(ctx, data); err != nil {
@@ -59,6 +74,13 @@ func (h *GasketHandlers) CreateGasketData(ctx context.Context, data *moment_api.
 
 func (h *GasketHandlers) UpdateGasketData(ctx context.Context, data *moment_api.UpdateGasketDataRequest) (*moment_api.Response, error) {
 	if err := h.service.UpdateGasketData(ctx, data); err != nil {
+		return nil, err
+	}
+	return &moment_api.Response{}, nil
+}
+
+func (h *GasketHandlers) UpdateGasketTypeId(ctx context.Context, data *moment_api.UpdateGasketTypeIdRequest) (*moment_api.Response, error) {
+	if err := h.service.UpdateGasketTypeId(ctx, data); err != nil {
 		return nil, err
 	}
 	return &moment_api.Response{}, nil
