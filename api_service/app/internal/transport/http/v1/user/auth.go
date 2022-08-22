@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
@@ -29,6 +30,21 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
+	limit, err := h.services.Limit.Get(c, c.ClientIP())
+	if err != nil && !errors.Is(err, models.ErrClientIPNotFound) {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+	if errors.Is(err, models.ErrClientIPNotFound) {
+		h.services.Limit.Create(c, c.ClientIP())
+	}
+
+	if limit.Count > h.auth.CountAttempt {
+		h.services.AddAttempt(c, c.ClientIP())
+		models.NewErrorResponse(c, http.StatusTooManyRequests, "too many request", "too many request")
+		return
+	}
+
 	user, err := h.userClient.GetUser(c, &user_api.GetUserRequest{Login: dto.Login, Password: dto.Password})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -36,9 +52,11 @@ func (h *Handler) signIn(c *gin.Context) {
 	}
 
 	if user.User == nil {
+		h.services.AddAttempt(c, c.ClientIP())
 		models.NewErrorResponse(c, http.StatusBadRequest, "invalid crenditails", "invalid data send")
 		return
 	}
+	h.services.Remove(c, c.ClientIP())
 
 	// запись в редисе и генерация токенов
 	token, err := h.services.SignIn(c, user.User)

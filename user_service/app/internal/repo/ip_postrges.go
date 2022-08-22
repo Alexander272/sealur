@@ -27,7 +27,7 @@ func NewIpRepo(db *sqlx.DB, tableName string, conf config.IPConfig) *IpRepo {
 }
 
 func (r *IpRepo) GetAll(ctx context.Context, req *user_api.GetAllIpRequest) (ips []models.Ip, err error) {
-	query := fmt.Sprintf("SELECT ip, date, user_id FROM %s ORDER BY user_id", r.tableName)
+	query := fmt.Sprintf("SELECT ip, date, user_id FROM %s ORDER BY user_id, date DESC", r.tableName)
 
 	if err := r.db.Select(&ips, query); err != nil {
 		return ips, fmt.Errorf("failed to execute query. error: %w", err)

@@ -58,7 +58,7 @@ func main() {
 
 	//* Services, Repos & API Handlers
 
-	repos := repository.NewRepo(client)
+	repos := repository.NewRepo(client, conf.Auth)
 	services := service.NewServices(service.Deps{
 		Repos:           repos,
 		TokenManager:    tokenManager,

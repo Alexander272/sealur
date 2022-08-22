@@ -29,6 +29,8 @@ type (
 	AuthConfig struct {
 		AccessTokenTTL  time.Duration `mapstructure:"accessTokenTTL"`
 		RefreshTokenTTL time.Duration `mapstructure:"refreshTokenTTL"`
+		LimitAuthTTL    time.Duration `mapstructure:"limitAuthTTL"`
+		CountAttempt    int32         `mapstructure:"countAttempt"`
 		Secure          bool          `mapstructure:"secure"`
 		Domain          string        `mapstructure:"domain"`
 		Key             string

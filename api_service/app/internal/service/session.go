@@ -76,40 +76,6 @@ func (s *SessionService) SingOut(ctx context.Context, userId string) error {
 	return nil
 }
 
-// func (s *SessionService) Refresh(ctx context.Context, user *user_api.User) (string, error) {
-// 	_, accessToken, err := s.tokenManager.NewJWT(user.Id, user.Email, user.Roles, s.accessTokenTTL)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	refreshToken, err := s.tokenManager.NewRefreshToken()
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	accessData := repository.SessionData{
-// 		UserId:      user.Id,
-// 		Roles:       user.Roles,
-// 		AccessToken: accessToken,
-// 		Exp:         s.accessTokenTTL,
-// 	}
-// 	if err := s.repo.Create(ctx, user.Id, accessData); err != nil {
-// 		return "", fmt.Errorf("failed to create session. error: %w", err)
-// 	}
-
-// 	refreshData := repository.SessionData{
-// 		UserId:       user.Id,
-// 		Roles:        user.Roles,
-// 		AccessToken:  accessToken,
-// 		RefreshToken: refreshToken,
-// 		Exp:          s.refreshTokenTTL,
-// 	}
-// 	if err := s.repo.Create(ctx, fmt.Sprintf("%s_refresh", user.Id), refreshData); err != nil {
-// 		return "", fmt.Errorf("failed to create session (refresh). error: %w", err)
-// 	}
-
-// 	return accessToken, nil
-// }
-
 func (s *SessionService) CheckSession(ctx context.Context, u *user_api.User, token string) (bool, error) {
 	user, err := s.repo.Get(ctx, u.Id)
 	if err != nil && !errors.Is(err, models.ErrSessionEmpty) {
