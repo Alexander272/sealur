@@ -15,8 +15,24 @@ func (h *FlangeHandlers) GetBolts(ctx context.Context, req *moment_api.GetBoltsR
 	return &moment_api.BoltsResponse{Bolts: bolts}, nil
 }
 
+func (h *FlangeHandlers) GetAllBolts(ctx context.Context, req *moment_api.GetBoltsRequest) (*moment_api.BoltsResponse, error) {
+	bolts, err := h.service.GetAllBolts(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &moment_api.BoltsResponse{Bolts: bolts}, nil
+}
+
 func (h *FlangeHandlers) CreateBolt(ctx context.Context, bolt *moment_api.CreateBoltRequest) (*moment_api.Response, error) {
 	if err := h.service.CreateBolt(ctx, bolt); err != nil {
+		return nil, err
+	}
+	return &moment_api.Response{}, nil
+}
+
+func (h *FlangeHandlers) CreateBolts(ctx context.Context, bolt *moment_api.CreateBoltsRequest) (*moment_api.Response, error) {
+	if err := h.service.CreateBolts(ctx, bolt); err != nil {
 		return nil, err
 	}
 	return &moment_api.Response{}, nil

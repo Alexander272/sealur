@@ -67,6 +67,7 @@ func (s *FlangeService) GetStandarts(ctx context.Context, req *moment_api.GetSta
 			TitleDn:   item.TitleDn,
 			TitlePn:   item.TitlePn,
 			IsNeedRow: item.IsNeedRow,
+			IsInch:    item.IsInch,
 			Rows:      rows,
 		})
 	}
@@ -98,6 +99,7 @@ func (s *FlangeService) GetStandartsWithSize(ctx context.Context, req *moment_ap
 			TitleDn:   item.TitleDn,
 			TitlePn:   item.TitlePn,
 			IsNeedRow: item.IsNeedRow,
+			IsInch:    item.IsInch,
 			Rows:      rows,
 			Sizes:     sizes,
 		})

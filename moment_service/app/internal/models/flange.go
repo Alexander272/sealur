@@ -11,7 +11,7 @@ type FlangeSize struct {
 	S1       float64 `db:"s1"`
 	Length   float64 `db:"length"`
 	Count    int32   `db:"count"`
-	Diameter int32   `db:"diameter"`
+	Diameter float64 `db:"diameter"`
 	Area     float64 `db:"area"`
 }
 

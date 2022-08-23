@@ -53,7 +53,7 @@ func (r *GasketRepo) GetGasket(ctx context.Context, req *moment_api.GetGasketReq
 
 func (r *GasketRepo) GetGasketWithThick(ctx context.Context, req *moment_api.GetGasketRequest) (gasket []models.GasketWithThick, err error) {
 	query := fmt.Sprintf(`SELECT %s.id, title, thickness FROM %s
-		INNER JOIN %s ON %s.id = %s.gasket_id ORDER BY id`,
+		INNER JOIN %s ON %s.id = %s.gasket_id ORDER BY id, thickness`,
 		GasketTable, GasketTable, GasketDataTable, GasketTable, GasketDataTable)
 
 	if err := r.db.Select(&gasket, query); err != nil {

@@ -2,6 +2,7 @@ package moment
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
@@ -13,10 +14,12 @@ func (h *Handler) initBoltsRoutes(api *gin.RouterGroup) {
 	bolts := api.Group("/bolts", h.middleware.UserIdentity)
 	{
 		bolts.GET("/", h.getBolts)
+		bolts.GET("/all", h.getAllBolts)
 		bolts = bolts.Group("/", h.middleware.AccessForMomentAdmin)
 		{
 			bolts.POST("/", h.createBolt)
-			bolts.PATCH("/:id", h.updateBolt)
+			bolts.POST("/several", h.createBolts)
+			bolts.PUT("/:id", h.updateBolt)
 			bolts.DELETE("/:id", h.deleteBolt)
 		}
 	}
@@ -29,13 +32,48 @@ func (h *Handler) initBoltsRoutes(api *gin.RouterGroup) {
 // @ModuleID getBolts
 // @Accept json
 // @Produce json
+// @Param isInch query bool false "is inch"
 // @Success 200 {object} models.DataResponse{Data=[]moment_api.Bolt}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/bolts/ [get]
 func (h *Handler) getBolts(c *gin.Context) {
-	bolts, err := h.flangeClient.GetBolts(c, &moment_api.GetBoltsRequest{})
+	defIsInch := false
+	isInchQeury := c.Query("isInch")
+	if isInchQeury != "" {
+		isInch, err := strconv.ParseBool(isInchQeury)
+		if err != nil {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+			return
+		}
+		defIsInch = isInch
+	}
+
+	bolts, err := h.flangeClient.GetBolts(c, &moment_api.GetBoltsRequest{IsInch: defIsInch})
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: bolts.Bolts, Count: len(bolts.Bolts)})
+}
+
+// @Summary Get All Bolts
+// @Tags Sealur Moment -> bolts
+// @Security ApiKeyAuth
+// @Description получение болтов
+// @ModuleID getAllBolts
+// @Accept json
+// @Produce json
+// @Param isInch query bool false "is inch"
+// @Success 200 {object} models.DataResponse{Data=[]moment_api.Bolt}
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-moment/bolts/all [get]
+func (h *Handler) getAllBolts(c *gin.Context) {
+	bolts, err := h.flangeClient.GetAllBolts(c, &moment_api.GetBoltsRequest{})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -68,6 +106,48 @@ func (h *Handler) createBolt(c *gin.Context) {
 		Title:    dto.Title,
 		Diameter: dto.Diameter,
 		Area:     dto.Area,
+		IsInch:   dto.IsInch,
+	})
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusCreated, models.IdResponse{Message: "Created"})
+}
+
+// @Summary Create Bolts
+// @Tags Sealur Moment -> bolts
+// @Security ApiKeyAuth
+// @Description создание болтов
+// @ModuleID createBolts
+// @Accept json
+// @Produce json
+// @Param bolt body []moment_model.BoltDTO true "bolt info"
+// @Success 201 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-moment/bolts/several [post]
+func (h *Handler) createBolts(c *gin.Context) {
+	var dto []moment_model.BoltDTO
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	bolts := []*moment_api.CreateBoltRequest{}
+	for _, bd := range dto {
+		bolts = append(bolts, &moment_api.CreateBoltRequest{
+			Title:    bd.Title,
+			Diameter: bd.Diameter,
+			Area:     bd.Area,
+			IsInch:   bd.IsInch,
+		})
+	}
+
+	_, err := h.flangeClient.CreateBolts(c, &moment_api.CreateBoltsRequest{
+		Bolts: bolts,
 	})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -109,6 +189,7 @@ func (h *Handler) updateBolt(c *gin.Context) {
 		Title:    dto.Title,
 		Diameter: dto.Diameter,
 		Area:     dto.Area,
+		IsInch:   dto.IsInch,
 	})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")

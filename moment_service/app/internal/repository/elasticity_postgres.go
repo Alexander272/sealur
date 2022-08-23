@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
@@ -29,31 +28,9 @@ func (r *MaterialsRepo) CreateElasticity(ctx context.Context, elasticity *moment
 }
 
 func (r *MaterialsRepo) UpdateElasticity(ctx context.Context, elasticity *moment_api.UpdateElasticityRequest) error {
-	setValues := make([]string, 0)
-	args := make([]interface{}, 0)
-	argId := 1
+	query := fmt.Sprintf("UPDATE %s SET temperature=$1, elasticity=$2 WHERE id=$3", ElasticityTable)
 
-	if elasticity.MarkId != "" {
-		setValues = append(setValues, fmt.Sprintf("mark_id=$%d", argId))
-		args = append(args, elasticity.MarkId)
-		argId++
-	}
-	if elasticity.Temperature != 0 {
-		setValues = append(setValues, fmt.Sprintf("temperature=$%d", argId))
-		args = append(args, elasticity.Temperature)
-		argId++
-	}
-	if elasticity.Elasticity != 0 {
-		setValues = append(setValues, fmt.Sprintf("elasticity=$%d", argId))
-		args = append(args, elasticity.Elasticity)
-		argId++
-	}
-
-	setQuery := strings.Join(setValues, ", ")
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", ElasticityTable, setQuery, argId)
-
-	args = append(args, elasticity.Id)
-	_, err := r.db.Exec(query, args...)
+	_, err := r.db.Exec(query, elasticity.Temperature, elasticity.Elasticity, elasticity.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

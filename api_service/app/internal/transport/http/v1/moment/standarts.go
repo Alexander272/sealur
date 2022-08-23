@@ -17,7 +17,7 @@ func (h *Handler) initStandartsRoutes(api *gin.RouterGroup) {
 		standarts = standarts.Group("/", h.middleware.AccessForMomentAdmin)
 		{
 			standarts.POST("/", h.createStandart)
-			standarts.PATCH("/:id", h.updateStandart)
+			standarts.PUT("/:id", h.updateStandart)
 			standarts.DELETE("/:id", h.deleteStandart)
 		}
 	}

@@ -56,7 +56,7 @@ func (s *FomulasService) getFormulasForFlange(
 	Dcp := strings.ReplaceAll(strconv.FormatFloat(data.Dcp, 'G', 3, 64), "E", "*10^")
 	Lb0 := strings.ReplaceAll(strconv.FormatFloat(result.Bolt.Lenght, 'G', 3, 64), "E", "*10^")
 	typeBolt := strings.ReplaceAll(strconv.FormatFloat(s.typeBolt[result.Data.Type], 'G', 3, 64), "E", "*10^")
-	diameter := data.Bolt.Diameter
+	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 3, 64)
 	bEpsilon := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Epsilon, 'G', 3, 64), "E", "*10^")
 	bEpsilonAt20 := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.EpsilonAt20, 'G', 3, 64), "E", "*10^")
 	area := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Area, 'G', 3, 64), "E", "*10^")
@@ -221,13 +221,13 @@ func (s *FomulasService) getFormulasForFlange(
 		formulas.Basis.Q = fmt.Sprintf("max(%s; %s) / %f * %s *%s", pbm, pbr, math.Pi, Dcp, width)
 
 		if !(result.Calc.Basis.SigmaB1 > constants.MaxSigmaB && data.Bolt.Diameter >= constants.MinDiameter && data.Bolt.Diameter <= constants.MaxDiameter) {
-			formulas.Basis.Mkp = fmt.Sprintf("(0.3 * %s * %d/%d) / 1000", pbm, diameter, count)
+			formulas.Basis.Mkp = fmt.Sprintf("(0.3 * %s * %s/%d) / 1000", pbm, diameter, count)
 		}
 		formulas.Basis.Mkp1 = fmt.Sprintf("0.75 * %s", mkp)
 
 		Prek := fmt.Sprintf("0.8 * %s * %s", ab, bSigmaAt20)
 		formulas.Basis.Qrek = fmt.Sprintf("(%s) / (%f * %s * %s)", Prek, math.Pi, Dcp, width)
-		formulas.Basis.Mrek = fmt.Sprintf("(0.3 * %s * %d/%d) / 1000", Prek, diameter, count)
+		formulas.Basis.Mrek = fmt.Sprintf("(0.3 * %s * %s/%d) / 1000", Prek, diameter, count)
 
 		Pmax := fmt.Sprintf("%s * %s", dSigmaM, ab)
 		formulas.Basis.Qmax = fmt.Sprintf("(%s) / (%f * %s *%s)", Pmax, math.Pi, Dcp, width)
@@ -235,7 +235,7 @@ func (s *FomulasService) getFormulasForFlange(
 		if TypeGasket == "Soft" && result.Calc.Basis.Qmax > data.Gasket.PermissiblePres {
 			Pmax = fmt.Sprintf("%s * %f * %s *%s", permissiblePres, math.Pi, Dcp, width)
 		}
-		formulas.Basis.Mmax = fmt.Sprintf("(0.3 * %s *%d / %d) / 1000", Pmax, diameter, count)
+		formulas.Basis.Mmax = fmt.Sprintf("(0.3 * %s *%s / %d) / 1000", Pmax, diameter, count)
 	} else {
 		formulas.Strength = &moment_api.CalcFormulas_Strength{}
 
@@ -243,7 +243,7 @@ func (s *FomulasService) getFormulasForFlange(
 			formulas.Strength.Yp = fmt.Sprintf("(%s * %s) / (%s * %f * %s *%s)", th, compression, epsilon, math.Pi, Dcp, width)
 		}
 
-		formulas.Strength.Lb = fmt.Sprintf("%s + %s * %d", Lb0, typeBolt, diameter)
+		formulas.Strength.Lb = fmt.Sprintf("%s + %s * %s", Lb0, typeBolt, diameter)
 		formulas.Strength.Yb = fmt.Sprintf("%s / (%s * %s * %d)", Lb, bEpsilonAt20, area, count)
 
 		divider := fmt.Sprintf("%s + %s * %s/%s + (%s * %s/%s) * %s^2 + (%s * %s/%s) * %s^2",
@@ -294,7 +294,7 @@ func (s *FomulasService) getFormulasForFlange(
 		formulas.Strength.FDSigmaR = fmt.Sprintf("%s * %s * %s * %s", kyp, kyz, kyt, bSigma)
 		formulas.Strength.FQ = fmt.Sprintf("max(%s; %s) / %f * %s *%s", fpbm, fpbr, math.Pi, Dcp, width)
 		if !(result.Calc.Strength.FSigmaB1 > constants.MaxSigmaB && data.Bolt.Diameter >= constants.MinDiameter && data.Bolt.Diameter <= constants.MaxDiameter) {
-			formulas.Strength.FMkp = fmt.Sprintf("(0.3 * %s * %d/%d) / 1000", fpbm, diameter, count)
+			formulas.Strength.FMkp = fmt.Sprintf("(0.3 * %s * %s/%d) / 1000", fpbm, diameter, count)
 		}
 		formulas.Strength.FMkp1 = fmt.Sprintf("0.75 * %s", fmkp)
 
@@ -325,13 +325,13 @@ func (s *FomulasService) getFormulasForFlange(
 		formulas.Strength.SQ = fmt.Sprintf("max(%s; %s) / %f * %s *%s", spbm, spbr, math.Pi, Dcp, width)
 
 		if !(result.Calc.Strength.FSigmaB1 > constants.MaxSigmaB && data.Bolt.Diameter >= constants.MinDiameter && data.Bolt.Diameter <= constants.MaxDiameter) {
-			formulas.Strength.SMkp = fmt.Sprintf("(0.3 * %s * %d/%d) / 1000", spbm, diameter, count)
+			formulas.Strength.SMkp = fmt.Sprintf("(0.3 * %s * %s/%d) / 1000", spbm, diameter, count)
 		}
 		formulas.Strength.SMkp1 = fmt.Sprintf("0.75 * %s", smkp)
 
 		Prek := fmt.Sprintf("0.8 * %s * %s", ab, bSigmaAt20)
 		formulas.Strength.Qrek = fmt.Sprintf("(%s) / (%f * %s * %s)", Prek, math.Pi, Dcp, width)
-		formulas.Strength.Mrek = fmt.Sprintf("(0.3 * %s * %d/%d) / 1000", Prek, diameter, count)
+		formulas.Strength.Mrek = fmt.Sprintf("(0.3 * %s * %s/%d) / 1000", Prek, diameter, count)
 
 		Pmax := fmt.Sprintf("%s * %s", dSigmaM, ab)
 		formulas.Strength.Qmax = fmt.Sprintf("(%s) / (%f * %s *%s)", Pmax, math.Pi, Dcp, width)
@@ -339,7 +339,7 @@ func (s *FomulasService) getFormulasForFlange(
 		if TypeGasket == "Soft" && result.Calc.Basis.Qmax > data.Gasket.PermissiblePres {
 			Pmax = fmt.Sprintf("%s * %f * %s *%s", permissiblePres, math.Pi, Dcp, width)
 		}
-		formulas.Strength.Mmax = fmt.Sprintf("(0.3 * %s *%d / %d) / 1000", Pmax, diameter, count)
+		formulas.Strength.Mmax = fmt.Sprintf("(0.3 * %s *%s / %d) / 1000", Pmax, diameter, count)
 	}
 
 	return formulas
@@ -456,7 +456,7 @@ func (s *FomulasService) getStrengthFormulas(
 	}
 
 	count := data.Bolt.Count
-	diameter := data.Bolt.Diameter
+	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 3, 64)
 	h := strings.ReplaceAll(strconv.FormatFloat(flange.H, 'G', 3, 64), "E", "*10^")
 	m := strconv.FormatFloat(data.Gasket.M, 'G', 3, 64)
 	b := strings.ReplaceAll(strconv.FormatFloat(flange.B, 'G', 3, 64), "E", "*10^")
@@ -465,7 +465,7 @@ func (s *FomulasService) getStrengthFormulas(
 	cf := strings.ReplaceAll(strconv.FormatFloat(res.Cf, 'G', 3, 64), "E", "*10^")
 
 	temp1 := fmt.Sprintf("%f * %s/%d", math.Pi, D6, count)
-	temp2 := fmt.Sprintf("2*%d + 6*%s/(%s + 0.5)", diameter, h, m)
+	temp2 := fmt.Sprintf("2*%s + 6*%s/(%s + 0.5)", diameter, h, m)
 
 	strength.Cf = fmt.Sprintf("max(1; Sqrt((%s) / (%s)))", temp1, temp2)
 

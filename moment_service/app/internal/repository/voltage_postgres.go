@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
@@ -29,34 +28,9 @@ func (r *MaterialsRepo) CreateVoltage(ctx context.Context, voltage *moment_api.C
 }
 
 func (r *MaterialsRepo) UpdateVoltage(ctx context.Context, voltage *moment_api.UpdateVoltageRequest) error {
-	setValues := make([]string, 0)
-	args := make([]interface{}, 0)
-	argId := 1
+	query := fmt.Sprintf("UPDATE %s SET temperature=$1, voltage=$2 WHERE id=$3", VoltageTable)
 
-	//TODO будут проблемы если нужно будет записать 0 в бд
-	//? можно передавать инфинити если значения нет и делать проверку на равенство
-
-	if voltage.MarkId != "" {
-		setValues = append(setValues, fmt.Sprintf("mark_id=$%d", argId))
-		args = append(args, voltage.MarkId)
-		argId++
-	}
-	if voltage.Temperature != 0 {
-		setValues = append(setValues, fmt.Sprintf("temperature=$%d", argId))
-		args = append(args, voltage.Temperature)
-		argId++
-	}
-	if voltage.Voltage != 0 {
-		setValues = append(setValues, fmt.Sprintf("voltage=$%d", argId))
-		args = append(args, voltage.Voltage)
-		argId++
-	}
-
-	setQuery := strings.Join(setValues, ", ")
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", VoltageTable, setQuery, argId)
-
-	args = append(args, voltage.Id)
-	_, err := r.db.Exec(query, args...)
+	_, err := r.db.Exec(query, voltage.Temperature, voltage.Voltage, voltage.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

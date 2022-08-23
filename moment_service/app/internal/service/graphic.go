@@ -267,7 +267,7 @@ func (s *GraphicService) CalculateF(betta, x float64) float64 {
 }
 
 // Крутящий момент при затяжке для болтов | функция тупо скопирована из оригинала
-func (s *GraphicService) CalculateMkp(diameter int32, sigma float64) float64 {
+func (s *GraphicService) CalculateMkp(diameter float64, sigma float64) float64 {
 	var mkp, max, m float64
 
 	switch {

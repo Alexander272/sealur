@@ -21,7 +21,9 @@ type Flange interface {
 	DeleteFlangeSize(context.Context, *moment_api.DeleteFlangeSizeRequest) error
 
 	GetBolts(context.Context, *moment_api.GetBoltsRequest) ([]*moment_api.Bolt, error)
+	GetAllBolts(context.Context, *moment_api.GetBoltsRequest) ([]*moment_api.Bolt, error)
 	CreateBolt(context.Context, *moment_api.CreateBoltRequest) error
+	CreateBolts(context.Context, *moment_api.CreateBoltsRequest) error
 	UpdateBolt(context.Context, *moment_api.UpdateBoltRequest) error
 	DeleteBolt(context.Context, *moment_api.DeleteBoltRequest) error
 
@@ -96,7 +98,7 @@ type Graphic interface {
 	CalculateBetaF(betta, x float64) float64
 	CalculateBetaV(betta, x float64) float64
 	CalculateF(betta, x float64) float64
-	CalculateMkp(diameter int32, sigma float64) float64
+	CalculateMkp(diameter float64, sigma float64) float64
 }
 
 type Read interface {

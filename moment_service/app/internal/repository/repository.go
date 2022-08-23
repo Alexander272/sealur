@@ -17,7 +17,9 @@ type Flange interface {
 	DeleteFlangeSize(context.Context, *moment_api.DeleteFlangeSizeRequest) error
 
 	GetBolts(context.Context, *moment_api.GetBoltsRequest) ([]models.BoltsDTO, error)
+	GetAllBolts(context.Context, *moment_api.GetBoltsRequest) ([]models.BoltsDTO, error)
 	CreateBolt(context.Context, *moment_api.CreateBoltRequest) error
+	CreateBolts(context.Context, *moment_api.CreateBoltsRequest) error
 	UpdateBolt(context.Context, *moment_api.UpdateBoltRequest) error
 	DeleteBolt(context.Context, *moment_api.DeleteBoltRequest) error
 

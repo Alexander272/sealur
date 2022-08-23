@@ -257,7 +257,7 @@ func (b *BoltsData) NewBolts() (bolts *moment_api.BoltData, err error) {
 		bolts.Temp = temp
 	}
 	if b.Name == "another" {
-		diameter, err := strconv.Atoi(b.Diameter)
+		diameter, err := strconv.ParseFloat(b.Diameter, 64)
 		if err != nil {
 			return nil, err
 		}
@@ -265,7 +265,7 @@ func (b *BoltsData) NewBolts() (bolts *moment_api.BoltData, err error) {
 		if err != nil {
 			return nil, err
 		}
-		bolts.Diameter = int32(diameter)
+		bolts.Diameter = diameter
 		bolts.Area = area
 	}
 	if b.MarkId == "another" {

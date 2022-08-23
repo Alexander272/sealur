@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
@@ -29,31 +28,9 @@ func (r *MaterialsRepo) CreateAlpha(ctx context.Context, alpha *moment_api.Creat
 }
 
 func (r *MaterialsRepo) UpateAlpha(ctx context.Context, alpha *moment_api.UpdateAlphaRequest) error {
-	setValues := make([]string, 0)
-	args := make([]interface{}, 0)
-	argId := 1
+	query := fmt.Sprintf("UPDATE %s SET temperature=$1, alpha=$2 WHERE id=$3", AlphaTable)
 
-	if alpha.MarkId != "" {
-		setValues = append(setValues, fmt.Sprintf("mark_id=$%d", argId))
-		args = append(args, alpha.MarkId)
-		argId++
-	}
-	if alpha.Temperature != 0 {
-		setValues = append(setValues, fmt.Sprintf("temperature=$%d", argId))
-		args = append(args, alpha.Temperature)
-		argId++
-	}
-	if alpha.Alpha != 0 {
-		setValues = append(setValues, fmt.Sprintf("alpha=$%d", argId))
-		args = append(args, alpha.Alpha)
-		argId++
-	}
-
-	setQuery := strings.Join(setValues, ", ")
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", AlphaTable, setQuery, argId)
-
-	args = append(args, alpha.Id)
-	_, err := r.db.Exec(query, args...)
+	_, err := r.db.Exec(query, alpha.Temperature, alpha.Alpha, alpha.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

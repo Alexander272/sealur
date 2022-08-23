@@ -203,7 +203,7 @@ func (h *Handler) sendOrder(c *gin.Context) {
 	}
 	userId, _ := c.Get(h.middleware.UserIdCtx)
 
-	_, err := h.proClient.SaveOrder(c, &pro_api.SaveOrderRequest{
+	_, err := h.proClient.SendOrder(c, &pro_api.SaveOrderRequest{
 		OrderId: orderId,
 		UserId:  userId.(string),
 	})

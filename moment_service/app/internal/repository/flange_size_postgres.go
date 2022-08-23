@@ -19,7 +19,7 @@ func NewFlangeRepo(db *sqlx.DB) *FlangeRepo {
 }
 
 func (r *FlangeRepo) GetFlangeSize(ctx context.Context, req *moment_api.GetFlangeSizeRequest) (size models.FlangeSize, err error) {
-	//TODO похоже надо добваить зависимоcть от ряда
+	//TODO похоже надо добавить зависимоcть от ряда
 	query := fmt.Sprintf(`SELECT %s.id, pn, d, d6, d_out, h, s0, s1, length, count, diameter, area FROM %s
 		INNER JOIN %s on bolt_id=%s.id WHERE stand_id=$1 AND d=$2 AND pn=$3`,
 		FlangeSizeTable, FlangeSizeTable, BoltsTable, BoltsTable)
@@ -59,6 +59,7 @@ func (r *FlangeRepo) GetFullFlangeSize(ctx context.Context, req *moment_api.GetF
 }
 
 func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_api.CreateFlangeSizeRequest) error {
+	//TODO добваить ряды в модель и запрос
 	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, d, d6, d_out, h, s0, s1, length, count, bolt_id)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, FlangeSizeTable)
 
@@ -74,6 +75,7 @@ func (r *FlangeRepo) UpdateFlangeSize(ctx context.Context, size *moment_api.Upda
 	args := make([]interface{}, 0)
 	argId := 1
 
+	//TODO добваить ряды в модель и запрос
 	if size.StandId != "" {
 		setValues = append(setValues, fmt.Sprintf("stand_id=$%d", argId))
 		args = append(args, size.StandId)

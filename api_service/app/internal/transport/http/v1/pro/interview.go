@@ -35,12 +35,15 @@ func (h *Handler) sendInterview(c *gin.Context) {
 		return
 	}
 
-	drawing := &pro_api.Drawing{
-		Id:       dto.Drawing.Id,
-		Name:     dto.Drawing.Name,
-		OrigName: dto.Drawing.OrigName,
-		Group:    dto.Drawing.Group,
-		Link:     dto.Drawing.Link,
+	var drawing *pro_api.Drawing = nil
+	if dto.Drawing != nil {
+		drawing = &pro_api.Drawing{
+			Id:       dto.Drawing.Id,
+			Name:     dto.Drawing.Name,
+			OrigName: dto.Drawing.OrigName,
+			Group:    dto.Drawing.Group,
+			Link:     dto.Drawing.Link,
+		}
 	}
 
 	size := &pro_api.SizesInt{

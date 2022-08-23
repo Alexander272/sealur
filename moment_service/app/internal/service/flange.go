@@ -24,6 +24,7 @@ func (s *FlangeService) GetFlangeSize(ctx context.Context, req *moment_api.GetFl
 		return models.FlangeSize{}, fmt.Errorf("failed to get flange size. error: %w", err)
 	}
 	size.Area = math.Round(size.Area*1000) / 1000
+	size.Diameter = math.Round(size.Diameter*1000) / 1000
 
 	return size, nil
 }
@@ -124,7 +125,7 @@ func (s *FlangeService) GetFullFlangeSize(ctx context.Context, size *moment_api.
 		sizeRow1 = append(sizeRow1, &moment_api.FullFlangeSize{
 			Id:      fsd.Id,
 			StandId: fsd.StandId,
-			Pn:      fsd.Pn,
+			Pn:      math.Round(fsd.Pn*1000) / 1000,
 			D:       fsd.D,
 			D6:      fsd.D6,
 			DOut:    fsd.DOut,
@@ -141,7 +142,7 @@ func (s *FlangeService) GetFullFlangeSize(ctx context.Context, size *moment_api.
 			sizeRow2 = append(sizeRow2, &moment_api.FullFlangeSize{
 				Id:      fsd.Id,
 				StandId: fsd.StandId,
-				Pn:      fsd.Pn,
+				Pn:      math.Round(fsd.Pn*1000) / 1000,
 				D:       fsd.D,
 				D6:      fsd.D6,
 				DOut:    fsd.DOut,

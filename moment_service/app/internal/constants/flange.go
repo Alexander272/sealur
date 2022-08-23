@@ -33,8 +33,8 @@ const (
 	NoLoadKyt float64 = 1
 	LoadKyt   float64 = 1.3
 
-	MinDiameter int32   = 20
-	MaxDiameter int32   = 52
+	MinDiameter float64 = 20
+	MaxDiameter float64 = 52
 	MaxSigmaB   float64 = 120
 
 	MinD      float64 = 400

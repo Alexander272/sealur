@@ -8,6 +8,7 @@ type StandartDTO struct {
 	TitlePn   string `db:"title_pn"`
 	IsNeedRow bool   `db:"is_need_row"`
 	Rows      string `db:"rows"`
+	IsInch    bool   `db:"is_inch"`
 }
 
 type StandartWithSize struct {
@@ -18,5 +19,6 @@ type StandartWithSize struct {
 	TitlePn   string `db:"title_pn"`
 	IsNeedRow bool   `db:"is_need_row"`
 	Rows      string `db:"rows"`
+	IsInch    bool   `db:"is_inch"`
 	Sizes     []FlangeSize
 }
