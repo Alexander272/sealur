@@ -171,6 +171,13 @@ func (s *FlangeService) CreateFlangeSize(ctx context.Context, size *moment_api.C
 	return nil
 }
 
+func (s *FlangeService) CreateFlangeSizes(ctx context.Context, size *moment_api.CreateFlangeSizesRequest) error {
+	if err := s.repo.CreateFlangeSizes(ctx, size); err != nil {
+		return fmt.Errorf("failed to create flange sizes. error: %w", err)
+	}
+	return nil
+}
+
 func (s *FlangeService) UpdateFlangeSize(ctx context.Context, size *moment_api.UpdateFlangeSizeRequest) error {
 	if err := s.repo.UpdateFlangeSize(ctx, size); err != nil {
 		return fmt.Errorf("failed to update flange size. error: %w", err)

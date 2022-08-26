@@ -59,12 +59,30 @@ func (r *FlangeRepo) GetFullFlangeSize(ctx context.Context, req *moment_api.GetF
 }
 
 func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_api.CreateFlangeSizeRequest) error {
-	//TODO добваить ряды в модель и запрос
-	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, d, d6, d_out, h, s0, s1, length, count, bolt_id)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, FlangeSizeTable)
+	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, d, d6, d_out, h, s0, s1, length, count, bolt_id, row)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`, FlangeSizeTable)
 
-	_, err := r.db.Exec(query, size.StandId, size.Pn, size.D, size.D6, size.DOut, size.H, size.S0, size.S1, size.Length, size.Count, size.BoltId)
+	_, err := r.db.Exec(query, size.StandId, size.Pn, size.D, size.D6, size.DOut, size.H, size.S0, size.S1, size.Length, size.Count, size.BoltId, size.Row)
 	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *FlangeRepo) CreateFlangeSizes(ctx context.Context, size *moment_api.CreateFlangeSizesRequest) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+
+	for i, s := range size.Sizes {
+		setValues = append(setValues, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+			i*12+1, i*12+2, i*12+3, i*12+4, i*12+5, i*12+6, i*12+7, i*12+8, i*12+9, i*12+10, i*12+11, i*12+12))
+		args = append(args, s.StandId, s.Pn, s.D, s.D6, s.DOut, s.H, s.S0, s.S1, s.Length, s.Count, s.BoltId, s.Row)
+	}
+
+	query := fmt.Sprintf("INSERT INTO %s (stand_id, pn, d, d6, d_out, h, s0, s1, length, count, bolt_id, row) VALUES %s",
+		FlangeSizeTable, strings.Join(setValues, ", "))
+
+	if _, err := r.db.Exec(query, args...); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return nil

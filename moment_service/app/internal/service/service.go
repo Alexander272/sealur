@@ -17,6 +17,7 @@ type Flange interface {
 	GetFullFlangeSize(context.Context, *moment_api.GetFullFlangeSizeRequest) (*moment_api.FullFlangeSizeResponse, error)
 	GetBasisFlangeSize(context.Context, *moment_api.GetBasisFlangeSizeRequest) (*moment_api.BasisFlangeSizeResponse, error)
 	CreateFlangeSize(context.Context, *moment_api.CreateFlangeSizeRequest) error
+	CreateFlangeSizes(context.Context, *moment_api.CreateFlangeSizesRequest) error
 	UpdateFlangeSize(context.Context, *moment_api.UpdateFlangeSizeRequest) error
 	DeleteFlangeSize(context.Context, *moment_api.DeleteFlangeSizeRequest) error
 

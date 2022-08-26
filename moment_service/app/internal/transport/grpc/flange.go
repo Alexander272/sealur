@@ -33,6 +33,13 @@ func (h *FlangeHandlers) CreateFlangeSize(ctx context.Context, size *moment_api.
 	return &moment_api.Response{}, nil
 }
 
+func (h *FlangeHandlers) CreateFlangeSizes(ctx context.Context, size *moment_api.CreateFlangeSizesRequest) (*moment_api.Response, error) {
+	if err := h.service.CreateFlangeSizes(ctx, size); err != nil {
+		return nil, err
+	}
+	return &moment_api.Response{}, nil
+}
+
 func (h *FlangeHandlers) UpdateFlangeSize(ctx context.Context, size *moment_api.UpdateFlangeSizeRequest) (*moment_api.Response, error) {
 	if err := h.service.UpdateFlangeSize(ctx, size); err != nil {
 		return nil, err

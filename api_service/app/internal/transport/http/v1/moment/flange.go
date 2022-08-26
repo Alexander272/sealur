@@ -14,6 +14,7 @@ func (h *Handler) initFlangeRoutes(api *gin.RouterGroup) {
 	{
 		flange.GET("/", h.getFlangeSize)
 		flange.POST("/", h.createFlangeSize)
+		flange.POST("/several", h.createFlangeSizes)
 		flange.PATCH("/:id", h.updateFlangeSize)
 		flange.DELETE("/:id", h.deleteFlangeSize)
 	}
@@ -83,6 +84,53 @@ func (h *Handler) createFlangeSize(c *gin.Context) {
 		Count:   dto.Count,
 		BoltId:  dto.BoltId,
 	})
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusCreated, models.IdResponse{Message: "Created"})
+}
+
+// @Summary Create Flange Sizes
+// @Tags Sealur Moment -> flange-sizes
+// @Security ApiKeyAuth
+// @Description создание размеров
+// @ModuleID createFlangeSizes
+// @Accept json
+// @Produce json
+// @Param size body []moment_model.FlangeSizeDTO true "size info"
+// @Success 201 {object} models.IdResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-moment/flange-sizes/several [post]
+func (h *Handler) createFlangeSizes(c *gin.Context) {
+	var dto []moment_model.FlangeSizeDTO
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	sizes := []*moment_api.CreateFlangeSizeRequest{}
+	for _, sd := range dto {
+		sizes = append(sizes, &moment_api.CreateFlangeSizeRequest{
+			StandId: sd.StandId,
+			Pn:      sd.Pn,
+			D:       sd.D,
+			D6:      sd.D6,
+			DOut:    sd.DOut,
+			H:       sd.H,
+			S0:      sd.S0,
+			S1:      sd.S1,
+			Length:  sd.Length,
+			Count:   sd.Count,
+			BoltId:  sd.BoltId,
+			Row:     sd.Row,
+		})
+	}
+
+	_, err := h.flangeClient.CreateFlangeSizes(c, &moment_api.CreateFlangeSizesRequest{Sizes: sizes})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

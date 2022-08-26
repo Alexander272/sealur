@@ -12,4 +12,5 @@ type FlangeSizeDTO struct {
 	Length  float64 `json:"length,omitempty"`
 	Count   int32   `json:"count,omitempty"`
 	BoltId  string  `json:"botId"`
+	Row     int32   `json:"row"`
 }
