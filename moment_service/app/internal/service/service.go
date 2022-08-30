@@ -5,6 +5,7 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur/moment_service/internal/repository"
+	"github.com/Alexander272/sealur/moment_service/internal/service/formulas"
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
@@ -121,10 +122,10 @@ func NewServices(repos *repository.Repositories) *Services {
 	gasket := NewGasketService(repos.Gasket)
 	graphic := NewGraphicService()
 	data := NewDataService(flange, materials, gasket, graphic)
-	formulas := NewFormulasService()
+	formulas := formulas.NewFormulasService()
 
 	return &Services{
-		CalcFlange: NewCalcFlangeService(graphic, data, formulas),
+		CalcFlange: NewCalcFlangeService(graphic, data, formulas.Flange),
 		Flange:     flange,
 		Materials:  materials,
 		Gasket:     gasket,

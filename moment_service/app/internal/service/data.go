@@ -48,21 +48,7 @@ func NewDataService(flange *FlangeService, materials *MaterialsService, gasket *
 	}
 }
 
-type DataFlange struct {
-	Flange1    *moment_api.FlangeResult
-	Flange2    *moment_api.FlangeResult
-	Type1      moment_api.FlangeData_Type
-	Type2      moment_api.FlangeData_Type
-	Washer1    *moment_api.WasherResult
-	Washer2    *moment_api.WasherResult
-	Embed      *moment_api.EmbedResult
-	Bolt       *moment_api.BoltResult
-	Gasket     *moment_api.GasketResult
-	TypeGasket string
-	Dcp, B0    float64
-}
-
-func (s *DataService) getDataForFlange(ctx context.Context, data *moment_api.CalcFlangeRequest) (result DataFlange, err error) {
+func (s *DataService) GetDataForFlange(ctx context.Context, data *moment_api.CalcFlangeRequest) (result models.DataFlange, err error) {
 	//* формула из Таблицы В.1
 	Tb := s.typeFlangesTB[data.Flanges.String()] * data.Temp
 	if data.FlangesData[0].Type == moment_api.FlangeData_free {

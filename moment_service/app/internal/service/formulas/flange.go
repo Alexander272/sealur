@@ -1,4 +1,4 @@
-package service
+package formulas
 
 import (
 	"fmt"
@@ -7,16 +7,17 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
+	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
-type FomulasService struct {
+type FlangeService struct {
 	typeBolt map[string]float64
 	Kyp      map[bool]float64
 	Kyz      map[string]float64
 }
 
-func NewFormulasService() *FomulasService {
+func NewFlangeService() *FlangeService {
 	bolt := map[string]float64{
 		"bolt": constants.BoltD,
 		"pin":  constants.PinD,
@@ -31,16 +32,16 @@ func NewFormulasService() *FomulasService {
 		"controllablePin": constants.ControllablePinKyz,
 	}
 
-	return &FomulasService{
+	return &FlangeService{
 		typeBolt: bolt,
 		Kyp:      kp,
 		Kyz:      kz,
 	}
 }
 
-func (s *FomulasService) getFormulasForFlange(
+func (s *FlangeService) GetFormulasForFlange(
 	TypeGasket, Condition string, IsWork, IsUseWasher, IsEmbedded bool,
-	data DataFlange,
+	data models.DataFlange,
 	result moment_api.FlangeResponse,
 	calculation moment_api.CalcFlangeRequest_Calcutation,
 	gamma_, yb_, yp_ float64,
@@ -345,7 +346,7 @@ func (s *FomulasService) getFormulasForFlange(
 	return formulas
 }
 
-func (s *FomulasService) getFlangeFormulas(
+func (s *FlangeService) getFlangeFormulas(
 	typeF moment_api.FlangeData_Type,
 	data *moment_api.FlangeResult,
 	D6, DOut, Dcp string,
@@ -431,10 +432,10 @@ func (s *FomulasService) getFlangeFormulas(
 	return f
 }
 
-func (s *FomulasService) getStrengthFormulas(
+func (s *FlangeService) getStrengthFormulas(
 	typeF moment_api.FlangeData_Type,
 	AxialForce, BendingMoment int32,
-	data DataFlange,
+	data models.DataFlange,
 	flange *moment_api.FlangeResult,
 	res *moment_api.StrengthResult,
 	D6, Dcp, Pbm, Pbr, Qd, QFM, pressure string,

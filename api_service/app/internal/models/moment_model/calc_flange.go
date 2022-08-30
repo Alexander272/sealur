@@ -118,6 +118,147 @@ type FlangeSize struct {
 	Hk   string `json:"hk"`
 }
 
+func (f *CalcFlange) NewFlange() (flange *moment_api.CalcFlangeRequest, err error) {
+	pressure, err := strconv.ParseFloat(f.Pressure, 64)
+	if err != nil {
+		return nil, err
+	}
+	axialForce, err := strconv.Atoi(f.AxialForce)
+	if err != nil {
+		return nil, err
+	}
+	bendingMoment, err := strconv.Atoi(f.BendingMoment)
+	if err != nil {
+		return nil, err
+	}
+	temp, err := strconv.ParseFloat(f.Temp, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	flanges := moment_api.CalcFlangeRequest_Flanges_value[f.Flanges]
+	typeB := moment_api.CalcFlangeRequest_Type_value[f.TypeB]
+	condition := moment_api.CalcFlangeRequest_Condition_value[f.Condition]
+	calculation := moment_api.CalcFlangeRequest_Calcutation_value[f.Calculation]
+
+	flangesData := []*moment_api.FlangeData{}
+	flange1, err := f.FlangesData.First.NewFlangeData()
+	if err != nil {
+		return nil, err
+	}
+	flangesData = append(flangesData, flange1)
+
+	if !f.IsSameFlange {
+		flange2, err := f.FlangesData.Second.NewFlangeData()
+		if err != nil {
+			return nil, err
+		}
+		flangesData = append(flangesData, flange2)
+	}
+
+	bolts, err := f.Bolts.NewBolts()
+	if err != nil {
+		return nil, err
+	}
+
+	gasket, err := f.Gasket.NewGasket()
+	if err != nil {
+		return nil, err
+	}
+
+	var embed *moment_api.EmbedData
+	if f.IsEmbedded {
+		embed, err = f.Embed.NewEmbed()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var washer []*moment_api.WasherData
+	if f.IsUseWasher {
+		washer, err = f.Washer.NewWasher()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	flange = &moment_api.CalcFlangeRequest{
+		Pressure:       pressure,
+		AxialForce:     int32(axialForce),
+		BendingMoment:  int32(bendingMoment),
+		Temp:           temp,
+		IsWork:         f.IsWork,
+		Flanges:        moment_api.CalcFlangeRequest_Flanges(flanges),
+		IsSameFlange:   f.IsSameFlange,
+		IsEmbedded:     f.IsEmbedded,
+		Type:           moment_api.CalcFlangeRequest_Type(typeB),
+		Condition:      moment_api.CalcFlangeRequest_Condition(condition),
+		Calculation:    moment_api.CalcFlangeRequest_Calcutation(calculation),
+		IsUseWasher:    f.IsUseWasher,
+		IsNeedFormulas: f.IsNeedFormulas,
+		FlangesData:    flangesData,
+		Bolts:          bolts,
+		Gasket:         gasket,
+		Washer:         washer,
+		Embed:          embed,
+	}
+	return flange, nil
+}
+
+func (f *Flanges) NewFlangeData() (flange *moment_api.FlangeData, err error) {
+	var size *moment_api.FlangeData_Size
+	if f.StandartId == "another" {
+		size, err = f.Size.NewSize()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var mat, rMat *moment_api.MaterialData
+	if f.MarkId == "another" {
+		mat, err = f.Material.NewMaterial()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if f.RingMarkId == "another" {
+		rMat, err = f.RingMaterial.NewMaterial()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	typeF := moment_api.FlangeData_Type_value[f.TypeF]
+	corrosion, err := strconv.ParseFloat(f.Corrosion, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	var temp float64
+	if f.Temp != "" {
+		temp, err = strconv.ParseFloat(f.Temp, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	flange = &moment_api.FlangeData{
+		Type:         moment_api.FlangeData_Type(typeF),
+		StandartId:   f.StandartId,
+		MarkId:       f.MarkId,
+		Material:     mat,
+		Dy:           f.Dy,
+		Py:           f.Py,
+		Corrosion:    corrosion,
+		Size:         size,
+		Temp:         temp,
+		RingMarkId:   f.RingMarkId,
+		RingMaterial: rMat,
+	}
+
+	return flange, nil
+}
+
 func (m *MaterialData) NewMaterial() (mat *moment_api.MaterialData, err error) {
 	alpha, err := strconv.ParseFloat(m.AlphaF, 64)
 	if err != nil {

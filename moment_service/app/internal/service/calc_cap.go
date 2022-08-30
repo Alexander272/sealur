@@ -9,7 +9,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
-type CalcFlangeService struct {
+type CalcCapService struct {
 	graphic  *GraphicService
 	data     *DataService
 	formulas formulas.Flange
@@ -18,7 +18,7 @@ type CalcFlangeService struct {
 	Kyz      map[string]float64
 }
 
-func NewCalcFlangeService(graphic *GraphicService, data *DataService, formulas formulas.Flange) *CalcFlangeService {
+func NewCalcCapService(graphic *GraphicService, data *DataService, formulas formulas.Flange) *CalcCapService {
 	bolt := map[string]float64{
 		"bolt": constants.BoltD,
 		"pin":  constants.PinD,
@@ -35,7 +35,7 @@ func NewCalcFlangeService(graphic *GraphicService, data *DataService, formulas f
 		"controllablePin": constants.ControllablePinKyz,
 	}
 
-	return &CalcFlangeService{
+	return &CalcCapService{
 		graphic:  graphic,
 		data:     data,
 		formulas: formulas,
@@ -45,8 +45,7 @@ func NewCalcFlangeService(graphic *GraphicService, data *DataService, formulas f
 	}
 }
 
-//? можно расчет по основным формулам вынести в отдельный пакет, а потом просто использовать (должно сделать код более понятным)
-func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.CalcFlangeRequest) (*moment_api.FlangeResponse, error) {
+func (s *CalcCapService) Calculation(ctx context.Context, data *moment_api.CalcFlangeRequest) (*moment_api.FlangeResponse, error) {
 	d, err := s.data.GetDataForFlange(ctx, data)
 	if err != nil {
 		return nil, err
@@ -69,6 +68,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 		}
 	}
 
+	//TODO исправить (тут крышка)
 	if !data.IsSameFlange {
 		result.Flanges = append(result.Flanges, d.Flange2)
 	}
@@ -488,7 +488,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 	return &result, nil
 }
 
-func (s *CalcFlangeService) formatInitData(data *moment_api.CalcFlangeRequest) *moment_api.DataResult {
+func (s *CalcCapService) formatInitData(data *moment_api.CalcFlangeRequest) *moment_api.DataResult {
 	work := map[bool]string{
 		true:  "Рабочие условия",
 		false: "Условия испытаний",
@@ -528,7 +528,7 @@ func (s *CalcFlangeService) formatInitData(data *moment_api.CalcFlangeRequest) *
 }
 
 // расчеты если выполняется прочностной расчет
-func (s *CalcFlangeService) getCalculatedStrength(
+func (s *CalcCapService) getCalculatedStrength(
 	flange *moment_api.FlangeResult,
 	bolt *moment_api.BoltResult,
 	typeF moment_api.FlangeData_Type,

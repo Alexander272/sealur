@@ -73,7 +73,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		logger.Error(err)
 	}
 
-	c.SetCookie(h.cookieName, token, int(h.auth.RefreshTokenTTL.Seconds()), "/", h.auth.Domain, h.auth.Secure, true)
+	c.SetCookie(h.cookieName, token, int(h.auth.RefreshTokenTTL.Seconds()), "/", c.Request.Host, h.auth.Secure, true)
 	c.JSON(http.StatusOK, models.DataResponse{Data: user.User})
 }
 
@@ -147,7 +147,7 @@ func (h *Handler) signOut(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie(h.cookieName, "", 0, "/", h.auth.Domain, h.auth.Secure, true)
+	c.SetCookie(h.cookieName, "", 0, "/", c.Request.Host, h.auth.Secure, true)
 	c.JSON(http.StatusNoContent, models.IdResponse{Message: "Sign-out completed successfully"})
 }
 
@@ -188,6 +188,6 @@ func (h *Handler) refresh(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie(h.cookieName, newToken, int(h.auth.RefreshTokenTTL.Seconds()), "/", h.auth.Domain, h.auth.Secure, true)
+	c.SetCookie(h.cookieName, newToken, int(h.auth.RefreshTokenTTL.Seconds()), "/", c.Request.Host, h.auth.Secure, true)
 	c.JSON(http.StatusOK, models.DataResponse{Data: user})
 }
