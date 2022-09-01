@@ -13,6 +13,10 @@ type CalcFlange interface {
 	Calculation(ctx context.Context, data *moment_api.CalcFlangeRequest) (*moment_api.FlangeResponse, error)
 }
 
+type CalcCap interface {
+	Calculation(ctx context.Context, data *moment_api.CalcCapRequest) (*moment_api.CapResponse, error)
+}
+
 type Flange interface {
 	GetFlangeSize(context.Context, *moment_api.GetFlangeSizeRequest) (models.FlangeSize, error)
 	GetFullFlangeSize(context.Context, *moment_api.GetFullFlangeSizeRequest) (*moment_api.FullFlangeSizeResponse, error)
@@ -109,6 +113,7 @@ type Read interface {
 
 type Services struct {
 	CalcFlange
+	CalcCap
 	Flange
 	Materials
 	Gasket
@@ -126,6 +131,7 @@ func NewServices(repos *repository.Repositories) *Services {
 
 	return &Services{
 		CalcFlange: NewCalcFlangeService(graphic, data, formulas.Flange),
+		CalcCap:    NewCalcCapService(graphic, data, formulas),
 		Flange:     flange,
 		Materials:  materials,
 		Gasket:     gasket,

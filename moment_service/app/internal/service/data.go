@@ -121,13 +121,13 @@ func (s *DataService) GetDataForFlange(ctx context.Context, data *moment_api.Cal
 		result.Dcp = data.Gasket.DOut - result.B0
 	}
 
-	flange1, err = s.getCalculatedData(ctx, data.FlangesData[0].Type, flange1, result.Dcp)
+	flange1, err = s.getCalculatedDataFlange(ctx, data.FlangesData[0].Type, flange1, result.Dcp)
 	if err != nil {
 		return result, err
 	}
 
 	if len(data.FlangesData) > 1 {
-		flange2, err = s.getCalculatedData(ctx, data.FlangesData[1].Type, flange2, result.Dcp)
+		flange2, err = s.getCalculatedDataFlange(ctx, data.FlangesData[1].Type, flange2, result.Dcp)
 		if err != nil {
 			return result, err
 		}
@@ -137,6 +137,88 @@ func (s *DataService) GetDataForFlange(ctx context.Context, data *moment_api.Cal
 
 	result.Flange1 = flange1
 	result.Flange2 = flange2
+
+	return result, nil
+}
+
+func (s *DataService) GetDataForCap(ctx context.Context, data *moment_api.CalcCapRequest) (result models.DataCap, err error) {
+	//* формула из Таблицы В.1
+	Tb := s.typeFlangesTB[data.Flanges.String()] * data.Temp
+	if data.FlangeData.Type == moment_api.FlangeData_free {
+		Tb = s.typeFlangesTB[data.Flanges.String()+"-free"] * data.Temp
+	}
+
+	flange, boltSize, err := s.getDataFlange(ctx, data.FlangeData, data.Bolts, data.Flanges.String(), data.Temp)
+	if err != nil {
+		return result, err
+	}
+	cap, err := s.getDataCap(ctx, data.CapData, data.Flanges.String(), data.Temp)
+	if err != nil {
+		return result, err
+	}
+
+	result.FType = data.FlangeData.Type
+
+	//TODO add cap data
+
+	result.Bolt, err = s.getBoltData(ctx, data.Bolts, boltSize, flange.L, Tb)
+	if err != nil {
+		return result, err
+	}
+
+	//? я использую температуру фланца. хз верно илил нет.
+	if data.IsUseWasher {
+		result.Washer1, err = s.getWasherData(ctx, data.Washer[0], flange.Tf)
+		if err != nil {
+			return result, err
+		}
+
+		result.Washer2, err = s.getWasherData(ctx, data.Washer[1], cap.T)
+		if err != nil {
+			return result, err
+		}
+	}
+	if data.IsEmbedded {
+		result.Embed, err = s.getEmbedData(ctx, data.Embed, data.Temp)
+		if err != nil {
+			return result, err
+		}
+	}
+	bp := (data.Gasket.DOut - data.Gasket.DIn) / 2
+	result.Gasket, result.TypeGasket, err = s.getGasketData(ctx, data.Gasket, bp)
+	if err != nil {
+		return result, err
+	}
+
+	if result.TypeGasket == "Oval" {
+		// фомула 4
+		result.B0 = bp / 4
+		// фомула ?
+		result.Dcp = data.Gasket.DOut - bp/2
+
+	} else {
+		if bp <= constants.Bp {
+			// фомула 2
+			result.B0 = bp
+		} else {
+			// фомула 3
+			result.B0 = constants.B0 * math.Sqrt(bp)
+		}
+		// фомула 5
+		result.Dcp = data.Gasket.DOut - result.B0
+	}
+
+	flange, err = s.getCalculatedDataFlange(ctx, data.FlangeData.Type, flange, result.Dcp)
+	if err != nil {
+		return result, err
+	}
+	cap, err = s.getCalculatedDataCap(ctx, data.CapData.Type, cap, flange.H, flange.D, flange.S0, flange.DOut, result.Dcp)
+	if err != nil {
+		return result, err
+	}
+
+	result.Flange = flange
+	result.Cap = cap
 
 	return result, nil
 }
@@ -394,7 +476,50 @@ func (s *DataService) getDataFlange(
 	return flangeData, boltSize, nil
 }
 
-func (s *DataService) getCalculatedData(
+func (s *DataService) getDataCap(
+	ctx context.Context,
+	cap *moment_api.CapData,
+	typeFlange string,
+	temp float64,
+) (capData *moment_api.CapResult, err error) {
+	capData = &moment_api.CapResult{
+		H:      cap.H,
+		Radius: cap.Radius,
+		Delta:  cap.Delta,
+	}
+	capData.T = s.typeFlangesTF[typeFlange] * temp
+
+	var mat models.MaterialsResult
+	if cap.MarkId != "another" {
+		var err error
+		mat, err = s.materials.GetMatFotCalculate(ctx, cap.MarkId, capData.T)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		mat = models.MaterialsResult{
+			Title:       cap.Material.Title,
+			AlphaF:      cap.Material.AlphaF,
+			EpsilonAt20: cap.Material.EpsilonAt20,
+			Epsilon:     cap.Material.Epsilon,
+		}
+	}
+
+	capData.Material = mat.Title
+	capData.Alpha = mat.AlphaF
+	capData.EpsilonAt20 = mat.EpsilonAt20
+	capData.Epsilon = mat.Epsilon
+
+	// flangeData.SigmaM = constants.SigmaM * mat.Sigma
+	// flangeData.SigmaMAt20 = constants.SigmaM * mat.SigmaAt20
+	// flangeData.SigmaR = constants.SigmaR * mat.Sigma
+	// flangeData.SigmaRAt20 = constants.SigmaR * mat.SigmaAt20
+	// capData.Type = cap.Type.String()
+
+	return capData, nil
+}
+
+func (s *DataService) getCalculatedDataFlange(
 	ctx context.Context,
 	flangeType moment_api.FlangeData_Type,
 	data *moment_api.FlangeResult,
@@ -467,6 +592,28 @@ func (s *DataService) getCalculatedData(
 	} else {
 		calculated.Yfn = math.Pow(math.Pi/4, 3) * (data.Ds / (data.EpsilonAt20 * data.DOut * math.Pow(data.H, 3)))
 		calculated.Yfc = math.Pow(math.Pi/4, 3) * (data.D6 / (data.EpsilonKAt20 * data.Dnk * math.Pow(data.Hk, 3)))
+	}
+
+	return calculated, nil
+}
+
+func (s *DataService) getCalculatedDataCap(
+	ctx context.Context,
+	capType moment_api.CapData_Type,
+	data *moment_api.CapResult,
+	h, D, S0, DOut, Dcp float64,
+) (*moment_api.CapResult, error) {
+	calculated := data
+
+	if capType == moment_api.CapData_flat {
+		data.K = DOut / Dcp
+		data.X = (0.67*math.Pow(data.K, 2)*(1+8.55*math.Log10(data.K)) - 1) / ((data.K - 1) *
+			(math.Pow(data.K, 2) - 1 + (1.857*math.Pow(data.K, 2)+1)*(math.Pow(data.H, 3)/math.Pow(data.Delta, 3))))
+		data.Y = data.X / (math.Pow(data.Delta, 3) * data.EpsilonAt20)
+	} else {
+		data.K = (h / D) * math.Sqrt(data.Radius/S0)
+		data.X = 1 / (1 + 1.285*data.K + 1.63*data.K*math.Pow((h/S0), 2)*math.Log10(DOut/D))
+		data.Y = ((1 - data.X*(1+1.285*data.K)) / (data.EpsilonAt20 * math.Pow(h, 3))) * ((DOut + D) / (DOut - D))
 	}
 
 	return calculated, nil

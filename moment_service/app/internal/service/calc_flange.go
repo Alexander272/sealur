@@ -99,7 +99,7 @@ func (s *CalcFlangeService) Calculation(ctx context.Context, data *moment_api.Ca
 	}
 
 	// приложение К пояснение к формуле К.2
-	Lb := Lb0 + s.typeBolt[data.Type.String()]*float64(d.Bolt.Diameter)
+	Lb := Lb0 + s.typeBolt[data.Type.String()]*d.Bolt.Diameter
 	// формула К.2
 	yb := Lb / (d.Bolt.EpsilonAt20 * d.Bolt.Area * float64(d.Bolt.Count))
 	// фомула 8

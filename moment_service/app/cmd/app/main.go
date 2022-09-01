@@ -64,6 +64,7 @@ func main() {
 	server := grpc.NewServer(opts...)
 	moment_api.RegisterPingServiceServer(server, handlers.Ping)
 	moment_api.RegisterCalcFlangeServiceServer(server, handlers.CalcFlange)
+	moment_api.RegisterCalcCapServiceServer(server, handlers.CalcCap)
 	moment_api.RegisterMaterialsServiceServer(server, handlers.Materials)
 	moment_api.RegisterGasketServiceServer(server, handlers.Gasket)
 	moment_api.RegisterFlangeServiceServer(server, handlers.Flange)

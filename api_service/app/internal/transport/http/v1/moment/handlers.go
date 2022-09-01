@@ -21,6 +21,7 @@ type Handler struct {
 	flangeClient     moment_api.FlangeServiceClient
 	readClient       moment_api.ReadServiceClient
 	calcFlangeClient moment_api.CalcFlangeServiceClient
+	calcCapClient    moment_api.CalcCapServiceClient
 }
 
 func NewHandler(middleware *middleware.Middleware) *Handler {
@@ -62,6 +63,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	flangeClient := moment_api.NewFlangeServiceClient(connect)
 	readClient := moment_api.NewReadServiceClient(connect)
 	calcFlangeClient := moment_api.NewCalcFlangeServiceClient(connect)
+	calcCapClient := moment_api.NewCalcCapServiceClient(connect)
 
 	h.pingClient = pingClient
 	h.gasketClient = gasketClient
@@ -69,6 +71,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.flangeClient = flangeClient
 	h.readClient = readClient
 	h.calcFlangeClient = calcFlangeClient
+	h.calcCapClient = calcCapClient
 
 	moment := api.Group("/sealur-moment")
 	{
@@ -92,7 +95,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 
 		h.initReadRoutes(moment)
 
-		h.initCalcFlangeRoutes(moment)
+		h.initCalcRoutes(moment)
 	}
 }
 

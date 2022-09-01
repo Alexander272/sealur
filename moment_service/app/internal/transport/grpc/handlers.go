@@ -14,6 +14,10 @@ type CalcFlange interface {
 	moment_api.CalcFlangeServiceServer
 }
 
+type CalcCap interface {
+	moment_api.CalcCapServiceServer
+}
+
 type Materials interface {
 	moment_api.MaterialsServiceServer
 }
@@ -35,6 +39,7 @@ type Handler struct {
 	conf    config.ApiConfig
 	Ping
 	CalcFlange
+	CalcCap
 	Materials
 	Gasket
 	Flange
@@ -47,6 +52,7 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		conf:       conf,
 		Ping:       NewPingHandlers(),
 		CalcFlange: NewCalcFlangeHandlers(service.CalcFlange),
+		CalcCap:    NewCalcCapHandlers(service.CalcCap),
 		Materials:  NewMaterialsHandlers(service.Materials),
 		Gasket:     NewGasketService(service.Gasket),
 		Flange:     NewFlangeHandlers(service.Flange),

@@ -15,3 +15,16 @@ type DataFlange struct {
 	TypeGasket string
 	Dcp, B0    float64
 }
+
+type DataCap struct {
+	Flange     *moment_api.FlangeResult
+	Cap        *moment_api.CapResult
+	FType      moment_api.FlangeData_Type
+	Washer1    *moment_api.WasherResult
+	Washer2    *moment_api.WasherResult
+	Embed      *moment_api.EmbedResult
+	Bolt       *moment_api.BoltResult
+	Gasket     *moment_api.GasketResult
+	TypeGasket string
+	Dcp, B0    float64
+}
