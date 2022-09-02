@@ -131,7 +131,7 @@ func NewServices(repos *repository.Repositories) *Services {
 
 	return &Services{
 		CalcFlange: NewCalcFlangeService(graphic, data, formulas.Flange),
-		CalcCap:    NewCalcCapService(graphic, data, formulas),
+		CalcCap:    NewCalcCapService(graphic, data, formulas.Cap),
 		Flange:     flange,
 		Materials:  materials,
 		Gasket:     gasket,

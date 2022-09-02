@@ -40,7 +40,7 @@ services:
 
     moment_service:
         restart: on-failure:5
-        image: sealur/moment_service:0.6.0
+        image: sealur/moment_service:0.6.1
         container_name: dev-moment_service
         env_file:
             - .env

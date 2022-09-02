@@ -158,8 +158,7 @@ func (s *DataService) GetDataForCap(ctx context.Context, data *moment_api.CalcCa
 	}
 
 	result.FType = data.FlangeData.Type
-
-	//TODO add cap data
+	result.CType = data.CapData.Type
 
 	result.Bolt, err = s.getBoltData(ctx, data.Bolts, boltSize, flange.L, Tb)
 	if err != nil {

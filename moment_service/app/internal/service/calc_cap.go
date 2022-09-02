@@ -12,13 +12,13 @@ import (
 type CalcCapService struct {
 	graphic  *GraphicService
 	data     *DataService
-	formulas formulas.Flange
+	formulas formulas.Cap
 	typeBolt map[string]float64
 	Kyp      map[bool]float64
 	Kyz      map[string]float64
 }
 
-func NewCalcCapService(graphic *GraphicService, data *DataService, formulas formulas.Flange) *CalcCapService {
+func NewCalcCapService(graphic *GraphicService, data *DataService, formulas formulas.Cap) *CalcCapService {
 	bolt := map[string]float64{
 		"bolt": constants.BoltD,
 		"pin":  constants.PinD,
@@ -65,13 +65,11 @@ func (s *CalcCapService) Calculation(ctx context.Context, data *moment_api.CalcC
 		result.Washers = append(result.Washers, d.Washer1, d.Washer2)
 	}
 
-	// TODO
 	if data.Calculation == moment_api.CalcCapRequest_basis {
 		result.Calc.Basis = &moment_api.CalcMomentBasis{}
+	} else {
+		result.Calc.Strength = &moment_api.CalcMomentStrength{}
 	}
-	// else {
-	// 	result.Calc.Strength = &moment_api.CalcMomentStrength{}
-	// }
 
 	Lb0 := d.Gasket.Thickness + d.Flange.H + d.Cap.H
 
@@ -107,7 +105,7 @@ func (s *CalcCapService) Calculation(ctx context.Context, data *moment_api.CalcC
 	}
 	result.Calc.Alpha = alpha
 
-	// // формула 6
+	// формула 6
 	Pobg := 0.5 * math.Pi * d.Dcp * d.B0 * d.Gasket.Pres
 
 	var Rp float64 = 0
@@ -131,83 +129,62 @@ func (s *CalcCapService) Calculation(ctx context.Context, data *moment_api.CalcC
 	Pb2 := math.Max(Pobg, minB)
 	Pb1 := alpha*(Qd+float64(data.AxialForce)) + Rp
 
-	// if data.Calculation != moment_api.CalcCapRequest_basis {
-	// 	result.Calc.Strength.MinB = minB
-	// 	result.Calc.Strength.FPb1 = Pb1
-	// 	result.Calc.Strength.FPb2 = Pb2
-	// 	result.Calc.Strength.Yp = yp
-	// 	result.Calc.Strength.Yb = yb
-	// 	result.Calc.Strength.Lb = Lb
+	if data.Calculation != moment_api.CalcCapRequest_basis {
+		result.Calc.Strength.MinB = minB
+		result.Calc.Strength.FPb1 = Pb1
+		result.Calc.Strength.FPb2 = Pb2
+		result.Calc.Strength.Yp = yp
+		result.Calc.Strength.Yb = yb
+		result.Calc.Strength.Lb = Lb
 
-	// Pbm := math.Max(Pb1, Pb2)
-	// 	Pbr := Pbm + (1-alpha)*(Qd+float64(data.AxialForce)) + 4*(1-alphaM)*math.Abs(float64(data.BendingMoment))/d.Dcp
-	// 	result.Calc.Strength.FPb = Pbm
-	// 	result.Calc.Strength.FPbr = Pbr
+		Pbm := math.Max(Pb1, Pb2)
+		Pbr := Pbm + (1-alpha)*(Qd+float64(data.AxialForce))
+		result.Calc.Strength.FPb = Pbm
+		result.Calc.Strength.FPbr = Pbr
 
-	// 	result.Calc.Strength.FSigmaB1 = Pbm / Ab
-	// 	result.Calc.Strength.FSigmaB2 = Pbr / Ab
+		result.Calc.Strength.FSigmaB1 = Pbm / Ab
+		result.Calc.Strength.FSigmaB2 = Pbr / Ab
 
-	// 	Kyp := s.Kyp[data.IsWork]
-	// 	Kyz := s.Kyz[data.Condition.String()]
-	// 	Kyt := constants.NoLoadKyt
+		Kyp := s.Kyp[data.IsWork]
+		Kyz := s.Kyz[data.Condition.String()]
+		Kyt := constants.NoLoadKyt
 
-	// 	result.Calc.Strength.FDSigmaM = 1.2 * Kyp * Kyz * Kyt * d.Bolt.SigmaAt20
-	// 	result.Calc.Strength.FDSigmaR = Kyp * Kyz * Kyt * d.Bolt.Sigma
+		result.Calc.Strength.FDSigmaM = 1.2 * Kyp * Kyz * Kyt * d.Bolt.SigmaAt20
+		result.Calc.Strength.FDSigmaR = Kyp * Kyz * Kyt * d.Bolt.Sigma
 
-	// 	if result.Calc.Strength.FSigmaB1 > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {
-	// 		result.Calc.Strength.FMkp = s.graphic.CalculateMkp(d.Bolt.Diameter, result.Calc.Strength.FSigmaB2)
-	// 	} else {
-	// 		result.Calc.Strength.FMkp = (0.3 * Pbm * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000.0
-	// 	}
+		if result.Calc.Strength.FSigmaB1 > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {
+			result.Calc.Strength.FMkp = s.graphic.CalculateMkp(d.Bolt.Diameter, result.Calc.Strength.FSigmaB2)
+		} else {
+			result.Calc.Strength.FMkp = (0.3 * Pbm * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000.0
+		}
 
-	// 	result.Calc.Strength.FMkp1 = 0.75 * result.Calc.Strength.FMkp
+		result.Calc.Strength.FMkp1 = 0.75 * result.Calc.Strength.FMkp
 
-	// 	var qmax float64
-	// 	if d.TypeGasket == "Soft" {
-	// 		qmax = math.Max(Pbm, Pbr) / (math.Pi * d.Dcp * d.Gasket.Width)
-	// 	}
-	// 	result.Calc.Strength.FQ = qmax
+		var qmax float64
+		if d.TypeGasket == "Soft" {
+			qmax = math.Max(Pbm, Pbr) / (math.Pi * d.Dcp * d.Gasket.Width)
+		}
+		result.Calc.Strength.FQ = qmax
 
-	// 	strength1 := s.getCalculatedStrength(
-	// 		d.Flange1,
-	// 		d.Bolt,
-	// 		d.Type1,
-	// 		d.Gasket.M,
-	// 		data.Pressure,
-	// 		Qd,
-	// 		d.Dcp,
-	// 		result.Calc.Strength.FSigmaB1,
-	// 		Pbm,
-	// 		Pbr,
-	// 		QFM,
-	// 		data.AxialForce,
-	// 		data.BendingMoment,
-	// 		data.IsWork,
-	// 		false,
-	// 	)
-	// 	result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, strength1)
-
-	// 	if len(data.FlangesData) > 1 {
-	// 		strength2 := s.getCalculatedStrength(
-	// 			d.Flange2,
-	// 			d.Bolt,
-	// 			d.Type2,
-	// 			d.Gasket.M,
-	// 			data.Pressure,
-	// 			Qd,
-	// 			d.Dcp,
-	// 			result.Calc.Strength.FSigmaB2,
-	// 			Pbm,
-	// 			Pbr,
-	// 			QFM,
-	// 			data.AxialForce,
-	// 			data.BendingMoment,
-	// 			data.IsWork,
-	// 			false,
-	// 		)
-	// 		result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, strength2)
-	// 	}
-	// }
+		strength1 := s.getCalculatedStrength(
+			d.Flange,
+			d.Bolt,
+			d.FType,
+			d.Gasket.M,
+			data.Pressure,
+			Qd,
+			d.Dcp,
+			result.Calc.Strength.FSigmaB1,
+			Pbm,
+			Pbr,
+			QFM,
+			data.AxialForce,
+			0,
+			data.IsWork,
+			false,
+		)
+		result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, strength1)
+	}
 
 	var divider, temp1, temp2 float64
 	divider = yp + yb*d.Bolt.EpsilonAt20/d.Bolt.Epsilon + (d.Flange.Yf*d.Flange.EpsilonAt20/d.Flange.Epsilon)*math.Pow(d.Flange.B, 2) +
@@ -310,143 +287,93 @@ func (s *CalcCapService) Calculation(ctx context.Context, data *moment_api.CalcC
 
 			result.Calc.Basis.Mmax = (0.3 * Pmax * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000
 		}
+	} else {
+		result.Calc.Strength.Gamma = gamma
+		result.Calc.Strength.SPb1 = Pb1
+		result.Calc.Strength.SPb2 = Pb2
+		result.Calc.Strength.SPbr = Pbr
+		result.Calc.Strength.SPb = Pbm
+		result.Calc.Strength.SQ = qmax
+		result.Calc.Strength.SSigmaB1 = SigmaB1
+		result.Calc.Strength.SSigmaB2 = SigmaB2
+		result.Calc.Strength.SDSigmaM = DSigmaM
+		result.Calc.Strength.SDSigmaR = DSigmaR
+		result.Calc.Strength.VSigmaB1 = v_sigmab1
+		result.Calc.Strength.VSigmaB2 = v_sigmab2
+
+		strength1 := s.getCalculatedStrength(
+			d.Flange,
+			d.Bolt,
+			d.FType,
+			d.Gasket.M,
+			data.Pressure,
+			Qd,
+			d.Dcp,
+			result.Calc.Strength.SSigmaB1,
+			Pbm,
+			Pbr,
+			QFM,
+			data.AxialForce,
+			0,
+			data.IsWork,
+			true,
+		)
+		result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, strength1)
+
+		if d.TypeGasket == "Soft" && qmax <= d.Gasket.PermissiblePres {
+			result.Calc.Strength.VQmax = true
+		}
+
+		if strength1.Teta <= strength1.DTeta {
+			result.Calc.Strength.VTeta1 = true
+		}
+
+		if d.FType == moment_api.FlangeData_free && strength1.TetaK <= strength1.DTetaK {
+			result.Calc.Strength.VTetaK1 = true
+		}
+
+		if result.Calc.Strength.SSigmaB1 > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {
+			result.Calc.Strength.SMkp = s.graphic.CalculateMkp(d.Bolt.Diameter, result.Calc.Strength.SSigmaB1)
+		} else {
+			//? вроде как формула изменилась, но почему-то использовалась новая формула
+			result.Calc.Strength.SMkp = (0.3 * Pbm * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000
+		}
+		result.Calc.Strength.SMkp1 = 0.75 * result.Calc.Strength.SMkp
+
+		if (v_sigmab1 && v_sigmab2 && d.TypeGasket != "Soft") ||
+			(v_sigmab1 && v_sigmab2 && qmax <= float64(d.Gasket.PermissiblePres) && d.TypeGasket == "Soft") {
+
+			if (result.Calc.Strength.VTeta1 && d.FType != moment_api.FlangeData_free) ||
+				(result.Calc.Strength.VTeta1 && d.FType == moment_api.FlangeData_free && result.Calc.Strength.VTetaK1) {
+
+				Prek := 0.8 * Ab * d.Bolt.SigmaAt20
+				result.Calc.Strength.Qrek = Prek / (math.Pi * d.Dcp * d.Gasket.Width)
+				result.Calc.Strength.Mrek = (0.3 * Prek * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000
+
+				Pmax := result.Calc.Strength.SDSigmaM * Ab
+				result.Calc.Strength.Qmax = Pmax / (math.Pi * d.Dcp * d.Gasket.Width)
+
+				if d.TypeGasket == "Soft" && result.Calc.Strength.Qmax > d.Gasket.PermissiblePres {
+					Pmax = float64(d.Gasket.PermissiblePres) * (math.Pi * d.Dcp * d.Gasket.Width)
+					result.Calc.Strength.Qmax = float64(d.Gasket.PermissiblePres)
+				}
+
+				result.Calc.Strength.Mmax = (0.3 * Pmax * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000
+			}
+		}
 	}
-	// else {
-	// 	result.Calc.Strength.Gamma = gamma
-	// 	result.Calc.Strength.SPb1 = Pb1
-	// 	result.Calc.Strength.SPb2 = Pb2
-	// 	result.Calc.Strength.SPbr = Pbr
-	// 	result.Calc.Strength.SPb = Pbm
-	// 	result.Calc.Strength.SQ = qmax
-	// 	result.Calc.Strength.SSigmaB1 = SigmaB1
-	// 	result.Calc.Strength.SSigmaB2 = SigmaB2
-	// 	result.Calc.Strength.SDSigmaM = DSigmaM
-	// 	result.Calc.Strength.SDSigmaR = DSigmaR
-	// 	result.Calc.Strength.VSigmaB1 = v_sigmab1
-	// 	result.Calc.Strength.VSigmaB2 = v_sigmab2
 
-	// 	strength1 := s.getCalculatedStrength(
-	// 		d.Flange1,
-	// 		d.Bolt,
-	// 		d.Type1,
-	// 		d.Gasket.M,
-	// 		data.Pressure,
-	// 		Qd,
-	// 		d.Dcp,
-	// 		result.Calc.Strength.SSigmaB1,
-	// 		Pbm,
-	// 		Pbr,
-	// 		QFM,
-	// 		data.AxialForce,
-	// 		data.BendingMoment,
-	// 		data.IsWork,
-	// 		true,
-	// 	)
-	// 	result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, strength1)
-
-	// 	strength2 := &moment_api.StrengthResult{}
-	// 	if len(data.FlangesData) > 1 {
-	// 		strength2 = s.getCalculatedStrength(
-	// 			d.Flange2,
-	// 			d.Bolt,
-	// 			d.Type2,
-	// 			d.Gasket.M,
-	// 			data.Pressure,
-	// 			Qd,
-	// 			d.Dcp,
-	// 			result.Calc.Strength.SSigmaB2,
-	// 			Pbm,
-	// 			Pbr,
-	// 			QFM,
-	// 			data.AxialForce,
-	// 			data.BendingMoment,
-	// 			data.IsWork,
-	// 			true,
-	// 		)
-	// 		result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, strength2)
-	// 	}
-
-	// 	if d.TypeGasket == "Soft" && qmax <= d.Gasket.PermissiblePres {
-	// 		result.Calc.Strength.VQmax = true
-	// 	}
-
-	// 	if strength1.Teta <= strength1.DTeta {
-	// 		result.Calc.Strength.VTeta1 = true
-	// 	}
-
-	// 	if d.Type1 == moment_api.FlangeData_free && strength1.TetaK <= strength1.DTetaK {
-	// 		result.Calc.Strength.VTetaK1 = true
-	// 	}
-
-	// 	if !data.IsSameFlange {
-	// 		if strength2.Teta <= strength2.DTeta {
-	// 			result.Calc.Strength.VTeta2 = true
-	// 		}
-
-	// 		if d.Type2 == moment_api.FlangeData_free && strength2.TetaK <= strength2.DTetaK {
-	// 			result.Calc.Strength.VTetaK2 = true
-	// 		}
-	// 	}
-
-	// 	if result.Calc.Strength.SSigmaB1 > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {
-	// 		result.Calc.Strength.SMkp = s.graphic.CalculateMkp(d.Bolt.Diameter, result.Calc.Strength.SSigmaB1)
-	// 	} else {
-	// 		//? вроде как формула изменилась, но почему-то использовалась новая формула
-	// 		result.Calc.Strength.SMkp = (0.3 * Pbm * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000
-	// 	}
-	// 	result.Calc.Strength.SMkp1 = 0.75 * result.Calc.Strength.SMkp
-
-	// 	if (v_sigmab1 && v_sigmab2 && d.TypeGasket != "Soft") ||
-	// 		(v_sigmab1 && v_sigmab2 && qmax <= float64(d.Gasket.PermissiblePres) && d.TypeGasket == "Soft") {
-	// 		ok := false
-
-	// 		if !data.IsSameFlange {
-	// 			commonCond := result.Calc.Strength.VTeta1 && result.Calc.Strength.VTeta2
-	// 			cond1 := commonCond && d.Type1 != moment_api.FlangeData_free && d.Type2 != moment_api.FlangeData_free
-	// 			cond2 := commonCond && d.Type1 == moment_api.FlangeData_free && d.Type2 != moment_api.FlangeData_free && result.Calc.Strength.VTetaK1
-	// 			cond3 := commonCond && d.Type1 != moment_api.FlangeData_free && d.Type2 == moment_api.FlangeData_free && result.Calc.Strength.VTetaK2
-	// 			cond4 := commonCond && d.Type1 == moment_api.FlangeData_free && d.Type2 == moment_api.FlangeData_free &&
-	// 				result.Calc.Strength.VTetaK1 && result.Calc.Strength.VTetaK2
-
-	// 			if cond1 || cond2 || cond3 || cond4 {
-	// 				ok = true
-	// 			}
-	// 		} else {
-	// 			if (result.Calc.Strength.VTeta1 && d.Type1 != moment_api.FlangeData_free) ||
-	// 				(result.Calc.Strength.VTeta1 && d.Type1 == moment_api.FlangeData_free && result.Calc.Strength.VTetaK1) {
-	// 				ok = true
-	// 			}
-	// 		}
-
-	// 		if ok {
-	// 			Prek := 0.8 * Ab * d.Bolt.SigmaAt20
-	// 			result.Calc.Strength.Qrek = Prek / (math.Pi * d.Dcp * d.Gasket.Width)
-	// 			result.Calc.Strength.Mrek = (0.3 * Prek * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000
-
-	// 			Pmax := result.Calc.Strength.SDSigmaM * Ab
-	// 			result.Calc.Strength.Qmax = Pmax / (math.Pi * d.Dcp * d.Gasket.Width)
-
-	// 			if d.TypeGasket == "Soft" && result.Calc.Strength.Qmax > d.Gasket.PermissiblePres {
-	// 				Pmax = float64(d.Gasket.PermissiblePres) * (math.Pi * d.Dcp * d.Gasket.Width)
-	// 				result.Calc.Strength.Qmax = float64(d.Gasket.PermissiblePres)
-	// 			}
-
-	// 			result.Calc.Strength.Mmax = (0.3 * Pmax * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000
-	// 		}
-	// 	}
-	// }
-
-	// if data.IsNeedFormulas {
-	// 	result.Formulas = s.formulas.GetFormulasForFlange(
-	// 		d.TypeGasket,
-	// 		data.Condition.String(),
-	// 		data.IsWork, data.IsUseWasher, data.IsEmbedded,
-	// 		d,
-	// 		result,
-	// 		data.Calculation,
-	// 		gamma, yb, yp,
-	// 	)
-	// }
+	if data.IsNeedFormulas {
+		result.Formulas = s.formulas.GetFormulasForCap(
+			d.TypeGasket,
+			data.Condition.String(),
+			data.IsWork, data.IsUseWasher, data.IsEmbedded,
+			d,
+			result,
+			data.Calculation,
+			gamma, yb, yp,
+		)
+	}
 
 	return &result, nil
 }

@@ -17,7 +17,7 @@ require (
 )
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20220901054059-9d86f4d49803 // indirect
+	github.com/Alexander272/sealur_proto/api v0.0.0-20220902091550-49a4cb677c75 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
