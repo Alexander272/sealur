@@ -34,20 +34,26 @@ func (s *ReadService) GetFlange(ctx context.Context, req *moment_api.GetFlangeRe
 	standarts := []*moment_api.StandartWithSize{}
 
 	for _, s2 := range st {
-		sizes, err := s.flange.GetBasisFlangeSize(ctx, &moment_api.GetBasisFlangeSizeRequest{IsUseRow: s2.IsNeedRow, StandId: s2.Id})
+		sizes, err := s.flange.GetBasisFlangeSize(ctx, &moment_api.GetBasisFlangeSizeRequest{
+			IsUseRow: s2.IsNeedRow,
+			StandId:  s2.Id,
+			IsInch:   s2.IsInch,
+		})
 		if err != nil {
 			return nil, err
 		}
 
 		standarts = append(standarts, &moment_api.StandartWithSize{
-			Id:        s2.Id,
-			Title:     s2.Title,
-			TypeId:    s2.TypeId,
-			Sizes:     sizes,
-			TitleDn:   s2.TitleDn,
-			TitlePn:   s2.TitlePn,
-			IsNeedRow: s2.IsNeedRow,
-			Rows:      s2.Rows,
+			Id:             s2.Id,
+			Title:          s2.Title,
+			TypeId:         s2.TypeId,
+			Sizes:          sizes,
+			TitleDn:        s2.TitleDn,
+			TitlePn:        s2.TitlePn,
+			IsNeedRow:      s2.IsNeedRow,
+			Rows:           s2.Rows,
+			IsInch:         s2.IsInch,
+			HasDesignation: s2.HasDesignation,
 		})
 	}
 

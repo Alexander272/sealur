@@ -20,15 +20,15 @@ func (h *Handler) initFlangeRoutes(api *gin.RouterGroup) {
 	}
 }
 
-// @Summary Create Flange Size
+// @Summary Get Flange Size
 // @Tags Sealur Moment -> flange-sizes
 // @Security ApiKeyAuth
 // @Description создание размеров
-// @ModuleID createFlangeSize
+// @ModuleID getFlangeSize
 // @Accept json
 // @Produce json
 // @Param standartId query string true "standart Id"
-// @Success 201 {object} models.IdResponse
+// @Success 200 {object} models.IdResponse
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -74,6 +74,8 @@ func (h *Handler) createFlangeSize(c *gin.Context) {
 	_, err := h.flangeClient.CreateFlangeSize(c, &moment_api.CreateFlangeSizeRequest{
 		StandId: dto.StandId,
 		Pn:      dto.Pn,
+		Dn:      dto.Dn,
+		Dmm:     dto.Dmm,
 		D:       dto.D,
 		D6:      dto.D6,
 		DOut:    dto.DOut,
@@ -117,6 +119,8 @@ func (h *Handler) createFlangeSizes(c *gin.Context) {
 		sizes = append(sizes, &moment_api.CreateFlangeSizeRequest{
 			StandId: sd.StandId,
 			Pn:      sd.Pn,
+			Dn:      sd.Dn,
+			Dmm:     sd.Dmm,
 			D:       sd.D,
 			D6:      sd.D6,
 			DOut:    sd.DOut,
@@ -170,6 +174,7 @@ func (h *Handler) updateFlangeSize(c *gin.Context) {
 		Id:      id,
 		StandId: dto.StandId,
 		Pn:      dto.Pn,
+		Dn:      dto.Dn,
 		D:       dto.D,
 		D6:      dto.D6,
 		DOut:    dto.DOut,

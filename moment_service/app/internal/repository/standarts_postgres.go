@@ -72,7 +72,8 @@ func (r *FlangeRepo) DeleteTypeFlange(ctx context.Context, typeFlange *moment_ap
 }
 
 func (r *FlangeRepo) GetStandarts(ctx context.Context, req *moment_api.GetStandartsRequest) (standarts []models.StandartDTO, err error) {
-	query := fmt.Sprintf("SELECT id, title, type_id, title_dn, title_pn, is_need_row, rows, is_inch FROM %s WHERE type_id=$1 ORDER BY id", StandartsTable)
+	query := fmt.Sprintf(`SELECT id, title, type_id, title_dn, title_pn, is_need_row, rows, is_inch, has_designation 
+		FROM %s WHERE type_id=$1 ORDER BY id`, StandartsTable)
 
 	if err := r.db.Select(&standarts, query, req.TypeId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -81,10 +82,11 @@ func (r *FlangeRepo) GetStandarts(ctx context.Context, req *moment_api.GetStanda
 }
 
 func (r *FlangeRepo) CreateStandart(ctx context.Context, stand *moment_api.CreateStandartRequest) (id string, err error) {
-	query := fmt.Sprintf(`INSERT INTO %s (title, type_id, title_dn, title_pn, is_need_row, rows, is_inch) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`, StandartsTable)
+	query := fmt.Sprintf(`INSERT INTO %s (title, type_id, title_dn, title_pn, is_need_row, rows, is_inch, has_designation) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`, StandartsTable)
 
-	row := r.db.QueryRow(query, stand.Title, stand.TypeId, stand.TitleDn, stand.TitlePn, stand.IsNeedRow, strings.Join(stand.Rows, "; "), stand.IsInch)
+	row := r.db.QueryRow(query, stand.Title, stand.TypeId, stand.TitleDn, stand.TitlePn, stand.IsNeedRow,
+		strings.Join(stand.Rows, "; "), stand.IsInch, stand.HasDesignation)
 	if row.Err() != nil {
 		return "", fmt.Errorf("failed to execute query. error: %w", row.Err())
 	}
@@ -98,11 +100,11 @@ func (r *FlangeRepo) CreateStandart(ctx context.Context, stand *moment_api.Creat
 }
 
 func (r *FlangeRepo) UpdateStandart(ctx context.Context, stand *moment_api.UpdateStandartRequest) error {
-	query := fmt.Sprintf(`UPDATE %s SET title=$1, type_id=$2, title_dn=$3, title_pn=$4, is_need_row=$5, rows=$6, is_inch=$7 
-		WHERE id=$8`, StandartsTable)
+	query := fmt.Sprintf(`UPDATE %s SET title=$1, type_id=$2, title_dn=$3, title_pn=$4, is_need_row=$5, rows=$6, 
+		is_inch=$7, has_desigantion=$8 WHERE id=$9`, StandartsTable)
 
 	_, err := r.db.Exec(query, stand.Title, stand.TypeId, stand.TitleDn, stand.TitlePn, stand.IsNeedRow,
-		strings.Join(stand.Rows, "; "), stand.IsInch, stand.Id)
+		strings.Join(stand.Rows, "; "), stand.IsInch, stand.HasDesignation, stand.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

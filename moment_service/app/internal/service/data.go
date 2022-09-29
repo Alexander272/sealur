@@ -508,6 +508,7 @@ func (s *DataService) getDataCap(
 	capData.Alpha = mat.AlphaF
 	capData.EpsilonAt20 = mat.EpsilonAt20
 	capData.Epsilon = mat.Epsilon
+	capData.Type = cap.Type.String()
 
 	// flangeData.SigmaM = constants.SigmaM * mat.Sigma
 	// flangeData.SigmaMAt20 = constants.SigmaM * mat.SigmaAt20

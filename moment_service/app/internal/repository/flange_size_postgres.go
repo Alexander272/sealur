@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
+	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 	"github.com/jmoiron/sqlx"
 )
@@ -34,12 +35,19 @@ func (r *FlangeRepo) GetBasisFlangeSizes(ctx context.Context, req models.GetBasi
 	args := make([]interface{}, 0)
 	args = append(args, req.StandId)
 
+	orderField := "d"
+	if req.IsInch {
+		orderField = "dmm"
+	}
+
 	var query string
 	if req.IsUseRow {
-		query = fmt.Sprintf(`SELECT id, pn, d FROM %s WHERE stand_id=$1 AND row=$2 ORDER BY d, pn`, FlangeSizeTable)
+		query = fmt.Sprintf(`SELECT id, pn, d, dn, COALESCE(d = 0, true) as is_empty_d FROM %s 
+			WHERE stand_id=$1 AND row=$2 ORDER BY %s, pn`, FlangeSizeTable, orderField)
 		args = append(args, req.Row)
 	} else {
-		query = fmt.Sprintf(`SELECT id, pn, d FROM %s WHERE stand_id=$1 ORDER BY d, pn`, FlangeSizeTable)
+		query = fmt.Sprintf(`SELECT id, pn, d, dn, COALESCE(d = 0, true) as is_empty_d FROM %s 
+			WHERE stand_id=$1 ORDER BY %s, pn`, FlangeSizeTable, orderField)
 	}
 
 	if err := r.db.Select(&sizes, query, args...); err != nil {
@@ -49,7 +57,7 @@ func (r *FlangeRepo) GetBasisFlangeSizes(ctx context.Context, req models.GetBasi
 }
 
 func (r *FlangeRepo) GetFullFlangeSize(ctx context.Context, req *moment_api.GetFullFlangeSizeRequest, row int32) (size []models.FlangeSizeDTO, err error) {
-	query := fmt.Sprintf(`SELECT id, stand_id, pn, d, d6, d_out, h, s0, s1, length, count, bolt_id FROM %s WHERE stand_id=$1 AND row=$2`,
+	query := fmt.Sprintf(`SELECT id, stand_id, pn, dn, dmm, d, d6, d_out, h, s0, s1, length, count, bolt_id FROM %s WHERE stand_id=$1 AND row=$2`,
 		FlangeSizeTable)
 
 	if err := r.db.Select(&size, query, req.StandId, row); err != nil {
@@ -59,10 +67,11 @@ func (r *FlangeRepo) GetFullFlangeSize(ctx context.Context, req *moment_api.GetF
 }
 
 func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_api.CreateFlangeSizeRequest) error {
-	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, d, d6, d_out, h, s0, s1, length, count, bolt_id, row)
+	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, dn, dmm, d, d6, d_out, h, s0, s1, length, count, bolt_id, row)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`, FlangeSizeTable)
 
-	_, err := r.db.Exec(query, size.StandId, size.Pn, size.D, size.D6, size.DOut, size.H, size.S0, size.S1, size.Length, size.Count, size.BoltId, size.Row)
+	_, err := r.db.Exec(query, size.StandId, size.Pn, size.Dn, size.Dmm, size.D, size.D6, size.DOut, size.H, size.S0, size.S1,
+		size.Length, size.Count, size.BoltId, size.Row)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -74,12 +83,13 @@ func (r *FlangeRepo) CreateFlangeSizes(ctx context.Context, size *moment_api.Cre
 	args := make([]interface{}, 0)
 
 	for i, s := range size.Sizes {
-		setValues = append(setValues, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
-			i*12+1, i*12+2, i*12+3, i*12+4, i*12+5, i*12+6, i*12+7, i*12+8, i*12+9, i*12+10, i*12+11, i*12+12))
-		args = append(args, s.StandId, s.Pn, s.D, s.D6, s.DOut, s.H, s.S0, s.S1, s.Length, s.Count, s.BoltId, s.Row)
+		logger.Debug(s)
+		setValues = append(setValues, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+			i*14+1, i*14+2, i*14+3, i*14+4, i*14+5, i*14+6, i*14+7, i*14+8, i*14+9, i*14+10, i*14+11, i*14+12, i*14+13, i*14+14))
+		args = append(args, s.StandId, s.Pn, s.Dn, s.Dmm, s.D, s.D6, s.DOut, s.H, s.S0, s.S1, s.Length, s.Count, s.BoltId, s.Row)
 	}
 
-	query := fmt.Sprintf("INSERT INTO %s (stand_id, pn, d, d6, d_out, h, s0, s1, length, count, bolt_id, row) VALUES %s",
+	query := fmt.Sprintf("INSERT INTO %s (stand_id, pn, dn, dmm, d, d6, d_out, h, s0, s1, length, count, bolt_id, row) VALUES %s",
 		FlangeSizeTable, strings.Join(setValues, ", "))
 
 	if _, err := r.db.Exec(query, args...); err != nil {
@@ -103,6 +113,16 @@ func (r *FlangeRepo) UpdateFlangeSize(ctx context.Context, size *moment_api.Upda
 	if size.Pn != 0 {
 		setValues = append(setValues, fmt.Sprintf("pn=$%d", argId))
 		args = append(args, size.Pn)
+		argId++
+	}
+	if size.Dn != "" {
+		setValues = append(setValues, fmt.Sprintf("dn=$%d", argId))
+		args = append(args, size.Dn)
+		argId++
+	}
+	if size.Dmm != 0 {
+		setValues = append(setValues, fmt.Sprintf("dmm=$%d", argId))
+		args = append(args, size.Dmm)
 		argId++
 	}
 	if size.D != 0 {

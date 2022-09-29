@@ -61,14 +61,15 @@ func (s *FlangeService) GetStandarts(ctx context.Context, req *moment_api.GetSta
 		}
 
 		standarts = append(standarts, &moment_api.Standart{
-			Id:        item.Id,
-			Title:     item.Title,
-			TypeId:    item.TypeId,
-			TitleDn:   item.TitleDn,
-			TitlePn:   item.TitlePn,
-			IsNeedRow: item.IsNeedRow,
-			IsInch:    item.IsInch,
-			Rows:      rows,
+			Id:             item.Id,
+			Title:          item.Title,
+			TypeId:         item.TypeId,
+			TitleDn:        item.TitleDn,
+			TitlePn:        item.TitlePn,
+			IsNeedRow:      item.IsNeedRow,
+			IsInch:         item.IsInch,
+			HasDesignation: item.HasDesignation,
+			Rows:           rows,
 		})
 	}
 
@@ -82,7 +83,11 @@ func (s *FlangeService) GetStandartsWithSize(ctx context.Context, req *moment_ap
 	}
 
 	for _, item := range data {
-		sizes, err := s.GetBasisFlangeSize(ctx, &moment_api.GetBasisFlangeSizeRequest{IsUseRow: item.IsNeedRow, StandId: item.Id})
+		sizes, err := s.GetBasisFlangeSize(ctx, &moment_api.GetBasisFlangeSizeRequest{
+			IsUseRow: item.IsNeedRow,
+			StandId:  item.Id,
+			IsInch:   item.IsInch,
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -93,15 +98,16 @@ func (s *FlangeService) GetStandartsWithSize(ctx context.Context, req *moment_ap
 		}
 
 		standarts = append(standarts, &moment_api.StandartWithSize{
-			Id:        item.Id,
-			Title:     item.Title,
-			TypeId:    item.TypeId,
-			TitleDn:   item.TitleDn,
-			TitlePn:   item.TitlePn,
-			IsNeedRow: item.IsNeedRow,
-			IsInch:    item.IsInch,
-			Rows:      rows,
-			Sizes:     sizes,
+			Id:             item.Id,
+			Title:          item.Title,
+			TypeId:         item.TypeId,
+			TitleDn:        item.TitleDn,
+			TitlePn:        item.TitlePn,
+			IsNeedRow:      item.IsNeedRow,
+			IsInch:         item.IsInch,
+			HasDesignation: item.HasDesignation,
+			Rows:           rows,
+			Sizes:          sizes,
 		})
 	}
 

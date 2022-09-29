@@ -119,7 +119,6 @@ func (s *CapService) GetFormulasForCap(
 	}
 
 	formulas.Qd = fmt.Sprintf("0.785 * %s^2 * %s", Dcp, pressure)
-	formulas.Qfm = fmt.Sprintf("max((%d + 4*|%d|/%s);(%d - 4*|%d|/%s))", axialForce, bendingMoment, Dcp, axialForce, bendingMoment, Dcp)
 
 	var tF1, tF2 string
 	af1 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.AlphaF, 'G', 3, 64), "E", "*10^")
@@ -266,7 +265,7 @@ func (s *CapService) GetFormulasForCap(
 		dSigmaM := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.SDSigmaM, 'G', 3, 64), "E", "*10^")
 
 		formulas.Strength.SPb2 = fmt.Sprintf("max(%s;0.4 * %s * %s)", po, ab, bSigmaAt20)
-		formulas.Strength.SPb1 = fmt.Sprintf("max(%s; %s-%s)", pb1F, pb1F, qt)
+		formulas.Strength.SPb1 = fmt.Sprintf("max(%s; %s - %s)", pb1F, pb1F, qt)
 		formulas.Strength.SPb = fmt.Sprintf("max(%s;%s)", pb1, pb2)
 		formulas.Strength.SPbr = fmt.Sprintf("%s + (1-%s) * (%s + %d) + %s", spbm, alpha, qd, axialForce, qt)
 		formulas.Strength.SSigmaB1 = fmt.Sprintf("%s / %s", spbm, ab)

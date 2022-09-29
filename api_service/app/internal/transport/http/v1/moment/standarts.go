@@ -72,7 +72,6 @@ func (h *Handler) getStandartsWithSize(c *gin.Context) {
 		return
 	}
 
-	//? путь где лежат файлы с расчетами. smb://martynov@192.168.5.24/documents/ИМЕННЫЕ%20ПАПКИ/Холкин%20В.А/Работа/Сервис-Газификация/Расчеты
 	standarts, err := h.flangeClient.GetStandartsWithSize(c, &moment_api.GetStandartsRequest{TypeId: typeId})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -103,12 +102,13 @@ func (h *Handler) createStandart(c *gin.Context) {
 	}
 
 	stand, err := h.flangeClient.CreateStandart(c, &moment_api.CreateStandartRequest{
-		Title:     dto.Title,
-		TypeId:    dto.TypeId,
-		TitleDn:   dto.TitleDn,
-		TitlePn:   dto.TitlePn,
-		IsNeedRow: dto.IsNeedRow,
-		Rows:      dto.Rows,
+		Title:          dto.Title,
+		TypeId:         dto.TypeId,
+		TitleDn:        dto.TitleDn,
+		TitlePn:        dto.TitlePn,
+		IsNeedRow:      dto.IsNeedRow,
+		Rows:           dto.Rows,
+		HasDesignation: dto.HasDesignation,
 	})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
@@ -146,13 +146,15 @@ func (h *Handler) updateStandart(c *gin.Context) {
 	}
 
 	_, err := h.flangeClient.UpdateStandart(c, &moment_api.UpdateStandartRequest{
-		Id:        id,
-		Title:     dto.Title,
-		TypeId:    dto.TypeId,
-		TitleDn:   dto.TitleDn,
-		TitlePn:   dto.TitlePn,
-		IsNeedRow: dto.IsNeedRow,
-		Rows:      dto.Rows,
+		Id:             id,
+		Title:          dto.Title,
+		TypeId:         dto.TypeId,
+		TitleDn:        dto.TitleDn,
+		TitlePn:        dto.TitlePn,
+		IsNeedRow:      dto.IsNeedRow,
+		Rows:           dto.Rows,
+		IsInch:         dto.IsInch,
+		HasDesignation: dto.HasDesignation,
 	})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")

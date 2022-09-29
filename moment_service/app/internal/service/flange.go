@@ -32,32 +32,42 @@ func (s *FlangeService) GetFlangeSize(ctx context.Context, req *moment_api.GetFl
 func (s *FlangeService) GetBasisFlangeSize(ctx context.Context, req *moment_api.GetBasisFlangeSizeRequest) (*moment_api.BasisFlangeSizeResponse, error) {
 	res := &moment_api.BasisFlangeSizeResponse{}
 
-	if req.IsUseRow {
-		reqSize1 := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: 0}
-		sizes1, err := s.repo.GetBasisFlangeSizes(ctx, reqSize1)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get size. error: %w", err)
-		}
+	reqSize1 := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: 0, IsInch: req.IsInch}
+	sizes1, err := s.repo.GetBasisFlangeSizes(ctx, reqSize1)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get size. error: %w", err)
+	}
 
-		sizeRow := []*moment_api.BasisFlangeSize{}
+	sizeRow := []*moment_api.BasisFlangeSize{}
 
-		curD := math.Inf(-1)
-		for _, fs := range sizes1 {
-			fs.Pn = math.Round(fs.Pn*1000) / 1000
+	curD := math.Inf(-1)
+	curDn := ""
+	for _, fs := range sizes1 {
+		fs.Pn = math.Round(fs.Pn*1000) / 1000
+		if req.IsInch {
+			if curDn != fs.Dn {
+				curDn = fs.Dn
+				sizeRow = append(sizeRow, &moment_api.BasisFlangeSize{
+					Dn: fs.Dn,
+				})
+			}
+		} else {
 			if curD != fs.D {
 				curD = fs.D
 				sizeRow = append(sizeRow, &moment_api.BasisFlangeSize{
-					Dn: fs.D,
+					Dn: fmt.Sprint(fs.D),
 				})
-				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
-			} else {
-				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
 			}
 		}
+		sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, &moment_api.BasisFlangeSize_Pn{
+			Pn:       fs.Pn,
+			IsEmptyD: fs.IsEmptyD,
+		})
+	}
+	res.SizeRow1 = sizeRow
 
-		res.SizeRow1 = sizeRow
-
-		reqSize2 := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: 1}
+	if req.IsUseRow {
+		reqSize2 := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: 1, IsInch: req.IsInch}
 		sizes2, err := s.repo.GetBasisFlangeSizes(ctx, reqSize2)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get size. error: %w", err)
@@ -66,45 +76,31 @@ func (s *FlangeService) GetBasisFlangeSize(ctx context.Context, req *moment_api.
 		sizeRow = []*moment_api.BasisFlangeSize{}
 
 		curD = math.Inf(-1)
+		curDn = ""
 		for _, fs := range sizes2 {
 			fs.Pn = math.Round(fs.Pn*1000) / 1000
-			if curD != fs.D {
-				curD = fs.D
-				sizeRow = append(sizeRow, &moment_api.BasisFlangeSize{
-					Dn: fs.D,
-				})
-				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
+			if req.IsInch {
+				if curDn != fs.Dn {
+					curDn = fs.Dn
+					sizeRow = append(sizeRow, &moment_api.BasisFlangeSize{
+						Dn: fs.Dn,
+					})
+				}
 			} else {
-				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
+				if curD != fs.D {
+					curD = fs.D
+					sizeRow = append(sizeRow, &moment_api.BasisFlangeSize{
+						Dn: fmt.Sprint(fs.D),
+					})
+				}
 			}
+			sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, &moment_api.BasisFlangeSize_Pn{
+				Pn:       fs.Pn,
+				IsEmptyD: fs.IsEmptyD,
+			})
 		}
 
 		res.SizeRow2 = sizeRow
-	} else {
-		reqSize := models.GetBasisSize{IsUseRow: req.IsUseRow, StandId: req.StandId, Row: 0}
-		sizes, err := s.repo.GetBasisFlangeSizes(ctx, reqSize)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get size. error: %w", err)
-		}
-
-		sizeRow := []*moment_api.BasisFlangeSize{}
-
-		curD := math.Inf(-1)
-		for _, fs := range sizes {
-			fs.Pn = math.Round(fs.Pn*1000) / 1000
-			if curD != fs.D {
-				curD = fs.D
-				sizeRow = append(sizeRow, &moment_api.BasisFlangeSize{
-					// Id: fs.Id,
-					Dn: fs.D,
-				})
-				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
-			} else {
-				sizeRow[len(sizeRow)-1].Pn = append(sizeRow[len(sizeRow)-1].Pn, fs.Pn)
-			}
-		}
-
-		res.SizeRow1 = sizeRow
 	}
 
 	return res, nil
@@ -126,13 +122,15 @@ func (s *FlangeService) GetFullFlangeSize(ctx context.Context, size *moment_api.
 			Id:      fsd.Id,
 			StandId: fsd.StandId,
 			Pn:      math.Round(fsd.Pn*1000) / 1000,
-			D:       fsd.D,
-			D6:      fsd.D6,
-			DOut:    fsd.DOut,
-			H:       fsd.H,
-			S0:      fsd.S0,
-			S1:      fsd.S1,
-			Length:  fsd.Length,
+			Dn:      fsd.Dn,
+			Dmm:     math.Round(fsd.Dmm*1000) / 1000,
+			D:       math.Round(fsd.D*1000) / 1000,
+			D6:      math.Round(fsd.D6*1000) / 1000,
+			DOut:    math.Round(fsd.DOut*1000) / 1000,
+			H:       math.Round(fsd.H*1000) / 1000,
+			S0:      math.Round(fsd.S0*1000) / 1000,
+			S1:      math.Round(fsd.S1*1000) / 1000,
+			Length:  math.Round(fsd.Length*1000) / 1000,
 			Count:   fsd.Count,
 			BoltId:  fsd.BoltId,
 		})
@@ -143,13 +141,15 @@ func (s *FlangeService) GetFullFlangeSize(ctx context.Context, size *moment_api.
 				Id:      fsd.Id,
 				StandId: fsd.StandId,
 				Pn:      math.Round(fsd.Pn*1000) / 1000,
-				D:       fsd.D,
-				D6:      fsd.D6,
-				DOut:    fsd.DOut,
-				H:       fsd.H,
-				S0:      fsd.S0,
-				S1:      fsd.S1,
-				Length:  fsd.Length,
+				Dn:      fsd.Dn,
+				Dmm:     math.Round(fsd.Dmm*1000) / 1000,
+				D:       math.Round(fsd.D*1000) / 1000,
+				D6:      math.Round(fsd.D6*1000) / 1000,
+				DOut:    math.Round(fsd.DOut*1000) / 1000,
+				H:       math.Round(fsd.H*1000) / 1000,
+				S0:      math.Round(fsd.S0*1000) / 1000,
+				S1:      math.Round(fsd.S1*1000) / 1000,
+				Length:  math.Round(fsd.Length*1000) / 1000,
 				Count:   fsd.Count,
 				BoltId:  fsd.BoltId,
 			})
