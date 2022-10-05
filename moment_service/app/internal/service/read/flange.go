@@ -1,26 +1,29 @@
-package service
+package read
 
 import (
 	"context"
 
+	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
+	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
+	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
-type ReadService struct {
-	flange    *FlangeService
-	materials *MaterialsService
-	gasket    *GasketService
+type FlangeService struct {
+	flange    *flange.FlangeService
+	materials *materials.MaterialsService
+	gasket    *gasket.GasketService
 }
 
-func NewReadService(flange *FlangeService, materials *MaterialsService, gasket *GasketService) *ReadService {
-	return &ReadService{
+func NewFlangeService(flange *flange.FlangeService, materials *materials.MaterialsService, gasket *gasket.GasketService) *FlangeService {
+	return &FlangeService{
 		flange:    flange,
 		materials: materials,
 		gasket:    gasket,
 	}
 }
 
-func (s *ReadService) GetFlange(ctx context.Context, req *moment_api.GetFlangeRequest) (*moment_api.GetFlangeResponse, error) {
+func (s *FlangeService) Get(ctx context.Context, req *moment_api.GetFlangeRequest) (*moment_api.GetFlangeResponse, error) {
 	typeFlange, err := s.flange.GetTypeFlange(ctx, &moment_api.GetTypeFlangeRequest{})
 	if err != nil {
 		return nil, err

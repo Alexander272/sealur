@@ -7,6 +7,8 @@ type FlangeSize struct {
 	Dn       string  `db:"dn"`
 	D6       float64 `db:"d6"`
 	DOut     float64 `db:"d_out"`
+	X        float64 `db:"x"`
+	A        float64 `db:"a"`
 	H        float64 `db:"h"`
 	S0       float64 `db:"s0"`
 	S1       float64 `db:"s1"`
@@ -26,6 +28,8 @@ type FlangeSizeDTO struct {
 	D       float64 `db:"d"`
 	D6      float64 `db:"d6"`
 	DOut    float64 `db:"d_out"`
+	X       float64 `db:"x"`
+	A       float64 `db:"a"`
 	H       float64 `db:"h"`
 	S0      float64 `db:"s0"`
 	S1      float64 `db:"s1"`

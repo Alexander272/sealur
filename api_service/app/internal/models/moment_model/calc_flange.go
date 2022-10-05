@@ -93,8 +93,10 @@ type Flanges struct {
 	TypeF        string       `json:"type"`
 	StandartId   string       `json:"standartId"`
 	MarkId       string       `json:"markId"`
-	Dy           int32        `json:"dy"`
+	Dy           string       `json:"dy"`
 	Py           float64      `json:"py"`
+	B            string       `json:"b"`
+	Row          int32        `json:"row"`
 	Corrosion    string       `json:"corrosion"`
 	Temp         string       `json:"temp"`
 	Size         FlangeSize   `json:"size"`
@@ -234,9 +236,15 @@ func (f *Flanges) NewFlangeData() (flange *moment_api.FlangeData, err error) {
 		return nil, err
 	}
 
-	var temp float64
+	var temp, b float64
 	if f.Temp != "" {
 		temp, err = strconv.ParseFloat(f.Temp, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if f.B != "" {
+		b, err = strconv.ParseFloat(f.B, 64)
 		if err != nil {
 			return nil, err
 		}
@@ -247,8 +255,10 @@ func (f *Flanges) NewFlangeData() (flange *moment_api.FlangeData, err error) {
 		StandartId:   f.StandartId,
 		MarkId:       f.MarkId,
 		Material:     mat,
-		Dy:           f.Dy,
+		Dn:           f.Dy,
 		Py:           f.Py,
+		B:            b,
+		Row:          f.Row,
 		Corrosion:    corrosion,
 		Size:         size,
 		Temp:         temp,

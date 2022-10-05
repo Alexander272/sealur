@@ -19,7 +19,7 @@ func NewReadHandlers(service service.Read) *ReadHandlers {
 }
 
 func (h *ReadHandlers) GetFlange(ctx context.Context, req *moment_api.GetFlangeRequest) (*moment_api.GetFlangeResponse, error) {
-	res, err := h.service.GetFlange(ctx, req)
+	res, err := h.service.Get(ctx, req)
 	if err != nil {
 		return nil, err
 	}

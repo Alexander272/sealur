@@ -29,7 +29,7 @@ type CalcCap struct {
 type Cap struct {
 	Type     string       `json:"type"`
 	H        string       `json:"h"`
-	Radius   string       `json:"redius"`
+	Radius   string       `json:"radius"`
 	Delta    string       `json:"delta"`
 	MarkId   string       `json:"markId"`
 	Material MaterialData `json:"material"`

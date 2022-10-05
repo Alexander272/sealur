@@ -13,5 +13,5 @@ const (
 	TypeFlangeTable = "type_flange"
 	StandartsTable  = "standarts"
 	BoltsTable      = "bolts"
-	FlangeSizeTable = "flange_size_copy"
+	FlangeSizeTable = "flange_size"
 )

@@ -20,12 +20,11 @@ func NewFlangeRepo(db *sqlx.DB) *FlangeRepo {
 }
 
 func (r *FlangeRepo) GetFlangeSize(ctx context.Context, req *moment_api.GetFlangeSizeRequest) (size models.FlangeSize, err error) {
-	//TODO похоже надо добавить зависимоcть от ряда
-	query := fmt.Sprintf(`SELECT %s.id, pn, d, d6, d_out, h, s0, s1, length, count, diameter, area FROM %s
-		INNER JOIN %s on bolt_id=%s.id WHERE stand_id=$1 AND d=$2 AND pn=$3`,
+	query := fmt.Sprintf(`SELECT %s.id, pn, d, d6, d_out, x, a, h, s0, s1, length, count, diameter, area FROM %s
+		INNER JOIN %s on bolt_id=%s.id WHERE stand_id=$1 AND dn=$2 AND pn=$3 AND row=$4`,
 		FlangeSizeTable, FlangeSizeTable, BoltsTable, BoltsTable)
 
-	if err := r.db.Get(&size, query, req.StandId, req.D, req.Pn); err != nil {
+	if err := r.db.Get(&size, query, req.StandId, req.Dn, req.Pn, req.Row); err != nil {
 		return size, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return size, nil
@@ -57,8 +56,8 @@ func (r *FlangeRepo) GetBasisFlangeSizes(ctx context.Context, req models.GetBasi
 }
 
 func (r *FlangeRepo) GetFullFlangeSize(ctx context.Context, req *moment_api.GetFullFlangeSizeRequest, row int32) (size []models.FlangeSizeDTO, err error) {
-	query := fmt.Sprintf(`SELECT id, stand_id, pn, dn, dmm, d, d6, d_out, h, s0, s1, length, count, bolt_id FROM %s WHERE stand_id=$1 AND row=$2`,
-		FlangeSizeTable)
+	query := fmt.Sprintf(`SELECT id, stand_id, pn, dn, dmm, d, d6, d_out, x, a, h, s0, s1, length, count, bolt_id 
+		FROM %s WHERE stand_id=$1 AND row=$2`, FlangeSizeTable)
 
 	if err := r.db.Select(&size, query, req.StandId, row); err != nil {
 		return size, fmt.Errorf("failed to execute query. error: %w", err)
@@ -67,10 +66,10 @@ func (r *FlangeRepo) GetFullFlangeSize(ctx context.Context, req *moment_api.GetF
 }
 
 func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_api.CreateFlangeSizeRequest) error {
-	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, dn, dmm, d, d6, d_out, h, s0, s1, length, count, bolt_id, row)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`, FlangeSizeTable)
+	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, dn, dmm, d, d6, d_out, x, a, h, s0, s1, length, count, bolt_id, row)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`, FlangeSizeTable)
 
-	_, err := r.db.Exec(query, size.StandId, size.Pn, size.Dn, size.Dmm, size.D, size.D6, size.DOut, size.H, size.S0, size.S1,
+	_, err := r.db.Exec(query, size.StandId, size.Pn, size.Dn, size.Dmm, size.D, size.D6, size.DOut, size.X, size.A, size.H, size.S0, size.S1,
 		size.Length, size.Count, size.BoltId, size.Row)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
@@ -84,12 +83,12 @@ func (r *FlangeRepo) CreateFlangeSizes(ctx context.Context, size *moment_api.Cre
 
 	for i, s := range size.Sizes {
 		logger.Debug(s)
-		setValues = append(setValues, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
-			i*14+1, i*14+2, i*14+3, i*14+4, i*14+5, i*14+6, i*14+7, i*14+8, i*14+9, i*14+10, i*14+11, i*14+12, i*14+13, i*14+14))
-		args = append(args, s.StandId, s.Pn, s.Dn, s.Dmm, s.D, s.D6, s.DOut, s.H, s.S0, s.S1, s.Length, s.Count, s.BoltId, s.Row)
+		setValues = append(setValues, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+			i*16+1, i*16+2, i*16+3, i*16+4, i*16+5, i*16+6, i*16+7, i*16+8, i*16+9, i*16+10, i*16+11, i*16+12, i*16+13, i*16+14, i*16+15, i*16+16))
+		args = append(args, s.StandId, s.Pn, s.Dn, s.Dmm, s.D, s.D6, s.DOut, s.X, s.A, s.H, s.S0, s.S1, s.Length, s.Count, s.BoltId, s.Row)
 	}
 
-	query := fmt.Sprintf("INSERT INTO %s (stand_id, pn, dn, dmm, d, d6, d_out, h, s0, s1, length, count, bolt_id, row) VALUES %s",
+	query := fmt.Sprintf("INSERT INTO %s (stand_id, pn, dn, dmm, d, d6, d_out, x, a, h, s0, s1, length, count, bolt_id, row) VALUES %s",
 		FlangeSizeTable, strings.Join(setValues, ", "))
 
 	if _, err := r.db.Exec(query, args...); err != nil {
@@ -103,7 +102,6 @@ func (r *FlangeRepo) UpdateFlangeSize(ctx context.Context, size *moment_api.Upda
 	args := make([]interface{}, 0)
 	argId := 1
 
-	//TODO добваить ряды в модель и запрос
 	if size.StandId != "" {
 		setValues = append(setValues, fmt.Sprintf("stand_id=$%d", argId))
 		args = append(args, size.StandId)
@@ -138,6 +136,16 @@ func (r *FlangeRepo) UpdateFlangeSize(ctx context.Context, size *moment_api.Upda
 	if size.DOut != 0 {
 		setValues = append(setValues, fmt.Sprintf("d_out=$%d", argId))
 		args = append(args, size.DOut)
+		argId++
+	}
+	if size.X != 0 {
+		setValues = append(setValues, fmt.Sprintf("x=$%d", argId))
+		args = append(args, size.X)
+		argId++
+	}
+	if size.A != 0 {
+		setValues = append(setValues, fmt.Sprintf("a=$%d", argId))
+		args = append(args, size.A)
 		argId++
 	}
 	if size.H != 0 {

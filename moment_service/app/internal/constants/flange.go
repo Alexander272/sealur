@@ -1,11 +1,9 @@
 package constants
 
 const (
-	IsolatedFlatTb float64 = 0.97
-	IsolatedFlatTf float64 = 1
-	//rTODO вернуть новое занчение
+	IsolatedFlatTb    float64 = 0.97
+	IsolatedFlatTf    float64 = 1
 	NonIsolatedFlatTb float64 = 0.95
-	// NonIsolatedFlatTb float64 = 0.85
 	NonIsolatedFlatTf float64 = 0.96
 
 	IsolatedFreeTb    float64 = 0.9

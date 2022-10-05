@@ -5,7 +5,12 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur/moment_service/internal/repository"
-	"github.com/Alexander272/sealur/moment_service/internal/service/formulas"
+	"github.com/Alexander272/sealur/moment_service/internal/service/calc"
+	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
+	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
+	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
+	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
+	"github.com/Alexander272/sealur/moment_service/internal/service/read"
 	"github.com/Alexander272/sealur_proto/api/moment_api"
 )
 
@@ -108,7 +113,7 @@ type Graphic interface {
 }
 
 type Read interface {
-	GetFlange(ctx context.Context, req *moment_api.GetFlangeRequest) (*moment_api.GetFlangeResponse, error)
+	read.Flange
 }
 
 type Services struct {
@@ -122,20 +127,19 @@ type Services struct {
 }
 
 func NewServices(repos *repository.Repositories) *Services {
-	flange := NewFlangeService(repos.Flange)
-	materials := NewMaterialsService(repos.Materials)
-	gasket := NewGasketService(repos.Gasket)
-	graphic := NewGraphicService()
-	data := NewDataService(flange, materials, gasket, graphic)
-	formulas := formulas.NewFormulasService()
+	flange := flange.NewFlangeService(repos.Flange)
+	materials := materials.NewMaterialsService(repos.Materials)
+	gasket := gasket.NewGasketService(repos.Gasket)
+	graphic := graphic.NewGraphicService()
+	calc := calc.NewCalcServices(flange, gasket, materials)
 
 	return &Services{
-		CalcFlange: NewCalcFlangeService(graphic, data, formulas.Flange),
-		CalcCap:    NewCalcCapService(graphic, data, formulas.Cap),
+		CalcFlange: calc.Flange,
+		CalcCap:    calc.Cap,
 		Flange:     flange,
 		Materials:  materials,
 		Gasket:     gasket,
 		Graphic:    graphic,
-		Read:       NewReadService(flange, materials, gasket),
+		Read:       read.NewReadService(flange, materials, gasket),
 	}
 }

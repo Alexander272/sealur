@@ -2,8 +2,8 @@
 
 Сервис API Gateway (Gateway Offloading)
 
-<b>папка proto</b>
-содержит сгнерирование proto-файлы (появилась потому что, не работают импроты, и как заставить их работать я пока не знаю)
+    replace github.com/Alexander272/sealur_proto/api => ../../../sealur_proto/api
+    scp -r ./build administrator@pro:/home/administrator/app
 
 #### шаблон файла config.yaml
 

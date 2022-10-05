@@ -8,6 +8,8 @@ type FlangeSizeDTO struct {
 	D       float64 `json:"d,omitempty"`
 	D6      float64 `json:"d6,omitempty"`
 	DOut    float64 `json:"dOut,omitempty"`
+	X       float64 `json:"x,omitempty"`
+	A       float64 `json:"a,omitempty"`
 	H       float64 `json:"h,omitempty"`
 	S0      float64 `json:"s0,omitempty"`
 	S1      float64 `json:"s1,omitempty"`

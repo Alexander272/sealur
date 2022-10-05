@@ -1,4 +1,4 @@
-package service
+package flange
 
 import (
 	"context"
@@ -127,6 +127,8 @@ func (s *FlangeService) GetFullFlangeSize(ctx context.Context, size *moment_api.
 			D:       math.Round(fsd.D*1000) / 1000,
 			D6:      math.Round(fsd.D6*1000) / 1000,
 			DOut:    math.Round(fsd.DOut*1000) / 1000,
+			X:       math.Round(fsd.X*1000) / 1000,
+			A:       math.Round(fsd.A*1000) / 1000,
 			H:       math.Round(fsd.H*1000) / 1000,
 			S0:      math.Round(fsd.S0*1000) / 1000,
 			S1:      math.Round(fsd.S1*1000) / 1000,
@@ -146,6 +148,8 @@ func (s *FlangeService) GetFullFlangeSize(ctx context.Context, size *moment_api.
 				D:       math.Round(fsd.D*1000) / 1000,
 				D6:      math.Round(fsd.D6*1000) / 1000,
 				DOut:    math.Round(fsd.DOut*1000) / 1000,
+				X:       math.Round(fsd.X*1000) / 1000,
+				A:       math.Round(fsd.A*1000) / 1000,
 				H:       math.Round(fsd.H*1000) / 1000,
 				S0:      math.Round(fsd.S0*1000) / 1000,
 				S1:      math.Round(fsd.S1*1000) / 1000,
