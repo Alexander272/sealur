@@ -5,16 +5,16 @@ import (
 	"math"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
 func (s *DataService) getDataCap(
 	ctx context.Context,
-	cap *moment_api.CapData,
+	cap *cap_model.CapData,
 	typeFlange string,
 	temp float64,
-) (capData *moment_api.CapResult, err error) {
-	capData = &moment_api.CapResult{
+) (capData *cap_model.CapResult, err error) {
+	capData = &cap_model.CapResult{
 		H:      cap.H,
 		Radius: cap.Radius,
 		Delta:  cap.Delta,
@@ -48,13 +48,13 @@ func (s *DataService) getDataCap(
 
 func (s *DataService) getCalculatedDataCap(
 	ctx context.Context,
-	capType moment_api.CapData_Type,
-	data *moment_api.CapResult,
+	capType cap_model.CapData_Type,
+	data *cap_model.CapResult,
 	h, D, S0, DOut, Dcp float64,
-) (*moment_api.CapResult, error) {
+) (*cap_model.CapResult, error) {
 	calculated := data
 
-	if capType == moment_api.CapData_flat {
+	if capType == cap_model.CapData_flat {
 		data.K = DOut / Dcp
 		data.X = (0.67*math.Pow(data.K, 2)*(1+8.55*math.Log10(data.K)) - 1) / ((data.K - 1) *
 			(math.Pow(data.K, 2) - 1 + (1.857*math.Pow(data.K, 2)+1)*(math.Pow(data.H, 3)/math.Pow(data.Delta, 3))))

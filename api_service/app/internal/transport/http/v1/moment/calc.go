@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/cap_model"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/flange_model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,14 +24,14 @@ func (h *Handler) initCalcRoutes(api *gin.RouterGroup) {
 // @ModuleID calculateFlange
 // @Accept json
 // @Produce json
-// @Param data body moment_model.CalcFlange true "flange data"
-// @Success 200 {object} models.DataResponse{data=moment_api.FlangeResponse}
+// @Param data body flange_model.CalcFlange true "flange data"
+// @Success 200 {object} models.DataResponse{data=calc_api.FlangeResponse}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/calc/flange/ [post]
 func (h *Handler) calculateFlange(c *gin.Context) {
-	var dto moment_model.CalcFlange
+	var dto flange_model.CalcFlange
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -42,7 +43,7 @@ func (h *Handler) calculateFlange(c *gin.Context) {
 		return
 	}
 
-	res, err := h.calcFlangeClient.CalculateFlange(c, data)
+	res, err := h.calcClient.CalculateFlange(c, data)
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -58,14 +59,14 @@ func (h *Handler) calculateFlange(c *gin.Context) {
 // @ModuleID calculateCap
 // @Accept json
 // @Produce json
-// @Param data body moment_model.CalcCap true "cap data"
-// @Success 200 {object} models.DataResponse{data=moment_api.CapData}
+// @Param data body cap_model.CalcCap true "cap data"
+// @Success 200 {object} models.DataResponse{data=calc_api.CapData}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/calc/cap/ [post]
 func (h *Handler) calculateCap(c *gin.Context) {
-	var dto moment_model.CalcCap
+	var dto cap_model.CalcCap
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -77,7 +78,7 @@ func (h *Handler) calculateCap(c *gin.Context) {
 		return
 	}
 
-	res, err := h.calcCapClient.CalculateCap(c, data)
+	res, err := h.calcClient.CalculateCap(c, data)
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

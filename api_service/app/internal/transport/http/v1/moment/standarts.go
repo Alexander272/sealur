@@ -5,7 +5,7 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +31,7 @@ func (h *Handler) initStandartsRoutes(api *gin.RouterGroup) {
 // @Accept json
 // @Produce json
 // @Param typeId query string true "type id"
-// @Success 200 {object} models.DataResponse{Data=[]moment_api.Standart}
+// @Success 200 {object} models.DataResponse{Data=[]flange_model.Standart}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -43,7 +43,7 @@ func (h *Handler) getStandarts(c *gin.Context) {
 		return
 	}
 
-	standarts, err := h.flangeClient.GetStandarts(c, &moment_api.GetStandartsRequest{TypeId: typeId})
+	standarts, err := h.flangeClient.GetStandarts(c, &flange_api.GetStandartsRequest{TypeId: typeId})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -60,7 +60,7 @@ func (h *Handler) getStandarts(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param typeId query string true "type id"
-// @Success 200 {object} models.DataResponse{Data=[]moment_api.StandartWithSize}
+// @Success 200 {object} models.DataResponse{Data=[]flange_model.StandartWithSize}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -72,7 +72,7 @@ func (h *Handler) getStandartsWithSize(c *gin.Context) {
 		return
 	}
 
-	standarts, err := h.flangeClient.GetStandartsWithSize(c, &moment_api.GetStandartsRequest{TypeId: typeId})
+	standarts, err := h.flangeClient.GetStandartsWithSize(c, &flange_api.GetStandartsRequest{TypeId: typeId})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -101,7 +101,7 @@ func (h *Handler) createStandart(c *gin.Context) {
 		return
 	}
 
-	stand, err := h.flangeClient.CreateStandart(c, &moment_api.CreateStandartRequest{
+	stand, err := h.flangeClient.CreateStandart(c, &flange_api.CreateStandartRequest{
 		Title:          dto.Title,
 		TypeId:         dto.TypeId,
 		TitleDn:        dto.TitleDn,
@@ -145,7 +145,7 @@ func (h *Handler) updateStandart(c *gin.Context) {
 		return
 	}
 
-	_, err := h.flangeClient.UpdateStandart(c, &moment_api.UpdateStandartRequest{
+	_, err := h.flangeClient.UpdateStandart(c, &flange_api.UpdateStandartRequest{
 		Id:             id,
 		Title:          dto.Title,
 		TypeId:         dto.TypeId,
@@ -184,7 +184,7 @@ func (h *Handler) deleteStandart(c *gin.Context) {
 		return
 	}
 
-	_, err := h.flangeClient.DeleteStandart(c, &moment_api.DeleteStandartRequest{Id: id})
+	_, err := h.flangeClient.DeleteStandart(c, &flange_api.DeleteStandartRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

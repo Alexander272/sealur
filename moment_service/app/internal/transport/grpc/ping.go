@@ -3,17 +3,17 @@ package grpc
 import (
 	"context"
 
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment"
 )
 
 type PingHandlers struct {
-	moment_api.UnimplementedPingServiceServer
+	moment.UnimplementedPingServiceServer
 }
 
 func NewPingHandlers() *PingHandlers {
 	return &PingHandlers{}
 }
 
-func (h *PingHandlers) Ping(ctx context.Context, req *moment_api.PingRequest) (*moment_api.PingResponse, error) {
-	return &moment_api.PingResponse{Ping: "pong"}, nil
+func (h *PingHandlers) Ping(ctx context.Context, req *moment.PingRequest) (*moment.PingResponse, error) {
+	return &moment.PingResponse{Ping: "pong"}, nil
 }

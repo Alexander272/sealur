@@ -5,7 +5,7 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,7 +39,7 @@ func (h *Handler) createEnvData(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.CreateEnvData(c, &moment_api.CreateEnvDataRequest{
+	_, err := h.gasketClient.CreateEnvData(c, &gasket_api.CreateEnvDataRequest{
 		EnvId:        dto.EnvId,
 		GasketId:     dto.GasketId,
 		M:            dto.M,
@@ -73,16 +73,16 @@ func (h *Handler) createManyEnvData(c *gin.Context) {
 		return
 	}
 
-	data := []*moment_api.CreateManyEnvDataRequest_Data{}
+	data := []*gasket_api.CreateManyEnvDataRequest_Data{}
 	for _, mgdd := range dto.Data {
-		data = append(data, &moment_api.CreateManyEnvDataRequest_Data{
+		data = append(data, &gasket_api.CreateManyEnvDataRequest_Data{
 			SpecificPres: mgdd.SpecificPres,
 			M:            mgdd.M,
 			EnvId:        mgdd.EnvId,
 		})
 	}
 
-	_, err := h.gasketClient.CreateManyEnvData(c, &moment_api.CreateManyEnvDataRequest{
+	_, err := h.gasketClient.CreateManyEnvData(c, &gasket_api.CreateManyEnvDataRequest{
 		GasketId: dto.GasketId,
 		Data:     data,
 	})
@@ -121,7 +121,7 @@ func (h *Handler) updateEnvData(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.UpdateEnvData(c, &moment_api.UpdateEnvDataRequest{
+	_, err := h.gasketClient.UpdateEnvData(c, &gasket_api.UpdateEnvDataRequest{
 		Id:           id,
 		EnvId:        dto.EnvId,
 		GasketId:     dto.GasketId,
@@ -156,7 +156,7 @@ func (h *Handler) deleteEnvData(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.DeleteEnvData(c, &moment_api.DeleteEnvDataRequest{Id: id})
+	_, err := h.gasketClient.DeleteEnvData(c, &gasket_api.DeleteEnvDataRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

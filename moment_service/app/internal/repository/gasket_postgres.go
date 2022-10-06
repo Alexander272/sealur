@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -42,7 +42,7 @@ func (r *GasketRepo) GetFullData(ctx context.Context, req models.GetGasket) (dat
 	return data, nil
 }
 
-func (r *GasketRepo) GetGasket(ctx context.Context, req *moment_api.GetGasketRequest) (gasket []models.GasketDTO, err error) {
+func (r *GasketRepo) GetGasket(ctx context.Context, req *gasket_api.GetGasketRequest) (gasket []models.GasketDTO, err error) {
 	query := fmt.Sprintf(`SELECT id, title FROM %s ORDER BY id`, GasketTable)
 
 	if err := r.db.Select(&gasket, query); err != nil {
@@ -51,7 +51,7 @@ func (r *GasketRepo) GetGasket(ctx context.Context, req *moment_api.GetGasketReq
 	return gasket, nil
 }
 
-func (r *GasketRepo) GetGasketWithThick(ctx context.Context, req *moment_api.GetGasketRequest) (gasket []models.GasketWithThick, err error) {
+func (r *GasketRepo) GetGasketWithThick(ctx context.Context, req *gasket_api.GetGasketRequest) (gasket []models.GasketWithThick, err error) {
 	query := fmt.Sprintf(`SELECT %s.id, title, thickness FROM %s
 		INNER JOIN %s ON %s.id = %s.gasket_id ORDER BY id, thickness`,
 		GasketTable, GasketTable, GasketDataTable, GasketTable, GasketDataTable)
@@ -62,7 +62,7 @@ func (r *GasketRepo) GetGasketWithThick(ctx context.Context, req *moment_api.Get
 	return gasket, nil
 }
 
-func (r *GasketRepo) CreateGasket(ctx context.Context, gasket *moment_api.CreateGasketRequest) (id string, err error) {
+func (r *GasketRepo) CreateGasket(ctx context.Context, gasket *gasket_api.CreateGasketRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", GasketTable)
 
 	row := r.db.QueryRow(query, gasket.Title)
@@ -78,7 +78,7 @@ func (r *GasketRepo) CreateGasket(ctx context.Context, gasket *moment_api.Create
 	return fmt.Sprintf("%d", idInt), nil
 }
 
-func (r *GasketRepo) UpdateGasket(ctx context.Context, gasket *moment_api.UpdateGasketRequest) error {
+func (r *GasketRepo) UpdateGasket(ctx context.Context, gasket *gasket_api.UpdateGasketRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET title=$1 WHERE id=$2", GasketTable)
 
 	_, err := r.db.Exec(query, gasket.Title, gasket.Id)
@@ -88,7 +88,7 @@ func (r *GasketRepo) UpdateGasket(ctx context.Context, gasket *moment_api.Update
 	return nil
 }
 
-func (r *GasketRepo) DeleteGasket(ctx context.Context, gasket *moment_api.DeleteGasketRequest) error {
+func (r *GasketRepo) DeleteGasket(ctx context.Context, gasket *gasket_api.DeleteGasketRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", GasketTable)
 
 	if _, err := r.db.Exec(query, gasket.Id); err != nil {
@@ -108,7 +108,7 @@ func (r *GasketRepo) GetGasketData(ctx context.Context, gasketId string) (gasket
 	return gasket, nil
 }
 
-func (r *GasketRepo) CreateManyGasketData(ctx context.Context, data *moment_api.CreateManyGasketDataRequest) error {
+func (r *GasketRepo) CreateManyGasketData(ctx context.Context, data *gasket_api.CreateManyGasketDataRequest) error {
 	query := fmt.Sprintf(`INSERT INTO %s (gasket_id, permissible_pres, compression, epsilon, thickness, type_id)
 		VALUES ($1, $2, $3, $4, $5, $6)`, GasketDataTable)
 
@@ -129,7 +129,7 @@ func (r *GasketRepo) CreateManyGasketData(ctx context.Context, data *moment_api.
 	return nil
 }
 
-func (r *GasketRepo) CreateGasketData(ctx context.Context, data *moment_api.CreateGasketDataRequest) error {
+func (r *GasketRepo) CreateGasketData(ctx context.Context, data *gasket_api.CreateGasketDataRequest) error {
 	query := fmt.Sprintf(`INSERT INTO %s (gasket_id, permissible_pres, compression, epsilon, thickness, type_id)
 		VALUES ($1, $2, $3, $4, $5, $6)`, GasketDataTable)
 
@@ -139,7 +139,7 @@ func (r *GasketRepo) CreateGasketData(ctx context.Context, data *moment_api.Crea
 	return nil
 }
 
-func (r *GasketRepo) UpdateGasketData(ctx context.Context, data *moment_api.UpdateGasketDataRequest) error {
+func (r *GasketRepo) UpdateGasketData(ctx context.Context, data *gasket_api.UpdateGasketDataRequest) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1
@@ -188,7 +188,7 @@ func (r *GasketRepo) UpdateGasketData(ctx context.Context, data *moment_api.Upda
 	return nil
 }
 
-func (r *GasketRepo) UpdateGasketTypeId(ctx context.Context, data *moment_api.UpdateGasketTypeIdRequest) error {
+func (r *GasketRepo) UpdateGasketTypeId(ctx context.Context, data *gasket_api.UpdateGasketTypeIdRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET type_id=$1 WHERE gasket_id=$2", GasketDataTable)
 
 	_, err := r.db.Exec(query, data.TypeId, data.GasketId)
@@ -198,7 +198,7 @@ func (r *GasketRepo) UpdateGasketTypeId(ctx context.Context, data *moment_api.Up
 	return nil
 }
 
-func (r *GasketRepo) DeleteGasketData(ctx context.Context, data *moment_api.DeleteGasketDataRequest) error {
+func (r *GasketRepo) DeleteGasketData(ctx context.Context, data *gasket_api.DeleteGasketDataRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", GasketDataTable)
 
 	if _, err := r.db.Exec(query, data.Id); err != nil {

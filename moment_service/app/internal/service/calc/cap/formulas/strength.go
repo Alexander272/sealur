@@ -8,19 +8,19 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
 func (s *FormulasService) getStrengthFormulas(
-	typeF moment_api.FlangeData_Type,
+	typeF cap_model.FlangeData_Type,
 	AxialForce, BendingMoment int32,
 	data models.DataCap,
-	flange *moment_api.FlangeResult,
-	res *moment_api.StrengthResult,
+	flange *cap_model.FlangeResult,
+	res *cap_model.StrengthResult,
 	D6, Dcp, Pbm, Pbr, Qd, QFM, pressure string,
 	isWork, isTemp bool,
-) *moment_api.AddStrengthFormulas {
-	strength := &moment_api.AddStrengthFormulas{}
+) *cap_model.AddStrengthFormulas {
+	strength := &cap_model.AddStrengthFormulas{}
 
 	var Ks float64
 	if flange.K <= constants.MinK {
@@ -52,7 +52,7 @@ func (s *FormulasService) getStrengthFormulas(
 	strength.MM = fmt.Sprintf("%s * %s * %s", cf, Pbm, b)
 	strength.Mp = fmt.Sprintf("%s * max(%s * %s + (%s + %s)*%s; |%s + %s|*%s)", cf, Pbr, b, Qd, QFM, e, Qd, QFM, e)
 
-	if typeF == moment_api.FlangeData_free {
+	if typeF == cap_model.FlangeData_free {
 		strength.MMk = fmt.Sprintf("%s * %s * %s", cf, Pbm, a)
 		strength.Mpk = fmt.Sprintf("%s * %s * %s", cf, Pbr, a)
 	}
@@ -72,7 +72,7 @@ func (s *FormulasService) getStrengthFormulas(
 	betaZ := strings.ReplaceAll(strconv.FormatFloat(flange.BetaZ, 'G', 3, 64), "E", "*10^")
 	sigmaR := strings.ReplaceAll(strconv.FormatFloat(flange.SigmaR, 'G', 3, 64), "E", "*10^")
 
-	if typeF == moment_api.FlangeData_welded && flange.S1 != flange.S0 {
+	if typeF == cap_model.FlangeData_welded && flange.S1 != flange.S0 {
 		strength.SigmaM1 = fmt.Sprintf("%s / (%s * (%s - %s)^2 * %s)", mm, lymda, s1, c, dvz)
 		strength.SigmaM0 = fmt.Sprintf("%s * %s", f, sigmaM1)
 	} else {
@@ -89,18 +89,18 @@ func (s *FormulasService) getStrengthFormulas(
 	mp := strings.ReplaceAll(strconv.FormatFloat(res.Mp, 'G', 3, 64), "E", "*10^")
 	sigmaP1 := strings.ReplaceAll(strconv.FormatFloat(res.SigmaP1, 'G', 3, 64), "E", "*10^")
 
-	if typeF == moment_api.FlangeData_free {
+	if typeF == cap_model.FlangeData_free {
 		strength.SigmaK = fmt.Sprintf("%s * %s / %s^2 * %s", betaY, mmk, hk, dk)
 	}
 
-	if typeF == moment_api.FlangeData_welded && flange.S1 != flange.S0 {
+	if typeF == cap_model.FlangeData_welded && flange.S1 != flange.S0 {
 		strength.SigmaP1 = fmt.Sprintf("%s / (%s * (%s - %s)^2 * %s)", mp, lymda, s1, c, dvz)
 		strength.SigmaP0 = fmt.Sprintf("%s * %s", f, sigmaP1)
 	} else {
 		strength.SigmaP1 = fmt.Sprintf("%s / (%s * (%s - %s)^2 * %s)", mp, lymda, s0, c, dvz)
 	}
 
-	if typeF == moment_api.FlangeData_welded {
+	if typeF == cap_model.FlangeData_welded {
 		temp := fmt.Sprintf("%f * (%s + %s) * (%s - %s)", math.Pi, d, s1, s1, c)
 		strength.SigmaMp = fmt.Sprintf("(0.785 * %s^2 * %s + %d + (4 * |%d|)/(%s + %s)) / %s",
 			d, pressure, AxialForce, BendingMoment, d, s1, temp)
@@ -122,7 +122,7 @@ func (s *FormulasService) getStrengthFormulas(
 	strength.SigmaRp = fmt.Sprintf("((1.33 * %s * %s + %s)/(%s * %s^2 * %s * %s)) * %s", betaF, h, l0, lymda, h, l0, d, mp)
 	strength.SigmaTp = fmt.Sprintf("(%s * %s)/(%s^2 * %s) - %s * %s", betaY, mp, h, d, betaZ, sigmaRp)
 
-	if typeF == moment_api.FlangeData_free {
+	if typeF == cap_model.FlangeData_free {
 		strength.SigmaKp = fmt.Sprintf("(%s * %s)/(%s^2 * %s)", betaY, mp, hk, dk)
 	}
 
@@ -132,7 +132,7 @@ func (s *FormulasService) getStrengthFormulas(
 
 	strength.Teta = fmt.Sprintf("%s * %s * %s/%s", mp, yf, epsilonAt20, epsilon)
 
-	if typeF == moment_api.FlangeData_free {
+	if typeF == cap_model.FlangeData_free {
 		epsilonK := strings.ReplaceAll(strconv.FormatFloat(flange.EpsilonK, 'G', 3, 64), "E", "*10^")
 		epsilonKAt20 := strings.ReplaceAll(strconv.FormatFloat(flange.EpsilonKAt20, 'G', 3, 64), "E", "*10^")
 		yk := strings.ReplaceAll(strconv.FormatFloat(flange.Yk, 'G', 3, 64), "E", "*10^")
@@ -151,7 +151,7 @@ func (s *FormulasService) getStrengthFormulas(
 	sigmaAt20 := strings.ReplaceAll(strconv.FormatFloat(flange.SigmaAt20, 'G', 3, 64), "E", "*10^")
 	sigma := strings.ReplaceAll(strconv.FormatFloat(flange.Sigma, 'G', 3, 64), "E", "*10^")
 
-	if typeF == moment_api.FlangeData_welded && flange.S1 != flange.S0 {
+	if typeF == cap_model.FlangeData_welded && flange.S1 != flange.S0 {
 		sigmaM := strings.ReplaceAll(strconv.FormatFloat(flange.SigmaM, 'G', 3, 64), "E", "*10^")
 		sigmaMAt20 := strings.ReplaceAll(strconv.FormatFloat(flange.SigmaMAt20, 'G', 3, 64), "E", "*10^")
 		sigmaRAt20 := strings.ReplaceAll(strconv.FormatFloat(flange.SigmaRAt20, 'G', 3, 64), "E", "*10^")
@@ -189,7 +189,7 @@ func (s *FormulasService) getStrengthFormulas(
 	strength.Max8 = fmt.Sprintf("max(|%s|; |%s|) ≤ %s * %s", sigmaR, sigmaT, kt, sigma)
 	strength.Max9 = fmt.Sprintf("max(|%s|; |%s|) ≤ %s * %s", sigmaRp, sigmaTp, kt, sigmaAt20)
 
-	if typeF == moment_api.FlangeData_free {
+	if typeF == cap_model.FlangeData_free {
 		sigmaK := strings.ReplaceAll(strconv.FormatFloat(res.SigmaK, 'G', 3, 64), "E", "*10^")
 		sigmaKp := strings.ReplaceAll(strconv.FormatFloat(res.SigmaKp, 'G', 3, 64), "E", "*10^")
 		sigmaKAt20 := strings.ReplaceAll(strconv.FormatFloat(flange.SigmaKAt20, 'G', 3, 64), "E", "*10^")

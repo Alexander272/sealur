@@ -6,7 +6,11 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
+	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
+	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/models/flange_model"
+	"github.com/Alexander272/sealur_proto/api/moment/read_api"
 )
 
 type FlangeService struct {
@@ -23,21 +27,21 @@ func NewFlangeService(flange *flange.FlangeService, materials *materials.Materia
 	}
 }
 
-func (s *FlangeService) Get(ctx context.Context, req *moment_api.GetFlangeRequest) (*moment_api.GetFlangeResponse, error) {
-	typeFlange, err := s.flange.GetTypeFlange(ctx, &moment_api.GetTypeFlangeRequest{})
+func (s *FlangeService) Get(ctx context.Context, req *read_api.GetFlangeRequest) (*read_api.GetFlangeResponse, error) {
+	typeFlange, err := s.flange.GetTypeFlange(ctx, &flange_api.GetTypeFlangeRequest{})
 	if err != nil {
 		return nil, err
 	}
 
-	st, err := s.flange.GetStandarts(ctx, &moment_api.GetStandartsRequest{TypeId: typeFlange[0].Id})
+	st, err := s.flange.GetStandarts(ctx, &flange_api.GetStandartsRequest{TypeId: typeFlange[0].Id})
 	if err != nil {
 		return nil, err
 	}
 
-	standarts := []*moment_api.StandartWithSize{}
+	standarts := []*flange_model.StandartWithSize{}
 
 	for _, s2 := range st {
-		sizes, err := s.flange.GetBasisFlangeSize(ctx, &moment_api.GetBasisFlangeSizeRequest{
+		sizes, err := s.flange.GetBasisFlangeSize(ctx, &flange_api.GetBasisFlangeSizeRequest{
 			IsUseRow: s2.IsNeedRow,
 			StandId:  s2.Id,
 			IsInch:   s2.IsInch,
@@ -46,7 +50,7 @@ func (s *FlangeService) Get(ctx context.Context, req *moment_api.GetFlangeReques
 			return nil, err
 		}
 
-		standarts = append(standarts, &moment_api.StandartWithSize{
+		standarts = append(standarts, &flange_model.StandartWithSize{
 			Id:             s2.Id,
 			Title:          s2.Title,
 			TypeId:         s2.TypeId,
@@ -60,22 +64,22 @@ func (s *FlangeService) Get(ctx context.Context, req *moment_api.GetFlangeReques
 		})
 	}
 
-	gasket, err := s.gasket.GetGasketWithThick(ctx, &moment_api.GetGasketRequest{})
+	gasket, err := s.gasket.GetGasketWithThick(ctx, &gasket_api.GetGasketRequest{})
 	if err != nil {
 		return nil, err
 	}
 
-	env, err := s.gasket.GetEnv(ctx, &moment_api.GetEnvRequest{})
+	env, err := s.gasket.GetEnv(ctx, &gasket_api.GetEnvRequest{})
 	if err != nil {
 		return nil, err
 	}
 
-	materials, err := s.materials.GetMaterials(ctx, &moment_api.GetMaterialsRequest{})
+	materials, err := s.materials.GetMaterials(ctx, &material_api.GetMaterialsRequest{})
 	if err != nil {
 		return nil, err
 	}
 
-	res := &moment_api.GetFlangeResponse{
+	res := &read_api.GetFlangeResponse{
 		TypeFlange: typeFlange,
 		Standarts:  standarts,
 		Gaskets:    gasket,

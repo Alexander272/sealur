@@ -3,17 +3,17 @@ package data
 import (
 	"context"
 
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
-func (s *DataService) getBoltData(ctx context.Context, data *moment_api.BoltData, bolt *moment_api.BoltResult, L, temp float64,
-) (*moment_api.BoltResult, error) {
+func (s *DataService) getBoltData(ctx context.Context, data *flange_model.BoltData, bolt *flange_model.BoltResult, L, temp float64,
+) (*flange_model.BoltResult, error) {
 	if data.MarkId != "another" {
 		mat, err := s.materials.GetMatFotCalculate(ctx, data.MarkId, temp)
 		if err != nil {
 			return nil, err
 		}
-		res := &moment_api.BoltResult{
+		res := &flange_model.BoltResult{
 			Diameter:    bolt.Diameter,
 			Area:        bolt.Area,
 			Count:       bolt.Count,
@@ -29,7 +29,7 @@ func (s *DataService) getBoltData(ctx context.Context, data *moment_api.BoltData
 		return res, nil
 	}
 
-	res := &moment_api.BoltResult{
+	res := &flange_model.BoltResult{
 		Diameter:    bolt.Diameter,
 		Area:        bolt.Area,
 		Count:       bolt.Count,

@@ -5,7 +5,8 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/models/material_model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,15 +39,15 @@ func (h *Handler) createVoltage(c *gin.Context) {
 		return
 	}
 
-	voltage := make([]*moment_api.Voltage, 0, len(dto.Voltage))
+	voltage := make([]*material_model.Voltage, 0, len(dto.Voltage))
 	for _, v := range dto.Voltage {
-		voltage = append(voltage, &moment_api.Voltage{
+		voltage = append(voltage, &material_model.Voltage{
 			Temperature: v.Temperature,
 			Voltage:     v.Voltage,
 		})
 	}
 
-	_, err := h.materialsClient.CreateVoltage(c, &moment_api.CreateVoltageRequest{
+	_, err := h.materialsClient.CreateVoltage(c, &material_api.CreateVoltageRequest{
 		MarkId:  dto.MarkId,
 		Voltage: voltage,
 	})
@@ -85,7 +86,7 @@ func (h *Handler) updateVoltage(c *gin.Context) {
 		return
 	}
 
-	_, err := h.materialsClient.UpdateVoltage(c, &moment_api.UpdateVoltageRequest{
+	_, err := h.materialsClient.UpdateVoltage(c, &material_api.UpdateVoltageRequest{
 		Id:          id,
 		MarkId:      dto.MarkId,
 		Temperature: dto.Temperature,
@@ -119,7 +120,7 @@ func (h *Handler) deleteVoltage(c *gin.Context) {
 		return
 	}
 
-	_, err := h.materialsClient.DeleteVoltage(c, &moment_api.DeleteVoltageRequest{Id: id})
+	_, err := h.materialsClient.DeleteVoltage(c, &material_api.DeleteVoltageRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

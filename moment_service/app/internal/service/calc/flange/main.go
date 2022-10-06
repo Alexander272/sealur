@@ -11,7 +11,8 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
 type FlangeService struct {
@@ -55,18 +56,18 @@ func NewFlangeService(graphic *graphic.GraphicService, flange *flange.FlangeServ
 }
 
 // расчет по ГОСТ 34233.4 - 2017
-func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFlangeRequest) (*moment_api.FlangeResponse, error) {
+func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponse, error) {
 	d, err := s.data.GetData(ctx, data)
 	if err != nil {
 		return nil, err
 	}
 
-	result := moment_api.FlangeResponse{
+	result := calc_api.FlangeResponse{
 		Data:         s.data.FormatInitData(data),
 		IsSameFlange: data.IsSameFlange,
 		Bolt:         d.Bolt,
-		Calc:         &moment_api.CalculatedFlange{},
-		Flanges:      []*moment_api.FlangeResult{d.Flange1},
+		Calc:         &flange_model.CalculatedFlange{},
+		Flanges:      []*flange_model.FlangeResult{d.Flange1},
 		Embed:        d.Embed,
 		Gasket:       d.Gasket,
 	}
@@ -82,18 +83,18 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFl
 		result.Flanges = append(result.Flanges, d.Flange2)
 	}
 
-	if data.Calculation == moment_api.CalcFlangeRequest_basis {
-		result.Calc.Basis = &moment_api.CalcMomentBasis{}
+	if data.Calculation == calc_api.FlangeRequest_basis {
+		result.Calc.Basis = &flange_model.CalcMomentBasis{}
 	} else {
-		result.Calc.Strength = &moment_api.CalcMomentStrength{}
+		result.Calc.Strength = &flange_model.CalcMomentStrength{}
 	}
 
 	Lb0 := d.Gasket.Thickness + d.Flange1.H + d.Flange2.H
 
-	if d.Type1 == moment_api.FlangeData_free {
+	if d.Type1 == flange_model.FlangeData_free {
 		Lb0 += d.Flange1.Hk
 	}
-	if d.Type2 == moment_api.FlangeData_free {
+	if d.Type2 == flange_model.FlangeData_free {
 		Lb0 += d.Flange2.Hk
 	}
 
@@ -116,7 +117,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFl
 
 	var alpha, dividend, divider float64
 
-	if d.TypeGasket == "Oval" || d.Type1 == moment_api.FlangeData_free || d.Type2 == moment_api.FlangeData_free {
+	if d.TypeGasket == "Oval" || d.Type1 == flange_model.FlangeData_free || d.Type2 == flange_model.FlangeData_free {
 		// Для фланцев с овальными и восьмигранными прокладками и для свободных фланцев коэффициенты жесткости фланцевого соединения принимают равными 1.
 		alpha = 1
 	} else {
@@ -130,11 +131,11 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFl
 		+d.Flange2.Yfn*d.Flange2.B*(d.Flange2.B+d.Flange2.E-math.Pow(d.Flange2.E, 2)/d.Dcp)
 	divider = yb + yp*math.Pow(d.Flange1.D6/d.Dcp, 2) + d.Flange1.Yfn*math.Pow(d.Flange1.B, 2) + d.Flange2.Yfn*math.Pow(d.Flange2.B, 2)
 
-	if d.Type1 == moment_api.FlangeData_free {
+	if d.Type1 == flange_model.FlangeData_free {
 		dividend += d.Flange1.Yfc * math.Pow(d.Flange1.A, 2)
 		divider += d.Flange1.Yfc * math.Pow(d.Flange1.A, 2)
 	}
-	if d.Type2 == moment_api.FlangeData_free {
+	if d.Type2 == flange_model.FlangeData_free {
 		dividend += d.Flange2.Yfc * math.Pow(d.Flange2.A, 2)
 		divider += d.Flange2.Yfc * math.Pow(d.Flange2.A, 2)
 	}
@@ -169,7 +170,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFl
 	Pb2 := math.Max(Pobg, minB)
 	Pb1 := alpha*(Qd+float64(data.AxialForce)) + Rp + 4*alphaM*math.Abs(float64(data.BendingMoment))/d.Dcp
 
-	if data.Calculation != moment_api.CalcFlangeRequest_basis {
+	if data.Calculation != calc_api.FlangeRequest_basis {
 		result.Calc.Strength.MinB = minB
 		result.Calc.Strength.FPb1 = Pb1
 		result.Calc.Strength.FPb2 = Pb2
@@ -250,10 +251,10 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFl
 	divider = yp + yb*d.Bolt.EpsilonAt20/d.Bolt.Epsilon + (d.Flange1.Yf*d.Flange1.EpsilonAt20/d.Flange1.Epsilon)*math.Pow(d.Flange1.B, 2) +
 		+(d.Flange2.Yf*d.Flange2.EpsilonAt20/d.Flange2.Epsilon)*math.Pow(d.Flange2.B, 2)
 
-	if d.Type1 == moment_api.FlangeData_free {
+	if d.Type1 == flange_model.FlangeData_free {
 		divider += (d.Flange1.Yk * d.Flange1.EpsilonKAt20 / d.Flange1.EpsilonK) * math.Pow(d.Flange1.A, 2)
 	}
-	if d.Type2 == moment_api.FlangeData_free {
+	if d.Type2 == flange_model.FlangeData_free {
 		divider += (d.Flange2.Yk * d.Flange2.EpsilonKAt20 / d.Flange2.EpsilonK) * math.Pow(d.Flange2.A, 2)
 	}
 
@@ -268,11 +269,11 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFl
 	}
 	temp2 = d.Flange1.H + d.Flange2.H
 
-	if d.Type1 == moment_api.FlangeData_free {
+	if d.Type1 == flange_model.FlangeData_free {
 		temp1 += d.Flange1.AlphaK * d.Flange1.Hk * (d.Flange1.Tk - 20)
 		temp2 += d.Flange1.Hk
 	}
-	if d.Type2 == moment_api.FlangeData_free {
+	if d.Type2 == flange_model.FlangeData_free {
 		temp1 += d.Flange2.AlphaK * d.Flange2.Hk * (d.Flange2.Tk - 20)
 		temp2 += d.Flange2.Hk
 	}
@@ -317,7 +318,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFl
 		v_sigmab2 = true
 	}
 
-	if data.Calculation == moment_api.CalcFlangeRequest_basis {
+	if data.Calculation == calc_api.FlangeRequest_basis {
 		result.Calc.Basis.MinB = minB
 		result.Calc.Basis.Pb1 = Pb1
 		result.Calc.Basis.Pb2 = Pb2
@@ -389,7 +390,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFl
 		)
 		result.Calc.Strength.Strength = append(result.Calc.Strength.Strength, strength1)
 
-		strength2 := &moment_api.StrengthResult{}
+		strength2 := &flange_model.StrengthResult{}
 		if len(data.FlangesData) > 1 {
 			strength2 = s.getCalculatedStrength(
 				d.Flange2,
@@ -419,7 +420,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFl
 			result.Calc.Strength.VTeta1 = true
 		}
 
-		if d.Type1 == moment_api.FlangeData_free && strength1.TetaK <= strength1.DTetaK {
+		if d.Type1 == flange_model.FlangeData_free && strength1.TetaK <= strength1.DTetaK {
 			result.Calc.Strength.VTetaK1 = true
 		}
 
@@ -428,7 +429,7 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFl
 				result.Calc.Strength.VTeta2 = true
 			}
 
-			if d.Type2 == moment_api.FlangeData_free && strength2.TetaK <= strength2.DTetaK {
+			if d.Type2 == flange_model.FlangeData_free && strength2.TetaK <= strength2.DTetaK {
 				result.Calc.Strength.VTetaK2 = true
 			}
 		}
@@ -447,18 +448,18 @@ func (s *FlangeService) Calculation(ctx context.Context, data *moment_api.CalcFl
 
 			if !data.IsSameFlange {
 				commonCond := result.Calc.Strength.VTeta1 && result.Calc.Strength.VTeta2
-				cond1 := commonCond && d.Type1 != moment_api.FlangeData_free && d.Type2 != moment_api.FlangeData_free
-				cond2 := commonCond && d.Type1 == moment_api.FlangeData_free && d.Type2 != moment_api.FlangeData_free && result.Calc.Strength.VTetaK1
-				cond3 := commonCond && d.Type1 != moment_api.FlangeData_free && d.Type2 == moment_api.FlangeData_free && result.Calc.Strength.VTetaK2
-				cond4 := commonCond && d.Type1 == moment_api.FlangeData_free && d.Type2 == moment_api.FlangeData_free &&
+				cond1 := commonCond && d.Type1 != flange_model.FlangeData_free && d.Type2 != flange_model.FlangeData_free
+				cond2 := commonCond && d.Type1 == flange_model.FlangeData_free && d.Type2 != flange_model.FlangeData_free && result.Calc.Strength.VTetaK1
+				cond3 := commonCond && d.Type1 != flange_model.FlangeData_free && d.Type2 == flange_model.FlangeData_free && result.Calc.Strength.VTetaK2
+				cond4 := commonCond && d.Type1 == flange_model.FlangeData_free && d.Type2 == flange_model.FlangeData_free &&
 					result.Calc.Strength.VTetaK1 && result.Calc.Strength.VTetaK2
 
 				if cond1 || cond2 || cond3 || cond4 {
 					ok = true
 				}
 			} else {
-				if (result.Calc.Strength.VTeta1 && d.Type1 != moment_api.FlangeData_free) ||
-					(result.Calc.Strength.VTeta1 && d.Type1 == moment_api.FlangeData_free && result.Calc.Strength.VTetaK1) {
+				if (result.Calc.Strength.VTeta1 && d.Type1 != flange_model.FlangeData_free) ||
+					(result.Calc.Strength.VTeta1 && d.Type1 == flange_model.FlangeData_free && result.Calc.Strength.VTetaK1) {
 					ok = true
 				}
 			}

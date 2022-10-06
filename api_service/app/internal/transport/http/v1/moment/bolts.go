@@ -6,7 +6,7 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,7 +33,7 @@ func (h *Handler) initBoltsRoutes(api *gin.RouterGroup) {
 // @Accept json
 // @Produce json
 // @Param isInch query bool false "is inch"
-// @Success 200 {object} models.DataResponse{Data=[]moment_api.Bolt}
+// @Success 200 {object} models.DataResponse{Data=[]flange_model.Bolt}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -50,7 +50,7 @@ func (h *Handler) getBolts(c *gin.Context) {
 		defIsInch = isInch
 	}
 
-	bolts, err := h.flangeClient.GetBolts(c, &moment_api.GetBoltsRequest{IsInch: defIsInch})
+	bolts, err := h.flangeClient.GetBolts(c, &flange_api.GetBoltsRequest{IsInch: defIsInch})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -67,13 +67,13 @@ func (h *Handler) getBolts(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param isInch query bool false "is inch"
-// @Success 200 {object} models.DataResponse{Data=[]moment_api.Bolt}
+// @Success 200 {object} models.DataResponse{Data=[]flange_model.Bolt}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/bolts/all [get]
 func (h *Handler) getAllBolts(c *gin.Context) {
-	bolts, err := h.flangeClient.GetAllBolts(c, &moment_api.GetBoltsRequest{})
+	bolts, err := h.flangeClient.GetAllBolts(c, &flange_api.GetBoltsRequest{})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -102,7 +102,7 @@ func (h *Handler) createBolt(c *gin.Context) {
 		return
 	}
 
-	_, err := h.flangeClient.CreateBolt(c, &moment_api.CreateBoltRequest{
+	_, err := h.flangeClient.CreateBolt(c, &flange_api.CreateBoltRequest{
 		Title:    dto.Title,
 		Diameter: dto.Diameter,
 		Area:     dto.Area,
@@ -136,9 +136,9 @@ func (h *Handler) createBolts(c *gin.Context) {
 		return
 	}
 
-	bolts := []*moment_api.CreateBoltRequest{}
+	bolts := []*flange_api.CreateBoltRequest{}
 	for _, bd := range dto {
-		bolts = append(bolts, &moment_api.CreateBoltRequest{
+		bolts = append(bolts, &flange_api.CreateBoltRequest{
 			Title:    bd.Title,
 			Diameter: bd.Diameter,
 			Area:     bd.Area,
@@ -146,7 +146,7 @@ func (h *Handler) createBolts(c *gin.Context) {
 		})
 	}
 
-	_, err := h.flangeClient.CreateBolts(c, &moment_api.CreateBoltsRequest{
+	_, err := h.flangeClient.CreateBolts(c, &flange_api.CreateBoltsRequest{
 		Bolts: bolts,
 	})
 	if err != nil {
@@ -184,7 +184,7 @@ func (h *Handler) updateBolt(c *gin.Context) {
 		return
 	}
 
-	_, err := h.flangeClient.UpdateBolt(c, &moment_api.UpdateBoltRequest{
+	_, err := h.flangeClient.UpdateBolt(c, &flange_api.UpdateBoltRequest{
 		Id:       id,
 		Title:    dto.Title,
 		Diameter: dto.Diameter,
@@ -219,7 +219,7 @@ func (h *Handler) deleteBolt(c *gin.Context) {
 		return
 	}
 
-	_, err := h.flangeClient.DeleteBolt(c, &moment_api.DeleteBoltRequest{Id: id})
+	_, err := h.flangeClient.DeleteBolt(c, &flange_api.DeleteBoltRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

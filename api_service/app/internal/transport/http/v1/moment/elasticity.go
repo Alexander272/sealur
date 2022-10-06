@@ -5,7 +5,8 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/models/material_model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,15 +39,15 @@ func (h *Handler) createElasticity(c *gin.Context) {
 		return
 	}
 
-	elasticity := make([]*moment_api.Elasticity, 0, len(dto.Elasticity))
+	elasticity := make([]*material_model.Elasticity, 0, len(dto.Elasticity))
 	for _, v := range dto.Elasticity {
-		elasticity = append(elasticity, &moment_api.Elasticity{
+		elasticity = append(elasticity, &material_model.Elasticity{
 			Temperature: v.Temperature,
 			Elasticity:  v.Elasticity,
 		})
 	}
 
-	_, err := h.materialsClient.CreateElasticity(c, &moment_api.CreateElasticityRequest{
+	_, err := h.materialsClient.CreateElasticity(c, &material_api.CreateElasticityRequest{
 		MarkId:     dto.MarkId,
 		Elasticity: elasticity,
 	})
@@ -85,7 +86,7 @@ func (h *Handler) updateElasticity(c *gin.Context) {
 		return
 	}
 
-	_, err := h.materialsClient.UpdateElasticity(c, &moment_api.UpdateElasticityRequest{
+	_, err := h.materialsClient.UpdateElasticity(c, &material_api.UpdateElasticityRequest{
 		Id:          id,
 		MarkId:      dto.MarkId,
 		Temperature: dto.Temperature,
@@ -119,7 +120,7 @@ func (h *Handler) deleteElasticity(c *gin.Context) {
 		return
 	}
 
-	_, err := h.materialsClient.DeleteElasticity(c, &moment_api.DeleteElasticityRequest{Id: id})
+	_, err := h.materialsClient.DeleteElasticity(c, &material_api.DeleteElasticityRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

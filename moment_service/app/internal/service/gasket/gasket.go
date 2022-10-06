@@ -7,7 +7,8 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur/moment_service/internal/repository"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
+	"github.com/Alexander272/sealur_proto/api/moment/models/gasket_model"
 )
 
 type GasketService struct {
@@ -28,14 +29,14 @@ func (s *GasketService) GetFullData(ctx context.Context, gasket models.GetGasket
 	return g, nil
 }
 
-func (s *GasketService) GetData(ctx context.Context, gasket *moment_api.GetFullDataRequest) (*moment_api.FullDataResponse, error) {
+func (s *GasketService) GetData(ctx context.Context, gasket *gasket_api.GetFullDataRequest) (*gasket_api.FullDataResponse, error) {
 	gasketData, err := s.repo.GetGasketData(ctx, gasket.GasketId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get gasket data. error: %w", err)
 	}
-	GasketData := []*moment_api.Full_GasketData{}
+	GasketData := []*gasket_model.Full_GasketData{}
 	for _, gdd := range gasketData {
-		GasketData = append(GasketData, &moment_api.Full_GasketData{
+		GasketData = append(GasketData, &gasket_model.Full_GasketData{
 			Id:              gdd.Id,
 			GasketId:        gdd.GasketId,
 			PermissiblePres: gdd.PermissiblePres,
@@ -46,13 +47,13 @@ func (s *GasketService) GetData(ctx context.Context, gasket *moment_api.GetFullD
 		})
 	}
 
-	gasketType, err := s.repo.GetTypeGasket(ctx, &moment_api.GetGasketTypeRequest{})
+	gasketType, err := s.repo.GetTypeGasket(ctx, &gasket_api.GetGasketTypeRequest{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get type gasket. error: %w", err)
 	}
-	GasketType := []*moment_api.GasketType{}
+	GasketType := []*gasket_model.GasketType{}
 	for _, tgd := range gasketType {
-		GasketType = append(GasketType, &moment_api.GasketType{
+		GasketType = append(GasketType, &gasket_model.GasketType{
 			Id:    tgd.Id,
 			Title: tgd.Title,
 			Label: tgd.Label,
@@ -63,9 +64,9 @@ func (s *GasketService) GetData(ctx context.Context, gasket *moment_api.GetFullD
 	if err != nil {
 		return nil, fmt.Errorf("failed to get env data. error: %w", err)
 	}
-	EnvData := []*moment_api.Full_EnvData{}
+	EnvData := []*gasket_model.Full_EnvData{}
 	for _, edd := range envData {
-		EnvData = append(EnvData, &moment_api.Full_EnvData{
+		EnvData = append(EnvData, &gasket_model.Full_EnvData{
 			Id:           edd.Id,
 			GasketId:     edd.GasketId,
 			EnvId:        edd.EnvId,
@@ -74,19 +75,19 @@ func (s *GasketService) GetData(ctx context.Context, gasket *moment_api.GetFullD
 		})
 	}
 
-	envType, err := s.repo.GetEnv(ctx, &moment_api.GetEnvRequest{})
+	envType, err := s.repo.GetEnv(ctx, &gasket_api.GetEnvRequest{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get type env. error: %w", err)
 	}
-	EnvType := []*moment_api.Env{}
+	EnvType := []*gasket_model.Env{}
 	for _, tgd := range envType {
-		EnvType = append(EnvType, &moment_api.Env{
+		EnvType = append(EnvType, &gasket_model.Env{
 			Id:    tgd.Id,
 			Title: tgd.Title,
 		})
 	}
 
-	data := moment_api.FullDataResponse{
+	data := gasket_api.FullDataResponse{
 		GasketData: GasketData,
 		GasketType: GasketType,
 		EnvData:    EnvData,
@@ -96,14 +97,14 @@ func (s *GasketService) GetData(ctx context.Context, gasket *moment_api.GetFullD
 	return &data, nil
 }
 
-func (s *GasketService) GetGasket(ctx context.Context, req *moment_api.GetGasketRequest) (gasket []*moment_api.Gasket, err error) {
+func (s *GasketService) GetGasket(ctx context.Context, req *gasket_api.GetGasketRequest) (gasket []*gasket_model.Gasket, err error) {
 	data, err := s.repo.GetGasket(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get gasket. error: %w", err)
 	}
 
 	for _, item := range data {
-		gasket = append(gasket, &moment_api.Gasket{
+		gasket = append(gasket, &gasket_model.Gasket{
 			Id:    item.Id,
 			Title: item.Title,
 		})
@@ -112,7 +113,7 @@ func (s *GasketService) GetGasket(ctx context.Context, req *moment_api.GetGasket
 	return gasket, nil
 }
 
-func (s *GasketService) GetGasketWithThick(ctx context.Context, req *moment_api.GetGasketRequest) (gasket []*moment_api.GasketWithThick, err error) {
+func (s *GasketService) GetGasketWithThick(ctx context.Context, req *gasket_api.GetGasketRequest) (gasket []*gasket_model.GasketWithThick, err error) {
 	data, err := s.repo.GetGasketWithThick(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get gasket. error: %w", err)
@@ -123,7 +124,7 @@ func (s *GasketService) GetGasketWithThick(ctx context.Context, req *moment_api.
 		item.Thickness = math.Round(item.Thickness*1000) / 1000
 		if item.Id != curId {
 			curId = item.Id
-			gasket = append(gasket, &moment_api.GasketWithThick{
+			gasket = append(gasket, &gasket_model.GasketWithThick{
 				Id:    item.Id,
 				Title: item.Title,
 			})
@@ -136,7 +137,7 @@ func (s *GasketService) GetGasketWithThick(ctx context.Context, req *moment_api.
 	return gasket, nil
 }
 
-func (s *GasketService) CreateGasket(ctx context.Context, gasket *moment_api.CreateGasketRequest) (id string, err error) {
+func (s *GasketService) CreateGasket(ctx context.Context, gasket *gasket_api.CreateGasketRequest) (id string, err error) {
 	id, err = s.repo.CreateGasket(ctx, gasket)
 	if err != nil {
 		return "", fmt.Errorf("failed to create gasket. error: %w", err)
@@ -144,14 +145,14 @@ func (s *GasketService) CreateGasket(ctx context.Context, gasket *moment_api.Cre
 	return id, nil
 }
 
-func (s *GasketService) UpdateGasket(ctx context.Context, gasket *moment_api.UpdateGasketRequest) error {
+func (s *GasketService) UpdateGasket(ctx context.Context, gasket *gasket_api.UpdateGasketRequest) error {
 	if err := s.repo.UpdateGasket(ctx, gasket); err != nil {
 		return fmt.Errorf("failed to update gasket. error: %w", err)
 	}
 	return nil
 }
 
-func (s *GasketService) DeleteGasket(ctx context.Context, gasket *moment_api.DeleteGasketRequest) error {
+func (s *GasketService) DeleteGasket(ctx context.Context, gasket *gasket_api.DeleteGasketRequest) error {
 	if err := s.repo.DeleteGasket(ctx, gasket); err != nil {
 		return fmt.Errorf("failed to delete gasket. error: %w", err)
 	}
@@ -159,35 +160,35 @@ func (s *GasketService) DeleteGasket(ctx context.Context, gasket *moment_api.Del
 }
 
 //---
-func (s *GasketService) CreateManyGasketData(ctx context.Context, data *moment_api.CreateManyGasketDataRequest) error {
+func (s *GasketService) CreateManyGasketData(ctx context.Context, data *gasket_api.CreateManyGasketDataRequest) error {
 	if err := s.repo.CreateManyGasketData(ctx, data); err != nil {
 		return fmt.Errorf("failed to create many gasket data. error: %w", err)
 	}
 	return nil
 }
 
-func (s *GasketService) CreateGasketData(ctx context.Context, data *moment_api.CreateGasketDataRequest) error {
+func (s *GasketService) CreateGasketData(ctx context.Context, data *gasket_api.CreateGasketDataRequest) error {
 	if err := s.repo.CreateGasketData(ctx, data); err != nil {
 		return fmt.Errorf("failed to create gasket data. error: %w", err)
 	}
 	return nil
 }
 
-func (s *GasketService) UpdateGasketData(ctx context.Context, data *moment_api.UpdateGasketDataRequest) error {
+func (s *GasketService) UpdateGasketData(ctx context.Context, data *gasket_api.UpdateGasketDataRequest) error {
 	if err := s.repo.UpdateGasketData(ctx, data); err != nil {
 		return fmt.Errorf("failed to update gasket data. error: %w", err)
 	}
 	return nil
 }
 
-func (s *GasketService) UpdateGasketTypeId(ctx context.Context, data *moment_api.UpdateGasketTypeIdRequest) error {
+func (s *GasketService) UpdateGasketTypeId(ctx context.Context, data *gasket_api.UpdateGasketTypeIdRequest) error {
 	if err := s.repo.UpdateGasketTypeId(ctx, data); err != nil {
 		return fmt.Errorf("failed to update gasket data. error: %w", err)
 	}
 	return nil
 }
 
-func (s *GasketService) DeleteGasketData(ctx context.Context, data *moment_api.DeleteGasketDataRequest) error {
+func (s *GasketService) DeleteGasketData(ctx context.Context, data *gasket_api.DeleteGasketDataRequest) error {
 	if err := s.repo.DeleteGasketData(ctx, data); err != nil {
 		return fmt.Errorf("failed to delete gasket data. error: %w", err)
 	}

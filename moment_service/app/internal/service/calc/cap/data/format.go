@@ -1,8 +1,11 @@
 package data
 
-import "github.com/Alexander272/sealur_proto/api/moment_api"
+import (
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
+)
 
-func (s *DataService) FormatInitData(data *moment_api.CalcCapRequest) *moment_api.DataResult {
+func (s *DataService) FormatInitData(data *calc_api.CapRequest) *cap_model.DataResult {
 	work := map[bool]string{
 		true:  "Рабочие условия",
 		false: "Условия испытаний",
@@ -26,7 +29,7 @@ func (s *DataService) FormatInitData(data *moment_api.CalcCapRequest) *moment_ap
 		"controllablePin": "Контроль по вытяжке шпилек",
 	}
 
-	res := &moment_api.DataResult{
+	res := &cap_model.DataResult{
 		Pressure:   data.Pressure,
 		AxialForce: data.AxialForce,
 		Temp:       data.Temp,

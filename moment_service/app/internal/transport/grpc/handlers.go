@@ -3,59 +3,58 @@ package grpc
 import (
 	"github.com/Alexander272/sealur/moment_service/internal/config"
 	"github.com/Alexander272/sealur/moment_service/internal/service"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
+	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
+	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/read_api"
 )
 
 type Ping interface {
-	moment_api.PingServiceServer
+	moment.PingServiceServer
 }
 
-type CalcFlange interface {
-	moment_api.CalcFlangeServiceServer
-}
-
-type CalcCap interface {
-	moment_api.CalcCapServiceServer
+type Calc interface {
+	calc_api.CalcServiceServer
 }
 
 type Materials interface {
-	moment_api.MaterialsServiceServer
+	material_api.MaterialsServiceServer
 }
 
 type Gasket interface {
-	moment_api.GasketServiceServer
+	gasket_api.GasketServiceServer
 }
 
 type Flange interface {
-	moment_api.FlangeServiceServer
+	flange_api.FlangeServiceServer
 }
 
 type Read interface {
-	moment_api.ReadServiceServer
+	read_api.ReadServiceServer
 }
 
 type Handler struct {
 	service *service.Services
 	conf    config.ApiConfig
 	Ping
-	CalcFlange
-	CalcCap
 	Materials
 	Gasket
 	Flange
 	Read
+	Calc
 }
 
 func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 	return &Handler{
-		service:    service,
-		conf:       conf,
-		Ping:       NewPingHandlers(),
-		CalcFlange: NewCalcFlangeHandlers(service.CalcFlange),
-		CalcCap:    NewCalcCapHandlers(service.CalcCap),
-		Materials:  NewMaterialsHandlers(service.Materials),
-		Gasket:     NewGasketService(service.Gasket),
-		Flange:     NewFlangeHandlers(service.Flange),
-		Read:       NewReadHandlers(service.Read),
+		service:   service,
+		conf:      conf,
+		Ping:      NewPingHandlers(),
+		Materials: NewMaterialsHandlers(service.Materials),
+		Gasket:    NewGasketService(service.Gasket),
+		Flange:    NewFlangeHandlers(service.Flange),
+		Read:      NewReadHandlers(service.Read),
+		Calc:      NewCalcHandlers(service.Calc),
 	}
 }

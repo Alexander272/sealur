@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/Alexander272/sealur/moment_service/internal/service"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/read_api"
 )
 
 type ReadHandlers struct {
 	service service.Read
-	moment_api.UnimplementedReadServiceServer
+	read_api.UnimplementedReadServiceServer
 }
 
 func NewReadHandlers(service service.Read) *ReadHandlers {
@@ -18,7 +18,7 @@ func NewReadHandlers(service service.Read) *ReadHandlers {
 	}
 }
 
-func (h *ReadHandlers) GetFlange(ctx context.Context, req *moment_api.GetFlangeRequest) (*moment_api.GetFlangeResponse, error) {
+func (h *ReadHandlers) GetFlange(ctx context.Context, req *read_api.GetFlangeRequest) (*read_api.GetFlangeResponse, error) {
 	res, err := h.service.Get(ctx, req)
 	if err != nil {
 		return nil, err

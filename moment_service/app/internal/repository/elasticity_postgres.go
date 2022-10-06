@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/material_api"
 )
 
-func (r *MaterialsRepo) CreateElasticity(ctx context.Context, elasticity *moment_api.CreateElasticityRequest) error {
+func (r *MaterialsRepo) CreateElasticity(ctx context.Context, elasticity *material_api.CreateElasticityRequest) error {
 	query := fmt.Sprintf("INSERT INTO %s (mark_id, temperature, elasticity) VALUES ($1, $2, $3)", ElasticityTable)
 
 	args := make([]interface{}, 0)
@@ -27,7 +27,7 @@ func (r *MaterialsRepo) CreateElasticity(ctx context.Context, elasticity *moment
 	return nil
 }
 
-func (r *MaterialsRepo) UpdateElasticity(ctx context.Context, elasticity *moment_api.UpdateElasticityRequest) error {
+func (r *MaterialsRepo) UpdateElasticity(ctx context.Context, elasticity *material_api.UpdateElasticityRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET temperature=$1, elasticity=$2 WHERE id=$3", ElasticityTable)
 
 	_, err := r.db.Exec(query, elasticity.Temperature, elasticity.Elasticity, elasticity.Id)
@@ -38,7 +38,7 @@ func (r *MaterialsRepo) UpdateElasticity(ctx context.Context, elasticity *moment
 	return nil
 }
 
-func (r *MaterialsRepo) DeleteElasticity(ctx context.Context, elasticity *moment_api.DeleteElasticityRequest) error {
+func (r *MaterialsRepo) DeleteElasticity(ctx context.Context, elasticity *material_api.DeleteElasticityRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", ElasticityTable)
 
 	if _, err := r.db.Exec(query, elasticity.Id); err != nil {

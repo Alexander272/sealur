@@ -6,15 +6,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
 func (s *FormulasService) getFlangeFormulas(
-	typeF moment_api.FlangeData_Type,
-	data *moment_api.FlangeResult,
+	typeF flange_model.FlangeData_Type,
+	data *flange_model.FlangeResult,
 	D6, DOut, Dcp string,
-) *moment_api.FlangeFormulas {
-	f := &moment_api.FlangeFormulas{}
+) *flange_model.FlangeFormulas {
+	f := &flange_model.FlangeFormulas{}
 
 	dk := strings.ReplaceAll(strconv.FormatFloat(data.Dk, 'G', 3, 64), "E", "*10^")
 	ds := strings.ReplaceAll(strconv.FormatFloat(data.Ds, 'G', 3, 64), "E", "*10^")
@@ -41,7 +41,7 @@ func (s *FormulasService) getFlangeFormulas(
 	hk := strings.ReplaceAll(strconv.FormatFloat(data.Hk, 'G', 3, 64), "E", "*10^")
 	psik := strings.ReplaceAll(strconv.FormatFloat(data.Psik, 'G', 3, 64), "E", "*10^")
 
-	if typeF != moment_api.FlangeData_free {
+	if typeF != flange_model.FlangeData_free {
 		f.B = fmt.Sprintf("0.5 * (%s - %s)", D6, Dcp)
 	} else {
 		Ds := fmt.Sprintf("0.5 * (%s + %s + 2*%s)", DOut, dk, h0)
@@ -49,7 +49,7 @@ func (s *FormulasService) getFlangeFormulas(
 		f.B = fmt.Sprintf("0.5 * (%s - %s)", Ds, Dcp)
 	}
 
-	if typeF == moment_api.FlangeData_welded {
+	if typeF == flange_model.FlangeData_welded {
 		f.X = fmt.Sprintf("%s / Sqrt(%s * %s)", l, d, s0)
 		f.Beta = fmt.Sprintf("%s / %s", s1, s0)
 		f.Xi = fmt.Sprintf("1 + (%s - 1) * %s / (%s + (1 + %s)/4)", beta, x, x, beta)
@@ -64,12 +64,12 @@ func (s *FormulasService) getFlangeFormulas(
 		betaF, h, l0, betaT, l0, betaV, h, betaU, l0, s0)
 	f.Yf = fmt.Sprintf("(0.91 * %s)/(%s * %s * %s^2) * %s", betaV, epsilonAt20, lymda, s0, l0)
 
-	if typeF == moment_api.FlangeData_free {
+	if typeF == flange_model.FlangeData_free {
 		f.Psik = fmt.Sprintf("1.28 * (log(%s/%s) / log(10))", dnk, dk)
 		f.Yk = fmt.Sprintf("1 / (%s * %s^3 * %s)", epsilonKAt20, hk, psik)
 	}
 
-	if typeF != moment_api.FlangeData_free {
+	if typeF != flange_model.FlangeData_free {
 		f.Yfn = fmt.Sprintf("(%f/4)^3 * (%s / (%s * %s * %s^3))", math.Pi, D6, epsilonAt20, DOut, h)
 	} else {
 		f.Yfn = fmt.Sprintf("(%f/4)^3 * (%s / (%s * %s * %s^3))", math.Pi, ds, epsilonAt20, DOut, h)

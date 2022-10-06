@@ -7,7 +7,7 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur/moment_service/pkg/logger"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -19,7 +19,7 @@ func NewFlangeRepo(db *sqlx.DB) *FlangeRepo {
 	return &FlangeRepo{db: db}
 }
 
-func (r *FlangeRepo) GetFlangeSize(ctx context.Context, req *moment_api.GetFlangeSizeRequest) (size models.FlangeSize, err error) {
+func (r *FlangeRepo) GetFlangeSize(ctx context.Context, req *flange_api.GetFlangeSizeRequest) (size models.FlangeSize, err error) {
 	query := fmt.Sprintf(`SELECT %s.id, pn, d, d6, d_out, x, a, h, s0, s1, length, count, diameter, area FROM %s
 		INNER JOIN %s on bolt_id=%s.id WHERE stand_id=$1 AND dn=$2 AND pn=$3 AND row=$4`,
 		FlangeSizeTable, FlangeSizeTable, BoltsTable, BoltsTable)
@@ -55,7 +55,7 @@ func (r *FlangeRepo) GetBasisFlangeSizes(ctx context.Context, req models.GetBasi
 	return sizes, nil
 }
 
-func (r *FlangeRepo) GetFullFlangeSize(ctx context.Context, req *moment_api.GetFullFlangeSizeRequest, row int32) (size []models.FlangeSizeDTO, err error) {
+func (r *FlangeRepo) GetFullFlangeSize(ctx context.Context, req *flange_api.GetFullFlangeSizeRequest, row int32) (size []models.FlangeSizeDTO, err error) {
 	query := fmt.Sprintf(`SELECT id, stand_id, pn, dn, dmm, d, d6, d_out, x, a, h, s0, s1, length, count, bolt_id 
 		FROM %s WHERE stand_id=$1 AND row=$2`, FlangeSizeTable)
 
@@ -65,7 +65,7 @@ func (r *FlangeRepo) GetFullFlangeSize(ctx context.Context, req *moment_api.GetF
 	return size, nil
 }
 
-func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_api.CreateFlangeSizeRequest) error {
+func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *flange_api.CreateFlangeSizeRequest) error {
 	query := fmt.Sprintf(`INSERT INTO %s (stand_id, pn, dn, dmm, d, d6, d_out, x, a, h, s0, s1, length, count, bolt_id, row)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`, FlangeSizeTable)
 
@@ -77,7 +77,7 @@ func (r *FlangeRepo) CreateFlangeSize(ctx context.Context, size *moment_api.Crea
 	return nil
 }
 
-func (r *FlangeRepo) CreateFlangeSizes(ctx context.Context, size *moment_api.CreateFlangeSizesRequest) error {
+func (r *FlangeRepo) CreateFlangeSizes(ctx context.Context, size *flange_api.CreateFlangeSizesRequest) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 
@@ -97,7 +97,7 @@ func (r *FlangeRepo) CreateFlangeSizes(ctx context.Context, size *moment_api.Cre
 	return nil
 }
 
-func (r *FlangeRepo) UpdateFlangeSize(ctx context.Context, size *moment_api.UpdateFlangeSizeRequest) error {
+func (r *FlangeRepo) UpdateFlangeSize(ctx context.Context, size *flange_api.UpdateFlangeSizeRequest) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1
@@ -191,7 +191,7 @@ func (r *FlangeRepo) UpdateFlangeSize(ctx context.Context, size *moment_api.Upda
 	return nil
 }
 
-func (r *FlangeRepo) DeleteFlangeSize(ctx context.Context, size *moment_api.DeleteFlangeSizeRequest) error {
+func (r *FlangeRepo) DeleteFlangeSize(ctx context.Context, size *flange_api.DeleteFlangeSizeRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", FlangeSizeTable)
 
 	if _, err := r.db.Exec(query, size.Id); err != nil {

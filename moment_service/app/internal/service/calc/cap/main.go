@@ -11,7 +11,8 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
 type CapService struct {
@@ -55,16 +56,16 @@ func NewCapService(graphic *graphic.GraphicService, flange *flange.FlangeService
 }
 
 // расчет по ГОСТ 34233.4 - 2017
-func (s *CapService) Calculation(ctx context.Context, data *moment_api.CalcCapRequest) (*moment_api.CapResponse, error) {
+func (s *CapService) CalculationCap(ctx context.Context, data *calc_api.CapRequest) (*calc_api.CapResponse, error) {
 	d, err := s.data.GetData(ctx, data)
 	if err != nil {
 		return nil, err
 	}
 
-	result := moment_api.CapResponse{
+	result := calc_api.CapResponse{
 		Data:   s.data.FormatInitData(data),
 		Bolt:   d.Bolt,
-		Calc:   &moment_api.CalculatedCap{},
+		Calc:   &cap_model.CalculatedCap{},
 		Flange: d.Flange,
 		Cap:    d.Cap,
 		Embed:  d.Embed,
@@ -75,15 +76,15 @@ func (s *CapService) Calculation(ctx context.Context, data *moment_api.CalcCapRe
 		result.Washers = append(result.Washers, d.Washer1, d.Washer2)
 	}
 
-	if data.Calculation == moment_api.CalcCapRequest_basis {
-		result.Calc.Basis = &moment_api.CalcMomentBasis{}
+	if data.Calculation == calc_api.CapRequest_basis {
+		result.Calc.Basis = &cap_model.CalcMomentBasis{}
 	} else {
-		result.Calc.Strength = &moment_api.CalcMomentStrength{}
+		result.Calc.Strength = &cap_model.CalcMomentStrength{}
 	}
 
 	Lb0 := d.Gasket.Thickness + d.Flange.H + d.Cap.H
 
-	if d.FType == moment_api.FlangeData_free {
+	if d.FType == cap_model.FlangeData_free {
 		Lb0 += d.Flange.Hk
 	}
 
@@ -105,7 +106,7 @@ func (s *CapService) Calculation(ctx context.Context, data *moment_api.CalcCapRe
 	result.Calc.A = Ab
 
 	var alpha float64
-	if d.TypeGasket == "Oval" || d.FType == moment_api.FlangeData_free {
+	if d.TypeGasket == "Oval" || d.FType == cap_model.FlangeData_free {
 		// Для фланцев с овальными и восьмигранными прокладками и для свободных фланцев коэффициенты жесткости фланцевого соединения принимают равными 1.
 		alpha = 1
 	} else {
@@ -139,7 +140,7 @@ func (s *CapService) Calculation(ctx context.Context, data *moment_api.CalcCapRe
 	Pb2 := math.Max(Pobg, minB)
 	Pb1 := alpha*(Qd+float64(data.AxialForce)) + Rp
 
-	if data.Calculation != moment_api.CalcCapRequest_basis {
+	if data.Calculation != calc_api.CapRequest_basis {
 		result.Calc.Strength.MinB = minB
 		result.Calc.Strength.FPb1 = Pb1
 		result.Calc.Strength.FPb2 = Pb2
@@ -200,7 +201,7 @@ func (s *CapService) Calculation(ctx context.Context, data *moment_api.CalcCapRe
 	divider = yp + yb*d.Bolt.EpsilonAt20/d.Bolt.Epsilon + (d.Flange.Yf*d.Flange.EpsilonAt20/d.Flange.Epsilon)*math.Pow(d.Flange.B, 2) +
 		+(d.Cap.Y*d.Cap.EpsilonAt20/d.Cap.Epsilon)*math.Pow(d.Flange.B, 2)
 
-	if d.FType == moment_api.FlangeData_free {
+	if d.FType == cap_model.FlangeData_free {
 		divider += (d.Flange.Yk * d.Flange.EpsilonKAt20 / d.Flange.EpsilonK) * math.Pow(d.Flange.A, 2)
 	}
 
@@ -215,7 +216,7 @@ func (s *CapService) Calculation(ctx context.Context, data *moment_api.CalcCapRe
 	}
 	temp2 = d.Flange.H + d.Flange.H
 
-	if d.FType == moment_api.FlangeData_free {
+	if d.FType == cap_model.FlangeData_free {
 		temp1 += d.Flange.AlphaK * d.Flange.Hk * (d.Flange.Tk - 20)
 		temp2 += d.Flange.Hk
 	}
@@ -258,7 +259,7 @@ func (s *CapService) Calculation(ctx context.Context, data *moment_api.CalcCapRe
 		v_sigmab2 = true
 	}
 
-	if data.Calculation == moment_api.CalcCapRequest_basis {
+	if data.Calculation == calc_api.CapRequest_basis {
 		result.Calc.Basis.MinB = minB
 		result.Calc.Basis.Pb1 = Pb1
 		result.Calc.Basis.Pb2 = Pb2
@@ -338,7 +339,7 @@ func (s *CapService) Calculation(ctx context.Context, data *moment_api.CalcCapRe
 			result.Calc.Strength.VTeta1 = true
 		}
 
-		if d.FType == moment_api.FlangeData_free && strength1.TetaK <= strength1.DTetaK {
+		if d.FType == cap_model.FlangeData_free && strength1.TetaK <= strength1.DTetaK {
 			result.Calc.Strength.VTetaK1 = true
 		}
 
@@ -353,8 +354,8 @@ func (s *CapService) Calculation(ctx context.Context, data *moment_api.CalcCapRe
 		if (v_sigmab1 && v_sigmab2 && d.TypeGasket != "Soft") ||
 			(v_sigmab1 && v_sigmab2 && qmax <= float64(d.Gasket.PermissiblePres) && d.TypeGasket == "Soft") {
 
-			if (result.Calc.Strength.VTeta1 && d.FType != moment_api.FlangeData_free) ||
-				(result.Calc.Strength.VTeta1 && d.FType == moment_api.FlangeData_free && result.Calc.Strength.VTetaK1) {
+			if (result.Calc.Strength.VTeta1 && d.FType != cap_model.FlangeData_free) ||
+				(result.Calc.Strength.VTeta1 && d.FType == cap_model.FlangeData_free && result.Calc.Strength.VTetaK1) {
 
 				Prek := 0.8 * Ab * d.Bolt.SigmaAt20
 				result.Calc.Strength.Qrek = Prek / (math.Pi * d.Dcp * d.Gasket.Width)

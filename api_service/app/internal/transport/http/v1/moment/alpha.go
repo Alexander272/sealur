@@ -5,7 +5,8 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/models/material_model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,15 +39,15 @@ func (h *Handler) createAlpha(c *gin.Context) {
 		return
 	}
 
-	alpha := make([]*moment_api.Alpha, 0, len(dto.Alpha))
+	alpha := make([]*material_model.Alpha, 0, len(dto.Alpha))
 	for _, v := range dto.Alpha {
-		alpha = append(alpha, &moment_api.Alpha{
+		alpha = append(alpha, &material_model.Alpha{
 			Temperature: v.Temperature,
 			Alpha:       v.Alpha,
 		})
 	}
 
-	_, err := h.materialsClient.CreateAlpha(c, &moment_api.CreateAlphaRequest{
+	_, err := h.materialsClient.CreateAlpha(c, &material_api.CreateAlphaRequest{
 		MarkId: dto.MarkId,
 		Alpha:  alpha,
 	})
@@ -85,7 +86,7 @@ func (h *Handler) updateAlpha(c *gin.Context) {
 		return
 	}
 
-	_, err := h.materialsClient.UpdateAlpha(c, &moment_api.UpdateAlphaRequest{
+	_, err := h.materialsClient.UpdateAlpha(c, &material_api.UpdateAlphaRequest{
 		Id:          id,
 		MarkId:      dto.MarkId,
 		Temperature: dto.Temperature,
@@ -119,7 +120,7 @@ func (h *Handler) deleteAlpha(c *gin.Context) {
 		return
 	}
 
-	_, err := h.materialsClient.DeleteAlpha(c, &moment_api.DeleteAlphaRequest{Id: id})
+	_, err := h.materialsClient.DeleteAlpha(c, &material_api.DeleteAlphaRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

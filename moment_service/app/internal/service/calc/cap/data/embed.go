@@ -3,16 +3,16 @@ package data
 import (
 	"context"
 
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
-func (s *DataService) getEmbedData(ctx context.Context, data *moment_api.EmbedData, temp float64) (*moment_api.EmbedResult, error) {
+func (s *DataService) getEmbedData(ctx context.Context, data *cap_model.EmbedData, temp float64) (*cap_model.EmbedResult, error) {
 	if data.MarkId != "another" {
 		washer, err := s.materials.GetMatFotCalculate(ctx, data.MarkId, temp)
 		if err != nil {
 			return nil, err
 		}
-		res := &moment_api.EmbedResult{
+		res := &cap_model.EmbedResult{
 			Material:  washer.Title,
 			Thickness: data.Thickness,
 			Alpha:     washer.AlphaF,
@@ -21,7 +21,7 @@ func (s *DataService) getEmbedData(ctx context.Context, data *moment_api.EmbedDa
 		return res, nil
 	}
 
-	res := &moment_api.EmbedResult{
+	res := &cap_model.EmbedResult{
 		Material:  data.Material.Title,
 		Thickness: data.Thickness,
 		Alpha:     data.Material.AlphaF,

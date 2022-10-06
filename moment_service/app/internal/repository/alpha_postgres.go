@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/material_api"
 )
 
-func (r *MaterialsRepo) CreateAlpha(ctx context.Context, alpha *moment_api.CreateAlphaRequest) error {
+func (r *MaterialsRepo) CreateAlpha(ctx context.Context, alpha *material_api.CreateAlphaRequest) error {
 	query := fmt.Sprintf("INSERT INTO %s (mark_id, temperature, alpha) VALUES ($1, $2, $3)", AlphaTable)
 
 	args := make([]interface{}, 0)
@@ -27,7 +27,7 @@ func (r *MaterialsRepo) CreateAlpha(ctx context.Context, alpha *moment_api.Creat
 	return nil
 }
 
-func (r *MaterialsRepo) UpateAlpha(ctx context.Context, alpha *moment_api.UpdateAlphaRequest) error {
+func (r *MaterialsRepo) UpateAlpha(ctx context.Context, alpha *material_api.UpdateAlphaRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET temperature=$1, alpha=$2 WHERE id=$3", AlphaTable)
 
 	_, err := r.db.Exec(query, alpha.Temperature, alpha.Alpha, alpha.Id)
@@ -38,7 +38,7 @@ func (r *MaterialsRepo) UpateAlpha(ctx context.Context, alpha *moment_api.Update
 	return nil
 }
 
-func (r *MaterialsRepo) DeleteAlpha(ctx context.Context, alpha *moment_api.DeleteAlphaRequest) error {
+func (r *MaterialsRepo) DeleteAlpha(ctx context.Context, alpha *material_api.DeleteAlphaRequest) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", AlphaTable)
 
 	if _, err := r.db.Exec(query, alpha.Id); err != nil {

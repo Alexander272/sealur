@@ -4,21 +4,21 @@ import (
 	"math"
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
 // расчеты если выполняется прочностной расчет
 func (s *CapService) getCalculatedStrength(
-	flange *moment_api.FlangeResult,
-	bolt *moment_api.BoltResult,
-	typeF moment_api.FlangeData_Type,
+	flange *cap_model.FlangeResult,
+	bolt *cap_model.BoltResult,
+	typeF cap_model.FlangeData_Type,
 	M, Pressure, Qd, Dcp, SigmaB, Pbm, Pbr, QFM float64,
 	AxialForce, BendingMoment int32,
 	isWork, isTemp bool,
-) *moment_api.StrengthResult {
+) *cap_model.StrengthResult {
 	//* большинтсво переменный называются +- так же как и в оригинале
 
-	strength := &moment_api.StrengthResult{}
+	strength := &cap_model.StrengthResult{}
 	teta := map[bool]float64{
 		true:  constants.WorkTeta,
 		false: constants.TestTeta,
@@ -42,7 +42,7 @@ func (s *CapService) getCalculatedStrength(
 	strength.Cf = math.Max(1, math.Sqrt(temp1/temp2))
 
 	var Dzv float64
-	if typeF == moment_api.FlangeData_welded && flange.D <= 20*flange.S1 {
+	if typeF == cap_model.FlangeData_welded && flange.D <= 20*flange.S1 {
 		if flange.F > 1 {
 			Dzv = flange.D + flange.S0
 		} else {
@@ -57,12 +57,12 @@ func (s *CapService) getCalculatedStrength(
 	strength.Mp = strength.Cf * math.Max(Pbr*flange.B+(Qd+QFM)*flange.E, math.Abs(Qd+QFM)*flange.E)
 
 	var sigmaM1, sigmaM0 float64
-	if typeF == moment_api.FlangeData_free {
+	if typeF == cap_model.FlangeData_free {
 		strength.MMk = strength.Cf * Pbm * flange.A
 		strength.Mpk = strength.Cf * Pbr * flange.A
 	}
 
-	if typeF == moment_api.FlangeData_welded && flange.S1 != flange.S0 {
+	if typeF == cap_model.FlangeData_welded && flange.S1 != flange.S0 {
 		sigmaM1 = strength.MM / (flange.Lymda * math.Pow(flange.S1-flange.C, 2) * Dzv)
 		sigmaM0 = flange.F * sigmaM1
 	} else {
@@ -77,11 +77,11 @@ func (s *CapService) getCalculatedStrength(
 	strength.SigmaT = sigmaT
 
 	var sigmaK, sigmaP1, sigmaP0, sigmaMp, sigmaMpm float64
-	if typeF == moment_api.FlangeData_free {
+	if typeF == cap_model.FlangeData_free {
 		sigmaK = flange.BetaY * strength.MMk / (math.Pow(flange.Hk, 2) * flange.Dk)
 	}
 
-	if typeF == moment_api.FlangeData_welded && flange.S1 != flange.S0 {
+	if typeF == cap_model.FlangeData_welded && flange.S1 != flange.S0 {
 		sigmaP1 = strength.Mp / (flange.Lymda * math.Pow(flange.S1-flange.C, 2) * Dzv)
 		sigmaP0 = flange.F * sigmaP1
 	} else {
@@ -90,7 +90,7 @@ func (s *CapService) getCalculatedStrength(
 		sigmaP0 = sigmaP1
 	}
 
-	if typeF == moment_api.FlangeData_welded {
+	if typeF == cap_model.FlangeData_welded {
 		temp := math.Pi * (flange.D + flange.S1) * (flange.S1 - flange.C)
 		// формула (ф. 37)
 		sigmaMp = (0.785*math.Pow(flange.D, 2)*Pressure + float64(AxialForce) +
@@ -111,11 +111,11 @@ func (s *CapService) getCalculatedStrength(
 	sigmaTp := flange.BetaY*strength.Mp/(math.Pow(flange.H, 2)*flange.D) - flange.BetaZ*sigmaRp
 
 	var sigmaKp float64
-	if typeF == moment_api.FlangeData_free {
+	if typeF == cap_model.FlangeData_free {
 		sigmaKp = flange.BetaY * strength.Mp / (math.Pow(flange.Hk, 2) * flange.Dk)
 	}
 
-	if typeF == moment_api.FlangeData_welded {
+	if typeF == cap_model.FlangeData_welded {
 		if flange.D <= constants.MinD {
 			strength.DTeta = constants.MinDTetta
 		} else if flange.D > constants.MaxD {
@@ -131,14 +131,14 @@ func (s *CapService) getCalculatedStrength(
 
 	strength.Teta = strength.Mp * flange.Yf * flange.EpsilonAt20 / flange.Epsilon
 
-	if typeF == moment_api.FlangeData_free {
+	if typeF == cap_model.FlangeData_free {
 		//strength.DTetaK = 0.002
 		strength.DTetaK = 0.02
 		strength.DTetaK = teta[isWork] * strength.DTetaK
 		strength.TetaK = strength.Mpk * flange.Yk * flange.EpsilonKAt20 / flange.EpsilonK
 	}
 
-	if typeF == moment_api.FlangeData_welded && flange.S1 != flange.S0 {
+	if typeF == cap_model.FlangeData_welded && flange.S1 != flange.S0 {
 		strength.Max1 = math.Max(math.Abs(sigmaM1+sigmaR), math.Abs(sigmaM1+sigmaT))
 
 		t1 := math.Max(math.Abs(sigmaP1-sigmaMp+sigmaRp), math.Abs(sigmaP1-sigmaMpm+sigmaRp))
@@ -187,7 +187,7 @@ func (s *CapService) getCalculatedStrength(
 	strength.CondMax8 = Kt[isTemp] * flange.SigmaAt20
 	strength.CondMax9 = Kt[isTemp] * flange.Sigma
 
-	if typeF == moment_api.FlangeData_free {
+	if typeF == cap_model.FlangeData_free {
 		strength.Max10 = sigmaK
 		strength.Max11 = sigmaKp
 

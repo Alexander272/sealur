@@ -5,7 +5,7 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,13 +29,13 @@ func (h *Handler) initTypeFlangeRoutes(api *gin.RouterGroup) {
 // @ModuleID getTypeFlange
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{Data=[]moment_api.TypeFlange}
+// @Success 200 {object} models.DataResponse{Data=[]flange_model.TypeFlange}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/type-flange/ [get]
 func (h *Handler) getTypeFlange(c *gin.Context) {
-	tf, err := h.flangeClient.GetTypeFlange(c, &moment_api.GetTypeFlangeRequest{})
+	tf, err := h.flangeClient.GetTypeFlange(c, &flange_api.GetTypeFlangeRequest{})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -64,7 +64,7 @@ func (h *Handler) createTypeFlange(c *gin.Context) {
 		return
 	}
 
-	tf, err := h.flangeClient.CreateTypeFlange(c, &moment_api.CreateTypeFlangeRequest{Title: dto.Title})
+	tf, err := h.flangeClient.CreateTypeFlange(c, &flange_api.CreateTypeFlangeRequest{Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -100,7 +100,7 @@ func (h *Handler) updateTypeFlange(c *gin.Context) {
 		return
 	}
 
-	_, err := h.flangeClient.UpdateTypeFlange(c, &moment_api.UpdateTypeFlangeRequest{
+	_, err := h.flangeClient.UpdateTypeFlange(c, &flange_api.UpdateTypeFlangeRequest{
 		Id:    id,
 		Title: dto.Title,
 	})
@@ -132,7 +132,7 @@ func (h *Handler) deleteTypeFlange(c *gin.Context) {
 		return
 	}
 
-	_, err := h.flangeClient.DeleteTypeFlange(c, &moment_api.DeleteTypeFlangeRequest{Id: id})
+	_, err := h.flangeClient.DeleteTypeFlange(c, &flange_api.DeleteTypeFlangeRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

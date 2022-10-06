@@ -6,13 +6,14 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
-func (s *DataService) GetData(ctx context.Context, data *moment_api.CalcCapRequest) (result models.DataCap, err error) {
+func (s *DataService) GetData(ctx context.Context, data *calc_api.CapRequest) (result models.DataCap, err error) {
 	//* формула из Таблицы В.1
 	Tb := s.typeFlangesTB[data.Flanges.String()] * data.Temp
-	if data.FlangeData.Type == moment_api.FlangeData_free {
+	if data.FlangeData.Type == cap_model.FlangeData_free {
 		Tb = s.typeFlangesTB[data.Flanges.String()+"-free"] * data.Temp
 	}
 

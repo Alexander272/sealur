@@ -1,10 +1,11 @@
-package moment_model
+package flange_model
 
 import (
 	"math"
 	"strconv"
 
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
 type CalcFlange struct {
@@ -50,7 +51,7 @@ type GasketData struct {
 type BoltsData struct {
 	MarkId   string       `json:"markId"`
 	Title    string       `json:"title"`
-	Name     string       `json:"name"`
+	BoltId   string       `json:"boltId"`
 	Diameter string       `json:"diameter"`
 	Area     string       `json:"area"`
 	Count    string       `json:"count"`
@@ -120,7 +121,7 @@ type FlangeSize struct {
 	Hk   string `json:"hk"`
 }
 
-func (f *CalcFlange) NewFlange() (flange *moment_api.CalcFlangeRequest, err error) {
+func (f *CalcFlange) NewFlange() (flange *calc_api.FlangeRequest, err error) {
 	pressure, err := strconv.ParseFloat(f.Pressure, 64)
 	if err != nil {
 		return nil, err
@@ -138,12 +139,12 @@ func (f *CalcFlange) NewFlange() (flange *moment_api.CalcFlangeRequest, err erro
 		return nil, err
 	}
 
-	flanges := moment_api.CalcFlangeRequest_Flanges_value[f.Flanges]
-	typeB := moment_api.CalcFlangeRequest_Type_value[f.TypeB]
-	condition := moment_api.CalcFlangeRequest_Condition_value[f.Condition]
-	calculation := moment_api.CalcFlangeRequest_Calcutation_value[f.Calculation]
+	flanges := calc_api.FlangeRequest_Flanges_value[f.Flanges]
+	typeB := calc_api.FlangeRequest_Type_value[f.TypeB]
+	condition := calc_api.FlangeRequest_Condition_value[f.Condition]
+	calculation := calc_api.FlangeRequest_Calcutation_value[f.Calculation]
 
-	flangesData := []*moment_api.FlangeData{}
+	flangesData := []*flange_model.FlangeData{}
 	flange1, err := f.FlangesData.First.NewFlangeData()
 	if err != nil {
 		return nil, err
@@ -168,7 +169,7 @@ func (f *CalcFlange) NewFlange() (flange *moment_api.CalcFlangeRequest, err erro
 		return nil, err
 	}
 
-	var embed *moment_api.EmbedData
+	var embed *flange_model.EmbedData
 	if f.IsEmbedded {
 		embed, err = f.Embed.NewEmbed()
 		if err != nil {
@@ -176,7 +177,7 @@ func (f *CalcFlange) NewFlange() (flange *moment_api.CalcFlangeRequest, err erro
 		}
 	}
 
-	var washer []*moment_api.WasherData
+	var washer []*flange_model.WasherData
 	if f.IsUseWasher {
 		washer, err = f.Washer.NewWasher()
 		if err != nil {
@@ -184,18 +185,18 @@ func (f *CalcFlange) NewFlange() (flange *moment_api.CalcFlangeRequest, err erro
 		}
 	}
 
-	flange = &moment_api.CalcFlangeRequest{
+	flange = &calc_api.FlangeRequest{
 		Pressure:       pressure,
 		AxialForce:     int32(axialForce),
 		BendingMoment:  int32(bendingMoment),
 		Temp:           temp,
 		IsWork:         f.IsWork,
-		Flanges:        moment_api.CalcFlangeRequest_Flanges(flanges),
+		Flanges:        calc_api.FlangeRequest_Flanges(flanges),
 		IsSameFlange:   f.IsSameFlange,
 		IsEmbedded:     f.IsEmbedded,
-		Type:           moment_api.CalcFlangeRequest_Type(typeB),
-		Condition:      moment_api.CalcFlangeRequest_Condition(condition),
-		Calculation:    moment_api.CalcFlangeRequest_Calcutation(calculation),
+		Type:           calc_api.FlangeRequest_Type(typeB),
+		Condition:      calc_api.FlangeRequest_Condition(condition),
+		Calculation:    calc_api.FlangeRequest_Calcutation(calculation),
 		IsUseWasher:    f.IsUseWasher,
 		IsNeedFormulas: f.IsNeedFormulas,
 		FlangesData:    flangesData,
@@ -207,8 +208,8 @@ func (f *CalcFlange) NewFlange() (flange *moment_api.CalcFlangeRequest, err erro
 	return flange, nil
 }
 
-func (f *Flanges) NewFlangeData() (flange *moment_api.FlangeData, err error) {
-	var size *moment_api.FlangeData_Size
+func (f *Flanges) NewFlangeData() (flange *flange_model.FlangeData, err error) {
+	var size *flange_model.FlangeData_Size
 	if f.StandartId == "another" {
 		size, err = f.Size.NewSize()
 		if err != nil {
@@ -216,7 +217,7 @@ func (f *Flanges) NewFlangeData() (flange *moment_api.FlangeData, err error) {
 		}
 	}
 
-	var mat, rMat *moment_api.MaterialData
+	var mat, rMat *flange_model.MaterialData
 	if f.MarkId == "another" {
 		mat, err = f.Material.NewMaterial()
 		if err != nil {
@@ -230,7 +231,7 @@ func (f *Flanges) NewFlangeData() (flange *moment_api.FlangeData, err error) {
 		}
 	}
 
-	typeF := moment_api.FlangeData_Type_value[f.TypeF]
+	typeF := flange_model.FlangeData_Type_value[f.TypeF]
 	corrosion, err := strconv.ParseFloat(f.Corrosion, 64)
 	if err != nil {
 		return nil, err
@@ -250,8 +251,8 @@ func (f *Flanges) NewFlangeData() (flange *moment_api.FlangeData, err error) {
 		}
 	}
 
-	flange = &moment_api.FlangeData{
-		Type:         moment_api.FlangeData_Type(typeF),
+	flange = &flange_model.FlangeData{
+		Type:         flange_model.FlangeData_Type(typeF),
 		StandartId:   f.StandartId,
 		MarkId:       f.MarkId,
 		Material:     mat,
@@ -269,7 +270,7 @@ func (f *Flanges) NewFlangeData() (flange *moment_api.FlangeData, err error) {
 	return flange, nil
 }
 
-func (m *MaterialData) NewMaterial() (mat *moment_api.MaterialData, err error) {
+func (m *MaterialData) NewMaterial() (mat *flange_model.MaterialData, err error) {
 	alpha, err := strconv.ParseFloat(m.AlphaF, 64)
 	if err != nil {
 		return nil, err
@@ -292,7 +293,7 @@ func (m *MaterialData) NewMaterial() (mat *moment_api.MaterialData, err error) {
 		return nil, err
 	}
 
-	mat = &moment_api.MaterialData{
+	mat = &flange_model.MaterialData{
 		Title:       m.Title,
 		AlphaF:      alpha,
 		EpsilonAt20: eAt20,
@@ -304,7 +305,7 @@ func (m *MaterialData) NewMaterial() (mat *moment_api.MaterialData, err error) {
 	return mat, nil
 }
 
-func (s *FlangeSize) NewSize() (size *moment_api.FlangeData_Size, err error) {
+func (s *FlangeSize) NewSize() (size *flange_model.FlangeData_Size, err error) {
 	dOut, err := strconv.ParseFloat(s.DOut, 64)
 	if err != nil {
 		return nil, err
@@ -369,7 +370,7 @@ func (s *FlangeSize) NewSize() (size *moment_api.FlangeData_Size, err error) {
 		}
 	}
 
-	size = &moment_api.FlangeData_Size{
+	size = &flange_model.FlangeData_Size{
 		DOut: dOut,
 		D:    d,
 		H:    h,
@@ -387,10 +388,10 @@ func (s *FlangeSize) NewSize() (size *moment_api.FlangeData_Size, err error) {
 	return size, nil
 }
 
-func (b *BoltsData) NewBolts() (bolts *moment_api.BoltData, err error) {
-	bolts = &moment_api.BoltData{
+func (b *BoltsData) NewBolts() (bolts *flange_model.BoltData, err error) {
+	bolts = &flange_model.BoltData{
 		MarkId: b.MarkId,
-		Name:   b.Name,
+		BoldId: b.BoltId,
 		Title:  b.Title,
 	}
 	if b.Count != "" {
@@ -407,7 +408,7 @@ func (b *BoltsData) NewBolts() (bolts *moment_api.BoltData, err error) {
 		}
 		bolts.Temp = temp
 	}
-	if b.Name == "another" {
+	if b.BoltId == "another" {
 		diameter, err := strconv.ParseFloat(b.Diameter, 64)
 		if err != nil {
 			return nil, err
@@ -429,7 +430,7 @@ func (b *BoltsData) NewBolts() (bolts *moment_api.BoltData, err error) {
 	return bolts, nil
 }
 
-func (g *GasketFullData) NewGasket() (gasket *moment_api.GasketData, err error) {
+func (g *GasketFullData) NewGasket() (gasket *flange_model.GasketData, err error) {
 	thickness, err := strconv.ParseFloat(g.Thickness, 64)
 	if err != nil {
 		return nil, err
@@ -442,7 +443,7 @@ func (g *GasketFullData) NewGasket() (gasket *moment_api.GasketData, err error) 
 	if err != nil {
 		return nil, err
 	}
-	gasket = &moment_api.GasketData{
+	gasket = &flange_model.GasketData{
 		GasketId:  g.GasketId,
 		EnvId:     g.EnvId,
 		Thickness: thickness,
@@ -461,7 +462,7 @@ func (g *GasketFullData) NewGasket() (gasket *moment_api.GasketData, err error) 
 	return gasket, nil
 }
 
-func (g *GasketData) NewGasketData() (data *moment_api.GasketData_Data, err error) {
+func (g *GasketData) NewGasketData() (data *flange_model.GasketData_Data, err error) {
 	q, err := strconv.ParseFloat(g.Qo, 64)
 	if err != nil {
 		return nil, err
@@ -483,11 +484,11 @@ func (g *GasketData) NewGasketData() (data *moment_api.GasketData_Data, err erro
 		return nil, err
 	}
 
-	typeG := moment_api.GasketData_Type_value[g.TypeG]
+	typeG := flange_model.GasketData_Type_value[g.TypeG]
 
-	data = &moment_api.GasketData_Data{
+	data = &flange_model.GasketData_Data{
 		Title:           g.Title,
-		Type:            moment_api.GasketData_Type(typeG),
+		Type:            flange_model.GasketData_Type(typeG),
 		Qo:              q,
 		M:               m,
 		Compression:     compression,
@@ -498,13 +499,13 @@ func (g *GasketData) NewGasketData() (data *moment_api.GasketData_Data, err erro
 	return data, nil
 }
 
-func (w *WasherData) NewWasher() (washers []*moment_api.WasherData, err error) {
+func (w *WasherData) NewWasher() (washers []*flange_model.WasherData, err error) {
 	thickness, err := strconv.ParseFloat(w.Thickness, 64)
 	if err != nil {
 		return nil, err
 	}
 
-	var material *moment_api.MaterialData
+	var material *flange_model.MaterialData
 	if w.First.MarkId == "another" {
 		material, err = w.First.Material.NewMaterial()
 		if err != nil {
@@ -512,14 +513,14 @@ func (w *WasherData) NewWasher() (washers []*moment_api.WasherData, err error) {
 		}
 	}
 
-	washers = append(washers, &moment_api.WasherData{
+	washers = append(washers, &flange_model.WasherData{
 		MarkId:    w.First.MarkId,
 		Thickness: thickness,
 		Material:  material,
 	})
 
 	if w.Second != (WasherMaterial{}) {
-		var material *moment_api.MaterialData
+		var material *flange_model.MaterialData
 		if w.Second.MarkId == "another" {
 			material, err = w.First.Material.NewMaterial()
 			if err != nil {
@@ -527,7 +528,7 @@ func (w *WasherData) NewWasher() (washers []*moment_api.WasherData, err error) {
 			}
 		}
 
-		washers = append(washers, &moment_api.WasherData{
+		washers = append(washers, &flange_model.WasherData{
 			MarkId:    w.Second.MarkId,
 			Thickness: thickness,
 			Material:  material,
@@ -537,13 +538,13 @@ func (w *WasherData) NewWasher() (washers []*moment_api.WasherData, err error) {
 	return washers, nil
 }
 
-func (e *EmbedData) NewEmbed() (embed *moment_api.EmbedData, err error) {
+func (e *EmbedData) NewEmbed() (embed *flange_model.EmbedData, err error) {
 	thickness, err := strconv.ParseFloat(e.Thickness, 64)
 	if err != nil {
 		return nil, err
 	}
 
-	var material *moment_api.MaterialData
+	var material *flange_model.MaterialData
 	if e.MarkId == "another" {
 		material, err = e.Material.NewMaterial()
 		if err != nil {
@@ -551,7 +552,7 @@ func (e *EmbedData) NewEmbed() (embed *moment_api.EmbedData, err error) {
 		}
 	}
 
-	embed = &moment_api.EmbedData{
+	embed = &flange_model.EmbedData{
 		MarkId:    e.MarkId,
 		Thickness: thickness,
 		Material:  material,

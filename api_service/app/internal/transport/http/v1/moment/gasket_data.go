@@ -5,7 +5,7 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,9 +40,9 @@ func (h *Handler) createManyGasketData(c *gin.Context) {
 		return
 	}
 
-	data := []*moment_api.CreateManyGasketDataRequest_Data{}
+	data := []*gasket_api.CreateManyGasketDataRequest_Data{}
 	for _, mgdd := range dto.Data {
-		data = append(data, &moment_api.CreateManyGasketDataRequest_Data{
+		data = append(data, &gasket_api.CreateManyGasketDataRequest_Data{
 			PermissiblePres: mgdd.PermissiblePres,
 			Compression:     mgdd.Compression,
 			Epsilon:         mgdd.Epsilon,
@@ -50,7 +50,7 @@ func (h *Handler) createManyGasketData(c *gin.Context) {
 		})
 	}
 
-	_, err := h.gasketClient.CreateManyGasketData(c, &moment_api.CreateManyGasketDataRequest{
+	_, err := h.gasketClient.CreateManyGasketData(c, &gasket_api.CreateManyGasketDataRequest{
 		GasketId: dto.GasketId,
 		TypeId:   dto.TypeId,
 		Data:     data,
@@ -83,7 +83,7 @@ func (h *Handler) createGasketData(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.CreateGasketData(c, &moment_api.CreateGasketDataRequest{
+	_, err := h.gasketClient.CreateGasketData(c, &gasket_api.CreateGasketDataRequest{
 		GasketId:        dto.GasketId,
 		PermissiblePres: dto.PermissiblePres,
 		Compression:     dto.Compression,
@@ -126,7 +126,7 @@ func (h *Handler) updateGasketData(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.UpdateGasketData(c, &moment_api.UpdateGasketDataRequest{
+	_, err := h.gasketClient.UpdateGasketData(c, &gasket_api.UpdateGasketDataRequest{
 		Id:              id,
 		GasketId:        dto.GasketId,
 		PermissiblePres: dto.PermissiblePres,
@@ -170,7 +170,7 @@ func (h *Handler) updateGasketTypeId(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.UpdateGasketTypeId(c, &moment_api.UpdateGasketTypeIdRequest{
+	_, err := h.gasketClient.UpdateGasketTypeId(c, &gasket_api.UpdateGasketTypeIdRequest{
 		GasketId: gasketId,
 		TypeId:   dto.TypeId,
 	})
@@ -202,7 +202,7 @@ func (h *Handler) deleteGasketData(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.DeleteGasketData(c, &moment_api.DeleteGasketDataRequest{Id: id})
+	_, err := h.gasketClient.DeleteGasketData(c, &gasket_api.DeleteGasketDataRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

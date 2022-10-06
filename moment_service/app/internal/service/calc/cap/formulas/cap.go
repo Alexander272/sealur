@@ -5,21 +5,21 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
 func (s *FormulasService) getCapFormulas(
-	capType moment_api.CapData_Type,
-	data *moment_api.CapResult,
+	capType cap_model.CapData_Type,
+	data *cap_model.CapResult,
 	h, D, S0, DOut, Dcp string,
-) *moment_api.CapFormulas {
-	f := &moment_api.CapFormulas{}
+) *cap_model.CapFormulas {
+	f := &cap_model.CapFormulas{}
 
 	k := strings.ReplaceAll(strconv.FormatFloat(data.K, 'G', 3, 64), "E", "*10^")
 	x := strings.ReplaceAll(strconv.FormatFloat(data.X, 'G', 3, 64), "E", "*10^")
 	eAt20 := strings.ReplaceAll(strconv.FormatFloat(data.EpsilonAt20, 'G', 3, 64), "E", "*10^")
 
-	if capType == moment_api.CapData_flat {
+	if capType == cap_model.CapData_flat {
 		H := strings.ReplaceAll(strconv.FormatFloat(data.H, 'G', 3, 64), "E", "*10^")
 		delta := strings.ReplaceAll(strconv.FormatFloat(data.Delta, 'G', 3, 64), "E", "*10^")
 

@@ -8,7 +8,8 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
 type FormulasService struct {
@@ -42,11 +43,11 @@ func NewFormulasService() *FormulasService {
 func (s *FormulasService) GetFormulas(
 	TypeGasket, Condition string, IsWork, IsUseWasher, IsEmbedded bool,
 	data models.DataCap,
-	result moment_api.CapResponse,
-	calculation moment_api.CalcCapRequest_Calcutation,
+	result calc_api.CapResponse,
+	calculation calc_api.CapRequest_Calcutation,
 	gamma_, yb_, yp_ float64,
-) *moment_api.CalcCapFormulas {
-	formulas := &moment_api.CalcCapFormulas{}
+) *cap_model.CalcCapFormulas {
+	formulas := &cap_model.CalcCapFormulas{}
 
 	width := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.Width, 'G', 3, 64), "E", "*10^")
 	gDOut := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.DOut, 'G', 3, 64), "E", "*10^")
@@ -107,7 +108,7 @@ func (s *FormulasService) GetFormulas(
 
 	formulas.A = fmt.Sprintf("%d * %s", count, area)
 
-	if !(TypeGasket == "Oval" || data.FType == moment_api.FlangeData_free) {
+	if !(TypeGasket == "Oval" || data.FType == cap_model.FlangeData_free) {
 		formulas.Alpha = fmt.Sprintf("1 - (%s - (%s * %s + %s * %s) * %s)/(%s + %s + (%s + %s) * %s^2)",
 			yp, yf1, e1, y, b1, b1, yp, yb, yf1, y, b1)
 	}
@@ -140,7 +141,7 @@ func (s *FormulasService) GetFormulas(
 	}
 	tF2 = fmt.Sprintf("%s + %s", h1, h)
 
-	if data.FType == moment_api.FlangeData_free {
+	if data.FType == cap_model.FlangeData_free {
 		ak := strings.ReplaceAll(strconv.FormatFloat(data.Flange.AlphaK, 'G', 3, 64), "E", "*10^")
 		h := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Hk, 'G', 3, 64), "E", "*10^")
 		tk := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Tk, 'G', 3, 64), "E", "*10^")
@@ -165,8 +166,8 @@ func (s *FormulasService) GetFormulas(
 
 	pb1F := fmt.Sprintf("%s * (%s + %d) + %s", alpha, qd, axialForce, rp)
 
-	if calculation == moment_api.CalcCapRequest_basis {
-		formulas.Basis = &moment_api.BasisFormulas{}
+	if calculation == calc_api.CapRequest_basis {
+		formulas.Basis = &cap_model.BasisFormulas{}
 
 		pb2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Basis.Pb2, 'G', 3, 64), "E", "*10^")
 		pb1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Basis.Pb1, 'G', 3, 64), "E", "*10^")
@@ -203,7 +204,7 @@ func (s *FormulasService) GetFormulas(
 		}
 		formulas.Basis.Mmax = fmt.Sprintf("(0.3 * %s *%s / %d) / 1000", Pmax, diameter, count)
 	} else {
-		formulas.Strength = &moment_api.CalcCapFormulas_StrengthFormulas{}
+		formulas.Strength = &cap_model.StrengthFormulas{}
 		eAt20 := strings.ReplaceAll(strconv.FormatFloat(data.Cap.EpsilonAt20, 'G', 3, 64), "E", "*10^")
 		e := strings.ReplaceAll(strconv.FormatFloat(data.Cap.Epsilon, 'G', 3, 64), "E", "*10^")
 		d := strings.ReplaceAll(strconv.FormatFloat(data.Flange.D, 'G', 3, 64), "E", "*10^")
@@ -220,7 +221,7 @@ func (s *FormulasService) GetFormulas(
 		divider := fmt.Sprintf("%s + %s * %s/%s + (%s * %s/%s) * %s^2 + (%s * %s/%s) * %s^2",
 			yp, yb, bEpsilonAt20, bEpsilon, yf1, epAt201, ep1, b1, y, eAt20, e, b1)
 
-		if data.FType == moment_api.FlangeData_free {
+		if data.FType == cap_model.FlangeData_free {
 			yk := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Yk, 'G', 3, 64), "E", "*10^")
 			ek := strings.ReplaceAll(strconv.FormatFloat(data.Flange.EpsilonK, 'G', 3, 64), "E", "*10^")
 			ekAt20 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.EpsilonKAt20, 'G', 3, 64), "E", "*10^")

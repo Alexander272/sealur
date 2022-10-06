@@ -1,8 +1,11 @@
 package data
 
-import "github.com/Alexander272/sealur_proto/api/moment_api"
+import (
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
+)
 
-func (s *DataService) FormatInitData(data *moment_api.CalcFlangeRequest) *moment_api.DataResult {
+func (s *DataService) FormatInitData(data *calc_api.FlangeRequest) *flange_model.DataResult {
 	work := map[bool]string{
 		true:  "Рабочие условия",
 		false: "Условия испытаний",
@@ -26,7 +29,7 @@ func (s *DataService) FormatInitData(data *moment_api.CalcFlangeRequest) *moment
 		"controllablePin": "Контроль по вытяжке шпилек",
 	}
 
-	res := &moment_api.DataResult{
+	res := &flange_model.DataResult{
 		Pressure:      data.Pressure,
 		BendingMoment: data.BendingMoment,
 		AxialForce:    data.AxialForce,

@@ -13,7 +13,12 @@ import (
 	handlers "github.com/Alexander272/sealur/moment_service/internal/transport/grpc"
 	"github.com/Alexander272/sealur/moment_service/pkg/database/postgres"
 	"github.com/Alexander272/sealur/moment_service/pkg/logger"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
+	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
+	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/read_api"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -62,13 +67,12 @@ func main() {
 	}
 
 	server := grpc.NewServer(opts...)
-	moment_api.RegisterPingServiceServer(server, handlers.Ping)
-	moment_api.RegisterCalcFlangeServiceServer(server, handlers.CalcFlange)
-	moment_api.RegisterCalcCapServiceServer(server, handlers.CalcCap)
-	moment_api.RegisterMaterialsServiceServer(server, handlers.Materials)
-	moment_api.RegisterGasketServiceServer(server, handlers.Gasket)
-	moment_api.RegisterFlangeServiceServer(server, handlers.Flange)
-	moment_api.RegisterReadServiceServer(server, handlers.Read)
+	moment.RegisterPingServiceServer(server, handlers.Ping)
+	material_api.RegisterMaterialsServiceServer(server, handlers.Materials)
+	gasket_api.RegisterGasketServiceServer(server, handlers.Gasket)
+	flange_api.RegisterFlangeServiceServer(server, handlers.Flange)
+	read_api.RegisterReadServiceServer(server, handlers.Read)
+	calc_api.RegisterCalcServiceServer(server, handlers.Calc)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {

@@ -7,21 +7,25 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
+	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
+	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/read_api"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 type Handler struct {
-	middleware       *middleware.Middleware
-	pingClient       moment_api.PingServiceClient
-	gasketClient     moment_api.GasketServiceClient
-	materialsClient  moment_api.MaterialsServiceClient
-	flangeClient     moment_api.FlangeServiceClient
-	readClient       moment_api.ReadServiceClient
-	calcFlangeClient moment_api.CalcFlangeServiceClient
-	calcCapClient    moment_api.CalcCapServiceClient
+	middleware      *middleware.Middleware
+	pingClient      moment.PingServiceClient
+	gasketClient    gasket_api.GasketServiceClient
+	materialsClient material_api.MaterialsServiceClient
+	flangeClient    flange_api.FlangeServiceClient
+	readClient      read_api.ReadServiceClient
+	calcClient      calc_api.CalcServiceClient
 }
 
 func NewHandler(middleware *middleware.Middleware) *Handler {
@@ -57,21 +61,19 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		logger.Fatalf("failed connection to pro service. error: %w", err)
 	}
 
-	pingClient := moment_api.NewPingServiceClient(connect)
-	gasketClient := moment_api.NewGasketServiceClient(connect)
-	materialsClient := moment_api.NewMaterialsServiceClient(connect)
-	flangeClient := moment_api.NewFlangeServiceClient(connect)
-	readClient := moment_api.NewReadServiceClient(connect)
-	calcFlangeClient := moment_api.NewCalcFlangeServiceClient(connect)
-	calcCapClient := moment_api.NewCalcCapServiceClient(connect)
+	pingClient := moment.NewPingServiceClient(connect)
+	gasketClient := gasket_api.NewGasketServiceClient(connect)
+	materialsClient := material_api.NewMaterialsServiceClient(connect)
+	flangeClient := flange_api.NewFlangeServiceClient(connect)
+	readClient := read_api.NewReadServiceClient(connect)
+	calcClient := calc_api.NewCalcServiceClient(connect)
 
 	h.pingClient = pingClient
 	h.gasketClient = gasketClient
 	h.materialsClient = materialsClient
 	h.flangeClient = flangeClient
 	h.readClient = readClient
-	h.calcFlangeClient = calcFlangeClient
-	h.calcCapClient = calcCapClient
+	h.calcClient = calcClient
 
 	moment := api.Group("/sealur-moment")
 	{
@@ -100,7 +102,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 }
 
 func (h *Handler) pingUsers(c *gin.Context) {
-	res, err := h.pingClient.Ping(c, &moment_api.PingRequest{})
+	res, err := h.pingClient.Ping(c, &moment.PingRequest{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

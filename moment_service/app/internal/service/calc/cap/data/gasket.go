@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
-func (s *DataService) getGasketData(ctx context.Context, data *moment_api.GasketData, bp float64) (*moment_api.GasketResult, string, error) {
+func (s *DataService) getGasketData(ctx context.Context, data *cap_model.GasketData, bp float64) (*cap_model.GasketResult, string, error) {
 	if data.GasketId != "another" {
 		g := models.GetGasket{GasketId: data.GasketId, EnvId: data.EnvId, Thickness: data.Thickness}
 		gasket, err := s.gasket.GetFullData(ctx, g)
@@ -15,7 +15,7 @@ func (s *DataService) getGasketData(ctx context.Context, data *moment_api.Gasket
 			return nil, "", err
 		}
 
-		res := &moment_api.GasketResult{
+		res := &cap_model.GasketResult{
 			Gasket:          gasket.Gasket,
 			Env:             gasket.Env,
 			Type:            gasket.TypeTitle,
@@ -38,7 +38,7 @@ func (s *DataService) getGasketData(ctx context.Context, data *moment_api.Gasket
 		"Metal": "Металлическая",
 	}
 
-	res := &moment_api.GasketResult{
+	res := &cap_model.GasketResult{
 		Gasket:          data.Data.Title,
 		Type:            data.Data.Type.String(),
 		Thickness:       data.Thickness,

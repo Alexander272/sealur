@@ -6,7 +6,7 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,13 +30,13 @@ func (h *Handler) initTypeGasketRoutes(api *gin.RouterGroup) {
 // @ModuleID getTypeGasket
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{Data=[]moment_api.GasketType}
+// @Success 200 {object} models.DataResponse{Data=[]gasket_api.GasketType}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/type-gasket/ [get]
 func (h *Handler) getTypeGasket(c *gin.Context) {
-	gasket, err := h.gasketClient.GetGasketType(c, &moment_api.GetGasketTypeRequest{})
+	gasket, err := h.gasketClient.GetGasketType(c, &gasket_api.GetGasketTypeRequest{})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -65,7 +65,7 @@ func (h *Handler) createTypeGasket(c *gin.Context) {
 		return
 	}
 
-	gasket, err := h.gasketClient.CreateGasketType(c, &moment_api.CreateGasketTypeRequest{Title: dto.Title})
+	gasket, err := h.gasketClient.CreateGasketType(c, &gasket_api.CreateGasketTypeRequest{Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -102,7 +102,7 @@ func (h *Handler) updateTypeGasket(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.UpdateGasketType(c, &moment_api.UpdateGasketTypeRequest{Id: id, Title: dto.Title})
+	_, err := h.gasketClient.UpdateGasketType(c, &gasket_api.UpdateGasketTypeRequest{Id: id, Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -131,7 +131,7 @@ func (h *Handler) deleteTypeGasket(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.DeleteGasketType(c, &moment_api.DeleteGasketTypeRequest{Id: id})
+	_, err := h.gasketClient.DeleteGasketType(c, &gasket_api.DeleteGasketTypeRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

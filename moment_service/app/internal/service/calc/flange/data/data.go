@@ -6,13 +6,14 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
-func (s *DataService) GetData(ctx context.Context, data *moment_api.CalcFlangeRequest) (result models.DataFlange, err error) {
+func (s *DataService) GetData(ctx context.Context, data *calc_api.FlangeRequest) (result models.DataFlange, err error) {
 	//* формула из Таблицы В.1
 	Tb := s.typeFlangesTB[data.Flanges.String()] * data.Temp
-	if data.FlangesData[0].Type == moment_api.FlangeData_free {
+	if data.FlangesData[0].Type == flange_model.FlangeData_free {
 		Tb = s.typeFlangesTB[data.Flanges.String()+"-free"] * data.Temp
 	}
 
@@ -37,7 +38,6 @@ func (s *DataService) GetData(ctx context.Context, data *moment_api.CalcFlangeRe
 		return result, err
 	}
 
-	//? я использую температуру фланца. хз верно илил нет.
 	if data.IsUseWasher {
 		result.Washer1, err = s.getWasherData(ctx, data.Washer[0], flange1.Tf)
 		if err != nil {

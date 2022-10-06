@@ -7,18 +7,19 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
+	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 )
 
 func (s *DataService) getDataFlange(
 	ctx context.Context,
-	flange *moment_api.FlangeData,
-	bolt *moment_api.BoltData,
+	flange *cap_model.FlangeData,
+	bolt *cap_model.BoltData,
 	typeFlange string,
 	temp float64,
-) (flangeData *moment_api.FlangeResult, boltSize *moment_api.BoltResult, err error) {
+) (flangeData *cap_model.FlangeResult, boltSize *cap_model.BoltResult, err error) {
 	if flange.StandartId == "another" {
-		flangeData = &moment_api.FlangeResult{
+		flangeData = &cap_model.FlangeResult{
 			DOut: flange.Size.DOut,
 			D:    flange.Size.D,
 			Dk:   flange.Size.Dk,
@@ -33,13 +34,13 @@ func (s *DataService) getDataFlange(
 			D6:   flange.Size.D6,
 			C:    flange.Corrosion,
 		}
-		boltSize = &moment_api.BoltResult{
+		boltSize = &cap_model.BoltResult{
 			Diameter: bolt.Diameter,
 			Count:    bolt.Count,
 			Area:     bolt.Area,
 		}
 	} else {
-		size, err := s.flange.GetFlangeSize(ctx, &moment_api.GetFlangeSizeRequest{
+		size, err := s.flange.GetFlangeSize(ctx, &flange_api.GetFlangeSizeRequest{
 			// D:       flange.Dy,
 			Pn:      flange.Py,
 			StandId: flange.StandartId,
@@ -50,7 +51,7 @@ func (s *DataService) getDataFlange(
 			return nil, nil, fmt.Errorf("failed to get size. error: %w", err)
 		}
 
-		flangeData = &moment_api.FlangeResult{
+		flangeData = &cap_model.FlangeResult{
 			DOut: size.DOut,
 			D:    size.D,
 			H:    size.H,
@@ -66,7 +67,7 @@ func (s *DataService) getDataFlange(
 			size.S1 = (size.X - flange.B) / 2
 		}
 
-		boltSize = &moment_api.BoltResult{
+		boltSize = &cap_model.BoltResult{
 			Diameter: size.Diameter,
 			Count:    size.Count,
 			Area:     size.Area,
@@ -75,7 +76,7 @@ func (s *DataService) getDataFlange(
 
 	flangeData.Tf = s.typeFlangesTF[typeFlange] * temp
 
-	if flange.Type == moment_api.FlangeData_free {
+	if flange.Type == cap_model.FlangeData_free {
 		flangeData.Tk = s.typeFlangesTK[typeFlange] * temp
 
 		//? при свободных фланцах добавляется еще один материал
@@ -140,12 +141,12 @@ func (s *DataService) getDataFlange(
 
 func (s *DataService) getCalculatedDataFlange(
 	ctx context.Context,
-	flangeType moment_api.FlangeData_Type,
-	data *moment_api.FlangeResult,
+	flangeType cap_model.FlangeData_Type,
+	data *cap_model.FlangeResult,
 	Dcp float64,
-) (*moment_api.FlangeResult, error) {
+) (*cap_model.FlangeResult, error) {
 	calculated := data
-	if flangeType != moment_api.FlangeData_free {
+	if flangeType != cap_model.FlangeData_free {
 		calculated.B = 0.5 * (data.D6 - Dcp)
 	} else {
 		calculated.Ds = 0.5 * (data.DOut + data.Dk + 2*data.H0)
@@ -153,7 +154,7 @@ func (s *DataService) getCalculatedDataFlange(
 		calculated.B = 0.5 * (data.Ds - Dcp)
 	}
 
-	if flangeType != moment_api.FlangeData_welded {
+	if flangeType != cap_model.FlangeData_welded {
 		calculated.Se = data.S0
 	} else {
 		calculated.X = data.L / (math.Sqrt(data.D * data.S0))
@@ -181,7 +182,7 @@ func (s *DataService) getCalculatedDataFlange(
 	divider = math.Pow(calculated.K, 2) - 1
 	calculated.BetaZ = dividend / divider
 
-	if flangeType == moment_api.FlangeData_welded && data.S0 != data.S1 {
+	if flangeType == cap_model.FlangeData_welded && data.S0 != data.S1 {
 		calculated.BetaF = s.graphic.CalculateBetaF(calculated.Beta, calculated.X)
 		calculated.BetaV = s.graphic.CalculateBetaV(calculated.Beta, calculated.X)
 		calculated.F = s.graphic.CalculateF(calculated.Beta, calculated.X)
@@ -195,12 +196,12 @@ func (s *DataService) getCalculatedDataFlange(
 		+(calculated.BetaV*math.Pow(data.H, 3))/(calculated.BetaU*calculated.L0*math.Pow(data.S0, 2))
 	calculated.Yf = (0.91 * calculated.BetaV) / (data.EpsilonAt20 * calculated.Lymda * math.Pow(data.S0, 2) * calculated.L0)
 
-	if flangeType == moment_api.FlangeData_free {
+	if flangeType == cap_model.FlangeData_free {
 		calculated.Psik = 1.28 * (math.Log(data.Dnk/data.Dk) / math.Log(10))
 		calculated.Yk = 1 / (data.EpsilonKAt20 * math.Pow(data.Hk, 3) * calculated.Psik)
 	}
 
-	if flangeType != moment_api.FlangeData_free {
+	if flangeType != cap_model.FlangeData_free {
 		calculated.Yfn = math.Pow(math.Pi/4, 3) * (data.D6 / (data.EpsilonAt20 * data.DOut * math.Pow(data.H, 3)))
 	} else {
 		calculated.Yfn = math.Pow(math.Pi/4, 3) * (data.Ds / (data.EpsilonAt20 * data.DOut * math.Pow(data.H, 3)))

@@ -6,7 +6,7 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,13 +30,13 @@ func (h *Handler) initEnvRoutes(api *gin.RouterGroup) {
 // @ModuleID getEnv
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.DataResponse{Data=[]moment_api.Env}
+// @Success 200 {object} models.DataResponse{Data=[]gasket_api.Env}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/env/ [get]
 func (h *Handler) getEnv(c *gin.Context) {
-	env, err := h.gasketClient.GetEnv(c, &moment_api.GetEnvRequest{})
+	env, err := h.gasketClient.GetEnv(c, &gasket_api.GetEnvRequest{})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -65,7 +65,7 @@ func (h *Handler) createEnv(c *gin.Context) {
 		return
 	}
 
-	env, err := h.gasketClient.CreateEnv(c, &moment_api.CreateEnvRequest{Title: dto.Title})
+	env, err := h.gasketClient.CreateEnv(c, &gasket_api.CreateEnvRequest{Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -102,7 +102,7 @@ func (h *Handler) updateEnv(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.UpdateEnv(c, &moment_api.UpdateEnvRequest{Id: id, Title: dto.Title})
+	_, err := h.gasketClient.UpdateEnv(c, &gasket_api.UpdateEnvRequest{Id: id, Title: dto.Title})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -131,7 +131,7 @@ func (h *Handler) deleteEnv(c *gin.Context) {
 		return
 	}
 
-	_, err := h.gasketClient.DeleteEnv(c, &moment_api.DeleteEnvRequest{Id: id})
+	_, err := h.gasketClient.DeleteEnv(c, &gasket_api.DeleteEnvRequest{Id: id})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

@@ -7,7 +7,8 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur/moment_service/internal/repository"
-	"github.com/Alexander272/sealur_proto/api/moment_api"
+	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/models/material_model"
 )
 
 type MaterialsService struct {
@@ -19,7 +20,7 @@ func NewMaterialsService(repo repository.Materials) *MaterialsService {
 }
 
 func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string, temp float64) (models.MaterialsResult, error) {
-	mats, err := s.repo.GetAllData(ctx, &moment_api.GetMaterialsDataRequest{MarkId: markId})
+	mats, err := s.repo.GetAllData(ctx, &material_api.GetMaterialsDataRequest{MarkId: markId})
 	if err != nil {
 		return models.MaterialsResult{}, fmt.Errorf("failed to get materials. error: %w", err)
 	}
@@ -101,14 +102,14 @@ func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string
 	return res, nil
 }
 
-func (s *MaterialsService) GetMaterials(ctx context.Context, req *moment_api.GetMaterialsRequest) (materials []*moment_api.Material, err error) {
+func (s *MaterialsService) GetMaterials(ctx context.Context, req *material_api.GetMaterialsRequest) (materials []*material_model.Material, err error) {
 	mats, err := s.repo.GetMaterials(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get materials. error: %w", err)
 	}
 
 	for _, item := range mats {
-		materials = append(materials, &moment_api.Material{
+		materials = append(materials, &material_model.Material{
 			Id:    item.Id,
 			Title: item.Title,
 		})
@@ -117,15 +118,15 @@ func (s *MaterialsService) GetMaterials(ctx context.Context, req *moment_api.Get
 	return materials, nil
 }
 
-func (s *MaterialsService) GetMaterialsWithIsEmpty(ctx context.Context, req *moment_api.GetMaterialsRequest,
-) (materials []*moment_api.MaterialWithIsEmpty, err error) {
+func (s *MaterialsService) GetMaterialsWithIsEmpty(ctx context.Context, req *material_api.GetMaterialsRequest,
+) (materials []*material_model.MaterialWithIsEmpty, err error) {
 	mats, err := s.repo.GetMaterialsWithIsEmpty(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get materials. error: %w", err)
 	}
 
 	for _, item := range mats {
-		materials = append(materials, &moment_api.MaterialWithIsEmpty{
+		materials = append(materials, &material_model.MaterialWithIsEmpty{
 			Id:                item.Id,
 			Title:             item.Title,
 			IsEmptyAlpha:      item.IsEmptyAlpha,
@@ -137,46 +138,46 @@ func (s *MaterialsService) GetMaterialsWithIsEmpty(ctx context.Context, req *mom
 	return materials, nil
 }
 
-func (s *MaterialsService) GetMaterialsData(ctx context.Context, req *moment_api.GetMaterialsDataRequest,
-) (materials *moment_api.MaterialsDataResponse, err error) {
+func (s *MaterialsService) GetMaterialsData(ctx context.Context, req *material_api.GetMaterialsDataRequest,
+) (materials *material_api.MaterialsDataResponse, err error) {
 	mats, err := s.repo.GetAllData(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get materials. error: %w", err)
 	}
 
-	voltage := make([]*moment_api.MaterialsDataResponse_Voltage, 0, len(mats.Voltage))
+	voltage := make([]*material_api.MaterialsDataResponse_Voltage, 0, len(mats.Voltage))
 	for _, item := range mats.Voltage {
 		item.Voltage = math.Round(item.Voltage*1000) / 1000
-		voltage = append(voltage, &moment_api.MaterialsDataResponse_Voltage{
+		voltage = append(voltage, &material_api.MaterialsDataResponse_Voltage{
 			Id:          item.Id,
 			Temperature: item.Temperature,
 			Voltage:     item.Voltage,
 		})
 	}
 
-	elasticity := make([]*moment_api.MaterialsDataResponse_Elasticity, 0, len(mats.Elasticity))
+	elasticity := make([]*material_api.MaterialsDataResponse_Elasticity, 0, len(mats.Elasticity))
 	for _, item := range mats.Elasticity {
 		item.Elasticity = math.Round(item.Elasticity*1000) / 1000
 
-		elasticity = append(elasticity, &moment_api.MaterialsDataResponse_Elasticity{
+		elasticity = append(elasticity, &material_api.MaterialsDataResponse_Elasticity{
 			Id:          item.Id,
 			Temperature: item.Temperature,
 			Elasticity:  item.Elasticity,
 		})
 	}
 
-	alpha := make([]*moment_api.MaterialsDataResponse_Alpha, 0, len(mats.Alpha))
+	alpha := make([]*material_api.MaterialsDataResponse_Alpha, 0, len(mats.Alpha))
 	for _, item := range mats.Alpha {
 		item.Alpha = math.Round(item.Alpha*1000) / 1000
 
-		alpha = append(alpha, &moment_api.MaterialsDataResponse_Alpha{
+		alpha = append(alpha, &material_api.MaterialsDataResponse_Alpha{
 			Id:          item.Id,
 			Temperature: item.Temperature,
 			Alpha:       item.Alpha,
 		})
 	}
 
-	materials = &moment_api.MaterialsDataResponse{
+	materials = &material_api.MaterialsDataResponse{
 		Voltage:    voltage,
 		Elasticity: elasticity,
 		Alpha:      alpha,
@@ -185,7 +186,7 @@ func (s *MaterialsService) GetMaterialsData(ctx context.Context, req *moment_api
 	return materials, nil
 }
 
-func (s *MaterialsService) CreateMaterial(ctx context.Context, material *moment_api.CreateMaterialRequest) (id string, err error) {
+func (s *MaterialsService) CreateMaterial(ctx context.Context, material *material_api.CreateMaterialRequest) (id string, err error) {
 	id, err = s.repo.CreateMaterial(ctx, material)
 	if err != nil {
 		return "", fmt.Errorf("failed to create material. error: %w", err)
@@ -193,14 +194,14 @@ func (s *MaterialsService) CreateMaterial(ctx context.Context, material *moment_
 	return id, nil
 }
 
-func (s *MaterialsService) UpdateMaterial(ctx context.Context, material *moment_api.UpdateMaterialRequest) error {
+func (s *MaterialsService) UpdateMaterial(ctx context.Context, material *material_api.UpdateMaterialRequest) error {
 	if err := s.repo.UpdateMaterial(ctx, material); err != nil {
 		return fmt.Errorf("failed to update material. error: %w", err)
 	}
 	return nil
 }
 
-func (s *MaterialsService) DeleteMaterial(ctx context.Context, material *moment_api.DeleteMaterialRequest) error {
+func (s *MaterialsService) DeleteMaterial(ctx context.Context, material *material_api.DeleteMaterialRequest) error {
 	if err := s.repo.DeleteMaterial(ctx, material); err != nil {
 		return fmt.Errorf("failed to delete material. error: %w", err)
 	}
