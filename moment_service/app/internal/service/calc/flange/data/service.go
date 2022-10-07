@@ -41,6 +41,7 @@ func NewDataService(flange *flange.FlangeService, materials *materials.Materials
 		flange:        flange,
 		materials:     materials,
 		gasket:        gasket,
+		graphic:       graphic,
 		typeFlangesTF: flangesTF,
 		typeFlangesTB: flangesTB,
 		typeFlangesTK: flangeTK,

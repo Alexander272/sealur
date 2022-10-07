@@ -34,14 +34,28 @@ func (s *DataService) getDataFlange(
 			D6:   fl.Size.D6,
 			C:    fl.Corrosion,
 		}
-		boltSize = &flange_model.BoltResult{
-			Diameter: bolt.Diameter,
-			Count:    bolt.Count,
-			Area:     bolt.Area,
+
+		if bolt.BoltId != "another" {
+			b, err := s.flange.GetBolt(ctx, bolt.BoltId)
+			if err != nil {
+				return nil, nil, fmt.Errorf("failed to get bolt size. error: %w", err)
+			}
+			boltSize = &flange_model.BoltResult{
+				Diameter: b.Diameter,
+				Count:    bolt.Count,
+				Area:     b.Area,
+			}
+		} else {
+			boltSize = &flange_model.BoltResult{
+				Diameter: bolt.Diameter,
+				Count:    bolt.Count,
+				Area:     bolt.Area,
+			}
 		}
+
 	} else {
 		size, err := s.flange.GetFlangeSize(ctx, &flange_api.GetFlangeSizeRequest{
-			// D:       flange.Dy,
+			// D:       fl.Dy,
 			Pn:      fl.Py,
 			StandId: fl.StandartId,
 			Dn:      fl.Dn,

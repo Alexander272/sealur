@@ -9,6 +9,15 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 )
 
+func (r *FlangeRepo) GetBolt(ctx context.Context, boltId string) (bolt models.BoltSize, err error) {
+	query := fmt.Sprintf("SELECT diameter, area FROM %s WHERE id=$1", BoltsTable)
+
+	if err := r.db.Get(&bolt, query, boltId); err != nil {
+		return bolt, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return bolt, nil
+}
+
 func (r *FlangeRepo) GetBolts(ctx context.Context, req *flange_api.GetBoltsRequest) (bolts []models.BoltsDTO, err error) {
 	query := fmt.Sprintf(`SELECT id, title, diameter, area, is_inch FROM %s WHERE is_inch=$1 ORDER BY diameter`, BoltsTable)
 

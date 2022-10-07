@@ -101,7 +101,7 @@ func (r *FlangeRepo) CreateStandart(ctx context.Context, stand *flange_api.Creat
 
 func (r *FlangeRepo) UpdateStandart(ctx context.Context, stand *flange_api.UpdateStandartRequest) error {
 	query := fmt.Sprintf(`UPDATE %s SET title=$1, type_id=$2, title_dn=$3, title_pn=$4, is_need_row=$5, rows=$6, 
-		is_inch=$7, has_desigantion=$8 WHERE id=$9`, StandartsTable)
+		is_inch=$7, has_designation=$8 WHERE id=$9`, StandartsTable)
 
 	_, err := r.db.Exec(query, stand.Title, stand.TypeId, stand.TitleDn, stand.TitlePn, stand.IsNeedRow,
 		strings.Join(stand.Rows, "; "), stand.IsInch, stand.HasDesignation, stand.Id)

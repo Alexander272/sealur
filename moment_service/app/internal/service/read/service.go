@@ -10,15 +10,21 @@ import (
 )
 
 type Flange interface {
-	Get(ctx context.Context, req *read_api.GetFlangeRequest) (*read_api.GetFlangeResponse, error)
+	GetFlange(ctx context.Context, req *read_api.GetFlangeRequest) (*read_api.GetFlangeResponse, error)
+}
+
+type Float interface {
+	GetFloat(ctx context.Context, req *read_api.GetFloatRequest) (*read_api.GetFloatResponse, error)
 }
 
 type ReadService struct {
 	Flange
+	Float
 }
 
 func NewReadService(flange *flange.FlangeService, materials *materials.MaterialsService, gasket *gasket.GasketService) *ReadService {
 	return &ReadService{
 		Flange: NewFlangeService(flange, materials, gasket),
+		Float:  NewFloatService(materials, gasket),
 	}
 }

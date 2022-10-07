@@ -19,7 +19,16 @@ func NewReadHandlers(service service.Read) *ReadHandlers {
 }
 
 func (h *ReadHandlers) GetFlange(ctx context.Context, req *read_api.GetFlangeRequest) (*read_api.GetFlangeResponse, error) {
-	res, err := h.service.Get(ctx, req)
+	res, err := h.service.GetFlange(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *ReadHandlers) GetFloat(ctx context.Context, req *read_api.GetFloatRequest) (*read_api.GetFloatResponse, error) {
+	res, err := h.service.GetFloat(ctx, req)
 	if err != nil {
 		return nil, err
 	}

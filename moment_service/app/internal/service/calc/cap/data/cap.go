@@ -49,10 +49,10 @@ func (s *DataService) getDataCap(
 func (s *DataService) getCalculatedDataCap(
 	ctx context.Context,
 	capType cap_model.CapData_Type,
-	data *cap_model.CapResult,
+	calc *cap_model.CapResult,
 	h, D, S0, DOut, Dcp float64,
 ) (*cap_model.CapResult, error) {
-	calculated := data
+	data := calc
 
 	if capType == cap_model.CapData_flat {
 		data.K = DOut / Dcp
@@ -65,5 +65,5 @@ func (s *DataService) getCalculatedDataCap(
 		data.Y = ((1 - data.Omega*(1+1.285*data.Lambda)) / (data.EpsilonAt20 * math.Pow(h, 3))) * ((DOut + D) / (DOut - D))
 	}
 
-	return calculated, nil
+	return data, nil
 }

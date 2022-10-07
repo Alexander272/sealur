@@ -19,6 +19,7 @@ type Flange interface {
 	UpdateFlangeSize(context.Context, *flange_api.UpdateFlangeSizeRequest) error
 	DeleteFlangeSize(context.Context, *flange_api.DeleteFlangeSizeRequest) error
 
+	GetBolt(ctx context.Context, boltId string) (bolt models.BoltSize, err error)
 	GetBolts(context.Context, *flange_api.GetBoltsRequest) ([]models.BoltsDTO, error)
 	GetAllBolts(context.Context, *flange_api.GetBoltsRequest) ([]models.BoltsDTO, error)
 	CreateBolt(context.Context, *flange_api.CreateBoltRequest) error

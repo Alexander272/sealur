@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/float_model"
 )
 
 type DataFlange struct {
@@ -29,6 +30,15 @@ type DataCap struct {
 	Embed      *cap_model.EmbedResult
 	Bolt       *cap_model.BoltResult
 	Gasket     *cap_model.GasketResult
+	TypeGasket string
+	Dcp, B0    float64
+}
+
+type DataFloat struct {
+	Flange     *float_model.FlangeResult
+	Cap        *float_model.CapResult
+	Bolt       *float_model.BoltResult
+	Gasket     *float_model.GasketResult
 	TypeGasket string
 	Dcp, B0    float64
 }

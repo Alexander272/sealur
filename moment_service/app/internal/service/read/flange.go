@@ -27,7 +27,7 @@ func NewFlangeService(flange *flange.FlangeService, materials *materials.Materia
 	}
 }
 
-func (s *FlangeService) Get(ctx context.Context, req *read_api.GetFlangeRequest) (*read_api.GetFlangeResponse, error) {
+func (s *FlangeService) GetFlange(ctx context.Context, req *read_api.GetFlangeRequest) (*read_api.GetFlangeResponse, error) {
 	typeFlange, err := s.flange.GetTypeFlange(ctx, &flange_api.GetTypeFlangeRequest{})
 	if err != nil {
 		return nil, err

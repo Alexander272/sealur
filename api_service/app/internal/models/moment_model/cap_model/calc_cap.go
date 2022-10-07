@@ -430,7 +430,7 @@ func (s *FlangeSize) NewSize() (size *cap_model.FlangeData_Size, err error) {
 func (b *BoltsData) NewBolts() (bolts *cap_model.BoltData, err error) {
 	bolts = &cap_model.BoltData{
 		MarkId: b.MarkId,
-		BoldId: b.BoltId,
+		BoltId: b.BoltId,
 		Title:  b.Title,
 	}
 	if b.Count != "" {

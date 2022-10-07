@@ -391,7 +391,7 @@ func (s *FlangeSize) NewSize() (size *flange_model.FlangeData_Size, err error) {
 func (b *BoltsData) NewBolts() (bolts *flange_model.BoltData, err error) {
 	bolts = &flange_model.BoltData{
 		MarkId: b.MarkId,
-		BoldId: b.BoltId,
+		BoltId: b.BoltId,
 		Title:  b.Title,
 	}
 	if b.Count != "" {

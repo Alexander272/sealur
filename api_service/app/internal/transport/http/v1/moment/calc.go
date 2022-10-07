@@ -6,6 +6,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/cap_model"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/flange_model"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/float_model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,6 +15,7 @@ func (h *Handler) initCalcRoutes(api *gin.RouterGroup) {
 	{
 		calc.POST("/flange", h.calculateFlange)
 		calc.POST("/cap", h.calculateCap)
+		calc.POST("/float", h.calculateFloat)
 	}
 }
 
@@ -60,7 +62,7 @@ func (h *Handler) calculateFlange(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param data body cap_model.CalcCap true "cap data"
-// @Success 200 {object} models.DataResponse{data=calc_api.CapData}
+// @Success 200 {object} models.DataResponse{data=calc_api.CapResponse}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
@@ -79,6 +81,41 @@ func (h *Handler) calculateCap(c *gin.Context) {
 	}
 
 	res, err := h.calcClient.CalculateCap(c, data)
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: res})
+}
+
+// @Summary Calculate Float
+// @Tags Sealur Moment -> calc-float
+// @Security ApiKeyAuth
+// @Description расчет плавающей головки теплообменного аппарата
+// @ModuleID calculateFloat
+// @Accept json
+// @Produce json
+// @Param data body float_model.Calc true "float data"
+// @Success 200 {object} models.DataResponse{data=calc_api.FloatResponse}
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-moment/calc/float/ [post]
+func (h *Handler) calculateFloat(c *gin.Context) {
+	var dto float_model.Calc
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	data, err := dto.New()
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	res, err := h.calcClient.CalculateFloat(c, data)
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

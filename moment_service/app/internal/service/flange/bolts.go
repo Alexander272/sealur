@@ -5,9 +5,21 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 	"github.com/Alexander272/sealur_proto/api/moment/models/flange_model"
 )
+
+func (s *FlangeService) GetBolt(ctx context.Context, boltId string) (bolt models.BoltSize, err error) {
+	bolt, err = s.repo.GetBolt(ctx, boltId)
+	if err != nil {
+		return bolt, fmt.Errorf("failed to get bolt by id. error: %w", err)
+	}
+	bolt.Diameter = math.Round(bolt.Diameter*1000) / 1000
+	bolt.Area = math.Round(bolt.Area*1000) / 1000
+
+	return bolt, err
+}
 
 func (s *FlangeService) GetBolts(ctx context.Context, req *flange_api.GetBoltsRequest) (bolts []*flange_model.Bolt, err error) {
 	data, err := s.repo.GetBolts(ctx, req)

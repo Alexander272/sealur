@@ -23,6 +23,7 @@ import (
 type Calc interface {
 	CalculationFlange(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponse, error)
 	CalculationCap(ctx context.Context, data *calc_api.CapRequest) (*calc_api.CapResponse, error)
+	CalculationFloat(ctx context.Context, data *calc_api.FloatRequest) (*calc_api.FloatResponse, error)
 }
 
 type Flange interface {
@@ -117,6 +118,7 @@ type Graphic interface {
 
 type Read interface {
 	read.Flange
+	read.Float
 }
 
 type Services struct {
@@ -132,15 +134,13 @@ func NewServices(repos *repository.Repositories) *Services {
 	flange := flange.NewFlangeService(repos.Flange)
 	materials := materials.NewMaterialsService(repos.Materials)
 	gasket := gasket.NewGasketService(repos.Gasket)
-	graphic := graphic.NewGraphicService()
-	calc := calc.NewCalcServices(flange, gasket, materials)
 
 	return &Services{
-		Calc:      calc,
 		Flange:    flange,
 		Materials: materials,
 		Gasket:    gasket,
-		Graphic:   graphic,
+		Graphic:   graphic.NewGraphicService(),
 		Read:      read.NewReadService(flange, materials, gasket),
+		Calc:      calc.NewCalcServices(flange, gasket, materials),
 	}
 }
