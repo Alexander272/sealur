@@ -40,14 +40,15 @@ func (s *DataService) getDataCap(ctx context.Context, cap *float_model.CapData) 
 
 func (s *DataService) getCalculatedDataCap(
 	ctx context.Context,
-	calc *float_model.CapResult,
-	h, D, S0, DOut, Dcp float64,
+	flange *float_model.FlangeResult,
+	cap *float_model.CapResult,
 ) (*float_model.CapResult, error) {
-	data := calc
+	data := cap
 
-	data.Lambda = (h / D) * math.Sqrt(data.Radius/S0)
-	data.Omega = 1 / (1 + 1.285*data.Lambda + 1.63*data.Lambda*math.Pow((h/S0), 2)*math.Log10(DOut/D))
-	data.Y = ((1 - data.Omega*(1+1.285*data.Lambda)) / (data.EpsilonAt20 * math.Pow(h, 3))) * ((DOut + D) / (DOut - D))
+	data.Lambda = (cap.H / flange.D) * math.Sqrt(data.Radius/cap.S)
+	data.Omega = 1 / (1 + 1.285*data.Lambda + 1.63*data.Lambda*math.Pow((cap.H/cap.S), 2)*math.Log10(flange.DOut/flange.D))
+	data.Y = ((1 - data.Omega*(1+1.285*data.Lambda)) / (data.EpsilonAt20 * math.Pow(cap.H, 3))) *
+		((flange.DOut + flange.D) / (flange.DOut - flange.D))
 
 	return data, nil
 }

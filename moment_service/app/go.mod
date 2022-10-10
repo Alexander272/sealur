@@ -3,7 +3,7 @@ module github.com/Alexander272/sealur/moment_service
 go 1.17
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20221007115913-d322cd02767d
+	github.com/Alexander272/sealur_proto/api v0.0.0-20221010105923-53820a31717d
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.6

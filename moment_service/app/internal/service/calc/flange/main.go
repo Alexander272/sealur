@@ -26,16 +26,19 @@ type FlangeService struct {
 
 func NewFlangeService(graphic *graphic.GraphicService, flange *flange.FlangeService, gasket *gasket.GasketService,
 	materials *materials.MaterialsService) *FlangeService {
+	//значение зависит от поля "Тип соединения"
 	bolt := map[string]float64{
 		"bolt": constants.BoltD,
 		"pin":  constants.PinD,
 	}
 
+	// занчение зависит от поля "Условия работы"
 	kp := map[bool]float64{
 		true:  constants.WorkKyp,
 		false: constants.TestKyp,
 	}
 
+	// значение зависит от поля "Условие затяжки"
 	kz := map[string]float64{
 		"uncontrollable":  constants.UncontrollableKyz,
 		"controllable":    constants.ControllableKyz,
@@ -55,8 +58,9 @@ func NewFlangeService(graphic *graphic.GraphicService, flange *flange.FlangeServ
 	}
 }
 
-// расчет по ГОСТ 34233.4 - 2017
+// расчет момента затяжки фланец-фланец по ГОСТ 34233.4 - 2017
 func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponse, error) {
+	// получение данных (либо из бд, либо либо их пердают с клиента) для расчетов (+ там пару формул записано)
 	d, err := s.data.GetData(ctx, data)
 	if err != nil {
 		return nil, err
@@ -338,24 +342,24 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 				result.Calc.Basis.Mkp = s.graphic.CalculateMkp(d.Bolt.Diameter, result.Calc.Basis.SigmaB1)
 			} else {
 				//? вроде как формула изменилась, но почему-то использовалась новая формула
-				result.Calc.Basis.Mkp = (0.3 * Pbm * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000
+				result.Calc.Basis.Mkp = (0.3 * Pbm * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 			}
 
 			result.Calc.Basis.Mkp1 = 0.75 * result.Calc.Basis.Mkp
 
 			Prek := 0.8 * Ab * d.Bolt.SigmaAt20
 			result.Calc.Basis.Qrek = Prek / (math.Pi * d.Dcp * d.Gasket.Width)
-			result.Calc.Basis.Mrek = (0.3 * Prek * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000
+			result.Calc.Basis.Mrek = (0.3 * Prek * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 
 			Pmax := result.Calc.Basis.DSigmaM * Ab
 			result.Calc.Basis.Qmax = Pmax / (math.Pi * d.Dcp * d.Gasket.Width)
 
 			if d.TypeGasket == "Soft" && result.Calc.Basis.Qmax > d.Gasket.PermissiblePres {
 				Pmax = float64(d.Gasket.PermissiblePres) * (math.Pi * d.Dcp * d.Gasket.Width)
-				result.Calc.Basis.Qmax = float64(d.Gasket.PermissiblePres)
+				result.Calc.Basis.Qmax = d.Gasket.PermissiblePres
 			}
 
-			result.Calc.Basis.Mmax = (0.3 * Pmax * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000
+			result.Calc.Basis.Mmax = (0.3 * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 		}
 	} else {
 		result.Calc.Strength.Gamma = gamma

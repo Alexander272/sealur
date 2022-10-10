@@ -48,10 +48,14 @@ func (s *DataService) GetData(ctx context.Context, data *calc_api.FloatRequest) 
 		}
 	}
 
-	// flange, err = s.getCalculatedDataFlange(ctx, data.FlangesData[0].Type, flange1, result.Dcp)
-	// if err != nil {
-	// 	return result, err
-	// }
+	flange, err = s.getCalculatedDataFlange(ctx, flange, cap, result.Dcp)
+	if err != nil {
+		return result, err
+	}
+	cap, err = s.getCalculatedDataCap(ctx, flange, cap)
+	if err != nil {
+		return result, err
+	}
 
 	result.Flange = flange
 	result.Cap = cap

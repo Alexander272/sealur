@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"fmt"
+	"math"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/float_model"
@@ -63,4 +64,19 @@ func (s *DataService) getDataFlange(
 	flangeData.Sigma = mat.Sigma
 
 	return flangeData, boltSize, nil
+}
+
+func (s *DataService) getCalculatedDataFlange(
+	ctx context.Context,
+	data *float_model.FlangeResult,
+	cap *float_model.CapResult,
+	Dcp float64,
+) (*float_model.FlangeResult, error) {
+	calculated := data
+
+	calculated.B = 0.5 * (data.D6 - Dcp)
+	calculated.L0 = math.Sqrt(data.D * cap.S)
+	calculated.Y = 0
+
+	return calculated, nil
 }

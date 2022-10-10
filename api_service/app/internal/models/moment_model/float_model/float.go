@@ -15,7 +15,7 @@ type Calc struct {
 	Condition      string         `json:"condition"`
 	Gasket         GasketFullData `json:"gasket"`
 	Bolts          BoltsData      `json:"bolts"`
-	FlangeData     Flange         `json:"flangesData"`
+	FlangeData     Flange         `json:"flangeData"`
 	CapData        Cap            `json:"capData"`
 	IsNeedFormulas bool           `json:"isNeedFormulas"`
 }

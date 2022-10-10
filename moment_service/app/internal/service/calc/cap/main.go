@@ -26,16 +26,19 @@ type CapService struct {
 
 func NewCapService(graphic *graphic.GraphicService, flange *flange.FlangeService, gasket *gasket.GasketService,
 	materials *materials.MaterialsService) *CapService {
+	//значение зависит от поля "Тип соединения"
 	bolt := map[string]float64{
 		"bolt": constants.BoltD,
 		"pin":  constants.PinD,
 	}
 
+	// занчение зависит от поля "Условия работы"
 	kp := map[bool]float64{
 		true:  constants.WorkKyp,
 		false: constants.TestKyp,
 	}
 
+	// значение зависит от поля "Условие затяжки"
 	kz := map[string]float64{
 		"uncontrollable":  constants.UncontrollableKyz,
 		"controllable":    constants.ControllableKyz,
@@ -55,8 +58,9 @@ func NewCapService(graphic *graphic.GraphicService, flange *flange.FlangeService
 	}
 }
 
-// расчет по ГОСТ 34233.4 - 2017
+// расчет момента затяжка фланец-крышка по ГОСТ 34233.4 - 2017
 func (s *CapService) CalculationCap(ctx context.Context, data *calc_api.CapRequest) (*calc_api.CapResponse, error) {
+	// получение данных (либо из бд, либо либо их пердают с клиента) для расчетов (+ там пару формул записано)
 	d, err := s.data.GetData(ctx, data)
 	if err != nil {
 		return nil, err
