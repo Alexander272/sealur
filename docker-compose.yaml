@@ -52,6 +52,8 @@ services:
         restart: on-failure:5
         image: sealur/moment_service:0.6.8
         container_name: dev-moment_service
+        ports:
+            - 9000:9000
         env_file:
             - .env
 

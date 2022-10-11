@@ -381,6 +381,7 @@ func (s *CapService) CalculationCap(ctx context.Context, data *calc_api.CapReque
 	if data.IsNeedFormulas {
 		result.Formulas = s.formulas.GetFormulas(
 			d.TypeGasket,
+			data.Type.String(),
 			data.Condition.String(),
 			data.IsWork, data.IsUseWasher, data.IsEmbedded,
 			d,

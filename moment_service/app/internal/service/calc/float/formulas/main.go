@@ -41,7 +41,7 @@ func NewFormulasService() *FormulasService {
 }
 
 func (s *FormulasService) GetFormulas(
-	Condition string,
+	Condition, TypeBolt string,
 	IsWork bool,
 	data models.DataFloat,
 	result calc_api.FloatResponse,
@@ -51,7 +51,7 @@ func (s *FormulasService) GetFormulas(
 	area := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Area, 'G', 3, 64), "E", "*10^")
 	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 3, 64)
 	Lb0 := strings.ReplaceAll(strconv.FormatFloat(result.Bolt.Lenght, 'G', 3, 64), "E", "*10^")
-	typeBolt := strings.ReplaceAll(strconv.FormatFloat(s.typeBolt[result.Data.Type], 'G', 3, 64), "E", "*10^")
+	typeBolt := strings.ReplaceAll(strconv.FormatFloat(s.typeBolt[TypeBolt], 'G', 3, 64), "E", "*10^")
 	bEpsilonAt20 := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.EpsilonAt20, 'G', 3, 64), "E", "*10^")
 	bSigmaAt20 := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.SigmaAt20, 'G', 3, 64), "E", "*10^")
 	bSigma := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Sigma, 'G', 3, 64), "E", "*10^")
@@ -107,11 +107,14 @@ func (s *FormulasService) GetFormulas(
 		formulas.Alpha = fmt.Sprintf("1 - (%s - (%s - %s)*%s)/(%s + %s)", yp, cY, fB, fB, yp, yb)
 	}
 
-	formulas.Pb2 = fmt.Sprintf("max(%s, 0.4 * %s * %s)", Po, A, bSigmaAt20)
+	formulas.Pb2 = fmt.Sprintf("max(%s; 0.4 * %s * %s)", Po, A, bSigmaAt20)
 	formulas.Pb1 = fmt.Sprintf("%s*%s + %s", alpha, Qd, Rp)
 
 	formulas.Pb = fmt.Sprintf("max(%s; %s)", Pb1, Pb2)
 	formulas.Pbr = fmt.Sprintf("%s + (1 - %s)*%s", Pb, alpha, Qd)
+
+	formulas.SigmaB1 = fmt.Sprintf("%s / %s", Pb, A)
+	formulas.SigmaB2 = fmt.Sprintf("%s / %s", Pbr, A)
 
 	Kyp := strconv.FormatFloat(s.Kyp[IsWork], 'G', 3, 64)
 	Kyz := strconv.FormatFloat(s.Kyz[Condition], 'G', 3, 64)

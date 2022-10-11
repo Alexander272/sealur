@@ -41,7 +41,8 @@ func NewFormulasService() *FormulasService {
 }
 
 func (s *FormulasService) GetFormulas(
-	TypeGasket, Condition string, IsWork, IsUseWasher, IsEmbedded bool,
+	TypeGasket, TypeBolt, Condition string,
+	IsWork, IsUseWasher, IsEmbedded bool,
 	data models.DataCap,
 	result calc_api.CapResponse,
 	calculation calc_api.CapRequest_Calcutation,
@@ -57,7 +58,7 @@ func (s *FormulasService) GetFormulas(
 	epsilon := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.Epsilon, 'G', 3, 64), "E", "*10^")
 	Dcp := strings.ReplaceAll(strconv.FormatFloat(data.Dcp, 'G', 3, 64), "E", "*10^")
 	Lb0 := strings.ReplaceAll(strconv.FormatFloat(result.Bolt.Lenght, 'G', 3, 64), "E", "*10^")
-	typeBolt := strings.ReplaceAll(strconv.FormatFloat(s.typeBolt[result.Data.Type], 'G', 3, 64), "E", "*10^")
+	typeBolt := strings.ReplaceAll(strconv.FormatFloat(s.typeBolt[TypeBolt], 'G', 3, 64), "E", "*10^")
 	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 3, 64)
 	bEpsilon := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Epsilon, 'G', 3, 64), "E", "*10^")
 	bEpsilonAt20 := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.EpsilonAt20, 'G', 3, 64), "E", "*10^")

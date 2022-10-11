@@ -156,7 +156,7 @@ func (s *FloatService) CalculationFloat(ctx context.Context, data *calc_api.Floa
 
 	if data.IsNeedFormulas {
 		result.Formulas = s.formulas.GetFormulas(
-			data.Condition.String(),
+			data.Condition.String(), data.Type.String(),
 			data.IsWork,
 			d,
 			result,

@@ -41,7 +41,7 @@ func NewFormulasService() *FormulasService {
 }
 
 func (s *FormulasService) GetFormulas(
-	TypeGasket, Condition string,
+	TypeGasket, TypeBolt, Condition string,
 	IsWork, IsUseWasher, IsEmbedded bool,
 	data models.DataFlange,
 	result calc_api.FlangeResponse,
@@ -58,7 +58,7 @@ func (s *FormulasService) GetFormulas(
 	epsilon := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.Epsilon, 'G', 3, 64), "E", "*10^")
 	Dcp := strings.ReplaceAll(strconv.FormatFloat(data.Dcp, 'G', 3, 64), "E", "*10^")
 	Lb0 := strings.ReplaceAll(strconv.FormatFloat(result.Bolt.Lenght, 'G', 3, 64), "E", "*10^")
-	typeBolt := strings.ReplaceAll(strconv.FormatFloat(s.typeBolt[result.Data.Type], 'G', 3, 64), "E", "*10^")
+	typeBolt := strings.ReplaceAll(strconv.FormatFloat(s.typeBolt[TypeBolt], 'G', 3, 64), "E", "*10^")
 	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 3, 64)
 	bEpsilon := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Epsilon, 'G', 3, 64), "E", "*10^")
 	bEpsilonAt20 := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.EpsilonAt20, 'G', 3, 64), "E", "*10^")
@@ -212,9 +212,9 @@ func (s *FormulasService) GetFormulas(
 		mkp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Basis.Mkp, 'G', 3, 64), "E", "*10^")
 		dSigmaM := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Basis.DSigmaM, 'G', 3, 64), "E", "*10^")
 
-		formulas.Basis.Pb2 = fmt.Sprintf("max(%s;0.4 * %s * %s)", po, ab, bSigmaAt20)
+		formulas.Basis.Pb2 = fmt.Sprintf("max(%s; 0.4 * %s * %s)", po, ab, bSigmaAt20)
 		formulas.Basis.Pb1 = fmt.Sprintf("max(%s; %s-%s)", pb1F, pb1F, qt)
-		formulas.Basis.Pb = fmt.Sprintf("max(%s;%s)", pb1, pb2)
+		formulas.Basis.Pb = fmt.Sprintf("max(%s; %s)", pb1, pb2)
 		formulas.Basis.Pbr = fmt.Sprintf("%s + (1-%s) * (%s + %d) + %s + 4 * (1-%s) * |%d|/%s",
 			pbm, alpha, qd, axialForce, qt, alphaM, bendingMoment, Dcp)
 		formulas.Basis.SigmaB1 = fmt.Sprintf("%s / %s", pbm, ab)
@@ -285,9 +285,9 @@ func (s *FormulasService) GetFormulas(
 		smkp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.SMkp, 'G', 3, 64), "E", "*10^")
 		kyt := strconv.FormatFloat(constants.NoLoadKyt, 'G', 3, 64)
 
-		formulas.Strength.FPb2 = fmt.Sprintf("max(%s;0.4 * %s * %s)", po, ab, bSigmaAt20)
+		formulas.Strength.FPb2 = fmt.Sprintf("max(%s; 0.4 * %s * %s)", po, ab, bSigmaAt20)
 		formulas.Strength.FPb1 = pb1F
-		formulas.Strength.FPb = fmt.Sprintf("max(%s;%s)", pb1, pb2)
+		formulas.Strength.FPb = fmt.Sprintf("max(%s; %s)", pb1, pb2)
 		formulas.Strength.FPbr = fmt.Sprintf("%s + (1-%s) * (%s + %d) + 4 * (1-%s) * |%d|/%s",
 			fpbm, alpha, qd, axialForce, alphaM, bendingMoment, Dcp)
 		formulas.Strength.FSigmaB1 = fmt.Sprintf("%s / %s", fpbm, ab)
@@ -355,9 +355,9 @@ func (s *FormulasService) GetFormulas(
 		kyt = strconv.FormatFloat(constants.LoadKyt, 'G', 3, 64)
 		dSigmaM := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.SDSigmaM, 'G', 3, 64), "E", "*10^")
 
-		formulas.Strength.SPb2 = fmt.Sprintf("max(%s;0.4 * %s * %s)", po, ab, bSigmaAt20)
+		formulas.Strength.SPb2 = fmt.Sprintf("max(%s; 0.4 * %s * %s)", po, ab, bSigmaAt20)
 		formulas.Strength.SPb1 = fmt.Sprintf("max(%s; %s-%s)", pb1F, pb1F, qt)
-		formulas.Strength.SPb = fmt.Sprintf("max(%s;%s)", pb1, pb2)
+		formulas.Strength.SPb = fmt.Sprintf("max(%s; %s)", pb1, pb2)
 		formulas.Strength.SPbr = fmt.Sprintf("%s + (1-%s) * (%s + %d) + %s + 4 * (1-%s) * |%d|/%s",
 			spbm, alpha, qd, axialForce, qt, alphaM, bendingMoment, Dcp)
 		formulas.Strength.SSigmaB1 = fmt.Sprintf("%s / %s", spbm, ab)

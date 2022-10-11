@@ -16,10 +16,12 @@ func (s *DataService) getDataFlange(
 ) (flangeData *float_model.FlangeResult, boltSize *float_model.BoltResult, err error) {
 
 	flangeData = &float_model.FlangeResult{
-		DOut: fl.DOut,
-		D:    fl.D,
-		D6:   fl.D6,
-		Tf:   fl.T,
+		DOut:  fl.DOut,
+		D:     fl.D,
+		D6:    fl.D6,
+		Tf:    fl.T,
+		Width: fl.Width,
+		DIn:   fl.DIn,
 	}
 
 	if bolt.BoltId != "another" {

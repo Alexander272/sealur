@@ -489,6 +489,7 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 	if data.IsNeedFormulas {
 		result.Formulas = s.formulas.GetFormulas(
 			d.TypeGasket,
+			data.Type.String(),
 			data.Condition.String(),
 			data.IsWork, data.IsUseWasher, data.IsEmbedded,
 			d,

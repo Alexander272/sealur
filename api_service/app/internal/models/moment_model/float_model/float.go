@@ -75,6 +75,8 @@ type Flange struct {
 	T        string       `json:"t"`
 	MarkId   string       `json:"markId"`
 	Material MaterialData `json:"material"`
+	Width    string       `json:"width"`
+	DIn      string       `json:"dIn"`
 }
 
 func (f *Calc) New() (float *calc_api.FloatRequest, err error) {
@@ -146,6 +148,19 @@ func (f *Flange) NewFlangeData() (flange *float_model.FlangeData, err error) {
 	if err != nil {
 		return nil, err
 	}
+	var width, dIn float64
+	if f.Width != "" {
+		width, err = strconv.ParseFloat(f.Width, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if f.DIn != "" {
+		dIn, err = strconv.ParseFloat(f.DIn, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	flange = &float_model.FlangeData{
 		DOut:     dOut,
@@ -154,6 +169,8 @@ func (f *Flange) NewFlangeData() (flange *float_model.FlangeData, err error) {
 		T:        t,
 		MarkId:   f.MarkId,
 		Material: mat,
+		Width:    width,
+		DIn:      dIn,
 	}
 
 	return flange, nil

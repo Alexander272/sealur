@@ -39,6 +39,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		h.services.Limit.Create(c, c.ClientIP())
 	}
 
+	//TODO надо бы отправлять письмо на почту о превышении количества попыток авторизации
 	if limit.Count > h.auth.CountAttempt {
 		h.services.AddAttempt(c, c.ClientIP())
 		models.NewErrorResponse(c, http.StatusTooManyRequests, "too many request", "too many request")
