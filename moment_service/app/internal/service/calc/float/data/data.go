@@ -7,6 +7,7 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/float_model"
 )
 
 func (s *DataService) GetData(ctx context.Context, data *calc_api.FloatRequest) (result models.DataFloat, err error) {
@@ -35,7 +36,7 @@ func (s *DataService) GetData(ctx context.Context, data *calc_api.FloatRequest) 
 		result.B0 = (flange.Width + bp) / 2
 		result.Dcp = flange.DIn + flange.Width
 	} else {
-		if result.TypeGasket != "Soft" {
+		if result.TypeGasket != float_model.GasketData_Soft.String() {
 			result.B0 = bp / 4
 			result.Dcp = data.Gasket.DOut - bp/2
 		} else {

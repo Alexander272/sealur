@@ -93,6 +93,7 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 		result.Calc.Strength = &flange_model.CalcMomentStrength{}
 	}
 
+	// Расстояние между опорными поверхностями гайки
 	Lb0 := d.Gasket.Thickness + d.Flange1.H + d.Flange2.H
 
 	if d.Type1 == flange_model.FlangeData_free {
@@ -102,20 +103,25 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 		Lb0 += d.Flange2.Hk
 	}
 
+	// Эффективная ширина прокладки
 	result.Calc.B0 = d.B0
+	// Расчетный диаметр прокладки
 	result.Calc.Dsp = d.Dcp
 	result.Bolt.Lenght = Lb0
 
 	var yp float64 = 0
 	if d.TypeGasket == "Soft" {
+		// Податливость прокладки
 		yp = (d.Gasket.Thickness * d.Gasket.Compression) / (d.Gasket.Epsilon * math.Pi * d.Dcp * d.Gasket.Width)
 	}
 
 	// приложение К пояснение к формуле К.2
 	Lb := Lb0 + s.typeBolt[data.Type.String()]*d.Bolt.Diameter
 	// формула К.2
+	// Податливость болтов/шпилек
 	yb := Lb / (d.Bolt.EpsilonAt20 * d.Bolt.Area * float64(d.Bolt.Count))
 	// фомула 8
+	// Суммарная площадь сечения болтов/шпилек
 	Ab := float64(d.Bolt.Count) * d.Bolt.Area
 	result.Calc.A = Ab
 
@@ -129,6 +135,7 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 		alpha = 1 - (yp-(d.Flange1.Yf*d.Flange1.E*d.Flange1.B+d.Flange2.Yf*d.Flange2.E*d.Flange2.B))/
 			(yp+yb+(d.Flange1.Yf*math.Pow(d.Flange1.B, 2)+d.Flange2.Yf*math.Pow(d.Flange2.B, 2)))
 	}
+	// Коэффициент жесткости
 	result.Calc.Alpha = alpha
 
 	dividend = yb + d.Flange1.Yfn*d.Flange1.B*(d.Flange1.B+d.Flange1.E-math.Pow(d.Flange1.E, 2)/d.Dcp) +
@@ -144,25 +151,30 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 		divider += d.Flange2.Yfc * math.Pow(d.Flange2.A, 2)
 	}
 
-	//формула (Е.13)
+	// формула (Е.13)
+	// Коэффициент жесткости фланцевого соединения нагруженного внешним изгибающим моментом
 	alphaM := dividend / divider
 	result.Calc.AlphaM = alphaM
 	// формула 6
+	// Усилие необходимое для смятия прокладки при затяжке
 	Pobg := 0.5 * math.Pi * d.Dcp * d.B0 * d.Gasket.Pres
 
 	var Rp float64 = 0
 	if data.Pressure >= 0 {
 		// формула 7
+		// Усилие на прокладке в рабочих условиях
 		Rp = math.Pi * d.Dcp * d.B0 * d.Gasket.M * math.Abs(data.Pressure)
 	}
 
 	// формула 9
+	// Равнодействующая нагрузка от давления
 	Qd := 0.785 * math.Pow(d.Dcp, 2) * float64(data.Pressure)
 
 	temp1 := float64(data.AxialForce) + 4*math.Abs(float64(data.BendingMoment))/d.Dcp
 	temp2 := float64(data.AxialForce) - 4*math.Abs(float64(data.BendingMoment))/d.Dcp
 
 	// формула 10
+	// Приведенная нагрузка, вызванная воздействием внешней силы и изгибающего момента
 	QFM := math.Max(temp1, temp2)
 
 	result.Calc.Po = Pobg
@@ -171,7 +183,10 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 	result.Calc.Qfm = QFM
 
 	minB := 0.4 * Ab * d.Bolt.SigmaAt20
+	// Расчетная нагрузка на болты/шпильки при затяжке, необходимая для обеспечения обжатия прокладки и минимального начального натяжения болтов/шпилек
 	Pb2 := math.Max(Pobg, minB)
+	// Расчетная нагрузка на болты/шпильки при затяжке, необходимая для обеспечения в рабочих условиях давления на
+	// прокладку достаточного для герметизации фланцевого соединения
 	Pb1 := alpha*(Qd+float64(data.AxialForce)) + Rp + 4*alphaM*math.Abs(float64(data.BendingMoment))/d.Dcp
 
 	if data.Calculation != calc_api.FlangeRequest_basis {
@@ -182,19 +197,25 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 		result.Calc.Strength.Yb = yb
 		result.Calc.Strength.Lb = Lb
 
+		// Расчетная нагрузка на болты/шпильки фланцевых соединений
 		Pbm := math.Max(Pb1, Pb2)
+		// Расчетная нагрузка на болты/шпильки фланцевых соединений в рабочих условиях
 		Pbr := Pbm + (1-alpha)*(Qd+float64(data.AxialForce)) + 4*(1-alphaM)*math.Abs(float64(data.BendingMoment))/d.Dcp
 		result.Calc.Strength.FPb = Pbm
 		result.Calc.Strength.FPbr = Pbr
 
+		// Расчетное напряжение в болтах/шпильках - при затяжке
 		result.Calc.Strength.FSigmaB1 = Pbm / Ab
+		// Расчетное напряжение в болтах/шпильках - в рабочих условиях
 		result.Calc.Strength.FSigmaB2 = Pbr / Ab
 
 		Kyp := s.Kyp[data.IsWork]
 		Kyz := s.Kyz[data.Condition.String()]
 		Kyt := constants.NoLoadKyt
 
+		// Условия прочности болтов шпилек - при затяжке
 		result.Calc.Strength.FDSigmaM = 1.2 * Kyp * Kyz * Kyt * d.Bolt.SigmaAt20
+		// Условия прочности болтов шпилек - в рабочих условиях
 		result.Calc.Strength.FDSigmaR = Kyp * Kyz * Kyt * d.Bolt.Sigma
 
 		if result.Calc.Strength.FSigmaB1 > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {

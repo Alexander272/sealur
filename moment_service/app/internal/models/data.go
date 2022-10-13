@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/dev_cooling_model"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/float_model"
 )
@@ -41,4 +42,13 @@ type DataFloat struct {
 	Gasket     *float_model.GasketResult
 	TypeGasket string
 	Dcp, B0    float64
+}
+
+type DataDevCooling struct {
+	Cap        *dev_cooling_model.CapResult
+	TubeSheet  *dev_cooling_model.TubeSheetResult
+	Tube       *dev_cooling_model.TubeResult
+	Bolt       *dev_cooling_model.BoltResult
+	Gasket     *dev_cooling_model.GasketResult
+	TypeGasket dev_cooling_model.GasketData_Type
 }

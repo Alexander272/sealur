@@ -76,8 +76,11 @@ func (s *DataService) getCalculatedDataFlange(
 ) (*float_model.FlangeResult, error) {
 	calculated := data
 
+	// Плечи действия усилий в болтах/шпильках
 	calculated.B = 0.5 * (data.D6 - Dcp)
+	// Параметр длины обечайки
 	calculated.L0 = math.Sqrt(data.D * cap.S)
+	// Угловая податливость фланца при затяжке (она 0 т.к. S0 = 0)
 	calculated.Y = 0
 
 	return calculated, nil

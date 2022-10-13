@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/cap"
+	"github.com/Alexander272/sealur/moment_service/internal/service/calc/dev_cooling"
 	calc_flange "github.com/Alexander272/sealur/moment_service/internal/service/calc/flange"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/float"
 	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
@@ -25,18 +26,24 @@ type Float interface {
 	CalculationFloat(ctx context.Context, data *calc_api.FloatRequest) (*calc_api.FloatResponse, error)
 }
 
+type DevCooling interface {
+	CalculateDevCooling(ctx context.Context, data *calc_api.DevCoolingRequest) (*calc_api.DevCoolingResponse, error)
+}
+
 type CalcService struct {
 	Flange
 	Cap
 	Float
+	DevCooling
 }
 
 func NewCalcServices(flange *flange.FlangeService, gasket *gasket.GasketService, materials *materials.MaterialsService) *CalcService {
 	graphic := graphic.NewGraphicService()
 
 	return &CalcService{
-		Flange: calc_flange.NewFlangeService(graphic, flange, gasket, materials),
-		Cap:    cap.NewCapService(graphic, flange, gasket, materials),
-		Float:  float.NewFloatService(graphic, flange, gasket, materials),
+		Flange:     calc_flange.NewFlangeService(graphic, flange, gasket, materials),
+		Cap:        cap.NewCapService(graphic, flange, gasket, materials),
+		Float:      float.NewFloatService(graphic, flange, gasket, materials),
+		DevCooling: dev_cooling.NewCoolingService(graphic, flange, gasket, materials),
 	}
 }

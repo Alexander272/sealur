@@ -21,9 +21,14 @@ import (
 )
 
 type Calc interface {
+	// расчет момента затяжки фланец-фланец по ГОСТ 34233.4 - 2017
 	CalculationFlange(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponse, error)
+	// расчет момента затяжка фланец-крышка по ГОСТ 34233.4 - 2017
 	CalculationCap(ctx context.Context, data *calc_api.CapRequest) (*calc_api.CapResponse, error)
+	// расчет плавающей головки теплообменного аппарата
 	CalculationFloat(ctx context.Context, data *calc_api.FloatRequest) (*calc_api.FloatResponse, error)
+	// расчет аппаратов воздушного охлаждения
+	CalculateDevCooling(ctx context.Context, data *calc_api.DevCoolingRequest) (*calc_api.DevCoolingResponse, error)
 }
 
 type Flange interface {

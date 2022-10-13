@@ -18,7 +18,7 @@ func (s *DataService) getGasketData(ctx context.Context, data *float_model.Gaske
 		res := &float_model.GasketResult{
 			Gasket:          gasket.Gasket,
 			Env:             gasket.Env,
-			Type:            gasket.TypeTitle,
+			Type:            gasket.Type,
 			Thickness:       data.Thickness,
 			DOut:            data.DOut,
 			Width:           bp,
@@ -29,13 +29,6 @@ func (s *DataService) getGasketData(ctx context.Context, data *float_model.Gaske
 			Epsilon:         gasket.Epsilon,
 		}
 		return res, gasket.TypeTitle, nil
-	}
-
-	//? наверное это не лучшее решение
-	titles := map[string]string{
-		"Soft":  "Мягкая",
-		"Oval":  "Восьмигранная",
-		"Metal": "Металлическая",
 	}
 
 	res := &float_model.GasketResult{
@@ -50,5 +43,5 @@ func (s *DataService) getGasketData(ctx context.Context, data *float_model.Gaske
 		Compression:     data.Data.Compression,
 		Epsilon:         data.Data.Epsilon,
 	}
-	return res, titles[data.Data.Type.String()], nil
+	return res, data.Data.Type.String(), nil
 }

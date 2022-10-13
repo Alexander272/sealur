@@ -28,7 +28,7 @@ func (s *DataService) getGasketData(ctx context.Context, data *flange_model.Gask
 			Compression:     gasket.Compression,
 			Epsilon:         gasket.Epsilon,
 		}
-		return res, gasket.TypeTitle, nil
+		return res, gasket.Type, nil
 	}
 
 	//? наверное это не лучшее решение
@@ -40,7 +40,7 @@ func (s *DataService) getGasketData(ctx context.Context, data *flange_model.Gask
 
 	res := &flange_model.GasketResult{
 		Gasket:          data.Data.Title,
-		Type:            data.Data.Type.String(),
+		Type:            titles[data.Data.Type.String()],
 		Thickness:       data.Thickness,
 		DOut:            data.DOut,
 		Width:           bp,
@@ -50,5 +50,5 @@ func (s *DataService) getGasketData(ctx context.Context, data *flange_model.Gask
 		Compression:     data.Data.Compression,
 		Epsilon:         data.Data.Epsilon,
 	}
-	return res, titles[data.Data.Type.String()], nil
+	return res, data.Data.Type.String(), nil
 }

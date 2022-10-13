@@ -20,14 +20,15 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/material_api"
 	"github.com/Alexander272/sealur_proto/api/moment/read_api"
 	_ "github.com/lib/pq"
+	"github.com/subosito/gotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 func main() {
-	// if err := gotenv.Load("../../.env"); err != nil {
-	// 	logger.Fatalf("error loading env variables: %s", err.Error())
-	// }
+	if err := gotenv.Load("../../.env"); err != nil {
+		logger.Fatalf("error loading env variables: %s", err.Error())
+	}
 	conf, err := config.Init("configs")
 	if err != nil {
 		logger.Fatalf("error initializing configs: %s", err.Error())
@@ -58,7 +59,7 @@ func main() {
 
 	cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
 	if err != nil {
-		logger.Fatalf("failed to load certificate. error: %w", err)
+		logger.Fatalf("failed to load certificate. error: %s", err.Error())
 	}
 
 	opts := []grpc.ServerOption{
@@ -76,12 +77,12 @@ func main() {
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {
-		logger.Fatalf("failed to create grpc listener:", err)
+		logger.Fatalf("failed to create grpc listener: %s", err.Error())
 	}
 
 	go func() {
 		if err = server.Serve(listener); err != nil {
-			logger.Fatalf("failed to start server:", err)
+			logger.Fatalf("failed to start server: %s", err.Error())
 		}
 	}()
 	logger.Infof("Application started on port: %s", conf.Http.Port)

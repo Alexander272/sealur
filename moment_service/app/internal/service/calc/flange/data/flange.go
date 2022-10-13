@@ -161,6 +161,7 @@ func (s *DataService) getCalculatedDataFlange(
 ) (*flange_model.FlangeResult, error) {
 	calculated := data
 	if flangeType != flange_model.FlangeData_free {
+		// Плечи действия усилий в болтах/шпильках
 		calculated.B = 0.5 * (data.D6 - Dcp)
 	} else {
 		calculated.Ds = 0.5 * (data.DOut + data.Dk + 2*data.H0)
@@ -169,16 +170,21 @@ func (s *DataService) getCalculatedDataFlange(
 	}
 
 	if flangeType != flange_model.FlangeData_welded {
+		// Эквивалентная толщина втулки
 		calculated.Se = data.S0
 	} else {
 		calculated.X = data.L / (math.Sqrt(data.D * data.S0))
 		calculated.Beta = data.S1 / data.S0
+		// Коэффициент зависящий от соотношения размеров конической втулки фланца
 		calculated.Xi = 1 + (calculated.Beta-1)*calculated.X/(calculated.X+(1+calculated.Beta)/4)
 		calculated.Se = calculated.Xi * data.S0
 	}
 
+	// Плечо усилия от действия давления на фланец
 	calculated.E = 0.5 * (Dcp - data.D - calculated.Se)
+	// Параметр длины обечайки
 	calculated.L0 = math.Sqrt(data.D * data.S0)
+	// Отношение наружного диаметра тарелки фланца к внутреннему диаметру
 	calculated.K = data.DOut / data.D
 
 	dividend := math.Pow(calculated.K, 2)*(1+8.55*(math.Log(calculated.K)/math.Log(10))) - 1
@@ -207,7 +213,9 @@ func (s *DataService) getCalculatedDataFlange(
 	}
 
 	calculated.Lymda = (calculated.BetaF*data.H+calculated.L0)/(calculated.BetaT*calculated.L0) +
-		+(calculated.BetaV*math.Pow(data.H, 3))/(calculated.BetaU*calculated.L0*math.Pow(data.S0, 2))
+		(calculated.BetaV*math.Pow(data.H, 3))/(calculated.BetaU*calculated.L0*math.Pow(data.S0, 2))
+
+	// Угловая податливость фланца при затяжке
 	calculated.Yf = (0.91 * calculated.BetaV) / (data.EpsilonAt20 * calculated.Lymda * math.Pow(data.S0, 2) * calculated.L0)
 
 	if flangeType == flange_model.FlangeData_free {
@@ -216,6 +224,7 @@ func (s *DataService) getCalculatedDataFlange(
 	}
 
 	if flangeType != flange_model.FlangeData_free {
+		// Угловая податливость фланца нагруженного внешним изгибающим моментом
 		calculated.Yfn = math.Pow(math.Pi/4, 3) * (data.D6 / (data.EpsilonAt20 * data.DOut * math.Pow(data.H, 3)))
 	} else {
 		calculated.Yfn = math.Pow(math.Pi/4, 3) * (data.Ds / (data.EpsilonAt20 * data.DOut * math.Pow(data.H, 3)))

@@ -102,7 +102,7 @@ func (s *FormulasService) GetFormulas(
 	if result.Data.Pressure >= 0 {
 		formulas.Rp = fmt.Sprintf("%f * %s * %s * %s * |%s|", math.Pi, Dcp, b0, gM, pressure)
 	}
-	formulas.Qd = fmt.Sprintf("0.785 * %s^2 * %s", Dcp, pressure)
+	formulas.Qd = fmt.Sprintf("0.785 * (%s)^2 * %s", Dcp, pressure)
 	if data.TypeGasket == "Oval" {
 		formulas.Alpha = fmt.Sprintf("1 - (%s - (%s - %s)*%s)/(%s + %s)", yp, cY, fB, fB, yp, yb)
 	}

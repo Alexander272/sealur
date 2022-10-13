@@ -79,9 +79,9 @@ func (s *FormulasService) getStrengthFormulas(
 		strength.SigmaM1 = fmt.Sprintf("%s / (%s * (%s - %s)^2 * %s)", mm, lymda, s0, c, dvz)
 	}
 
-	strength.SigmaR = fmt.Sprintf("((1.33 * %s * %s + %s)/(%s * %s^2 * %s * %s)) * %s",
+	strength.SigmaR = fmt.Sprintf("((1.33 * %s * %s + %s)/(%s * (%s)^2 * %s * %s)) * %s",
 		betaF, h, l0, lymda, h, l0, d, mm)
-	strength.SigmaT = fmt.Sprintf("(%s * %s)/(%s^2 * %s) - %s * %s", betaY, mm, h, d, betaZ, sigmaR)
+	strength.SigmaT = fmt.Sprintf("(%s * %s)/((%s)^2 * %s) - %s * %s", betaY, mm, h, d, betaZ, sigmaR)
 
 	hk := strings.ReplaceAll(strconv.FormatFloat(flange.Hk, 'G', 3, 64), "E", "*10^")
 	dk := strings.ReplaceAll(strconv.FormatFloat(flange.Dk, 'G', 3, 64), "E", "*10^")
@@ -90,7 +90,7 @@ func (s *FormulasService) getStrengthFormulas(
 	sigmaP1 := strings.ReplaceAll(strconv.FormatFloat(res.SigmaP1, 'G', 3, 64), "E", "*10^")
 
 	if typeF == flange_model.FlangeData_free {
-		strength.SigmaK = fmt.Sprintf("%s * %s / %s^2 * %s", betaY, mmk, hk, dk)
+		strength.SigmaK = fmt.Sprintf("%s * %s / (%s)^2 * %s", betaY, mmk, hk, dk)
 	}
 
 	if typeF == flange_model.FlangeData_welded && flange.S1 != flange.S0 {
@@ -102,16 +102,16 @@ func (s *FormulasService) getStrengthFormulas(
 
 	if typeF == flange_model.FlangeData_welded {
 		temp := fmt.Sprintf("%f * (%s + %s) * (%s - %s)", math.Pi, d, s1, s1, c)
-		strength.SigmaMp = fmt.Sprintf("(0.785 * %s^2 * %s + %d + (4 * |%d|)/(%s + %s)) / %s",
+		strength.SigmaMp = fmt.Sprintf("(0.785 * (%s)^2 * %s + %d + (4 * |%d|)/(%s + %s)) / %s",
 			d, pressure, AxialForce, BendingMoment, d, s1, temp)
-		strength.SigmaMpm = fmt.Sprintf("(0.785 * %s^2 * %s + %d - (4 * |%d|)/(%s + %s)) / %s",
+		strength.SigmaMpm = fmt.Sprintf("(0.785 * (%s)^2 * %s + %d - (4 * |%d|)/(%s + %s)) / %s",
 			d, pressure, AxialForce, BendingMoment, d, s1, temp)
 	}
 
 	temp := fmt.Sprintf("%f * (%s + %s) * (%s - %s)", math.Pi, d, s0, s0, c)
-	strength.SigmaMp0 = fmt.Sprintf("(0.785 * %s^2 * %s + %d + (4 * |%d|)/(%s + %s)) / %s",
+	strength.SigmaMp0 = fmt.Sprintf("(0.785 * (%s)^2 * %s + %d + (4 * |%d|)/(%s + %s)) / %s",
 		d, pressure, AxialForce, BendingMoment, d, s0, temp)
-	strength.SigmaMpm0 = fmt.Sprintf("(0.785 * %s^2 * %s + %d - (4 * |%d|)/(%s + %s)) / %s",
+	strength.SigmaMpm0 = fmt.Sprintf("(0.785 * (%s)^2 * %s + %d - (4 * |%d|)/(%s + %s)) / %s",
 		d, pressure, AxialForce, BendingMoment, d, s0, temp)
 
 	strength.SigmaMop = fmt.Sprintf("%s * %s / (2 * (%s - %s))", pressure, d, s0, c)
@@ -119,11 +119,11 @@ func (s *FormulasService) getStrengthFormulas(
 	sigmaRp := strings.ReplaceAll(strconv.FormatFloat(res.SigmaRp, 'G', 3, 64), "E", "*10^")
 	sigmaTp := strings.ReplaceAll(strconv.FormatFloat(res.SigmaTp, 'G', 3, 64), "E", "*10^")
 
-	strength.SigmaRp = fmt.Sprintf("((1.33 * %s * %s + %s)/(%s * %s^2 * %s * %s)) * %s", betaF, h, l0, lymda, h, l0, d, mp)
-	strength.SigmaTp = fmt.Sprintf("(%s * %s)/(%s^2 * %s) - %s * %s", betaY, mp, h, d, betaZ, sigmaRp)
+	strength.SigmaRp = fmt.Sprintf("((1.33 * %s * %s + %s)/(%s * (%s)^2 * %s * %s)) * %s", betaF, h, l0, lymda, h, l0, d, mp)
+	strength.SigmaTp = fmt.Sprintf("(%s * %s)/((%s)^2 * %s) - %s * %s", betaY, mp, h, d, betaZ, sigmaRp)
 
 	if typeF == flange_model.FlangeData_free {
-		strength.SigmaKp = fmt.Sprintf("(%s * %s)/(%s^2 * %s)", betaY, mp, hk, dk)
+		strength.SigmaKp = fmt.Sprintf("(%s * %s)/((%s)^2 * %s)", betaY, mp, hk, dk)
 	}
 
 	epsilon := strings.ReplaceAll(strconv.FormatFloat(flange.Epsilon, 'G', 3, 64), "E", "*10^")
