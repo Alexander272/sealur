@@ -27,15 +27,15 @@ func (s *DataService) getTubeData(ctx context.Context, tube *dev_cooling_model.T
 		}
 	} else {
 		mat = models.MaterialsResult{
-			Title:     tube.Material.Title,
-			Epsilon:   tube.Material.Epsilon,
-			SigmaAt20: tube.Material.SigmaAt20,
-			Sigma:     tube.Material.Sigma,
+			Title:       tube.Material.Title,
+			EpsilonAt20: tube.Material.Epsilon,
+			SigmaAt20:   tube.Material.SigmaAt20,
+			Sigma:       tube.Material.Sigma,
 		}
 	}
 
 	tubeData.Material = mat.Title
-	tubeData.Epsilon = mat.Epsilon
+	tubeData.Epsilon = mat.EpsilonAt20
 	tubeData.SigmaAt20 = mat.SigmaAt20
 	tubeData.Sigma = mat.Sigma
 

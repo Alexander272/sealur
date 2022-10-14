@@ -33,7 +33,7 @@ func (s *DataService) getBoltData(ctx context.Context, bolt *dev_cooling_model.B
 			return nil, err
 		}
 		boltData.Material = mat.Title
-		boltData.Epsilon = mat.Epsilon
+		boltData.Epsilon = mat.EpsilonAt20
 		boltData.SigmaAt20 = mat.SigmaAt20
 		boltData.Sigma = mat.Sigma
 	} else {

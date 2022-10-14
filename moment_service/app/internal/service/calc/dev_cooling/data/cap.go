@@ -31,15 +31,15 @@ func (s *DataService) getDataCap(ctx context.Context, cap *dev_cooling_model.Cap
 		}
 	} else {
 		mat = models.MaterialsResult{
-			Title:     cap.Material.Title,
-			Epsilon:   cap.Material.Epsilon,
-			SigmaAt20: cap.Material.SigmaAt20,
-			Sigma:     cap.Material.Sigma,
+			Title:       cap.Material.Title,
+			EpsilonAt20: cap.Material.Epsilon,
+			SigmaAt20:   cap.Material.SigmaAt20,
+			Sigma:       cap.Material.Sigma,
 		}
 	}
 
 	capData.Material = mat.Title
-	capData.Epsilon = mat.Epsilon
+	capData.Epsilon = mat.EpsilonAt20
 	capData.SigmaAt20 = mat.SigmaAt20
 	capData.Sigma = mat.Sigma
 
