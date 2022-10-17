@@ -6,6 +6,7 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/dev_cooling/data"
+	"github.com/Alexander272/sealur/moment_service/internal/service/calc/dev_cooling/formulas"
 	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
@@ -15,9 +16,9 @@ import (
 )
 
 type CoolingService struct {
-	graphic *graphic.GraphicService
-	data    *data.DataService
-	// formulas *formulas.FormulasService
+	graphic  *graphic.GraphicService
+	data     *data.DataService
+	formulas *formulas.FormulasService
 	typeBolt map[string]float64
 	mu       map[string]float64
 }
@@ -35,14 +36,14 @@ func NewCoolingService(graphic *graphic.GraphicService, flange *flange.FlangeSer
 	}
 
 	data := data.NewDataService(flange, materials, gasket, graphic)
-	// formulas := formulas.NewFormulasService()
+	formulas := formulas.NewFormulasService()
 
 	return &CoolingService{
 		typeBolt: bolt,
 		mu:       mu,
 		graphic:  graphic,
 		data:     data,
-		// formulas: formulas,
+		formulas: formulas,
 	}
 }
 
@@ -68,6 +69,11 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 	Bolt := &dev_cooling_model.CalcBolt{}
 	TubeSheet := &dev_cooling_model.CalcTubeSheet{}
 	Cap := &dev_cooling_model.CalcCap{}
+	Moment := &dev_cooling_model.CalcMoment{}
+
+	if data.CameraDiagram != calc_api.DevCoolingRequest_schema1 && data.CameraDiagram != calc_api.DevCoolingRequest_schema5 {
+		d.Cap.Strength = 1
+	}
 
 	// расчетная ширина плоской прокладки
 	Auxiliary.EstimatedGasketWidth = math.Min(d.Gasket.Width, 3.87*math.Sqrt(d.Gasket.Width))
@@ -132,8 +138,8 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 			0.6*(Auxiliary.Upsilon*Auxiliary.Mu*((2*d.Tube.Depth)/(d.Tube.Diameter*d.Tube.Thickness))*d.Tube.Sigma)
 	}
 
-	// коэффициент уменьшения допускаемых напряжений при продольном изгибе
 	//! тут в Epsilon лежит значение EpsilonAt20
+	// коэффициент уменьшения допускаемых напряжений при продольном изгибе
 	Auxiliary.PhiT = 1 / math.Sqrt(1+math.Pow(1.8*(d.Tube.Sigma/d.Tube.Epsilon)*
 		math.Pow(d.Tube.ReducedLength/(d.Tube.Diameter-d.Tube.Thickness), 2), 2))
 
@@ -261,9 +267,9 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 
 	Lb = d.Bolt.Lenght + s.typeBolt[data.TypeBolt.String()]*d.Bolt.Diameter
 
-	// Линейная податливость болта (шпильки)
+	// Yb Линейная податливость болта (шпильки)
 	Bolt.UpsilonB = Lb / (d.Bolt.Epsilon * d.Bolt.Area * float64(d.Bolt.Count))
-	// Линейная податливость прокладки
+	// Yp Линейная податливость прокладки
 	Bolt.UpsilonP = d.Gasket.Thickness / (2 * d.Bolt.Epsilon * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
 
 	tmp1 = Bolt.UpsilonB + (Bolt.CapUpsilonM+Bolt.SheetUpsilonM)*math.Pow(Auxiliary.Arm1, 2)
@@ -275,7 +281,7 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 	// Fв - Расчетное усилие в болтах (шпильках) в условиях эксплуатации
 	Bolt.WorkEffort = data.Pressure * (Bolt.Lp*Auxiliary.Bp + 2*Auxiliary.EstimatedGasketWidth*d.Gasket.M*(Bolt.Lp+Auxiliary.Bp))
 
-	//TODO в оригинале почему-то тут не WorkEffort, а полщадь и количество болтов
+	//TODO в оригинале почему-то тут не WorkEffort, а площадь и количество болтов
 	tmp1 = (result.Calc.Pressure / data.Pressure) * Bolt.WorkEffort
 	tmp2 = result.Calc.Pressure * (Bolt.Eta*Bolt.Lp*Auxiliary.Bp + 2*Auxiliary.EstimatedGasketWidth*d.Gasket.M*(Bolt.Lp+Auxiliary.Bp))
 	// F0 - Расчетное усилие в болтах (шпильках) в условиях испытаний или монтажа
@@ -293,10 +299,154 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 		Y: d.Bolt.Sigma,
 	}
 
+	// Условие прочности прокладки
+	result.Calc.GasketCond = &dev_cooling_model.Condition{
+		X: math.Max(Bolt.WorkEffort, Bolt.Effort) / (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width),
+		Y: d.Gasket.PermissiblePres,
+	}
+
+	// коэффициенты для Толщина трубной решетки в пределах зоны перфорации
+	TubeSheet.Lambda = (4 * Bolt.WorkEffort * Auxiliary.Arm1) / (data.Pressure * (Bolt.Lp + Auxiliary.Bp) * math.Pow(Auxiliary.EstimatedZoneWidth, 2))
+	if data.Pressure*Auxiliary.Eta <= Auxiliary.PhiT*Auxiliary.LoadTube {
+		TubeSheet.OmegaP = data.Pressure / (Auxiliary.LoadTube + data.Pressure*Auxiliary.Eta)
+	} else {
+		tmp1 = data.Pressure*Auxiliary.Eta - Auxiliary.PhiT*Auxiliary.LoadTube
+		tmp2 = Auxiliary.LoadTube - data.Pressure*(2-Auxiliary.Eta)
+		tmp3 = data.Pressure * Auxiliary.LoadTube * (1 + Auxiliary.PhiT)
+		TubeSheet.OmegaP = (math.Pow(data.Pressure, 2) + tmp1*tmp2) / tmp3
+	}
+
+	tmp1 = math.Sqrt(data.Pressure / (Auxiliary.Phi * d.TubeSheet.Sigma))
+	tmp2 = math.Sqrt(TubeSheet.Lambda + TubeSheet.Psi + TubeSheet.OmegaP + 1.5*data.Pressure/(Auxiliary.Phi*d.TubeSheet.Sigma))
+	// s1 (s1min) - Толщина трубной решетки в пределах зоны перфорации
+	TubeSheet.ZoneThick = 0.71*Auxiliary.EstimatedZoneWidth*tmp1*tmp2 + d.TubeSheet.Corrosion
+
+	// F1 - Расчетное усилие
+	TubeSheet.Effort = (Bolt.Effort / (Bolt.Lp + Auxiliary.Bp)) * (data.Pressure / result.Calc.Pressure)
+
+	tmp1 = math.Sqrt(TubeSheet.Effort / d.TubeSheet.Sigma)
+	tmp2 = math.Sqrt(4*Auxiliary.Arm1 + 1.5*(TubeSheet.Effort/d.TubeSheet.Sigma))
+	tmp3 = math.Sqrt(4*Auxiliary.Arm2 + 1.5*(TubeSheet.Effort/d.TubeSheet.Sigma))
+	// s2 (s2min) - Толщина трубной решетки в месте уплотнения
+	TubeSheet.PlaceThick = 0.71*tmp1*tmp2 + d.TubeSheet.Corrosion
+	// s3 (s3min) - Толщина трубной решетки вне зоны уплотнения
+	TubeSheet.OutZoneThick = 0.71*tmp1*tmp3 + d.TubeSheet.Corrosion
+
+	tmp1 = math.Sinh(TubeSheet.Omega) + math.Sin(TubeSheet.Omega)
+	TubeSheet.ZF = TubeSheet.Omega * ((math.Cosh(TubeSheet.Omega) + math.Cos(TubeSheet.Omega)) / tmp1)
+	TubeSheet.ZM = (math.Pow(TubeSheet.Omega, 2) / 4) * ((math.Sinh(TubeSheet.Omega) - math.Sin(TubeSheet.Omega)) / tmp1)
+
+	//Условие прочности крепления труб в решетке
+	TubeSheet.Strength = &dev_cooling_model.Condition{
+		X: data.Pressure * (TubeSheet.ZF - Auxiliary.Eta + TubeSheet.ZM*(TubeSheet.Lambda+TubeSheet.Psi)),
+		Y: Auxiliary.Load,
+	}
+
+	// коэффициенты для Толщина донышка крышки
+	Cap.Lambda = (4 * Bolt.WorkEffort * Auxiliary.Arm1) / (data.Pressure * (Bolt.Lp + Auxiliary.Bp) * math.Pow(d.Cap.InnerSize, 2))
+
+	if data.CameraDiagram != calc_api.DevCoolingRequest_schema4 {
+		tmp1 = 1.5*(d.Bolt.Distance-d.Cap.InnerSize) - d.Cap.FlangeThick
+		Cap.Chi = (0.8 / d.Cap.L) * tmp1 * math.Pow(d.Cap.FlangeThick/d.Cap.WallThick, 2)
+	} else {
+		tmp1 = 6*d.Cap.FlangeThick - d.Bolt.Distance - d.Cap.InnerSize
+		tmp2 = math.Pow((d.Bolt.Distance-d.Cap.InnerSize)/d.Cap.BottomThick, 2)
+		Cap.Chi = (0.1 / d.Cap.L) * tmp1 * tmp2
+	}
+
+	if data.CameraDiagram != calc_api.DevCoolingRequest_schema5 {
+		Cap.Psi = (math.Pow(Auxiliary.Bp/d.Cap.InnerSize, 2)-1)*(d.Cap.L/(d.Cap.L+d.Cap.InnerSize)) -
+			4*math.Pow(d.Cap.Depth/d.Cap.InnerSize, 2)
+		Cap.F1 = 1 / (1 + (d.Cap.InnerSize / d.Cap.L) + math.Pow(d.Cap.InnerSize/d.Cap.L, 2))
+		Cap.F2 = 0.5 * Cap.F1
+		if data.CameraDiagram != calc_api.DevCoolingRequest_schema4 {
+			tmp1 = (1.5*(d.Bolt.Distance-d.Cap.InnerSize) - d.Cap.FlangeThick) * math.Pow(d.Cap.FlangeThick/d.Cap.BottomThick, 2)
+			tmp2 = (3*(d.Cap.Depth-d.Cap.FlangeThick) + 2*d.Cap.WallThick) * math.Pow(d.Cap.WallThick/d.Cap.BottomThick, 2)
+			Cap.ChiK = (0.8 / d.Cap.L) * (tmp1 + tmp2)
+		} else {
+			tmp1 = 6*d.Cap.FlangeThick - d.Bolt.Distance - d.Cap.InnerSize
+			tmp2 = math.Pow((d.Bolt.Distance-d.Cap.InnerSize)/d.Cap.BottomThick, 2)
+			Cap.ChiK = (0.1 / d.Cap.L) * tmp1 * tmp2
+		}
+		tmp1 = (Cap.Lambda + Cap.Psi + Cap.F1) / (1 + Cap.ChiK)
+		// s4 (s4min) - Толщина донышка крышки
+		Cap.BottomThick = 0.71*d.Cap.InnerSize*math.Sqrt(data.Pressure/d.Cap.Sigma)*
+			(math.Sqrt(math.Max(tmp1, Cap.F2)+1.5*data.Pressure/d.Cap.Sigma)) + d.Cap.Corrosion
+	} else {
+		// s4 (s4min) - Толщина донышка крышки
+		Cap.BottomThick = 0.71*d.Cap.InnerSize*math.Sqrt(data.Pressure/d.Cap.Sigma)*
+			math.Sqrt((Cap.Lambda/(d.Cap.Strength+Cap.Chi))+0.5*(data.Pressure/(math.Pow(d.Cap.Strength, 2)*d.Cap.Sigma))) + d.Cap.Corrosion
+	}
+
+	tmp1 = math.Sqrt(TubeSheet.Effort / d.TubeSheet.Sigma)
+	tmp2 = math.Sqrt(4*Auxiliary.Arm1/d.Cap.Strength + Cap.Chi)
+	// s5 (s5min) - Толщина стенки крышки в месте присоединения к фланцу
+	Cap.WallThick = 0.71*tmp1*tmp2 + d.Cap.Corrosion
+
+	tmp1 = math.Sqrt(TubeSheet.Effort / d.Cap.Sigma)
+	tmp2 = math.Sqrt(4*Auxiliary.Arm1 + 1.5*(TubeSheet.Effort/d.Cap.Sigma))
+	// s6 (s6min) - Толщина фланца крышки
+	Cap.FlangeThick = 0.71*tmp1*tmp2 + d.Cap.Corrosion
+
+	Cap.SideWallThick = Cap.WallThick
+	if data.CameraDiagram == calc_api.DevCoolingRequest_schema5 {
+		Cap.SideWallThick = math.Max(Cap.WallThick, 0.25*d.Cap.InnerSize*math.Sqrt(data.Pressure/d.Cap.Sigma)+d.Cap.Corrosion)
+	}
+
+	ok := true
+	if Bolt.WorkCond.X > Bolt.WorkCond.Y || Bolt.TestCond.X > Bolt.TestCond.Y {
+		ok = false
+	}
+	if result.Calc.GasketCond.X > result.Calc.GasketCond.Y {
+		ok = false
+	}
+	if TubeSheet.Omega > 1 || TubeSheet.Strength.X > TubeSheet.Strength.Y {
+		ok = false
+	}
+
+	if ok {
+		if Bolt.WorkCond.X > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {
+			// Крутящий момент при затяжке болтов/шпилек
+			Moment.Mkp = s.graphic.CalculateMkp(d.Bolt.Diameter, Bolt.WorkCond.X)
+		} else {
+			Moment.Mkp = (0.3 * Bolt.Effort * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		}
+
+		// Крутящий момент при затяжке болтов/шпилек со смазкой снижается на 25%
+		Moment.Mkp1 = 0.75 * Moment.Mkp
+
+		Prek := 0.8 * Ab * d.Bolt.SigmaAt20
+		// Напряжение на прокладке
+		Moment.Qrek = Prek / (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
+		// Момент затяжки при применении уплотнения на старых (изношенных) фланцах, имеющих перекосы
+		Moment.Mrek = (0.3 * Prek * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+
+		Pmax := Bolt.WorkCond.Y * Ab
+		// Максимальное напряжение на прокладке
+		Moment.Qmax = Pmax / (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
+		if Moment.Qmax > d.Gasket.PermissiblePres {
+			Pmax = d.Gasket.PermissiblePres * (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
+			Moment.Qmax = d.Gasket.PermissiblePres
+		}
+
+		// Максимальный крутящий момент при затяжке болтов/шпилек
+		Moment.Mmax = (0.3 * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+	}
+
 	result.Calc.Auxiliary = Auxiliary
 	result.Calc.Bolt = Bolt
 	result.Calc.TubeSheet = TubeSheet
 	result.Calc.Cap = Cap
+	result.Calc.Moment = Moment
+
+	if data.IsNeedFormulas {
+		result.Formulas = s.formulas.GetFormulas(
+			Ab, Lambda1, Lambda2, Alpha1, Alpha2,
+			*data,
+			d,
+			result,
+		)
+	}
 
 	return &result, nil
 }

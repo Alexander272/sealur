@@ -114,6 +114,7 @@ func (s *GasketService) GetGasket(ctx context.Context, req *gasket_api.GetGasket
 }
 
 func (s *GasketService) GetGasketWithThick(ctx context.Context, req *gasket_api.GetGasketRequest) (gasket []*gasket_model.GasketWithThick, err error) {
+	// TODO добавить возможность получения только определенного типа прокладок
 	data, err := s.repo.GetGasketWithThick(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get gasket. error: %w", err)
