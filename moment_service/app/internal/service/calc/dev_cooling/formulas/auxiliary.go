@@ -11,7 +11,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/dev_cooling_model"
 )
 
-func (s *FormulasService) GetAuxiliaryFormulas(
+func (s *FormulasService) getAuxiliaryFormulas(
 	data calc_api.DevCoolingRequest,
 	d models.DataDevCooling,
 	result calc_api.DevCoolingResponse,

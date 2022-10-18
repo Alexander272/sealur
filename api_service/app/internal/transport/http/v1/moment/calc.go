@@ -5,6 +5,7 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/cap_model"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/dev_cooling_model"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/flange_model"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/float_model"
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,7 @@ func (h *Handler) initCalcRoutes(api *gin.RouterGroup) {
 		calc.POST("/flange", h.calculateFlange)
 		calc.POST("/cap", h.calculateCap)
 		calc.POST("/float", h.calculateFloat)
+		calc.POST("/dev-cooling", h.calculateDevCooling)
 	}
 }
 
@@ -116,6 +118,41 @@ func (h *Handler) calculateFloat(c *gin.Context) {
 	}
 
 	res, err := h.calcClient.CalculateFloat(c, data)
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: res})
+}
+
+// @Summary Calculate Dev Cooling
+// @Tags Sealur Moment -> calc-dev-cooling
+// @Security ApiKeyAuth
+// @Description расчет аппаратов воздушного охлаждения
+// @ModuleID calculateDevCooling
+// @Accept json
+// @Produce json
+// @Param data body dev_cooling_model.Calc true "dev cooling data"
+// @Success 200 {object} models.DataResponse{data=calc_api.DevCoolingResponse}
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-moment/calc/dev-cooling/ [post]
+func (h *Handler) calculateDevCooling(c *gin.Context) {
+	var dto dev_cooling_model.Calc
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	data, err := dto.Parse()
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	res, err := h.calcClient.CalculateDevCooling(c, data)
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

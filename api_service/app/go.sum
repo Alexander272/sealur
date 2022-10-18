@@ -51,6 +51,8 @@ github.com/Alexander272/sealur_proto/api v0.0.0-20221010105923-53820a31717d h1:x
 github.com/Alexander272/sealur_proto/api v0.0.0-20221010105923-53820a31717d/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
 github.com/Alexander272/sealur_proto/api v0.0.0-20221012122840-c139baf94d73 h1:JhnZN7A0zpO6mncQrCD6npN7Fe9UB5LTFQHS5zjBLfA=
 github.com/Alexander272/sealur_proto/api v0.0.0-20221012122840-c139baf94d73/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
+github.com/Alexander272/sealur_proto/api v0.0.0-20221018060957-a249ef58d315 h1:GsnaJVoeKUdIk2VQsJQS3seHEKAkZu2X3rBtYkDgojs=
+github.com/Alexander272/sealur_proto/api v0.0.0-20221018060957-a249ef58d315/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=

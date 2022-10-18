@@ -11,7 +11,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/dev_cooling_model"
 )
 
-func (s *FormulasService) GetBoltFormulas(
+func (s *FormulasService) getBoltFormulas(
 	Lambda1, Lambda2, Alpha1, Alpha2 float64,
 	data calc_api.DevCoolingRequest,
 	d models.DataDevCooling,
@@ -39,6 +39,7 @@ func (s *FormulasService) GetBoltFormulas(
 	Phi6 = 2 * (d.Cap.FlangeThick / d.Cap.InnerSize)
 
 	Lb := d.Bolt.Lenght + s.typeBolt[data.TypeBolt.String()]*d.Bolt.Diameter
+	Ab := d.Bolt.Area * float64(d.Bolt.Count)
 
 	// перевод чисел в строки
 	sPhi1 := strings.ReplaceAll(strconv.FormatFloat(Phi1, 'G', 3, 64), "E", "*10^")
@@ -52,6 +53,7 @@ func (s *FormulasService) GetBoltFormulas(
 	sAlpha1 := strings.ReplaceAll(strconv.FormatFloat(Alpha1, 'G', 3, 64), "E", "*10^")
 	sAlpha2 := strings.ReplaceAll(strconv.FormatFloat(Alpha2, 'G', 3, 64), "E", "*10^")
 	sLb := strings.ReplaceAll(strconv.FormatFloat(Lb, 'G', 3, 64), "E", "*10^")
+	sAb := strings.ReplaceAll(strconv.FormatFloat(Ab, 'G', 3, 64), "E", "*10^")
 
 	pressure := strconv.FormatFloat(data.Pressure, 'G', 3, 64)
 
@@ -73,6 +75,8 @@ func (s *FormulasService) GetBoltFormulas(
 	outZoneThick := strconv.FormatFloat(d.TubeSheet.OutZoneThick, 'G', 3, 64)
 	tsEpsilon := strconv.FormatFloat(d.TubeSheet.Epsilon, 'G', 3, 64)
 
+	CPressure := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Pressure, 'G', 3, 64), "E", "*10^")
+
 	CapPsi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.Psi, 'G', 3, 64), "E", "*10^")
 
 	TsPsi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Psi, 'G', 3, 64), "E", "*10^")
@@ -90,6 +94,9 @@ func (s *FormulasService) GetBoltFormulas(
 	SheetUpsilonM := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.SheetUpsilonM, 'G', 3, 64), "E", "*10^")
 	CapUpsilonP := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.CapUpsilonP, 'G', 3, 64), "E", "*10^")
 	SheetUpsilonP := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.SheetUpsilonP, 'G', 3, 64), "E", "*10^")
+	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.WorkEffort, 'G', 3, 64), "E", "*10^")
+	Eta := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Eta, 'G', 3, 64), "E", "*10^")
+	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Effort, 'G', 3, 64), "E", "*10^")
 
 	tmp1 := fmt.Sprintf("(%s)^3 / (%s * (%s)^3)", innerSize, capEpsilon, bottomThick)
 	var tmp2, tmp3, tmpPhi string
@@ -134,22 +141,15 @@ func (s *FormulasService) GetBoltFormulas(
 	Bolt.WorkEffort = fmt.Sprintf("%s * (%s * %s + 2 * %s * %s * (%s + %s))", pressure, Lp, Bp, EstimatedGasketWidth, m, Lp, Bp)
 
 	//TODO в оригинале почему-то тут не WorkEffort, а площадь и количество болтов
-	// tmp1 = (result.Calc.Pressure / data.Pressure) * Bolt.WorkEffort
-	// tmp2 = result.Calc.Pressure * (Bolt.Eta*Bolt.Lp*Auxiliary.Bp + 2*Auxiliary.EstimatedGasketWidth*d.Gasket.M*(Bolt.Lp+Auxiliary.Bp))
+	tmp1 = fmt.Sprintf("(%s / %s) * %s", CPressure, pressure, WorkEffort)
+	tmp2 = fmt.Sprintf("%s * (%s * %s * %s + 2 * %s * %s * (%s + %s))", CPressure, Eta, Lp, Bp, EstimatedGasketWidth, m, Lp, Bp)
 	// F0 - Расчетное усилие в болтах (шпильках) в условиях испытаний или монтажа
-	// Bolt.Effort = math.Max(tmp1, tmp2)
+	Bolt.Effort = fmt.Sprintf("max(%s; %s)", tmp1, tmp2)
 
-	// Ab := d.Bolt.Area * float64(d.Bolt.Count)
 	// Условия прочности болтов/шпилек - в условиях испытания или монтажа
-	// Bolt.TestCond = &dev_cooling_model.Condition{
-	// 	X: Bolt.Effort / Ab,
-	// 	Y: d.Bolt.SigmaAt20,
-	// }
-	// // Условия прочности болтов/шпилек - в условиях эксплуатации
-	// Bolt.WorkCond = &dev_cooling_model.Condition{
-	// 	X: Bolt.WorkEffort / Ab,
-	// 	Y: d.Bolt.Sigma,
-	// }
+	Bolt.TestCond = fmt.Sprintf("%s / %s", Effort, sAb)
+	// Условия прочности болтов/шпилек - в условиях эксплуатации
+	Bolt.WorkCond = fmt.Sprintf("%s / %s", WorkEffort, sAb)
 
 	return Bolt
 }
