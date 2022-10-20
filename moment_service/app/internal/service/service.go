@@ -124,6 +124,7 @@ type Graphic interface {
 type Read interface {
 	read.Flange
 	read.Float
+	read.DevCooling
 }
 
 type Services struct {

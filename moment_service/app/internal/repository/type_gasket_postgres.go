@@ -10,7 +10,16 @@ import (
 )
 
 func (r *GasketRepo) GetTypeGasket(ctx context.Context, req *gasket_api.GetGasketTypeRequest) (types []models.TypeGasketDTO, err error) {
-	query := fmt.Sprintf(`SELECT id, title, label FROM %s ORDER BY id`, TypeGasketTable)
+	var query string
+	if req.TypeGasket[0] == gasket_api.TypeGasket_All {
+		query = fmt.Sprintf(`SELECT id, title, label FROM %s ORDER BY id`, TypeGasketTable)
+	} else {
+		params := make([]string, 0, len(req.TypeGasket))
+		for _, tg := range req.TypeGasket {
+			params = append(params, fmt.Sprintf("'%s'", tg.String()))
+		}
+		query = fmt.Sprintf(`SELECT id, title, label FROM %s WHERE label in (%s) ORDER BY id`, TypeGasketTable, strings.Join(params, ", "))
+	}
 
 	if err := r.db.Select(&types, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)

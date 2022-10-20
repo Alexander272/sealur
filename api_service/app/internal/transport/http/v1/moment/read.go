@@ -13,6 +13,7 @@ func (h *Handler) initReadRoutes(api *gin.RouterGroup) {
 	{
 		read.GET("/flange", h.getFlange)
 		read.GET("/float", h.getFloat)
+		read.GET("/dev-cooling", h.getDevCooling)
 	}
 }
 
@@ -28,6 +29,16 @@ func (h *Handler) getFlange(c *gin.Context) {
 
 func (h *Handler) getFloat(c *gin.Context) {
 	data, err := h.readClient.GetFloat(c, &read_api.GetFloatRequest{})
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: data})
+}
+
+func (h *Handler) getDevCooling(c *gin.Context) {
+	data, err := h.readClient.GetDevCooling(c, &read_api.GetDevCoolingtRequest{})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

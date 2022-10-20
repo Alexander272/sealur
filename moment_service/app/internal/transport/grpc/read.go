@@ -35,3 +35,11 @@ func (h *ReadHandlers) GetFloat(ctx context.Context, req *read_api.GetFloatReque
 
 	return res, nil
 }
+
+func (h *ReadHandlers) GetDevCooling(ctx context.Context, req *read_api.GetDevCoolingtRequest) (*read_api.GetDevCoolingResponse, error) {
+	res, err := h.service.GetDevCooling(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}

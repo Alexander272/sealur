@@ -30,13 +30,25 @@ func (h *Handler) initTypeGasketRoutes(api *gin.RouterGroup) {
 // @ModuleID getTypeGasket
 // @Accept json
 // @Produce json
+// @Param types query string false "types"
 // @Success 200 {object} models.DataResponse{Data=[]gasket_api.GasketType}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/type-gasket/ [get]
 func (h *Handler) getTypeGasket(c *gin.Context) {
-	gasket, err := h.gasketClient.GetGasketType(c, &gasket_api.GetGasketTypeRequest{})
+	types := c.QueryArray("types")
+	if len(types) == 0 {
+		types = append(types, "All")
+	}
+	TypesGasket := []gasket_api.TypeGasket{}
+	for _, v := range types {
+		TypesGasket = append(TypesGasket, gasket_api.TypeGasket(gasket_api.TypeGasket_value[v]))
+	}
+
+	gasket, err := h.gasketClient.GetGasketType(c, &gasket_api.GetGasketTypeRequest{
+		TypeGasket: TypesGasket,
+	})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

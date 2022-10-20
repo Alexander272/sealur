@@ -20,15 +20,14 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/material_api"
 	"github.com/Alexander272/sealur_proto/api/moment/read_api"
 	_ "github.com/lib/pq"
-	"github.com/subosito/gotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 func main() {
-	if err := gotenv.Load("../../.env"); err != nil {
-		logger.Fatalf("error loading env variables: %s", err.Error())
-	}
+	// if err := gotenv.Load("../../.env"); err != nil {
+	// 	logger.Fatalf("error loading env variables: %s", err.Error())
+	// }
 	conf, err := config.Init("configs")
 	if err != nil {
 		logger.Fatalf("error initializing configs: %s", err.Error())

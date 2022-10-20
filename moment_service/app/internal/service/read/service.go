@@ -17,14 +17,20 @@ type Float interface {
 	GetFloat(ctx context.Context, req *read_api.GetFloatRequest) (*read_api.GetFloatResponse, error)
 }
 
+type DevCooling interface {
+	GetDevCooling(ctx context.Context, req *read_api.GetDevCoolingtRequest) (*read_api.GetDevCoolingResponse, error)
+}
+
 type ReadService struct {
 	Flange
 	Float
+	DevCooling
 }
 
 func NewReadService(flange *flange.FlangeService, materials *materials.MaterialsService, gasket *gasket.GasketService) *ReadService {
 	return &ReadService{
-		Flange: NewFlangeService(flange, materials, gasket),
-		Float:  NewFloatService(materials, gasket),
+		Flange:     NewFlangeService(flange, materials, gasket),
+		Float:      NewFloatService(materials, gasket),
+		DevCooling: NewDevCoolingService(materials, gasket),
 	}
 }

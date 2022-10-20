@@ -52,9 +52,22 @@ func (r *GasketRepo) GetGasket(ctx context.Context, req *gasket_api.GetGasketReq
 }
 
 func (r *GasketRepo) GetGasketWithThick(ctx context.Context, req *gasket_api.GetGasketRequest) (gasket []models.GasketWithThick, err error) {
-	query := fmt.Sprintf(`SELECT %s.id, title, thickness FROM %s
-		INNER JOIN %s ON %s.id = %s.gasket_id ORDER BY id, thickness`,
-		GasketTable, GasketTable, GasketDataTable, GasketTable, GasketDataTable)
+	var query string
+	if len(req.TypeGasket) == 0 || req.TypeGasket[0] == gasket_api.TypeGasket_All {
+		query = fmt.Sprintf(`SELECT %s.id, title, thickness FROM %s
+			INNER JOIN %s ON %s.id = %s.gasket_id ORDER BY id, thickness`,
+			GasketTable, GasketTable, GasketDataTable, GasketTable, GasketDataTable)
+	} else {
+		params := make([]string, 0, len(req.TypeGasket))
+		for _, tg := range req.TypeGasket {
+			params = append(params, fmt.Sprintf("'%s'", tg.String()))
+		}
+
+		query = fmt.Sprintf(`SELECT %s.id, %s.title, thickness FROM %s	INNER JOIN %s ON %s.id = %s.gasket_id 
+			INNER JOIN %s ON type_id = %s.id WHERE label in (%s) ORDER BY id, thickness`,
+			GasketTable, GasketTable, GasketTable, GasketDataTable, GasketTable, GasketDataTable,
+			TypeGasketTable, TypeGasketTable, strings.Join(params, ", "))
+	}
 
 	if err := r.db.Select(&gasket, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)

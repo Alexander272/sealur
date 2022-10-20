@@ -249,9 +249,7 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 	Y3 := 0.5 * math.Sinh(TubeSheet.Omega) * math.Sin(TubeSheet.Omega)
 	Y4 := 0.25 * (math.Cosh(TubeSheet.Omega)*math.Sin(TubeSheet.Omega) - math.Sinh(TubeSheet.Omega)*math.Cos(TubeSheet.Omega))
 
-	// $alfa1 = ($Y2 - $Y2 * $Y1 - 4 * $Y4 * $Y3) / ($omega * ($Y2 * $Y4 - $Y3 * $Y3));
 	Alpha1 := (Y2 - Y2*Y1 - 4*Y4*Y3) / (TubeSheet.Omega * (Y2*Y4 - math.Pow(Y3, 2)))
-	// $alfa2 = ($Y1 * $Y3 + $Y3 - $Y2 * $Y2) / ($omega * $omega * ($Y2 * $Y4 - $Y3 * $Y3));
 	Alpha2 := (Y1*Y3 + Y3 - math.Pow(Y2, 2)) / (math.Pow(TubeSheet.Omega, 2) * (Y2*Y4 - math.Pow(Y3, 2)))
 
 	tmp1 = 0.23 * math.Pow(Auxiliary.EstimatedZoneWidth, 3) / (d.TubeSheet.Epsilon * math.Pow(d.TubeSheet.ZoneThick, 3))
