@@ -52,6 +52,7 @@ func (s *FormulasService) GetFormulas(
 	tSigma := strconv.FormatFloat(d.Tube.Sigma, 'G', 3, 64)
 
 	bottomThick := strconv.FormatFloat(d.Cap.BottomThick, 'G', 3, 64)
+	innerSize := strconv.FormatFloat(d.Cap.InnerSize, 'G', 3, 64)
 	capCorrosion := strconv.FormatFloat(d.Cap.Corrosion, 'G', 3, 64)
 	capSigmaAt20 := strconv.FormatFloat(d.Cap.SigmaAt20, 'G', 3, 64)
 	capSigma := strconv.FormatFloat(d.Cap.Sigma, 'G', 3, 64)
@@ -69,7 +70,7 @@ func (s *FormulasService) GetFormulas(
 
 	// Условия применения формул
 	formulas.Condition1 = fmt.Sprintf("(%s - %s) / %s", zoneThick, corrosion, Bp)
-	formulas.Condition2 = fmt.Sprintf("(%s - %s) / %s", bottomThick, capCorrosion, Bp)
+	formulas.Condition2 = fmt.Sprintf("(%s - %s) / %s", bottomThick, capCorrosion, innerSize)
 
 	cond1 := fmt.Sprintf("(%s / %s); (%s / %s)", capSigmaAt20, capSigma, tsSigmaAt20, tsSigma)
 	cond2 := fmt.Sprintf("(%s / %s); (%s / %s)", tSigmaAt20, tSigma, bSigmaAt20, bSigma)

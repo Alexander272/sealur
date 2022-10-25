@@ -199,19 +199,20 @@ func (c *Calc) Parse() (*calc_api.DevCoolingRequest, error) {
 	}
 
 	result := &calc_api.DevCoolingRequest{
-		Pressure:      pressure,
-		Temp:          temp,
-		TypeBolt:      calc_api.DevCoolingRequest_TypeBolt(typeBolt),
-		Method:        calc_api.DevCoolingRequest_MountingMethod(method),
-		Mounting:      calc_api.DevCoolingRequest_Mounting(mounting),
-		TypeMounting:  calc_api.DevCoolingRequest_TypeMounting(typeMounting),
-		CameraDiagram: calc_api.DevCoolingRequest_CameraDiagram(cameraDiagram),
-		Layout:        calc_api.DevCoolingRequest_Layout(layout),
-		Cap:           cap,
-		TubeSheet:     tubeSheet,
-		Tube:          tube,
-		Bolts:         bolts,
-		Gasket:        gasket,
+		Pressure:       pressure,
+		Temp:           temp,
+		TypeBolt:       calc_api.DevCoolingRequest_TypeBolt(typeBolt),
+		Method:         calc_api.DevCoolingRequest_MountingMethod(method),
+		Mounting:       calc_api.DevCoolingRequest_Mounting(mounting),
+		TypeMounting:   calc_api.DevCoolingRequest_TypeMounting(typeMounting),
+		CameraDiagram:  calc_api.DevCoolingRequest_CameraDiagram(cameraDiagram),
+		Layout:         calc_api.DevCoolingRequest_Layout(layout),
+		Cap:            cap,
+		TubeSheet:      tubeSheet,
+		Tube:           tube,
+		Bolts:          bolts,
+		Gasket:         gasket,
+		IsNeedFormulas: c.IsNeedFormulas,
 	}
 
 	return result, nil

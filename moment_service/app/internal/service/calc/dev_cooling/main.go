@@ -86,7 +86,7 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 		Y: constants.Condition,
 	}
 	result.Calc.Condition2 = &dev_cooling_model.Condition{
-		X: (d.Cap.BottomThick - d.Cap.Corrosion) / Auxiliary.Bp,
+		X: (d.Cap.BottomThick - d.Cap.Corrosion) / d.Cap.InnerSize,
 		Y: constants.Condition,
 	}
 
@@ -314,6 +314,8 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 		TubeSheet.OmegaP = (math.Pow(data.Pressure, 2) + tmp1*tmp2) / tmp3
 	}
 
+	TubeSheet.Condition = &dev_cooling_model.Condition{X: TubeSheet.OmegaP, Y: 1}
+
 	tmp1 = math.Sqrt(data.Pressure / (Auxiliary.Phi * d.TubeSheet.Sigma))
 	tmp2 = math.Sqrt(TubeSheet.Lambda + TubeSheet.Psi + TubeSheet.OmegaP + 1.5*data.Pressure/(Auxiliary.Phi*d.TubeSheet.Sigma))
 	// s1 (s1min) - Толщина трубной решетки в пределах зоны перфорации
@@ -336,8 +338,8 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 
 	//Условие прочности крепления труб в решетке
 	TubeSheet.Strength = &dev_cooling_model.Condition{
-		X: data.Pressure * (TubeSheet.ZF - Auxiliary.Eta + TubeSheet.ZM*(TubeSheet.Lambda+TubeSheet.Psi)),
-		Y: Auxiliary.Load,
+		X: Auxiliary.Load,
+		Y: data.Pressure * (TubeSheet.ZF - Auxiliary.Eta + TubeSheet.ZM*(TubeSheet.Lambda+TubeSheet.Psi)),
 	}
 
 	// коэффициенты для Толщина донышка крышки
@@ -398,7 +400,26 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 	if result.Calc.GasketCond.X > result.Calc.GasketCond.Y {
 		ok = false
 	}
-	if TubeSheet.Omega > 1 || TubeSheet.Strength.X > TubeSheet.Strength.Y {
+	if TubeSheet.Condition.X > TubeSheet.Condition.Y || TubeSheet.Strength.X < TubeSheet.Strength.Y {
+		ok = false
+	}
+
+	thickCond1 := TubeSheet.ZoneThick > d.TubeSheet.ZoneThick
+	thickCond2 := TubeSheet.PlaceThick > d.TubeSheet.PlaceThick
+	thickCond3 := TubeSheet.OutZoneThick > d.TubeSheet.OutZoneThick
+	thickCond4 := Cap.BottomThick > d.Cap.BottomThick
+	thickCond5 := Cap.WallThick > d.Cap.WallThick
+	thickCond6 := Cap.FlangeThick > d.Cap.FlangeThick
+	thickCond7 := Cap.SideWallThick > d.Cap.SideWallThick
+	var finalCond bool
+
+	if data.CameraDiagram != calc_api.DevCoolingRequest_schema4 {
+		finalCond = thickCond1 || thickCond2 || thickCond3 || thickCond4 || thickCond5 || thickCond6 || thickCond7
+	} else {
+		finalCond = thickCond1 || thickCond2 || thickCond3 || thickCond4 || thickCond6 || thickCond7
+	}
+
+	if finalCond {
 		ok = false
 	}
 
