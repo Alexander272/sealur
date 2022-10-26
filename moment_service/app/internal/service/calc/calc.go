@@ -5,6 +5,7 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/cap"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/dev_cooling"
+	"github.com/Alexander272/sealur/moment_service/internal/service/calc/express_circle"
 	calc_flange "github.com/Alexander272/sealur/moment_service/internal/service/calc/flange"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/float"
 	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
@@ -30,11 +31,16 @@ type DevCooling interface {
 	CalculateDevCooling(ctx context.Context, data *calc_api.DevCoolingRequest) (*calc_api.DevCoolingResponse, error)
 }
 
+type ExCircle interface {
+	CalculateExCircle(ctx context.Context, data *calc_api.ExpressCircleRequest) (*calc_api.ExpressCircleResponse, error)
+}
+
 type CalcService struct {
 	Flange
 	Cap
 	Float
 	DevCooling
+	ExCircle
 }
 
 func NewCalcServices(flange *flange.FlangeService, gasket *gasket.GasketService, materials *materials.MaterialsService) *CalcService {
@@ -45,5 +51,6 @@ func NewCalcServices(flange *flange.FlangeService, gasket *gasket.GasketService,
 		Cap:        cap.NewCapService(graphic, flange, gasket, materials),
 		Float:      float.NewFloatService(graphic, flange, gasket, materials),
 		DevCooling: dev_cooling.NewCoolingService(graphic, flange, gasket, materials),
+		ExCircle:   express_circle.NewExCircleService(graphic, flange, gasket, materials),
 	}
 }

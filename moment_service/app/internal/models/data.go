@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/dev_cooling_model"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_circle_model"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/float_model"
 )
@@ -51,4 +52,10 @@ type DataDevCooling struct {
 	Bolt       *dev_cooling_model.BoltResult
 	Gasket     *dev_cooling_model.GasketResult
 	TypeGasket dev_cooling_model.GasketData_Type
+}
+
+type DataExCircle struct {
+	Bolt       *express_circle_model.BoltResult
+	Gasket     *express_circle_model.GasketResult
+	TypeGasket express_circle_model.GasketData_Type
 }

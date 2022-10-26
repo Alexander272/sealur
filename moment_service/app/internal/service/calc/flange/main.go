@@ -168,7 +168,7 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 
 	// формула 9
 	// Равнодействующая нагрузка от давления
-	Qd := 0.785 * math.Pow(d.Dcp, 2) * float64(data.Pressure)
+	Qd := 0.785 * math.Pow(d.Dcp, 2) * data.Pressure
 
 	temp1 := float64(data.AxialForce) + 4*math.Abs(float64(data.BendingMoment))/d.Dcp
 	temp2 := float64(data.AxialForce) - 4*math.Abs(float64(data.BendingMoment))/d.Dcp

@@ -6,6 +6,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/cap_model"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/dev_cooling_model"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/ex_circle_model"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/flange_model"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/float_model"
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,7 @@ func (h *Handler) initCalcRoutes(api *gin.RouterGroup) {
 		calc.POST("/cap", h.calculateCap)
 		calc.POST("/float", h.calculateFloat)
 		calc.POST("/dev-cooling", h.calculateDevCooling)
+		calc.POST("/express-circle", h.calculateExCircle)
 	}
 }
 
@@ -153,6 +155,28 @@ func (h *Handler) calculateDevCooling(c *gin.Context) {
 	}
 
 	res, err := h.calcClient.CalculateDevCooling(c, data)
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: res})
+}
+
+func (h *Handler) calculateExCircle(c *gin.Context) {
+	var dto ex_circle_model.Calc
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	data, err := dto.Parse()
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	res, err := h.calcClient.CalculateExCircle(c, data)
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

@@ -29,6 +29,8 @@ type Calc interface {
 	CalculationFloat(ctx context.Context, data *calc_api.FloatRequest) (*calc_api.FloatResponse, error)
 	// расчет аппаратов воздушного охлаждения
 	CalculateDevCooling(ctx context.Context, data *calc_api.DevCoolingRequest) (*calc_api.DevCoolingResponse, error)
+	// экспресс оценка момента затяжки
+	CalculateExCircle(ctx context.Context, data *calc_api.ExpressCircleRequest) (*calc_api.ExpressCircleResponse, error)
 }
 
 type Flange interface {

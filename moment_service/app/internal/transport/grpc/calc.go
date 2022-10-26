@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Alexander272/sealur/moment_service/internal/service"
+	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 )
 
@@ -45,6 +46,15 @@ func (h *CalcHandlers) CalculateFloat(ctx context.Context, req *calc_api.FloatRe
 func (h *CalcHandlers) CalculateDevCooling(ctx context.Context, req *calc_api.DevCoolingRequest) (*calc_api.DevCoolingResponse, error) {
 	res, err := h.service.CalculateDevCooling(ctx, req)
 	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (h *CalcHandlers) CalculateExCircle(ctx context.Context, req *calc_api.ExpressCircleRequest) (*calc_api.ExpressCircleResponse, error) {
+	res, err := h.service.CalculateExCircle(ctx, req)
+	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 	return res, nil
