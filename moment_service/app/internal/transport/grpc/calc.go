@@ -59,3 +59,12 @@ func (h *CalcHandlers) CalculateExCircle(ctx context.Context, req *calc_api.Expr
 	}
 	return res, nil
 }
+
+func (h *CalcHandlers) CalculateExRectangle(ctx context.Context, req *calc_api.ExpressRectangleRequest) (*calc_api.ExpressRectangleResponse, error) {
+	res, err := h.service.CalculateExRect(ctx, req)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+	return res, nil
+}

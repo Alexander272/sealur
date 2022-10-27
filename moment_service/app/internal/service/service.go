@@ -31,6 +31,8 @@ type Calc interface {
 	CalculateDevCooling(ctx context.Context, data *calc_api.DevCoolingRequest) (*calc_api.DevCoolingResponse, error)
 	// экспресс оценка момента затяжки
 	CalculateExCircle(ctx context.Context, data *calc_api.ExpressCircleRequest) (*calc_api.ExpressCircleResponse, error)
+	// экспресс оценка момента затяжки
+	CalculateExRect(ctx context.Context, data *calc_api.ExpressRectangleRequest) (*calc_api.ExpressRectangleResponse, error)
 }
 
 type Flange interface {

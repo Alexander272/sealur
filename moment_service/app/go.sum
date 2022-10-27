@@ -54,12 +54,10 @@ cloud.google.com/go/storage v1.8.0/go.mod h1:Wv1Oy7z6Yz3DshWRJFhqM/UCfaWIRTdp0RX
 cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9ullr3+Kg0=
 cloud.google.com/go/storage v1.14.0/go.mod h1:GrKmX003DSIwi9o29oFT7YDnHYwZoctc3fOKtUw0Xmo=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
-github.com/Alexander272/sealur_proto/api v0.0.0-20221018060957-a249ef58d315 h1:GsnaJVoeKUdIk2VQsJQS3seHEKAkZu2X3rBtYkDgojs=
-github.com/Alexander272/sealur_proto/api v0.0.0-20221018060957-a249ef58d315/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
-github.com/Alexander272/sealur_proto/api v0.0.0-20221019061539-9ad0a3288689 h1:RtPwvpAAC3+BgO6Y7R9ge/OzB6xKwETKZRMQ054+z2k=
-github.com/Alexander272/sealur_proto/api v0.0.0-20221019061539-9ad0a3288689/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
-github.com/Alexander272/sealur_proto/api v0.0.0-20221026040325-d298a3dc4c72 h1:SL6G23I9ngg/PtcsWUeN96EwMq+J9eR4V8NCW5tQXe8=
-github.com/Alexander272/sealur_proto/api v0.0.0-20221026040325-d298a3dc4c72/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
+github.com/Alexander272/sealur_proto/api v0.0.0-20221027040417-09ec48c2b33f h1:XF+KsBm/2ehPnptrYlz8gSq8iCHEwY/bNQ6yGRGUaB4=
+github.com/Alexander272/sealur_proto/api v0.0.0-20221027040417-09ec48c2b33f/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
+github.com/Alexander272/sealur_proto/api v0.0.0-20221027044801-8c95e8cda95f h1:cCZhAZCkbquv5yXWtb3UuEMeUHDYur6cCT9vpyk2cRA=
+github.com/Alexander272/sealur_proto/api v0.0.0-20221027044801-8c95e8cda95f/go.mod h1:NyLwZfr6xBbrFpZ6+AVGmUBC1GzD8yCYyEnwyy5g3Oo=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=

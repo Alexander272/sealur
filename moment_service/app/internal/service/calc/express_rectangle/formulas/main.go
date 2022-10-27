@@ -4,7 +4,7 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
-	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_circle_model"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_rectangle_model"
 )
 
 type FormulasService struct {
@@ -39,10 +39,10 @@ func NewFormulasService() *FormulasService {
 	}
 }
 
-func (s *FormulasService) GetFormulas(req calc_api.ExpressCircleRequest, d models.DataExCircle, result calc_api.ExpressCircleResponse,
-) *express_circle_model.Formulas {
-	formulas := &express_circle_model.Formulas{
-		Deformation:   s.getDeformationFormulas(req, d, result),
+func (s *FormulasService) GetFormulas(req calc_api.ExpressRectangleRequest, d models.DataExRect, result calc_api.ExpressRectangleResponse,
+) *express_rectangle_model.Formulas {
+	formulas := &express_rectangle_model.Formulas{
+		Auxiliary:     s.getAuxiliaryFormulas(req, d, result),
 		ForcesInBolts: s.getForcesFormulas(req, d, result),
 		Bolt:          s.getBoltFormulas(req, d, result),
 		Moment:        s.getMomentFormulas(req, d, result),

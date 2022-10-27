@@ -29,7 +29,7 @@ services:
 
     api_service:
         restart: on-failure:5
-        image: sealur/api_service:1.6.0
+        image: sealur/api_service:1.6.1
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images
@@ -50,7 +50,7 @@ services:
 
     moment_service:
         restart: on-failure:5
-        image: sealur/moment_service:0.8.0
+        image: sealur/moment_service:0.8.1
         container_name: dev-moment_service
         ports:
             - 9000:9000

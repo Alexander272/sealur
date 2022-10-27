@@ -165,7 +165,7 @@ func (s *ExCircleService) CalculateExCircle(ctx context.Context, data *calc_api.
 	}
 
 	result.Calc.Deformation = Deformation
-	result.Calc.ForsesInBolts = ForcesInBolts
+	result.Calc.ForcesInBolts = ForcesInBolts
 	result.Calc.Bolt = Bolts
 	result.Calc.Moment = Moment
 

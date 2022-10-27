@@ -23,9 +23,9 @@ func (s *FormulasService) getBoltFormulas(req calc_api.ExpressCircleRequest, d m
 
 	Diameter := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Diameter, 'G', 3, 64), "E", "*10^")
 
-	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForsesInBolts.Area, 'G', 3, 64), "E", "*10^")
-	DesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForsesInBolts.DesignLoad, 'G', 3, 64), "E", "*10^")
-	WorkDesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForsesInBolts.WorkDesignLoad, 'G', 3, 64), "E", "*10^")
+	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 3, 64), "E", "*10^")
+	DesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.DesignLoad, 'G', 3, 64), "E", "*10^")
+	WorkDesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.WorkDesignLoad, 'G', 3, 64), "E", "*10^")
 
 	Kyp := s.Kyp[true]
 	Kyz := s.Kyz[req.Condition.String()]
