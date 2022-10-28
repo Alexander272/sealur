@@ -1,7 +1,9 @@
 package user
 
 import (
+	"math"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
@@ -18,20 +20,66 @@ import (
 // @ModuleID getAllUser
 // @Accept json
 // @Produce json
+// @Param page path string true "page number"
+// @Param search query string false "search value"
+// @Param search_field query false "searxh field"
 // @Success 200 {object} models.DataResponse{data=[]user_api.User}
 // @Failure 400,404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
-// @Router /users/all [get]
+// @Router /users/all/{page} [get]
 func (h *Handler) getAllUsers(c *gin.Context) {
-	users, err := h.userClient.GetAllUsers(c, &user_api.GetAllUserRequest{})
+	var countPage, limit int32
+	page := c.Param("page")
+	if page == "" {
+		countPage = 1
+	} else {
+		count, err := strconv.Atoi(page)
+		if err != nil {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "something went wrong")
+			return
+		}
+		countPage = int32(count)
+	}
+
+	parLimit := c.Query("limit")
+	if parLimit == "" {
+		limit = 12
+	} else {
+		l, err := strconv.Atoi(parLimit)
+		if err != nil {
+			logger.Debug("err: ", err.Error())
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "something went wrong")
+			return
+		}
+		limit = int32(l)
+	}
+
+	search := c.Query("search")
+	Fields := []user_api.GetAllUserRequest_SearchField{}
+	if search != "" {
+		fields := c.QueryArray("search_field")
+		for _, v := range fields {
+			field := user_api.GetAllUserRequest_SearchField_value[v]
+			Fields = append(Fields, user_api.GetAllUserRequest_SearchField(field))
+		}
+	}
+
+	users, err := h.userClient.GetAllUsers(c, &user_api.GetAllUserRequest{
+		Limit:  limit,
+		Offset: limit * (countPage - 1),
+		Search: &user_api.GetAllUserRequest_Search{
+			Field: Fields,
+			Value: search,
+		},
+	})
 	if err != nil {
 		logger.Debug("err: ", err.Error())
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
-	c.JSON(http.StatusOK, models.DataResponse{Data: users.Users, Count: len(users.Users)})
+	c.JSON(http.StatusOK, models.DataResponse{Data: users.Users, Count: int(math.Ceil(float64(users.Count) / float64(limit)))})
 }
 
 // @Summary Get New Users
@@ -254,4 +302,27 @@ func (h *Handler) deleteUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, models.IdResponse{Message: "User deleted successfully"})
+}
+
+// @Summary Clear Limit
+// @Tags Auth
+// @Description сброс счетчика неуспешных попыток авторизации
+// @ModuleID clearLimit
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.StatusResponse
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /users/clear [post]
+func (h *Handler) clearLimit(c *gin.Context) {
+	ip := c.Query("ip")
+	if ip == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "ip is empty", "ip is empty")
+		return
+	}
+
+	h.services.Remove(c, ip)
+
+	c.JSON(http.StatusOK, models.StatusResponse{Status: "Success"})
 }

@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"github.com/Alexander272/sealur/email_service/internal/config"
+	"github.com/Alexander272/sealur/email_service/internal/constants"
 	"github.com/Alexander272/sealur/email_service/pkg/email"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 )
@@ -39,7 +40,7 @@ func (s *OrderService) SendOrder(data *email_api.OrderData, file *bytes.Buffer) 
 		data.User.Phone = "-"
 	}
 
-	if err := input.GenerateBodyFromHTML("order.html", data.User); err != nil {
+	if err := input.GenerateBodyFromHTML(constants.OrderTemplate, data.User); err != nil {
 		return err
 	}
 

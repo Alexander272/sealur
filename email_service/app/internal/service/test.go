@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/Alexander272/sealur/email_service/internal/config"
+	"github.com/Alexander272/sealur/email_service/internal/constants"
 	"github.com/Alexander272/sealur/email_service/internal/models"
 	"github.com/Alexander272/sealur/email_service/pkg/email"
 	"github.com/Alexander272/sealur_proto/api/email_api"
@@ -38,7 +39,7 @@ func (s *TestwService) SendEmail(req *email_api.SendTestRequest) error {
 			Email:    s.conf.Support,
 		}
 
-		if err := input.GenerateBodyFromHTML("join.html", data); err != nil {
+		if err := input.GenerateBodyFromHTML(constants.JoinTemplate, data); err != nil {
 			return err
 		}
 
@@ -52,7 +53,7 @@ func (s *TestwService) SendEmail(req *email_api.SendTestRequest) error {
 			Link:         s.conf.Link,
 		}
 
-		if err := input.GenerateBodyFromHTML("confirm.html", data); err != nil {
+		if err := input.GenerateBodyFromHTML(constants.ConfirmTemplate, data); err != nil {
 			return err
 		}
 
@@ -68,7 +69,7 @@ func (s *TestwService) SendEmail(req *email_api.SendTestRequest) error {
 			Phone:        "-",
 		}
 
-		if err := input.GenerateBodyFromHTML("interview.html", data); err != nil {
+		if err := input.GenerateBodyFromHTML(constants.InterviewTemplate, data); err != nil {
 			return err
 		}
 
@@ -84,7 +85,7 @@ func (s *TestwService) SendEmail(req *email_api.SendTestRequest) error {
 			Phone:        "-",
 		}
 
-		if err := input.GenerateBodyFromHTML("order.html", data); err != nil {
+		if err := input.GenerateBodyFromHTML(constants.OrderTemplate, data); err != nil {
 			return err
 		}
 
@@ -96,7 +97,19 @@ func (s *TestwService) SendEmail(req *email_api.SendTestRequest) error {
 			Email: s.conf.Support,
 		}
 
-		if err := input.GenerateBodyFromHTML("reject.html", data); err != nil {
+		if err := input.GenerateBodyFromHTML(constants.RejectTemplate, data); err != nil {
+			return err
+		}
+
+	case "blocked":
+		input.Subject = "Testing Blocked Email Sealur Pro"
+
+		data := models.BlockedTemplate{
+			Ip:    "178.161.145.174",
+			Login: "Alex",
+		}
+
+		if err := input.GenerateBodyFromHTML(constants.BlockedTemplate, data); err != nil {
 			return err
 		}
 

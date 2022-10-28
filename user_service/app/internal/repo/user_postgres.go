@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/user_service/internal/models"
+	"github.com/Alexander272/sealur/user_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/user_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -42,10 +43,24 @@ func (r *UserRepo) Get(ctx context.Context, req *user_api.GetUserRequest) (user 
 }
 
 func (r *UserRepo) GetAll(ctx context.Context, req *user_api.GetAllUserRequest) (users []models.User, err error) {
-	query := fmt.Sprintf(`SELECT id, organization, name, email, city, position, phone, login FROM %s WHERE confirmed=true 
-		ORDER BY organization, name, id`, r.tableName)
+	search := ""
+	if req.Search.Value != "" {
+		search = " AND ("
+		tmp := []string{}
+		for _, field := range req.Search.Field {
+			tmp = append(tmp, fmt.Sprintf("%s like '%%%s%%' ", field, req.Search.Value))
+		}
+		search += strings.Join(tmp, " OR ")
+		search = fmt.Sprintf("%s)", search)
+	}
 
-	if err := r.db.Select(&users, query); err != nil {
+	logger.Debug(search)
+
+	query := fmt.Sprintf(`SELECT id, organization, name, email, city, position, phone, login, (SELECT count(id) FROM %s) as count
+		FROM %s WHERE confirmed=true%s	ORDER BY organization, name, id	LIMIT $1 OFFSET $2`,
+		r.tableName, r.tableName, search)
+
+	if err := r.db.Select(&users, query, req.Limit, req.Offset); err != nil {
 		return users, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return users, nil

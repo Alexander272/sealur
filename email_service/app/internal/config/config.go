@@ -43,6 +43,8 @@ type (
 		InterviewSubject string
 		Order            string
 		OrderSubject     string
+		Blocked          string
+		BlockedSubject   string
 		Confirm          string
 		ConfirmSubject   string
 		JoinSubject      string // Заголовок письма отпрявляемого пользователю после подтверждения

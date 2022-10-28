@@ -54,6 +54,7 @@ type (
 		ProService    ServiceConfig
 		FileService   ServiceConfig
 		UserService   ServiceConfig
+		EmailService  ServiceConfig
 		MomentService ServiceConfig
 	}
 
@@ -127,6 +128,10 @@ func setFromEnv(conf *Config) error {
 	conf.Services.UserService.AuthName = os.Getenv("API_NAME")
 	conf.Services.UserService.AuthPassword = os.Getenv("API_PASSWORD")
 	conf.Services.UserService.Url = os.Getenv("USER_HOST") + ":" + os.Getenv("USER_PORT")
+
+	conf.Services.EmailService.AuthName = os.Getenv("API_NAME")
+	conf.Services.EmailService.AuthPassword = os.Getenv("API_PASSWORD")
+	conf.Services.EmailService.Url = os.Getenv("EMAIL_HOST") + ":" + os.Getenv("EMAIL_PORT")
 
 	conf.Services.MomentService.AuthName = os.Getenv("API_NAME")
 	conf.Services.MomentService.AuthPassword = os.Getenv("API_PASSWORD")

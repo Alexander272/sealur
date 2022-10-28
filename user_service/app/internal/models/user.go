@@ -10,6 +10,7 @@ type User struct {
 	Phone        string `db:"phone"`
 	Password     string `db:"password"`
 	Login        string `db:"login"`
+	Count        int    `db:"count"`
 }
 
 type ConfirmUser struct {

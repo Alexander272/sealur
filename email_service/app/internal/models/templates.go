@@ -20,3 +20,8 @@ type RejectTemplate struct {
 	Name  string
 	Email string
 }
+
+type BlockedTemplate struct {
+	Ip    string
+	Login string
+}

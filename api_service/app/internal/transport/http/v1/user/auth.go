@@ -7,6 +7,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/user_model"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/user_api"
 	"github.com/gin-gonic/gin"
 )
@@ -39,8 +40,11 @@ func (h *Handler) signIn(c *gin.Context) {
 		h.services.Limit.Create(c, c.ClientIP())
 	}
 
-	//TODO надо бы отправлять письмо на почту о превышении количества попыток авторизации
-	if limit.Count > h.auth.CountAttempt {
+	if limit.Count == h.auth.CountAttempt {
+		h.emailClient.SendBlocked(c, &email_api.BlockedUserRequest{Ip: c.ClientIP(), Login: dto.Login})
+	}
+
+	if limit.Count >= h.auth.CountAttempt {
 		h.services.AddAttempt(c, c.ClientIP())
 		models.NewErrorResponse(c, http.StatusTooManyRequests, "too many request", "too many request")
 		return

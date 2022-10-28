@@ -8,6 +8,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/service"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/user_api"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -15,11 +16,12 @@ import (
 )
 
 type Handler struct {
-	userClient user_api.UserServiceClient
-	auth       config.AuthConfig
-	services   *service.Services
-	middleware *middleware.Middleware
-	cookieName string
+	userClient  user_api.UserServiceClient
+	emailClient email_api.EmailServiceClient
+	auth        config.AuthConfig
+	services    *service.Services
+	middleware  *middleware.Middleware
+	cookieName  string
 }
 
 func NewHandler(auth config.AuthConfig, services *service.Services, middleware *middleware.Middleware, cookieName string) *Handler {
@@ -60,6 +62,25 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 
 	userClient := user_api.NewUserServiceClient(connect)
 	h.userClient = userClient
+
+	//* данные для аутентификации
+	authEmail := models.Authentication{
+		ServiceName: conf.EmailService.AuthName,
+		Password:    conf.EmailService.AuthPassword,
+	}
+	//* опции grpc
+	optsEmail := []grpc.DialOption{
+		grpc.WithTransportCredentials(creds),
+		grpc.WithPerRPCCredentials(&authEmail),
+	}
+	//* подключение к сервису
+	connectEmail, err := grpc.Dial(conf.EmailService.Url, optsEmail...)
+	if err != nil {
+		logger.Fatalf("failed connection to pro service. error: %w", err)
+	}
+
+	emailClient := email_api.NewEmailServiceClient(connectEmail)
+	h.emailClient = emailClient
 
 	users := api.Group("/")
 	{

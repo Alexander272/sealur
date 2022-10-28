@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/email_service/internal/config"
+	"github.com/Alexander272/sealur/email_service/internal/constants"
 	"github.com/Alexander272/sealur/email_service/internal/models"
 	"github.com/Alexander272/sealur/email_service/pkg/email"
 	"github.com/Alexander272/sealur_proto/api/email_api"
@@ -40,7 +41,7 @@ func (s *UserService) SendConfirm(ctx context.Context, req *email_api.ConfirmUse
 		data.Position = "-"
 	}
 
-	if err := input.GenerateBodyFromHTML("confirm.html", data); err != nil {
+	if err := input.GenerateBodyFromHTML(constants.ConfirmTemplate, data); err != nil {
 		return err
 	}
 
@@ -58,7 +59,7 @@ func (s *UserService) SendReject(ctx context.Context, req *email_api.RejectUserR
 		Email: s.conf.Support,
 	}
 
-	if err := input.GenerateBodyFromHTML("reject.html", data); err != nil {
+	if err := input.GenerateBodyFromHTML(constants.RejectTemplate, data); err != nil {
 		return err
 	}
 
@@ -85,7 +86,7 @@ func (s *UserService) SendJoin(ctx context.Context, user *email_api.JoinUserRequ
 		data.Services = fmt.Sprintf("сервису %s", user.Services[0])
 	}
 
-	if err := input.GenerateBodyFromHTML("join.html", data); err != nil {
+	if err := input.GenerateBodyFromHTML(constants.JoinTemplate, data); err != nil {
 		return err
 	}
 

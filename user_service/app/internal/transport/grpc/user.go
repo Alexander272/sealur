@@ -22,12 +22,12 @@ func (h *Handler) GetUser(ctx context.Context, req *user_api.GetUserRequest) (*u
 }
 
 func (h *Handler) GetAllUsers(ctx context.Context, req *user_api.GetAllUserRequest) (*user_api.UsersResponse, error) {
-	users, err := h.service.User.GetAll(ctx, req)
+	users, count, err := h.service.User.GetAll(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 
-	return &user_api.UsersResponse{Users: users}, nil
+	return &user_api.UsersResponse{Users: users, Count: int32(count)}, nil
 }
 
 func (h *Handler) GetNewUsers(ctx context.Context, req *user_api.GetNewUserRequest) (*user_api.UsersResponse, error) {

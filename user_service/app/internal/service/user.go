@@ -82,24 +82,24 @@ func (s *UserService) Get(ctx context.Context, req *user_api.GetUserRequest) (u 
 	return u, nil
 }
 
-func (s *UserService) GetAll(ctx context.Context, req *user_api.GetAllUserRequest) ([]*user_api.User, error) {
+func (s *UserService) GetAll(ctx context.Context, req *user_api.GetAllUserRequest) ([]*user_api.User, int, error) {
 	users, err := s.userRepo.GetAll(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get all users. error: %w", err)
+		return nil, 0, fmt.Errorf("failed to get all users. error: %w", err)
 	}
 
 	if len(users) == 0 {
-		return nil, models.ErrUsersEmpty
+		return nil, 0, models.ErrUsersEmpty
 	}
 
 	roles, err := s.roleRepo.GetAll(ctx, &user_api.GetAllRolesRequest{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to get all roles. error: %w", err)
+		return nil, 0, fmt.Errorf("failed to get all roles. error: %w", err)
 	}
 
 	ips, err := s.ipRepo.GetAll(ctx, &user_api.GetAllIpRequest{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to get all ip. error: %w", err)
+		return nil, 0, fmt.Errorf("failed to get all ip. error: %w", err)
 	}
 
 	var u []*user_api.User
@@ -142,7 +142,7 @@ func (s *UserService) GetAll(ctx context.Context, req *user_api.GetAllUserReques
 		u = append(u, &user)
 	}
 
-	return u, nil
+	return u, users[0].Count, nil
 }
 
 func (s *UserService) GetNew(ctx context.Context, req *user_api.GetNewUserRequest) ([]*user_api.User, error) {

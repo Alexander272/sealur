@@ -11,7 +11,7 @@ import (
 
 type User interface {
 	Get(context.Context, *user_api.GetUserRequest) (*user_api.User, error)
-	GetAll(context.Context, *user_api.GetAllUserRequest) ([]*user_api.User, error)
+	GetAll(context.Context, *user_api.GetAllUserRequest) ([]*user_api.User, int, error)
 	GetNew(context.Context, *user_api.GetNewUserRequest) ([]*user_api.User, error)
 	Create(context.Context, *user_api.CreateUserRequest) (*user_api.SuccessResponse, error)
 	Confirm(context.Context, *user_api.ConfirmUserRequest) (*user_api.SuccessResponse, error)
