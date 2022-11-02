@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Alexander272/sealur/moment_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/moment/device_api"
 	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/Alexander272/sealur_proto/api/moment/material_api"
@@ -93,10 +94,61 @@ type Gasket interface {
 	DeleteGasketData(context.Context, *gasket_api.DeleteGasketDataRequest) error
 }
 
+type Device interface {
+	GetDevices(context.Context, *device_api.GetDeviceRequest) ([]models.DeviceDTO, error)
+	CreateDevices(context.Context, *device_api.CreateDeviceRequest) (id string, err error)
+	CreateFewDevices(context.Context, *device_api.CreateFewDeviceRequest) error
+	UpdateDevice(context.Context, *device_api.UpdateDeviceRequest) error
+	DeleteDevice(context.Context, *device_api.DeleteDeviceRequest) error
+
+	GetPressure(context.Context, *device_api.GetPressureRequest) ([]models.PressureDTO, error)
+	CreatePressure(context.Context, *device_api.CreatePressureRequest) (id string, err error)
+	CreateFewPressure(context.Context, *device_api.CreateFewPressureRequest) error
+	UpdatePressure(context.Context, *device_api.UpdatePressureRequest) error
+	DeletePressure(context.Context, *device_api.DeletePressureRequest) error
+
+	GetTubeCount(context.Context, *device_api.GetTubeCountRequest) ([]models.TubeCountDTO, error)
+	CreateTubeCount(context.Context, *device_api.CreateTubeCountRequest) (id string, err error)
+	CreateFewTubeCount(context.Context, *device_api.CreateFewTubeCountRequest) error
+	UpdateTubeCount(context.Context, *device_api.UpdateTubeCountRequest) error
+	DeleteTubeCount(context.Context, *device_api.DeleteTubeCountRequest) error
+
+	GetFinningFactor(context.Context, *device_api.GetFinningFactorRequest) ([]models.FinningFactorDTO, error)
+	CreateFinningFactor(context.Context, *device_api.CreateFinningFactorRequest) (id string, err error)
+	CreateFewFinningFactor(context.Context, *device_api.CreateFewFinningFactorRequest) error
+	UpdateFinningFactor(context.Context, *device_api.UpdateFinningFactorRequest) error
+	DeleteFinningFactor(context.Context, *device_api.DeleteFinningFactorRequest) error
+
+	GetSectionExecution(context.Context, *device_api.GetSectionExecutionRequest) ([]models.SectionExecutionDTO, error)
+	CreateSectionExecution(context.Context, *device_api.CreateSectionExecutionRequest) (id string, err error)
+	CreateFewSectionExecution(context.Context, *device_api.CreateFewSectionExecutionRequest) error
+	UpdateSectionExecution(context.Context, *device_api.UpdateSectionExecutionRequest) error
+	DeleteSectionExecution(context.Context, *device_api.DeleteSectionExecutionRequest) error
+
+	GetTubeLenght(context.Context, *device_api.GetTubeLenghtRequest) ([]models.TubeLenghtDTO, error)
+	CreateTubeLenght(context.Context, *device_api.CreateTubeLenghtRequest) (id string, err error)
+	CreateFewTubeLenght(context.Context, *device_api.CreateFewTubeLenghtRequest) error
+	UpdateTubeLenght(context.Context, *device_api.UpdateTubeLenghtRequest) error
+	DeleteTubeLenght(context.Context, *device_api.DeleteTubeLenghtRequest) error
+
+	GetNumberOfMoves(context.Context, *device_api.GetNumberOfMovesRequest) ([]models.NumberOfMovesDTO, error)
+	CreateNumberOfMoves(context.Context, *device_api.CreateNumberOfMovesRequest) (id string, err error)
+	CreateFewNumberOfMoves(context.Context, *device_api.CreateFewNumberOfMovesRequest) error
+	UpdateNumberOfMoves(context.Context, *device_api.UpdateNumberOfMovesRequest) error
+	DeleteNumberOfMoves(context.Context, *device_api.DeleteNumberOfMovesRequest) error
+
+	GetNameGasket(context.Context, *device_api.GetNameGasketRequest) ([]models.NameGasketDTO, error)
+	CreateNameGasket(context.Context, *device_api.CreateNameGasketRequest) (id string, err error)
+	CreateFewNameGasket(context.Context, *device_api.CreateFewNameGasketRequest) error
+	UpdateNameGasket(context.Context, *device_api.UpdateNameGasketRequest) error
+	DeleteNameGasket(context.Context, *device_api.DeleteNameGasketRequest) error
+}
+
 type Repositories struct {
 	Flange
 	Materials
 	Gasket
+	Device
 }
 
 func NewRepo(db *sqlx.DB) *Repositories {
@@ -104,5 +156,6 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		Flange:    NewFlangeRepo(db),
 		Materials: NewMaterialsRepo(db),
 		Gasket:    NewGasketRepo(db),
+		Device:    NewDeviceRepo(db),
 	}
 }
