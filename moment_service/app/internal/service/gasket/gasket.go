@@ -47,7 +47,7 @@ func (s *GasketService) GetData(ctx context.Context, gasket *gasket_api.GetFullD
 		})
 	}
 
-	gasketType, err := s.repo.GetTypeGasket(ctx, &gasket_api.GetGasketTypeRequest{})
+	gasketType, err := s.repo.GetTypeGasket(ctx, &gasket_api.GetGasketTypeRequest{TypeGasket: []gasket_api.TypeGasket{gasket_api.TypeGasket_All}})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get type gasket. error: %w", err)
 	}

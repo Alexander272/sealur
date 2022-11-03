@@ -38,5 +38,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0 // indirect
 )
-
-replace github.com/Alexander272/sealur_proto/api => ../../../sealur_proto/api

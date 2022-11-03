@@ -2,5 +2,5 @@ package models
 
 type TubeCountDTO struct {
 	Id    string `db:"id"`
-	Value string `db:"value"`
+	Value int32  `db:"value"`
 }

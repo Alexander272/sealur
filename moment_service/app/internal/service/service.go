@@ -6,15 +6,18 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur/moment_service/internal/repository"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc"
+	"github.com/Alexander272/sealur/moment_service/internal/service/device"
 	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
 	"github.com/Alexander272/sealur/moment_service/internal/service/read"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/device_api"
 	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/models/device_model"
 	"github.com/Alexander272/sealur_proto/api/moment/models/flange_model"
 	"github.com/Alexander272/sealur_proto/api/moment/models/gasket_model"
 	"github.com/Alexander272/sealur_proto/api/moment/models/material_model"
@@ -118,6 +121,56 @@ type Gasket interface {
 	DeleteGasketData(context.Context, *gasket_api.DeleteGasketDataRequest) error
 }
 
+type Device interface {
+	GetDevices(context.Context, *device_api.GetDeviceRequest) ([]*device_model.Device, error)
+	CreateDevice(context.Context, *device_api.CreateDeviceRequest) (id string, err error)
+	CreateFewDevices(context.Context, *device_api.CreateFewDeviceRequest) error
+	UpdateDevice(context.Context, *device_api.UpdateDeviceRequest) error
+	DeleteDevice(context.Context, *device_api.DeleteDeviceRequest) error
+
+	GetPressure(context.Context, *device_api.GetPressureRequest) ([]*device_model.Pressure, error)
+	CreatePressure(context.Context, *device_api.CreatePressureRequest) (id string, err error)
+	CreateFewPressure(context.Context, *device_api.CreateFewPressureRequest) error
+	UpdatePressure(context.Context, *device_api.UpdatePressureRequest) error
+	DeletePressure(context.Context, *device_api.DeletePressureRequest) error
+
+	GetTubeCount(context.Context, *device_api.GetTubeCountRequest) ([]*device_model.TubeCount, error)
+	CreateTubeCount(context.Context, *device_api.CreateTubeCountRequest) (id string, err error)
+	CreateFewTubeCount(context.Context, *device_api.CreateFewTubeCountRequest) error
+	UpdateTubeCount(context.Context, *device_api.UpdateTubeCountRequest) error
+	DeleteTubeCount(context.Context, *device_api.DeleteTubeCountRequest) error
+
+	GetFinningFactor(context.Context, *device_api.GetFinningFactorRequest) ([]*device_model.FinningFactor, error)
+	CreateFinningFactor(context.Context, *device_api.CreateFinningFactorRequest) (id string, err error)
+	CreateFewFinningFactor(context.Context, *device_api.CreateFewFinningFactorRequest) error
+	UpdateFinningFactor(context.Context, *device_api.UpdateFinningFactorRequest) error
+	DeleteFinningFactor(context.Context, *device_api.DeleteFinningFactorRequest) error
+
+	GetSectionExecution(context.Context, *device_api.GetSectionExecutionRequest) ([]*device_model.SectionExecution, error)
+	CreateSectionExecution(context.Context, *device_api.CreateSectionExecutionRequest) (id string, err error)
+	CreateFewSectionExecution(context.Context, *device_api.CreateFewSectionExecutionRequest) error
+	UpdateSectionExecution(context.Context, *device_api.UpdateSectionExecutionRequest) error
+	DeleteSectionExecution(context.Context, *device_api.DeleteSectionExecutionRequest) error
+
+	GetTubeLength(context.Context, *device_api.GetTubeLenghtRequest) ([]*device_model.TubeLenght, error)
+	CreateTubeLength(context.Context, *device_api.CreateTubeLenghtRequest) (id string, err error)
+	CreateFewTubeLength(context.Context, *device_api.CreateFewTubeLenghtRequest) error
+	UpdateTubeLength(context.Context, *device_api.UpdateTubeLenghtRequest) error
+	DeleteTubeLength(context.Context, *device_api.DeleteTubeLenghtRequest) error
+
+	GetNumberOfMoves(context.Context, *device_api.GetNumberOfMovesRequest) ([]*device_model.NumberOfMoves, error)
+	CreateNumberOfMoves(context.Context, *device_api.CreateNumberOfMovesRequest) (id string, err error)
+	CreateFewNumberOfMoves(context.Context, *device_api.CreateFewNumberOfMovesRequest) error
+	UpdateNumberOfMoves(context.Context, *device_api.UpdateNumberOfMovesRequest) error
+	DeleteNumberOfMoves(context.Context, *device_api.DeleteNumberOfMovesRequest) error
+
+	GetNameGasket(context.Context, *device_api.GetNameGasketRequest) ([]*device_model.NameGasket, error)
+	CreateNameGasket(context.Context, *device_api.CreateNameGasketRequest) (id string, err error)
+	CreateFewNameGasket(context.Context, *device_api.CreateFewNameGasketRequest) error
+	UpdateNameGasket(context.Context, *device_api.UpdateNameGasketRequest) error
+	DeleteNameGsket(context.Context, *device_api.DeleteNameGasketRequest) error
+}
+
 type Graphic interface {
 	CalculateBetaF(betta, x float64) float64
 	CalculateBetaV(betta, x float64) float64
@@ -136,6 +189,7 @@ type Services struct {
 	Flange
 	Materials
 	Gasket
+	Device
 	Graphic
 	Read
 }
@@ -144,11 +198,13 @@ func NewServices(repos *repository.Repositories) *Services {
 	flange := flange.NewFlangeService(repos.Flange)
 	materials := materials.NewMaterialsService(repos.Materials)
 	gasket := gasket.NewGasketService(repos.Gasket)
+	device := device.NewDeviceService(repos.Device)
 
 	return &Services{
 		Flange:    flange,
 		Materials: materials,
 		Gasket:    gasket,
+		Device:    device,
 		Graphic:   graphic.NewGraphicService(),
 		Read:      read.NewReadService(flange, materials, gasket),
 		Calc:      calc.NewCalcServices(flange, gasket, materials),

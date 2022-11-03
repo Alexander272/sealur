@@ -5,6 +5,7 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service"
 	"github.com/Alexander272/sealur_proto/api/moment"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/device_api"
 	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/Alexander272/sealur_proto/api/moment/material_api"
@@ -31,6 +32,10 @@ type Flange interface {
 	flange_api.FlangeServiceServer
 }
 
+type Device interface {
+	device_api.DeviceServiceServer
+}
+
 type Read interface {
 	read_api.ReadServiceServer
 }
@@ -42,6 +47,7 @@ type Handler struct {
 	Materials
 	Gasket
 	Flange
+	Device
 	Read
 	Calc
 }
@@ -54,6 +60,7 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		Materials: NewMaterialsHandlers(service.Materials),
 		Gasket:    NewGasketService(service.Gasket),
 		Flange:    NewFlangeHandlers(service.Flange),
+		Device:    NewDeviceHandlers(service.Device),
 		Read:      NewReadHandlers(service.Read),
 		Calc:      NewCalcHandlers(service.Calc),
 	}

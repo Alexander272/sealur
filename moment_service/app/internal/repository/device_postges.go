@@ -27,7 +27,7 @@ func (r *DeviceRepo) GetDevices(ctx context.Context, req *device_api.GetDeviceRe
 	return devices, nil
 }
 
-func (r *DeviceRepo) CreateDevices(ctx context.Context, device *device_api.CreateDeviceRequest) (id string, err error) {
+func (r *DeviceRepo) CreateDevice(ctx context.Context, device *device_api.CreateDeviceRequest) (id string, err error) {
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", DeviceModTable)
 
 	row := r.db.QueryRow(query, device.Title)

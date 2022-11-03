@@ -96,7 +96,7 @@ type Gasket interface {
 
 type Device interface {
 	GetDevices(context.Context, *device_api.GetDeviceRequest) ([]models.DeviceDTO, error)
-	CreateDevices(context.Context, *device_api.CreateDeviceRequest) (id string, err error)
+	CreateDevice(context.Context, *device_api.CreateDeviceRequest) (id string, err error)
 	CreateFewDevices(context.Context, *device_api.CreateFewDeviceRequest) error
 	UpdateDevice(context.Context, *device_api.UpdateDeviceRequest) error
 	DeleteDevice(context.Context, *device_api.DeleteDeviceRequest) error

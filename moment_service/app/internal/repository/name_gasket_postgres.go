@@ -9,7 +9,14 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/device_api"
 )
 
-func (r *DeviceRepo) GetNameGasket(ctx context.Context, req *device_api.GetNameGasketRequest) (gasket []models.NameGasketDTO, err error)
+func (r *DeviceRepo) GetNameGasket(ctx context.Context, req *device_api.GetNameGasketRequest) (gasket []models.NameGasketDTO, err error) {
+	query := fmt.Sprintf("SELECT id, num_id, pres_id, title FROM %s WHERE fin_id=$1", NumberOfMovesTable)
+
+	if err := r.db.Get(&gasket, query, req.FinId); err != nil {
+		return gasket, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return gasket, nil
+}
 
 func (r *DeviceRepo) CreateNameGasket(ctx context.Context, gasket *device_api.CreateNameGasketRequest) (id string, err error) {
 	query := fmt.Sprintf(`INSERT INTO %s (fin_id, num_id, pres_id, title, size_long, size_trans, width, thick1, thick2, thick3, thick4) 
