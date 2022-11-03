@@ -152,11 +152,11 @@ type Device interface {
 	UpdateSectionExecution(context.Context, *device_api.UpdateSectionExecutionRequest) error
 	DeleteSectionExecution(context.Context, *device_api.DeleteSectionExecutionRequest) error
 
-	GetTubeLength(context.Context, *device_api.GetTubeLenghtRequest) ([]*device_model.TubeLenght, error)
-	CreateTubeLength(context.Context, *device_api.CreateTubeLenghtRequest) (id string, err error)
-	CreateFewTubeLength(context.Context, *device_api.CreateFewTubeLenghtRequest) error
-	UpdateTubeLength(context.Context, *device_api.UpdateTubeLenghtRequest) error
-	DeleteTubeLength(context.Context, *device_api.DeleteTubeLenghtRequest) error
+	GetTubeLength(context.Context, *device_api.GetTubeLengthRequest) ([]*device_model.TubeLength, error)
+	CreateTubeLength(context.Context, *device_api.CreateTubeLengthRequest) (id string, err error)
+	CreateFewTubeLength(context.Context, *device_api.CreateFewTubeLengthRequest) error
+	UpdateTubeLength(context.Context, *device_api.UpdateTubeLengthRequest) error
+	DeleteTubeLength(context.Context, *device_api.DeleteTubeLengthRequest) error
 
 	GetNumberOfMoves(context.Context, *device_api.GetNumberOfMovesRequest) ([]*device_model.NumberOfMoves, error)
 	CreateNumberOfMoves(context.Context, *device_api.CreateNumberOfMovesRequest) (id string, err error)
@@ -165,6 +165,8 @@ type Device interface {
 	DeleteNumberOfMoves(context.Context, *device_api.DeleteNumberOfMovesRequest) error
 
 	GetNameGasket(context.Context, *device_api.GetNameGasketRequest) ([]*device_model.NameGasket, error)
+	GetFullNameGasket(context.Context, *device_api.GetFullNameGasketRequest) ([]*device_model.FullNameGasket, error)
+	GetNameGasketSize(context.Context, *device_api.GetNameGasketSizeRequest) ([]*device_model.NameGasketSize, error)
 	CreateNameGasket(context.Context, *device_api.CreateNameGasketRequest) (id string, err error)
 	CreateFewNameGasket(context.Context, *device_api.CreateFewNameGasketRequest) error
 	UpdateNameGasket(context.Context, *device_api.UpdateNameGasketRequest) error

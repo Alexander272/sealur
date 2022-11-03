@@ -14,6 +14,22 @@ func (h *DeviceHandlers) GetNameGasket(ctx context.Context, req *device_api.GetN
 	return &device_api.NameGasketResponse{Gasket: gasket}, nil
 }
 
+func (h *DeviceHandlers) GetFullNameGasket(ctx context.Context, req *device_api.GetFullNameGasketRequest) (*device_api.FullNameGasketResponse, error) {
+	gasket, err := h.service.GetFullNameGasket(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &device_api.FullNameGasketResponse{Gasket: gasket}, nil
+}
+
+func (h *DeviceHandlers) GetNameGasketSize(ctx context.Context, req *device_api.GetNameGasketSizeRequest) (*device_api.NameGasketSizeResponse, error) {
+	gasket, err := h.service.GetNameGasketSize(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &device_api.NameGasketSizeResponse{Gasket: gasket}, nil
+}
+
 func (h *DeviceHandlers) CreateNameGasket(ctx context.Context, gasket *device_api.CreateNameGasketRequest) (*device_api.IdResponse, error) {
 	id, err := h.service.CreateNameGasket(ctx, gasket)
 	if err != nil {

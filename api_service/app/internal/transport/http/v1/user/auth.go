@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
@@ -46,7 +47,11 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	if limit.Count >= h.auth.CountAttempt {
 		h.services.AddAttempt(c, c.ClientIP())
-		models.NewErrorResponse(c, http.StatusTooManyRequests, "too many request", "too many request")
+		models.NewErrorResponse(
+			c, http.StatusTooManyRequests,
+			fmt.Sprintf("too many request (%d >= %d)", limit.Count, h.auth.CountAttempt),
+			"too many request",
+		)
 		return
 	}
 

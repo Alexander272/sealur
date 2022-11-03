@@ -19,7 +19,7 @@ const (
 	PressureTable         = "pressure"
 	FinningFactorTable    = "finning_factor"
 	SectionExecutionTable = "section_execution"
-	TubeLenghtTable       = "tube_lenght"
+	TubeLengthTable       = "tube_lenght"
 	NumberOfMovesTable    = "number_of_moves"
 	NameGasketTable       = "name_gasket"
 )

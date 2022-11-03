@@ -18,6 +18,25 @@ func (r *DeviceRepo) GetNameGasket(ctx context.Context, req *device_api.GetNameG
 	return gasket, nil
 }
 
+func (r *DeviceRepo) GetFullNameGasket(ctx context.Context, req *device_api.GetFullNameGasketRequest) (gasket []models.FullNameGasketDTO, err error) {
+	query := fmt.Sprintf(`SELECT id, num_id, pres_id, title, size_long, size_trans, width, thick1, thick2, thick3, thick4 
+		FROM %s WHERE fin_id=$1`, NumberOfMovesTable)
+
+	if err := r.db.Get(&gasket, query, req.FinId); err != nil {
+		return gasket, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return gasket, nil
+}
+
+func (r *DeviceRepo) GetNameGasketSize(ctx context.Context, req *device_api.GetNameGasketSizeRequest) (gasket []models.NameGasketSizeDTO, err error) {
+	query := fmt.Sprintf("SELECT id, size_long, size_trans, width, thick1, thick2, thick3, thick4 FROM %s WHERE id=$1", NumberOfMovesTable)
+
+	if err := r.db.Get(&gasket, query, req.Id); err != nil {
+		return gasket, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return gasket, nil
+}
+
 func (r *DeviceRepo) CreateNameGasket(ctx context.Context, gasket *device_api.CreateNameGasketRequest) (id string, err error) {
 	query := fmt.Sprintf(`INSERT INTO %s (fin_id, num_id, pres_id, title, size_long, size_trans, width, thick1, thick2, thick3, thick4) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`, NameGasketTable)
