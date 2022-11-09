@@ -4,48 +4,289 @@ import (
 	"math"
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
+	"github.com/Alexander272/sealur/moment_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
-// расчеты если выполняется прочностной расчет
-func (s *FlangeService) getCalculatedStrength(
-	flange *flange_model.FlangeResult,
-	bolt *flange_model.BoltResult,
-	typeF flange_model.FlangeData_Type,
-	M, Pressure, Qd, Dcp, SigmaB, Pbm, Pbr, QFM float64,
-	AxialForce, BendingMoment int32,
-	isWork, isTemp bool,
-) *flange_model.StrengthResult {
-	//* большинтсво переменный называются +- так же как и в оригинале
+func (s *FlangeService) strengthCalculate(data models.DataFlange, req *calc_api.FlangeRequest) *flange_model.Calculated_Strength {
+	auxiliary := s.auxiliaryCalculate(data, req)
+	tightness := s.tightnessCalculate(auxiliary, data, req)
+	bolt1 := s.boltStrengthCalculate(data, req, tightness.Pb, tightness.Pbr, auxiliary.A, auxiliary.Dcp)
+	moment1 := s.momentCalculate(data, bolt1.SigmaB1, bolt1.DSigmaM, tightness.Pb, auxiliary.A, auxiliary.Dcp, false)
+	static1 := s.staticResistanceCalculate(data.Flange1, auxiliary.Flange1, data.Type1, data, req, tightness.Pb, tightness.Pbr, tightness.Qd, tightness.Qfm)
+	conditins1 := s.conditionsForStrengthCalculate(data.Type1, data.Flange1, auxiliary.Flange1, static1, req.IsWork, false)
+	tigLoad := s.tightnessLoadCalculate(auxiliary, tightness, data, req)
+	bolt2 := s.boltStrengthCalculate(data, req, tigLoad.Pb, tigLoad.Pbr, auxiliary.A, auxiliary.Dcp)
+	moment2 := s.momentCalculate(data, bolt2.SigmaB1, bolt2.DSigmaM, tigLoad.Pb, auxiliary.A, auxiliary.Dcp, false)
+	static2 := s.staticResistanceCalculate(data.Flange2, auxiliary.Flange2, data.Type2, data, req, tigLoad.Pb, tigLoad.Pbr, tightness.Qd, tightness.Qfm)
+	conditins2 := s.conditionsForStrengthCalculate(data.Type2, data.Flange2, auxiliary.Flange2, static2, req.IsWork, true)
+	finalMoment := s.momentCalculate(data, bolt2.SigmaB1, bolt2.DSigmaM, tigLoad.Pb, auxiliary.A, auxiliary.Dcp, true)
 
-	strength := &flange_model.StrengthResult{}
-	teta := map[bool]float64{
-		true:  constants.WorkTeta,
-		false: constants.TestTeta,
+	deformation := &flange_model.CalcDeformation{
+		B0:  auxiliary.B0,
+		Dcp: auxiliary.Dcp,
+		Po:  tightness.Po,
+		Rp:  tightness.Rp,
 	}
-	var Ks float64
-	if flange.K <= constants.MinK {
-		Ks = constants.MinKs
-	} else if flange.K >= constants.MaxK {
-		Ks = constants.MaxKs
+	forces := &flange_model.CalcForcesInBolts{
+		A:      auxiliary.A,
+		Qd:     tightness.Qd,
+		Qfm:    tightness.Qfm,
+		Qt:     tigLoad.Qt,
+		Pb:     tigLoad.Pb,
+		Alpha:  auxiliary.Alpha,
+		AlphaM: auxiliary.AlphaM,
+		Pb1:    tigLoad.Pb1,
+		MinB:   0.4 * auxiliary.A * data.Bolt.SigmaAt20,
+		Pb2:    tightness.Pb2,
+		Pbr:    tigLoad.Pbr,
+	}
+
+	res := &flange_model.Calculated_Strength{
+		Auxiliary:              auxiliary,
+		Tightness:              tightness,
+		BoltStrength1:          bolt1,
+		Moment1:                moment1,
+		StaticResistance1:      static1,
+		ConditionsForStrength1: conditins1,
+		TightnessLoad:          tigLoad,
+		BoltStrength2:          bolt2,
+		Moment2:                moment2,
+		StaticResistance2:      static2,
+		ConditionsForStrength2: conditins2,
+		Deformation:            deformation,
+		ForcesInBolts:          forces,
+		FinalMoment:            finalMoment,
+	}
+
+	return res
+}
+
+func (s *FlangeService) auxiliaryCalculate(data models.DataFlange, req *calc_api.FlangeRequest) *flange_model.CalcAuxiliary {
+	auxiliary := &flange_model.CalcAuxiliary{}
+
+	if data.TypeGasket == flange_model.GasketData_Oval {
+		// фомула 4
+		auxiliary.B0 = data.Gasket.Width / 4
+		// фомула ?
+		auxiliary.Dcp = data.Gasket.DOut - data.Gasket.Width/2
+
 	} else {
-		Ks = ((flange.K-constants.MinK)/(constants.MaxK-constants.MinK))*(constants.MaxKs-constants.MinKs) + constants.MinKs
-	}
-	Kt := map[bool]float64{
-		true:  constants.TempKt,
-		false: constants.Kt,
+		if data.Gasket.Width <= constants.Bp {
+			// фомула 2
+			auxiliary.B0 = data.Gasket.Width
+		} else {
+			// фомула 3
+			auxiliary.B0 = constants.B0 * math.Sqrt(data.Gasket.Width)
+		}
+		// фомула 5
+		auxiliary.Dcp = data.Gasket.DOut - auxiliary.B0
 	}
 
-	temp1 := math.Pi * flange.D6 / float64(bolt.Count)
-	temp2 := 2*float64(bolt.Diameter) + 6*flange.H/(M+0.5)
+	if data.TypeGasket == flange_model.GasketData_Soft {
+		// Податливость прокладки
+		auxiliary.Yp = (data.Gasket.Thickness * data.Gasket.Compression) / (data.Gasket.Epsilon * math.Pi * auxiliary.Dcp * data.Gasket.Width)
+	}
+	// приложение К пояснение к формуле К.2
+	auxiliary.Lb = data.Bolt.Lenght + s.typeBolt[req.Type.String()]*data.Bolt.Diameter
+	// формула К.2
+	// Податливость болтов/шпилек
+	auxiliary.Yb = auxiliary.Lb / (data.Bolt.EpsilonAt20 * data.Bolt.Area * float64(data.Bolt.Count))
+
+	// фомула 8
+	// Суммарная площадь сечения болтов/шпилек
+	auxiliary.A = float64(data.Bolt.Count) * data.Bolt.Area
+
+	flange1 := s.auxFlangeCalculate(req.FlangesData[0].Type, data.Flange1, auxiliary.Dcp)
+	flange2 := flange1
+	auxiliary.Flange1 = flange1
+	if len(req.FlangesData) > 1 {
+		flange2 = s.auxFlangeCalculate(req.FlangesData[1].Type, data.Flange2, auxiliary.Dcp)
+		auxiliary.Flange2 = flange2
+	}
+
+	if data.TypeGasket == flange_model.GasketData_Oval || data.Type1 == flange_model.FlangeData_free || data.Type2 == flange_model.FlangeData_free {
+		// Для фланцев с овальными и восьмигранными прокладками и для свободных фланцев коэффициенты жесткости фланцевого соединения принимают равными 1.
+		auxiliary.Alpha = 1
+	} else {
+		// формула (Е.11)
+		// Коэффициент жесткости
+		auxiliary.Alpha = 1 - (auxiliary.Yp-(flange1.Yf*flange1.E*flange1.B+flange2.Yf*flange2.E*flange2.B))/
+			(auxiliary.Yp+auxiliary.Yb+(flange1.Yf*math.Pow(flange1.B, 2)+flange2.Yf*math.Pow(flange2.B, 2)))
+	}
+
+	dividend := auxiliary.Yb + flange1.Yfn*flange1.B*(flange1.B+flange1.E-math.Pow(flange1.E, 2)/auxiliary.Dcp) +
+		+flange2.Yfn*flange2.B*(flange2.B+flange2.E-math.Pow(flange2.E, 2)/auxiliary.Dcp)
+	divider := auxiliary.Yb + auxiliary.Yp*math.Pow(data.Flange1.D6/auxiliary.Dcp, 2) + flange1.Yfn*math.Pow(flange1.B, 2) + flange2.Yfn*math.Pow(flange2.B, 2)
+
+	if data.Type1 == flange_model.FlangeData_free {
+		dividend += flange1.Yfc * math.Pow(flange1.A, 2)
+		divider += flange1.Yfc * math.Pow(flange1.A, 2)
+	}
+	if data.Type2 == flange_model.FlangeData_free {
+		dividend += flange2.Yfc * math.Pow(flange2.A, 2)
+		divider += flange2.Yfc * math.Pow(flange2.A, 2)
+	}
+
+	// формула (Е.13)
+	// Коэффициент жесткости фланцевого соединения нагруженного внешним изгибающим моментом
+	auxiliary.AlphaM = dividend / divider
+
+	divider = auxiliary.Yp + auxiliary.Yb*data.Bolt.EpsilonAt20/data.Bolt.Epsilon + (flange1.Yf*data.Flange1.EpsilonAt20/data.Flange1.Epsilon)*
+		math.Pow(flange1.B, 2) + (flange2.Yf*data.Flange2.EpsilonAt20/data.Flange2.Epsilon)*math.Pow(flange2.B, 2)
+
+	if data.Type1 == flange_model.FlangeData_free {
+		divider += (flange1.Yk * data.Flange1.Ring.EpsilonKAt20 / data.Flange1.Ring.EpsilonK) * math.Pow(flange1.A, 2)
+	}
+	if data.Type2 == flange_model.FlangeData_free {
+		divider += (flange2.Yk * data.Flange2.Ring.EpsilonKAt20 / data.Flange2.Ring.EpsilonK) * math.Pow(flange2.A, 2)
+	}
+
+	// формула (Е.8)
+	auxiliary.Gamma = 1 / divider
+
+	return auxiliary
+}
+
+func (s *FlangeService) auxFlangeCalculate(
+	flangeType flange_model.FlangeData_Type,
+	data *flange_model.FlangeResult,
+	Dcp float64,
+) *flange_model.CalcAuxiliary_Flange {
+	flange := &flange_model.CalcAuxiliary_Flange{}
+	if flangeType != flange_model.FlangeData_free {
+		// Плечи действия усилий в болтах/шпильках
+		flange.B = 0.5 * (data.D6 - Dcp)
+	} else {
+		flange.A = 0.5 * (data.D6 - data.Ds)
+		flange.B = 0.5 * (data.Ds - Dcp)
+	}
+
+	if flangeType != flange_model.FlangeData_welded {
+		// Эквивалентная толщина втулки
+		flange.Se = data.S0
+	} else {
+		flange.X = data.L / (math.Sqrt(data.D * data.S0))
+		flange.Beta = data.S1 / data.S0
+		// Коэффициент зависящий от соотношения размеров конической втулки фланца
+		flange.Xi = 1 + (flange.Beta-1)*flange.X/(flange.X+(1+flange.Beta)/4)
+		flange.Se = flange.Xi * data.S0
+	}
+
+	// Плечо усилия от действия давления на фланец
+	flange.E = 0.5 * (Dcp - data.D - flange.Se)
+	// Параметр длины обечайки
+	flange.L0 = math.Sqrt(data.D * data.S0)
+	// Отношение наружного диаметра тарелки фланца к внутреннему диаметру
+	flange.K = data.DOut / data.D
+
+	dividend := math.Pow(flange.K, 2)*(1+8.55*(math.Log(flange.K)/math.Log(10))) - 1
+	divider := (1.05 + 1.945*math.Pow(flange.K, 2)) * (flange.K - 1)
+	flange.BetaT = dividend / divider
+
+	divider = 1.36 * (math.Pow(flange.K, 2) - 1) * (flange.K - 1)
+	flange.BetaU = dividend / divider
+
+	dividend = 1 / (flange.K - 1)
+	divider = 0.69 + 5.72*((math.Pow(flange.K, 2)*(math.Log(flange.K)/math.Log(10)))/(math.Pow(flange.K, 2)-1))
+	flange.BetaY = dividend * divider
+
+	dividend = math.Pow(flange.K, 2) + 1
+	divider = math.Pow(flange.K, 2) - 1
+	flange.BetaZ = dividend / divider
+
+	if flangeType == flange_model.FlangeData_welded && data.S0 != data.S1 {
+		flange.BetaF = s.graphic.CalculateBetaF(flange.Beta, flange.X)
+		flange.BetaV = s.graphic.CalculateBetaV(flange.Beta, flange.X)
+		flange.F = s.graphic.CalculateF(flange.Beta, flange.X)
+	} else {
+		flange.BetaF = constants.InitBetaF
+		flange.BetaV = constants.InitBetaV
+		flange.F = constants.InitF
+	}
+
+	flange.Lymda = (flange.BetaF*data.H+flange.L0)/(flange.BetaT*flange.L0) +
+		(flange.BetaV*math.Pow(data.H, 3))/(flange.BetaU*flange.L0*math.Pow(data.S0, 2))
+
+	// Угловая податливость фланца при затяжке
+	flange.Yf = (0.91 * flange.BetaV) / (data.EpsilonAt20 * flange.Lymda * math.Pow(data.S0, 2) * flange.L0)
+
+	if flangeType == flange_model.FlangeData_free {
+		flange.Psik = 1.28 * (math.Log(data.Dnk/data.Dk) / math.Log(10))
+		flange.Yk = 1 / (data.Ring.EpsilonKAt20 * math.Pow(data.Hk, 3) * flange.Psik)
+	}
+
+	if flangeType != flange_model.FlangeData_free {
+		// Угловая податливость фланца нагруженного внешним изгибающим моментом
+		flange.Yfn = math.Pow(math.Pi/4, 3) * (data.D6 / (data.EpsilonAt20 * data.DOut * math.Pow(data.H, 3)))
+	} else {
+		flange.Yfn = math.Pow(math.Pi/4, 3) * (data.Ds / (data.EpsilonAt20 * data.DOut * math.Pow(data.H, 3)))
+		flange.Yfc = math.Pow(math.Pi/4, 3) * (data.D6 / (data.Ring.EpsilonKAt20 * data.Dnk * math.Pow(data.Hk, 3)))
+	}
+
+	return flange
+}
+
+func (s *FlangeService) tightnessCalculate(aux *flange_model.CalcAuxiliary, data models.DataFlange, req *calc_api.FlangeRequest) *flange_model.CalcTightness {
+	tightness := &flange_model.CalcTightness{}
+
+	// формула 6
+	// Усилие необходимое для смятия прокладки при затяжке
+	tightness.Po = 0.5 * math.Pi * aux.Dcp * aux.B0 * data.Gasket.Pres
+
+	if req.Pressure >= 0 {
+		// формула 7
+		// Усилие на прокладке в рабочих условиях
+		tightness.Rp = math.Pi * aux.Dcp * aux.B0 * data.Gasket.M * math.Abs(req.Pressure)
+	}
+
+	// формула 9
+	// Равнодействующая нагрузка от давления
+	tightness.Qd = 0.785 * math.Pow(aux.Dcp, 2) * req.Pressure
+
+	temp1 := float64(req.AxialForce) + 4*math.Abs(float64(req.BendingMoment))/aux.Dcp
+	temp2 := float64(req.AxialForce) - 4*math.Abs(float64(req.BendingMoment))/aux.Dcp
+
+	// формула 10
+	// Приведенная нагрузка, вызванная воздействием внешней силы и изгибающего момента
+	tightness.Qfm = math.Max(temp1, temp2)
+
+	minB := 0.4 * aux.A * data.Bolt.SigmaAt20
+	// Расчетная нагрузка на болты/шпильки при затяжке, необходимая для обеспечения обжатия прокладки и минимального начального натяжения болтов/шпилек
+	tightness.Pb2 = math.Max(tightness.Po, minB)
+	// Расчетная нагрузка на болты/шпильки при затяжке, необходимая для обеспечения в рабочих условиях давления на
+	// прокладку достаточного для герметизации фланцевого соединения
+	tightness.Pb1 = aux.Alpha*(tightness.Qd+float64(req.AxialForce)) + tightness.Rp + 4*aux.AlphaM*math.Abs(float64(req.BendingMoment))/aux.Dcp
+
+	// Расчетная нагрузка на болты/шпильки фланцевых соединений
+	tightness.Pb = math.Max(tightness.Pb1, tightness.Pb2)
+	// Расчетная нагрузка на болты/шпильки фланцевых соединений в рабочих условиях
+	tightness.Pbr = tightness.Pb + (1-aux.Alpha)*(tightness.Qd+float64(req.AxialForce)) + 4*(1-aux.AlphaM)*math.Abs(float64(req.BendingMoment))/aux.Dcp
+
+	return tightness
+}
+
+func (s *FlangeService) staticResistanceCalculate(
+	flange *flange_model.FlangeResult,
+	calcFlange *flange_model.CalcAuxiliary_Flange,
+	typeFlange flange_model.FlangeData_Type,
+	data models.DataFlange,
+	req *calc_api.FlangeRequest,
+	Pb, Pbr, Qd, Qfm float64,
+) *flange_model.CalcStaticResistance {
+	static := &flange_model.CalcStaticResistance{}
+
+	temp1 := math.Pi * flange.D6 / float64(data.Bolt.Count)
+	temp2 := 2*float64(data.Bolt.Diameter) + 6*flange.H/(data.Gasket.M+0.5)
 
 	// Коэффициент учитывающий изгиб тарелки фланца между болтами шпильками
-	strength.Cf = math.Max(1, math.Sqrt(temp1/temp2))
+	static.Cf = math.Max(1, math.Sqrt(temp1/temp2))
 
 	// Приведенный диаметр приварного встык фланца с конической или прямой втулкой
 	var Dzv float64
-	if typeF == flange_model.FlangeData_welded && flange.D <= 20*flange.S1 {
-		if flange.F > 1 {
+	if typeFlange == flange_model.FlangeData_welded && flange.D <= 20*flange.S1 {
+		if calcFlange.F > 1 {
 			Dzv = flange.D + flange.S0
 		} else {
 			Dzv = flange.D + flange.S1
@@ -53,63 +294,58 @@ func (s *FlangeService) getCalculatedStrength(
 	} else {
 		Dzv = flange.D
 	}
-	strength.Dzv = Dzv
+	static.Dzv = Dzv
 
 	// Расчетный изгибающий момент действующий на фланец при затяжке
-	strength.MM = strength.Cf * Pbm * flange.B
+	static.MM = static.Cf * Pb * calcFlange.B
 	// Расчетный изгибающий момент действующий на фланец в рабочих условиях
-	strength.Mp = strength.Cf * math.Max(Pbr*flange.B+(Qd+QFM)*flange.E, math.Abs(Qd+QFM)*flange.E)
+	static.Mp = static.Cf * math.Max(Pbr*calcFlange.B+(Qd+Qfm)*calcFlange.E, math.Abs(Qd+Qfm)*calcFlange.E)
 
-	if typeF == flange_model.FlangeData_free {
-		strength.MMk = strength.Cf * Pbm * flange.A
-		strength.Mpk = strength.Cf * Pbr * flange.A
+	if typeFlange == flange_model.FlangeData_free {
+		static.MMk = static.Cf * Pb * calcFlange.A
+		static.Mpk = static.Cf * Pbr * calcFlange.A
 	}
 
 	// Меридиональное изгибное напряжение во втулке приварного встык фланца обечайке трубе плоского фланца или обечайке бурта свободного фланца
-	var sigmaM1, sigmaM0 float64
-	if typeF == flange_model.FlangeData_welded && flange.S1 != flange.S0 {
+	if typeFlange == flange_model.FlangeData_welded && flange.S1 != flange.S0 {
 		// - для приварных встык фланцев с конической втулкой в сечении S1
-		sigmaM1 = strength.MM / (flange.Lymda * math.Pow(flange.S1-flange.C, 2) * Dzv)
+		static.SigmaM1 = static.MM / (calcFlange.Lymda * math.Pow(flange.S1-flange.C, 2) * Dzv)
 		// - для приварных встык фланцев с конической втулкой в сечении S0
-		sigmaM0 = flange.F * sigmaM1
+		static.SigmaM0 = calcFlange.F * static.SigmaM1
 	} else {
-		sigmaM1 = strength.MM / (flange.Lymda * math.Pow(flange.S0-flange.C, 2) * Dzv)
-		sigmaM0 = sigmaM1
+		static.SigmaM1 = static.MM / (calcFlange.Lymda * math.Pow(flange.S0-flange.C, 2) * Dzv)
+		static.SigmaM0 = static.SigmaM1
 	}
 
 	// Радиальное напряжение в тарелке приварного встык фланца плоского фланца и бурте свободного фланца в условиях затяжки
-	sigmaR := ((1.33*flange.BetaF*flange.H + flange.L0) / (flange.Lymda * math.Pow(flange.H, 2) * flange.L0 * flange.D)) * strength.MM
+	static.SigmaR = ((1.33*calcFlange.BetaF*flange.H + calcFlange.L0) / (calcFlange.Lymda * math.Pow(flange.H, 2) * calcFlange.L0 * flange.D)) * static.MM
 	// Окружное напряжение в тарелке приварного встык фланца плоского фланца и бурте свободного фланца в условиях затяжки
-	sigmaT := flange.BetaY*strength.MM/(math.Pow(flange.H, 2)*flange.D) - flange.BetaZ*sigmaR
+	static.SigmaT = calcFlange.BetaY*static.MM/(math.Pow(flange.H, 2)*flange.D) - calcFlange.BetaZ*static.SigmaR
 
-	strength.SigmaR = sigmaR
-	strength.SigmaT = sigmaT
-
-	var sigmaK, sigmaP1, sigmaP0, sigmaMp, sigmaMpm float64
-	if typeF == flange_model.FlangeData_free {
-		sigmaK = flange.BetaY * strength.MMk / (math.Pow(flange.Hk, 2) * flange.Dk)
+	if typeFlange == flange_model.FlangeData_free {
+		static.SigmaK = calcFlange.BetaY * static.MMk / (math.Pow(flange.Hk, 2) * flange.Dk)
 	}
 
 	// Меридиональные изгибные напряжения во втулке приварного встык фланца обечайке трубе плоского фланца или обечайке
 	// трубе бурта свободного фланца в рабочих условиях
-	if typeF == flange_model.FlangeData_welded && flange.S1 != flange.S0 {
+	if typeFlange == flange_model.FlangeData_welded && flange.S1 != flange.S0 {
 		// - для приварных встык фланцев с конической втулкой в сечении S1
-		sigmaP1 = strength.Mp / (flange.Lymda * math.Pow(flange.S1-flange.C, 2) * Dzv)
+		static.SigmaP1 = static.Mp / (calcFlange.Lymda * math.Pow(flange.S1-flange.C, 2) * Dzv)
 		// - для приварных встык фланцев с конической втулкой в сечении S0
-		sigmaP0 = flange.F * sigmaP1
+		static.SigmaP0 = calcFlange.F * static.SigmaP1
 	} else {
-		strength.IsSameSigma = true
-		sigmaP1 = strength.Mp / (flange.Lymda * math.Pow(flange.S0-flange.C, 2) * Dzv)
-		sigmaP0 = sigmaP1
+		static.IsEqualSigma = true
+		static.SigmaP1 = static.Mp / (calcFlange.Lymda * math.Pow(flange.S0-flange.C, 2) * Dzv)
+		static.SigmaP0 = static.SigmaP1
 	}
 
-	if typeF == flange_model.FlangeData_welded {
+	if typeFlange == flange_model.FlangeData_welded {
 		temp := math.Pi * (flange.D + flange.S1) * (flange.S1 - flange.C)
 		// формула (ф. 37)
-		sigmaMp = (0.785*math.Pow(flange.D, 2)*Pressure + float64(AxialForce) +
-			4*math.Abs(float64(BendingMoment)/(flange.D+flange.S1))) / temp
-		sigmaMpm = (0.785*math.Pow(flange.D, 2)*Pressure + float64(AxialForce) -
-			4*math.Abs(float64(BendingMoment)/(flange.D+flange.S1))) / temp
+		static.SigmaMp = (0.785*math.Pow(flange.D, 2)*req.Pressure + float64(req.AxialForce) +
+			4*math.Abs(float64(req.BendingMoment)/(flange.D+flange.S1))) / temp
+		static.SigmaMpm = (0.785*math.Pow(flange.D, 2)*req.Pressure + float64(req.AxialForce) -
+			4*math.Abs(float64(req.BendingMoment)/(flange.D+flange.S1))) / temp
 	}
 
 	temp := math.Pi * (flange.D + flange.S0) * (flange.S0 - flange.C)
@@ -117,121 +353,222 @@ func (s *FlangeService) getCalculatedStrength(
 	// плоского фланца или обечайке трубе бурта свободного фланца в рабочих условиях
 	// формула (ф. 37)
 	// - для приварных встык фланцев с конической втулкой в сечении S1
-	sigmaMp0 := (0.785*math.Pow(flange.D, 2)*Pressure + float64(AxialForce) +
-		4*math.Abs(float64(BendingMoment)/(flange.D+flange.S0))) / temp
+	static.SigmaMp0 = (0.785*math.Pow(flange.D, 2)*req.Pressure + float64(req.AxialForce) +
+		4*math.Abs(float64(req.BendingMoment)/(flange.D+flange.S0))) / temp
 	// - для приварных встык фланцев с конической втулкой в сечении S0 приварных фланцев с прямой втулкой плоских фланцев и свободных фланцев
-	sigmaMpm0 := (0.785*math.Pow(flange.D, 2)*Pressure + float64(AxialForce) -
-		4*math.Abs(float64(BendingMoment)/(flange.D+flange.S0))) / temp
+	static.SigmaMpm0 = (0.785*math.Pow(flange.D, 2)*req.Pressure + float64(req.AxialForce) -
+		4*math.Abs(float64(req.BendingMoment)/(flange.D+flange.S0))) / temp
 
 	// Окружные мембранные напряжения от действия давления во втулке приварного встык фланца обечайке
 	// трубе плоского фланца или обечайке трубе бурта свободного фланца в сечениии S0
-	sigmaMop := Pressure * flange.D / (2.0 * (flange.S0 - flange.C))
+	static.SigmaMop = req.Pressure * flange.D / (2.0 * (flange.S0 - flange.C))
 
 	// Напряжения в тарелке приварного встык фланца плоского фланца и бурте свободного фланца в рабочих условиях
 	// - радиальные напряжения
-	sigmaRp := ((1.33*flange.BetaF*flange.H + flange.L0) / (flange.Lymda * math.Pow(flange.H, 2) * flange.L0 * flange.D)) * strength.Mp
+	static.SigmaRp = ((1.33*calcFlange.BetaF*flange.H + calcFlange.L0) / (calcFlange.Lymda * math.Pow(flange.H, 2) * calcFlange.L0 * flange.D)) * static.Mp
 	// - окружное напряжения
-	sigmaTp := flange.BetaY*strength.Mp/(math.Pow(flange.H, 2)*flange.D) - flange.BetaZ*sigmaRp
+	static.SigmaTp = calcFlange.BetaY*static.Mp/(math.Pow(flange.H, 2)*flange.D) - calcFlange.BetaZ*static.SigmaRp
 
-	var sigmaKp float64
-	if typeF == flange_model.FlangeData_free {
-		sigmaKp = flange.BetaY * strength.Mp / (math.Pow(flange.Hk, 2) * flange.Dk)
+	if typeFlange == flange_model.FlangeData_free {
+		static.SigmaKp = calcFlange.BetaY * static.Mp / (math.Pow(flange.Hk, 2) * flange.Dk)
 	}
 
-	if typeF == flange_model.FlangeData_welded {
+	return static
+}
+
+func (s *FlangeService) conditionsForStrengthCalculate(
+	flangeType flange_model.FlangeData_Type,
+	flange *flange_model.FlangeResult,
+	calcFlange *flange_model.CalcAuxiliary_Flange,
+	static *flange_model.CalcStaticResistance,
+	isWork, isTemp bool,
+) *flange_model.CalcConditionsForStrength {
+	conditions := &flange_model.CalcConditionsForStrength{}
+
+	teta := map[bool]float64{
+		true:  constants.WorkTeta,
+		false: constants.TestTeta,
+	}
+	var Ks float64
+	if calcFlange.K <= constants.MinK {
+		Ks = constants.MinKs
+	} else if calcFlange.K >= constants.MaxK {
+		Ks = constants.MaxKs
+	} else {
+		Ks = ((calcFlange.K-constants.MinK)/(constants.MaxK-constants.MinK))*(constants.MaxKs-constants.MinKs) + constants.MinKs
+	}
+	Kt := map[bool]float64{
+		true:  constants.TempKt,
+		false: constants.Kt,
+	}
+
+	var DTeta, DTetaK float64
+	if flangeType == flange_model.FlangeData_welded {
 		if flange.D <= constants.MinD {
-			strength.DTeta = constants.MinDTetta
+			DTeta = constants.MinDTetta
 		} else if flange.D > constants.MaxD {
-			strength.DTeta = constants.MaxDTetta
+			DTeta = constants.MaxDTetta
 		} else {
-			strength.DTeta = ((flange.D-constants.MinD)/(constants.MaxD-constants.MinD))*
+			DTeta = ((flange.D-constants.MinD)/(constants.MaxD-constants.MinD))*
 				(constants.MaxDTetta-constants.MinDTetta) + constants.MinDTetta
 		}
 	} else {
-		strength.DTeta = constants.MaxDTetta
+		DTeta = constants.MaxDTetta
 	}
-	strength.DTeta = teta[isWork] * strength.DTeta
+	DTeta = teta[isWork] * DTeta
 
-	strength.Teta = strength.Mp * flange.Yf * flange.EpsilonAt20 / flange.Epsilon
+	conditions.Teta = static.Mp * calcFlange.Yf * flange.EpsilonAt20 / flange.Epsilon
+	conditions.CondTeta = &flange_model.Condition{
+		X: conditions.Teta,
+		Y: DTeta,
+	}
 
-	if typeF == flange_model.FlangeData_free {
+	if flangeType == flange_model.FlangeData_free {
 		//strength.DTetaK = 0.002
-		strength.DTetaK = 0.02
-		strength.DTetaK = teta[isWork] * strength.DTetaK
-		strength.TetaK = strength.Mpk * flange.Yk * flange.EpsilonKAt20 / flange.EpsilonK
+		DTetaK = 0.02
+		DTetaK = teta[isWork] * DTetaK
+		conditions.TetaK = static.Mpk * calcFlange.Yk * flange.Ring.EpsilonKAt20 / flange.Ring.EpsilonK
+		conditions.CondTetaK = &flange_model.Condition{
+			X: conditions.TetaK,
+			Y: DTetaK,
+		}
 	}
 
 	//* Условия статической прочности фланцев
-	if typeF == flange_model.FlangeData_welded && flange.S1 != flange.S0 {
-		strength.Max1 = math.Max(math.Abs(sigmaM1+sigmaR), math.Abs(sigmaM1+sigmaT))
+	if flangeType == flange_model.FlangeData_welded && flange.S1 != flange.S0 {
+		Max1 := math.Max(math.Abs(static.SigmaM1+static.SigmaR), math.Abs(static.SigmaM1+static.SigmaT))
 
-		t1 := math.Max(math.Abs(sigmaP1-sigmaMp+sigmaRp), math.Abs(sigmaP1-sigmaMpm+sigmaRp))
-		t2 := math.Max(math.Abs(sigmaP1-sigmaMp+sigmaTp), math.Abs(sigmaP1-sigmaMpm+sigmaTp))
+		t1 := math.Max(math.Abs(static.SigmaP1-static.SigmaMp+static.SigmaRp), math.Abs(static.SigmaP1-static.SigmaMpm+static.SigmaRp))
+		t2 := math.Max(math.Abs(static.SigmaP1-static.SigmaMp+static.SigmaTp), math.Abs(static.SigmaP1-static.SigmaMpm+static.SigmaTp))
 		t1 = math.Max(t1, t2)
-		t2 = math.Max(math.Abs(sigmaP1+sigmaMp), math.Abs(sigmaP1+sigmaMpm))
+		t2 = math.Max(math.Abs(static.SigmaP1+static.SigmaMp), math.Abs(static.SigmaP1+static.SigmaMpm))
 
-		strength.Max2 = math.Max(t1, t2)
-		strength.Max3 = sigmaM0
+		Max2 := math.Max(t1, t2)
+		Max3 := static.SigmaM0
 
-		t1 = math.Max(math.Abs(sigmaP0+sigmaMp0), math.Abs(sigmaP0-sigmaMp0))
-		t2 = math.Max(math.Abs(sigmaP0+sigmaMpm0), math.Abs(sigmaP0-sigmaMpm0))
+		t1 = math.Max(math.Abs(static.SigmaP0+static.SigmaMp0), math.Abs(static.SigmaP0-static.SigmaMp0))
+		t2 = math.Max(math.Abs(static.SigmaP0+static.SigmaMpm0), math.Abs(static.SigmaP0-static.SigmaMpm0))
 		t1 = math.Max(t1, t2)
-		t2 = math.Max(math.Abs(0.3*sigmaP0+sigmaMop), math.Abs(0.3*sigmaP0-sigmaMop))
+		t2 = math.Max(math.Abs(0.3*static.SigmaP0+static.SigmaMop), math.Abs(0.3*static.SigmaP0-static.SigmaMop))
 		t1 = math.Max(t1, t2)
-		t2 = math.Max(math.Abs(0.7*sigmaP0+(sigmaMp0-sigmaMop)), math.Abs(0.7*sigmaP0-(sigmaMp0-sigmaMop)))
+		t2 = math.Max(math.Abs(0.7*static.SigmaP0+(static.SigmaMp0-static.SigmaMop)), math.Abs(0.7*static.SigmaP0-(static.SigmaMp0-static.SigmaMop)))
 		t1 = math.Max(t1, t2)
-		t2 = math.Max(math.Abs(0.7*sigmaP0+(sigmaMpm0-sigmaMop)), math.Abs(0.7*sigmaP0-(sigmaMpm0-sigmaMop)))
+		t2 = math.Max(math.Abs(0.7*static.SigmaP0+(static.SigmaMpm0-static.SigmaMop)), math.Abs(0.7*static.SigmaP0-(static.SigmaMpm0-static.SigmaMop)))
 
-		strength.Max4 = math.Max(t1, t2)
+		Max4 := math.Max(t1, t2)
 
-		strength.CondMax1 = Ks * Kt[isTemp] * flange.SigmaMAt20
-		strength.CondMax2 = Ks * Kt[isTemp] * flange.SigmaM
-		strength.CondMax3 = 1.3 * flange.SigmaRAt20
-		strength.CondMax4 = 1.3 * flange.SigmaR
+		conditions.Max1 = &flange_model.Condition{
+			X: Max1,
+			Y: Ks * Kt[isTemp] * flange.SigmaMAt20,
+		}
+		conditions.Max2 = &flange_model.Condition{
+			X: Max2,
+			Y: Ks * Kt[isTemp] * flange.SigmaM,
+		}
+		conditions.Max3 = &flange_model.Condition{
+			X: Max3,
+			Y: 1.3 * flange.SigmaRAt20,
+		}
+		conditions.Max4 = &flange_model.Condition{
+			X: Max4,
+			Y: 1.3 * flange.SigmaR,
+		}
 	} else {
-		strength.Max5 = math.Max(math.Abs(sigmaM0+sigmaR), math.Abs(sigmaM0+sigmaT))
+		Max5 := math.Max(math.Abs(static.SigmaM0+static.SigmaR), math.Abs(static.SigmaM0+static.SigmaT))
 
-		t1 := math.Max(math.Abs(sigmaP0-sigmaMp0+sigmaTp), math.Abs(sigmaP0-sigmaMpm0+sigmaTp))
-		t2 := math.Max(math.Abs(sigmaP0-sigmaMp0+sigmaRp), math.Abs(sigmaP0-sigmaMpm0+sigmaRp))
+		t1 := math.Max(math.Abs(static.SigmaP0-static.SigmaMp0+static.SigmaTp), math.Abs(static.SigmaP0-static.SigmaMpm0+static.SigmaTp))
+		t2 := math.Max(math.Abs(static.SigmaP0-static.SigmaMp0+static.SigmaRp), math.Abs(static.SigmaP0-static.SigmaMpm0+static.SigmaRp))
 		t1 = math.Max(t1, t2)
-		t2 = math.Max(math.Abs(sigmaP0+sigmaMp0), math.Abs(sigmaP0+sigmaMpm0))
+		t2 = math.Max(math.Abs(static.SigmaP0+static.SigmaMp0), math.Abs(static.SigmaP0+static.SigmaMpm0))
 
-		strength.Max6 = math.Max(t1, t2)
+		Max6 := math.Max(t1, t2)
 
-		strength.CondMax5 = flange.SigmaAt20
-		strength.CondMax6 = flange.Sigma
+		conditions.Max5 = &flange_model.Condition{
+			X: Max5,
+			Y: flange.SigmaAt20,
+		}
+		conditions.Max6 = &flange_model.Condition{
+			X: Max6,
+			Y: flange.Sigma,
+		}
 	}
 
-	max7 := math.Max(math.Abs(sigmaMp0), math.Abs(sigmaMpm0))
-	strength.Max7 = math.Max(max7, math.Abs(sigmaMop))
-	strength.Max8 = math.Max(math.Abs(sigmaR), math.Abs(sigmaT))
-	strength.Max9 = math.Max(math.Abs(sigmaRp), math.Abs(sigmaTp))
+	max7 := math.Max(math.Abs(static.SigmaMp0), math.Abs(static.SigmaMpm0))
+	Max7 := math.Max(max7, math.Abs(static.SigmaMop))
+	Max8 := math.Max(math.Abs(static.SigmaR), math.Abs(static.SigmaT))
+	Max9 := math.Max(math.Abs(static.SigmaRp), math.Abs(static.SigmaTp))
 
-	strength.CondMax7 = flange.Sigma
-	strength.CondMax8 = Kt[isTemp] * flange.SigmaAt20
-	strength.CondMax9 = Kt[isTemp] * flange.Sigma
+	conditions.Max7 = &flange_model.Condition{X: Max7, Y: flange.Sigma}
+	conditions.Max8 = &flange_model.Condition{X: Max8, Y: Kt[isTemp] * flange.SigmaAt20}
+	conditions.Max9 = &flange_model.Condition{X: Max9, Y: Kt[isTemp] * flange.Sigma}
 
-	if typeF == flange_model.FlangeData_free {
-		strength.Max10 = sigmaK
-		strength.Max11 = sigmaKp
+	if flangeType == flange_model.FlangeData_free {
+		Max10 := static.SigmaK
+		Max11 := static.SigmaKp
 
-		strength.CondMax10 = Kt[isTemp] * flange.SigmaKAt20
-		strength.CondMax11 = Kt[isTemp] * flange.SigmaK
+		conditions.Max10 = &flange_model.Condition{X: Max10, Y: Kt[isTemp] * flange.Ring.SigmaKAt20}
+		conditions.Max11 = &flange_model.Condition{X: Max11, Y: Kt[isTemp] * flange.Ring.SigmaK}
 	}
 
-	strength.SigmaM0 = sigmaM0
-	strength.SigmaM1 = sigmaM1
-	strength.SigmaTp = sigmaTp
-	strength.SigmaRp = sigmaRp
-	strength.SigmaK = sigmaK
-	strength.SigmaP1 = sigmaP1
-	strength.SigmaP0 = sigmaP0
-	strength.SigmaMp = sigmaMp
-	strength.SigmaMpm = sigmaMpm
-	strength.SigmaMp0 = sigmaMp0
-	strength.SigmaMpm0 = sigmaMpm0
-	strength.SigmaMop = sigmaMop
-	strength.SigmaKp = sigmaKp
+	return conditions
+}
 
-	return strength
+func (s *FlangeService) tightnessLoadCalculate(
+	aux *flange_model.CalcAuxiliary,
+	tig *flange_model.CalcTightness,
+	data models.DataFlange,
+	req *calc_api.FlangeRequest,
+) *flange_model.CalcTightnessLoad {
+	tightness := &flange_model.CalcTightnessLoad{}
+
+	flange1 := aux.Flange1
+	flange2 := aux.Flange2
+
+	divider := aux.Yp + aux.Yb*data.Bolt.EpsilonAt20/data.Bolt.Epsilon + (flange1.Yf*data.Flange1.EpsilonAt20/data.Flange1.Epsilon)*math.Pow(flange1.B, 2) +
+		+(flange2.Yf*data.Flange2.EpsilonAt20/data.Flange2.Epsilon)*math.Pow(flange2.B, 2)
+
+	if data.Type1 == flange_model.FlangeData_free {
+		divider += (flange1.Yk * data.Flange1.Ring.EpsilonKAt20 / data.Flange1.Ring.EpsilonK) * math.Pow(flange1.A, 2)
+	}
+	if data.Type2 == flange_model.FlangeData_free {
+		divider += (flange2.Yk * data.Flange2.Ring.EpsilonKAt20 / data.Flange2.Ring.EpsilonK) * math.Pow(flange2.A, 2)
+	}
+
+	// формула (Е.8)
+	gamma := 1 / divider
+
+	var temp1, temp2 float64
+	if req.IsUseWasher {
+		temp1 = (data.Flange1.AlphaF*data.Flange1.H+data.Washer1.Alpha*data.Washer1.Thickness)*(data.Flange1.Tf-20) +
+			+(data.Flange2.AlphaF*data.Flange2.H+data.Washer2.Alpha*data.Washer2.Thickness)*(data.Flange2.Tf-20)
+	} else {
+		temp1 = data.Flange1.AlphaF*data.Flange1.H*(data.Flange1.Tf-20) + data.Flange2.AlphaF*data.Flange2.H*(data.Flange2.Tf-20)
+	}
+	temp2 = data.Flange1.H + data.Flange2.H
+
+	if data.Type1 == flange_model.FlangeData_free {
+		temp1 += data.Flange1.Ring.AlphaK * data.Flange1.Hk * (data.Flange1.Ring.Tk - 20)
+		temp2 += data.Flange1.Hk
+	}
+	if data.Type2 == flange_model.FlangeData_free {
+		temp1 += data.Flange2.Ring.AlphaK * data.Flange2.Hk * (data.Flange2.Ring.Tk - 20)
+		temp2 += data.Flange2.Hk
+	}
+	if req.IsEmbedded {
+		temp1 += data.Embed.Alpha * data.Embed.Thickness * (req.Temp - 20)
+		temp2 += data.Embed.Thickness
+	}
+
+	//? должно быть два варианта формулы с шайбой и без нее
+	// шайба будет задаваться так же как и болты + толщина шайбы
+
+	//формула 11 (в старом 13)
+	Qt := gamma * (temp1 - data.Bolt.Alpha*temp2*(data.Bolt.Temp-20))
+	tightness.Qt = Qt
+
+	tightness.Pb1 = math.Max(tig.Pb1, tig.Pb1-Qt)
+	tightness.Pb = math.Max(tightness.Pb1, tig.Pb2)
+	tightness.Pbr = tig.Pb + (1-aux.Alpha)*(tig.Qd+float64(req.AxialForce)) + Qt + 4*(1-aux.AlphaM)*math.Abs(float64(req.BendingMoment))/aux.Dcp
+
+	return tightness
 }

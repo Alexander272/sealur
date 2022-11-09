@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 	"fmt"
-	"math"
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
@@ -11,8 +10,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 )
 
-func (s *DataService) getDataFlange(
-	ctx context.Context,
+func (s *DataService) getFlangeData(ctx context.Context,
 	fl *flange_model.FlangeData,
 	bolt *flange_model.BoltData,
 	typeFlange string,
@@ -88,16 +86,17 @@ func (s *DataService) getDataFlange(
 		}
 	}
 
+	flangeData.Ds = 0.5 * (flangeData.DOut + flangeData.Dk + 2*flangeData.H0)
 	flangeData.Tf = s.typeFlangesTF[typeFlange] * temp
 
 	if fl.Type == flange_model.FlangeData_free {
-		flangeData.Tk = s.typeFlangesTK[typeFlange] * temp
+		flangeData.Ring.Tk = s.typeFlangesTK[typeFlange] * temp
 
 		//? при свободных фланцах добавляется еще один материал
 		var mat models.MaterialsResult
 		if fl.RingMarkId != "another" {
 			var err error
-			mat, err = s.materials.GetMatFotCalculate(ctx, fl.RingMarkId, flangeData.Tk)
+			mat, err = s.materials.GetMatForCalculate(ctx, fl.RingMarkId, flangeData.Ring.Tk)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -111,18 +110,18 @@ func (s *DataService) getDataFlange(
 				Sigma:       fl.RingMaterial.Sigma,
 			}
 		}
-		flangeData.RingMaterial = mat.Title
-		flangeData.AlphaK = mat.AlphaF
-		flangeData.EpsilonKAt20 = mat.EpsilonAt20
-		flangeData.EpsilonK = mat.Epsilon
-		flangeData.SigmaKAt20 = mat.SigmaAt20
-		flangeData.SigmaK = mat.Sigma
+		flangeData.Ring.Material = mat.Title
+		flangeData.Ring.AlphaK = mat.AlphaF
+		flangeData.Ring.EpsilonKAt20 = mat.EpsilonAt20
+		flangeData.Ring.EpsilonK = mat.Epsilon
+		flangeData.Ring.SigmaKAt20 = mat.SigmaAt20
+		flangeData.Ring.SigmaK = mat.Sigma
 	}
 
 	var mat models.MaterialsResult
 	if fl.MarkId != "another" {
 		var err error
-		mat, err = s.materials.GetMatFotCalculate(ctx, fl.MarkId, flangeData.Tf)
+		mat, err = s.materials.GetMatForCalculate(ctx, fl.MarkId, flangeData.Tf)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -151,85 +150,4 @@ func (s *DataService) getDataFlange(
 	flangeData.Type = fl.Type.String()
 
 	return flangeData, boltSize, nil
-}
-
-func (s *DataService) getCalculatedDataFlange(
-	ctx context.Context,
-	flangeType flange_model.FlangeData_Type,
-	data *flange_model.FlangeResult,
-	Dcp float64,
-) (*flange_model.FlangeResult, error) {
-	calculated := data
-	if flangeType != flange_model.FlangeData_free {
-		// Плечи действия усилий в болтах/шпильках
-		calculated.B = 0.5 * (data.D6 - Dcp)
-	} else {
-		calculated.Ds = 0.5 * (data.DOut + data.Dk + 2*data.H0)
-		calculated.A = 0.5 * (data.D6 - data.Ds)
-		calculated.B = 0.5 * (data.Ds - Dcp)
-	}
-
-	if flangeType != flange_model.FlangeData_welded {
-		// Эквивалентная толщина втулки
-		calculated.Se = data.S0
-	} else {
-		calculated.X = data.L / (math.Sqrt(data.D * data.S0))
-		calculated.Beta = data.S1 / data.S0
-		// Коэффициент зависящий от соотношения размеров конической втулки фланца
-		calculated.Xi = 1 + (calculated.Beta-1)*calculated.X/(calculated.X+(1+calculated.Beta)/4)
-		calculated.Se = calculated.Xi * data.S0
-	}
-
-	// Плечо усилия от действия давления на фланец
-	calculated.E = 0.5 * (Dcp - data.D - calculated.Se)
-	// Параметр длины обечайки
-	calculated.L0 = math.Sqrt(data.D * data.S0)
-	// Отношение наружного диаметра тарелки фланца к внутреннему диаметру
-	calculated.K = data.DOut / data.D
-
-	dividend := math.Pow(calculated.K, 2)*(1+8.55*(math.Log(calculated.K)/math.Log(10))) - 1
-	divider := (1.05 + 1.945*math.Pow(calculated.K, 2)) * (calculated.K - 1)
-	calculated.BetaT = dividend / divider
-
-	divider = 1.36 * (math.Pow(calculated.K, 2) - 1) * (calculated.K - 1)
-	calculated.BetaU = dividend / divider
-
-	dividend = 1 / (calculated.K - 1)
-	divider = 0.69 + 5.72*((math.Pow(calculated.K, 2)*(math.Log(calculated.K)/math.Log(10)))/(math.Pow(calculated.K, 2)-1))
-	calculated.BetaY = dividend * divider
-
-	dividend = math.Pow(calculated.K, 2) + 1
-	divider = math.Pow(calculated.K, 2) - 1
-	calculated.BetaZ = dividend / divider
-
-	if flangeType == flange_model.FlangeData_welded && data.S0 != data.S1 {
-		calculated.BetaF = s.graphic.CalculateBetaF(calculated.Beta, calculated.X)
-		calculated.BetaV = s.graphic.CalculateBetaV(calculated.Beta, calculated.X)
-		calculated.F = s.graphic.CalculateF(calculated.Beta, calculated.X)
-	} else {
-		calculated.BetaF = constants.InitBetaF
-		calculated.BetaV = constants.InitBetaV
-		calculated.F = constants.InitF
-	}
-
-	calculated.Lymda = (calculated.BetaF*data.H+calculated.L0)/(calculated.BetaT*calculated.L0) +
-		(calculated.BetaV*math.Pow(data.H, 3))/(calculated.BetaU*calculated.L0*math.Pow(data.S0, 2))
-
-	// Угловая податливость фланца при затяжке
-	calculated.Yf = (0.91 * calculated.BetaV) / (data.EpsilonAt20 * calculated.Lymda * math.Pow(data.S0, 2) * calculated.L0)
-
-	if flangeType == flange_model.FlangeData_free {
-		calculated.Psik = 1.28 * (math.Log(data.Dnk/data.Dk) / math.Log(10))
-		calculated.Yk = 1 / (data.EpsilonKAt20 * math.Pow(data.Hk, 3) * calculated.Psik)
-	}
-
-	if flangeType != flange_model.FlangeData_free {
-		// Угловая податливость фланца нагруженного внешним изгибающим моментом
-		calculated.Yfn = math.Pow(math.Pi/4, 3) * (data.D6 / (data.EpsilonAt20 * data.DOut * math.Pow(data.H, 3)))
-	} else {
-		calculated.Yfn = math.Pow(math.Pi/4, 3) * (data.Ds / (data.EpsilonAt20 * data.DOut * math.Pow(data.H, 3)))
-		calculated.Yfc = math.Pow(math.Pi/4, 3) * (data.D6 / (data.EpsilonKAt20 * data.Dnk * math.Pow(data.Hk, 3)))
-	}
-
-	return calculated, nil
 }

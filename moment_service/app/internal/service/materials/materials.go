@@ -19,7 +19,8 @@ func NewMaterialsService(repo repository.Materials) *MaterialsService {
 	return &MaterialsService{repo: repo}
 }
 
-func (s *MaterialsService) GetMatFotCalculate(ctx context.Context, markId string, temp float64) (models.MaterialsResult, error) {
+// Получение данных о материале
+func (s *MaterialsService) GetMatForCalculate(ctx context.Context, markId string, temp float64) (models.MaterialsResult, error) {
 	mats, err := s.repo.GetAllData(ctx, &material_api.GetMaterialsDataRequest{MarkId: markId})
 	if err != nil {
 		return models.MaterialsResult{}, fmt.Errorf("failed to get materials. error: %w", err)

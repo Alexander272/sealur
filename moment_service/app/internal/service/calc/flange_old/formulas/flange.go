@@ -11,7 +11,7 @@ import (
 
 func (s *FormulasService) getFlangeFormulas(
 	typeF flange_model.FlangeData_Type,
-	data *flange_model.FlangeResult,
+	data *flange_model.OldFlangeResult,
 	D6, DOut, Dcp string,
 ) *flange_model.FlangeFormulas {
 	f := &flange_model.FlangeFormulas{}

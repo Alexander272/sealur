@@ -7,21 +7,18 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
-func (s *DataService) getGasketData(ctx context.Context, data *flange_model.GasketData,
-) (*flange_model.GasketResult, flange_model.GasketData_Type, error) {
-	bp := (data.DOut - data.DIn) / 2
-
+func (s *DataService) getGasketData(ctx context.Context, data *flange_model.GasketData, bp float64) (*flange_model.GasketResult, string, error) {
 	if data.GasketId != "another" {
 		g := models.GetGasket{GasketId: data.GasketId, EnvId: data.EnvId, Thickness: data.Thickness}
 		gasket, err := s.gasket.GetFullData(ctx, g)
 		if err != nil {
-			return nil, 0, err
+			return nil, "", err
 		}
 
 		res := &flange_model.GasketResult{
 			Gasket:          gasket.Gasket,
 			Env:             gasket.Env,
-			Type:            gasket.Type,
+			Type:            gasket.TypeTitle,
 			Thickness:       data.Thickness,
 			DOut:            data.DOut,
 			Width:           bp,
@@ -31,12 +28,19 @@ func (s *DataService) getGasketData(ctx context.Context, data *flange_model.Gask
 			Compression:     gasket.Compression,
 			Epsilon:         gasket.Epsilon,
 		}
-		return res, flange_model.GasketData_Type(flange_model.GasketData_Type_value[gasket.Type]), nil
+		return res, gasket.Type, nil
+	}
+
+	//? наверное это не лучшее решение
+	titles := map[string]string{
+		"Soft":  "Мягкая",
+		"Oval":  "Восьмигранная",
+		"Metal": "Металлическая",
 	}
 
 	res := &flange_model.GasketResult{
 		Gasket:          data.Data.Title,
-		Type:            data.Data.Type.String(),
+		Type:            titles[data.Data.Type.String()],
 		Thickness:       data.Thickness,
 		DOut:            data.DOut,
 		Width:           bp,
@@ -46,5 +50,5 @@ func (s *DataService) getGasketData(ctx context.Context, data *flange_model.Gask
 		Compression:     data.Data.Compression,
 		Epsilon:         data.Data.Epsilon,
 	}
-	return res, data.Data.Type, nil
+	return res, data.Data.Type.String(), nil
 }

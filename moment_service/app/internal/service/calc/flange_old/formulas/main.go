@@ -43,8 +43,8 @@ func NewFormulasService() *FormulasService {
 func (s *FormulasService) GetFormulas(
 	TypeGasket, TypeBolt, Condition string,
 	IsWork, IsUseWasher, IsEmbedded bool,
-	data models.DataFlange,
-	result calc_api.FlangeResponse,
+	data models.DataFlangeOld,
+	result calc_api.FlangeResponseOld,
 	calculation calc_api.FlangeRequest_Calcutation,
 	gamma_, yb_, yp_ float64,
 ) *flange_model.CalcFlangeFormulas {

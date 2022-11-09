@@ -24,7 +24,7 @@ func (s *DataService) getTubeSheetData(ctx context.Context, tubeSheet *dev_cooli
 	var mat models.MaterialsResult
 	if tubeSheet.MarkId != "another" {
 		var err error
-		mat, err = s.materials.GetMatFotCalculate(ctx, tubeSheet.MarkId, temp)
+		mat, err = s.materials.GetMatForCalculate(ctx, tubeSheet.MarkId, temp)
 		if err != nil {
 			return nil, err
 		}

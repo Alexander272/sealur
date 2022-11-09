@@ -10,6 +10,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/models/flange_model"
 )
 
+// Получение размеров болтов по id
 func (s *FlangeService) GetBolt(ctx context.Context, boltId string) (bolt models.BoltSize, err error) {
 	bolt, err = s.repo.GetBolt(ctx, boltId)
 	if err != nil {

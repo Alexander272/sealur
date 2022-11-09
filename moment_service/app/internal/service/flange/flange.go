@@ -19,6 +19,7 @@ func NewFlangeService(repo repository.Flange) *FlangeService {
 	return &FlangeService{repo: repo}
 }
 
+// Получение размеров фланца и болтов
 func (s *FlangeService) GetFlangeSize(ctx context.Context, req *flange_api.GetFlangeSizeRequest) (models.FlangeSize, error) {
 	size, err := s.repo.GetFlangeSize(ctx, req)
 	if err != nil {

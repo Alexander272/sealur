@@ -25,7 +25,7 @@ func (s *DataService) getDataCap(ctx context.Context, cap *dev_cooling_model.Cap
 	var mat models.MaterialsResult
 	if cap.MarkId != "another" {
 		var err error
-		mat, err = s.materials.GetMatFotCalculate(ctx, cap.MarkId, temp)
+		mat, err = s.materials.GetMatForCalculate(ctx, cap.MarkId, temp)
 		if err != nil {
 			return nil, err
 		}

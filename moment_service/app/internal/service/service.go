@@ -25,6 +25,8 @@ import (
 
 type Calc interface {
 	// расчет момента затяжки фланец-фланец по ГОСТ 34233.4 - 2017
+	CalculationFlangeOld(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponseOld, error)
+	// расчет момента затяжки фланец-фланец по ГОСТ 34233.4 - 2017
 	CalculationFlange(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponse, error)
 	// расчет момента затяжка фланец-крышка по ГОСТ 34233.4 - 2017
 	CalculationCap(ctx context.Context, data *calc_api.CapRequest) (*calc_api.CapResponse, error)
@@ -39,6 +41,7 @@ type Calc interface {
 }
 
 type Flange interface {
+	// Получение размеров фланца и болтов
 	GetFlangeSize(context.Context, *flange_api.GetFlangeSizeRequest) (models.FlangeSize, error)
 	GetFullFlangeSize(context.Context, *flange_api.GetFullFlangeSizeRequest) (*flange_api.FullFlangeSizeResponse, error)
 	GetBasisFlangeSize(context.Context, *flange_api.GetBasisFlangeSizeRequest) (*flange_model.BasisFlangeSizeResponse, error)
@@ -67,7 +70,8 @@ type Flange interface {
 }
 
 type Materials interface {
-	GetMatFotCalculate(ctx context.Context, markId string, temp float64) (models.MaterialsResult, error)
+	// Получение данных о материале
+	GetMatForCalculate(ctx context.Context, markId string, temp float64) (models.MaterialsResult, error)
 
 	GetMaterials(context.Context, *material_api.GetMaterialsRequest) ([]*material_model.Material, error)
 	GetMaterialsWithIsEmpty(context.Context, *material_api.GetMaterialsRequest) ([]*material_model.MaterialWithIsEmpty, error)
@@ -90,6 +94,7 @@ type Materials interface {
 }
 
 type Gasket interface {
+	// Получение необходимых для расчета данных о прокладке
 	GetFullData(context.Context, models.GetGasket) (models.FullDataGasket, error)
 
 	GetData(ctx context.Context, gasket *gasket_api.GetFullDataRequest) (*gasket_api.FullDataResponse, error)

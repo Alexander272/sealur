@@ -26,7 +26,7 @@ func (s *DataService) getBoltData(ctx context.Context, bolt *express_circle_mode
 	}
 
 	if bolt.MarkId != "another" {
-		mat, err := s.materials.GetMatFotCalculate(ctx, bolt.MarkId, temp)
+		mat, err := s.materials.GetMatForCalculate(ctx, bolt.MarkId, temp)
 		if err != nil {
 			return nil, err
 		}

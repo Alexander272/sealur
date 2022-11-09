@@ -21,7 +21,7 @@ func (s *DataService) getTubeData(ctx context.Context, tube *dev_cooling_model.T
 	var mat models.MaterialsResult
 	if tube.MarkId != "another" {
 		var err error
-		mat, err = s.materials.GetMatFotCalculate(ctx, tube.MarkId, temp)
+		mat, err = s.materials.GetMatForCalculate(ctx, tube.MarkId, temp)
 		if err != nil {
 			return nil, err
 		}

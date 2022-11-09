@@ -21,6 +21,7 @@ func NewGasketService(repo repository.Gasket) *GasketService {
 	}
 }
 
+// Получение необходимых для расчета данных о прокладке
 func (s *GasketService) GetFullData(ctx context.Context, gasket models.GetGasket) (models.FullDataGasket, error) {
 	g, err := s.repo.GetFullData(ctx, gasket)
 	if err != nil {

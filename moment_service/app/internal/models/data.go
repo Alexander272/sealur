@@ -19,6 +19,19 @@ type DataFlange struct {
 	Embed      *flange_model.EmbedResult
 	Bolt       *flange_model.BoltResult
 	Gasket     *flange_model.GasketResult
+	TypeGasket flange_model.GasketData_Type
+}
+
+type DataFlangeOld struct {
+	Flange1    *flange_model.OldFlangeResult
+	Flange2    *flange_model.OldFlangeResult
+	Type1      flange_model.FlangeData_Type
+	Type2      flange_model.FlangeData_Type
+	Washer1    *flange_model.WasherResult
+	Washer2    *flange_model.WasherResult
+	Embed      *flange_model.EmbedResult
+	Bolt       *flange_model.BoltResult
+	Gasket     *flange_model.GasketResult
 	TypeGasket string
 	Dcp, B0    float64
 }

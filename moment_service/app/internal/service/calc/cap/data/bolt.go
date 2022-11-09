@@ -9,7 +9,7 @@ import (
 func (s *DataService) getBoltData(ctx context.Context, data *cap_model.BoltData, bolt *cap_model.BoltResult, L, temp float64,
 ) (*cap_model.BoltResult, error) {
 	if data.MarkId != "another" {
-		mat, err := s.materials.GetMatFotCalculate(ctx, data.MarkId, temp)
+		mat, err := s.materials.GetMatForCalculate(ctx, data.MarkId, temp)
 		if err != nil {
 			return nil, err
 		}

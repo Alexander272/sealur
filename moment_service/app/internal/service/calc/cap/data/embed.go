@@ -8,7 +8,7 @@ import (
 
 func (s *DataService) getEmbedData(ctx context.Context, data *cap_model.EmbedData, temp float64) (*cap_model.EmbedResult, error) {
 	if data.MarkId != "another" {
-		washer, err := s.materials.GetMatFotCalculate(ctx, data.MarkId, temp)
+		washer, err := s.materials.GetMatForCalculate(ctx, data.MarkId, temp)
 		if err != nil {
 			return nil, err
 		}

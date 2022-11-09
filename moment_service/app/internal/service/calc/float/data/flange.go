@@ -45,7 +45,7 @@ func (s *DataService) getDataFlange(
 	var mat models.MaterialsResult
 	if fl.MarkId != "another" {
 		var err error
-		mat, err = s.materials.GetMatFotCalculate(ctx, fl.MarkId, flangeData.Tf)
+		mat, err = s.materials.GetMatForCalculate(ctx, fl.MarkId, flangeData.Tf)
 		if err != nil {
 			return nil, nil, err
 		}
