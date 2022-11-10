@@ -9,9 +9,9 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
-func (s *FlangeService) basisCalculate(data models.DataFlange, req *calc_api.FlangeRequest) *flange_model.Calculated_Basis {
+func (s *FlangeService) basisCalculate(data models.DataFlange, req *calc_api.FlangeRequest) (*flange_model.Calculated_Basis, *flange_model.CalcAuxiliary) {
 	deformation := s.deformationCalculate(data, req.Pressure)
-	forces := s.forcesInBoltsCalculte(data, deformation, req)
+	forces, aux := s.forcesInBoltsCalculte(data, deformation, req)
 	bolts := s.boltStrengthCalculate(data, req, forces.Pb, forces.Pbr, forces.A, deformation.Dcp)
 	moment := &flange_model.CalcMoment{}
 
@@ -28,7 +28,7 @@ func (s *FlangeService) basisCalculate(data models.DataFlange, req *calc_api.Fla
 		Moment:        moment,
 	}
 
-	return res
+	return res, aux
 }
 
 func (s *FlangeService) deformationCalculate(data models.DataFlange, pressure float64) *flange_model.CalcDeformation {
@@ -69,7 +69,7 @@ func (s *FlangeService) forcesInBoltsCalculte(
 	data models.DataFlange,
 	def *flange_model.CalcDeformation,
 	req *calc_api.FlangeRequest,
-) *flange_model.CalcForcesInBolts {
+) (*flange_model.CalcForcesInBolts, *flange_model.CalcAuxiliary) {
 	forces := &flange_model.CalcForcesInBolts{}
 
 	// фомула 8
@@ -104,6 +104,13 @@ func (s *FlangeService) forcesInBoltsCalculte(
 	if len(req.FlangesData) > 1 {
 		flange2 = s.auxFlangeCalculate(req.FlangesData[1].Type, data.Flange2, def.Dcp)
 	}
+	aux := &flange_model.CalcAuxiliary{
+		Flange1: flange1,
+		Flange2: flange2,
+	}
+	aux.Yp = yp
+	aux.Lb = Lb
+	aux.Yb = yb
 
 	if data.TypeGasket == flange_model.GasketData_Oval || data.Type1 == flange_model.FlangeData_free || data.Type2 == flange_model.FlangeData_free {
 		// Для фланцев с овальными и восьмигранными прокладками и для свободных фланцев коэффициенты жесткости фланцевого соединения принимают равными 1.
@@ -152,6 +159,7 @@ func (s *FlangeService) forcesInBoltsCalculte(
 
 	// формула (Е.8)
 	gamma := 1 / divider
+	aux.Gamma = gamma
 
 	if req.IsUseWasher {
 		temp1 = (data.Flange1.AlphaF*data.Flange1.H+data.Washer1.Alpha*data.Washer1.Thickness)*(data.Flange1.Tf-20) +
@@ -185,7 +193,7 @@ func (s *FlangeService) forcesInBoltsCalculte(
 	forces.Pb = math.Max(forces.Pb1, forces.Pb2)
 	forces.Pbr = forces.Pb + (1-forces.Alpha)*(forces.Qd+float64(req.AxialForce)) + Qt + 4*(1-forces.AlphaM)*math.Abs(float64(req.BendingMoment))/def.Dcp
 
-	return forces
+	return forces, aux
 }
 
 func (s *FlangeService) boltStrengthCalculate(

@@ -6,7 +6,7 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/flange/data"
 
-	// "github.com/Alexander272/sealur/moment_service/internal/service/calc/flange/formulas"
+	"github.com/Alexander272/sealur/moment_service/internal/service/calc/flange/formulas"
 	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
@@ -16,9 +16,9 @@ import (
 )
 
 type FlangeService struct {
-	graphic *graphic.GraphicService
-	data    *data.DataService
-	// formulas *formulas.FormulasService
+	graphic  *graphic.GraphicService
+	data     *data.DataService
+	formulas *formulas.FormulasService
 	typeBolt map[string]float64
 	Kyp      map[bool]float64
 	Kyz      map[string]float64
@@ -46,12 +46,12 @@ func NewFlangeService(graphic *graphic.GraphicService, flange *flange.FlangeServ
 	}
 
 	data := data.NewDataService(flange, materials, gasket, graphic)
-	// formulas := formulas.NewFormulasService()
+	formulas := formulas.NewFormulasService()
 
 	return &FlangeService{
-		graphic: graphic,
-		data:    data,
-		// formulas: formulas,
+		graphic:  graphic,
+		data:     data,
+		formulas: formulas,
 		typeBolt: bolt,
 		Kyp:      kp,
 		Kyz:      kz,
@@ -86,10 +86,15 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 		result.Flanges = append(result.Flanges, d.Flange2)
 	}
 
+	aux := &flange_model.CalcAuxiliary{}
 	if data.Calculation == calc_api.FlangeRequest_basis {
-		result.Calc.Basis = s.basisCalculate(d, data)
+		result.Calc.Basis, aux = s.basisCalculate(d, data)
 	} else {
 		result.Calc.Strength = s.strengthCalculate(d, data)
+	}
+
+	if data.IsNeedFormulas {
+		result.Formulas = s.formulas.GetFormulas(data, d, &result, aux)
 	}
 
 	return &result, nil
