@@ -5,6 +5,7 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
+	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
@@ -14,14 +15,87 @@ func (s *FlangeService) strengthCalculate(data models.DataFlange, req *calc_api.
 	tightness := s.tightnessCalculate(auxiliary, data, req)
 	bolt1 := s.boltStrengthCalculate(data, req, tightness.Pb, tightness.Pbr, auxiliary.A, auxiliary.Dcp)
 	moment1 := s.momentCalculate(data, bolt1.SigmaB1, bolt1.DSigmaM, tightness.Pb, auxiliary.A, auxiliary.Dcp, false)
+
 	static1 := s.staticResistanceCalculate(data.Flange1, auxiliary.Flange1, data.Type1, data, req, tightness.Pb, tightness.Pbr, tightness.Qd, tightness.Qfm)
-	conditins1 := s.conditionsForStrengthCalculate(data.Type1, data.Flange1, auxiliary.Flange1, static1, req.IsWork, false)
+	conditions1 := s.conditionsForStrengthCalculate(data.Type1, data.Flange1, auxiliary.Flange1, static1, req.IsWork, false)
+	Static1 := []*flange_model.CalcStaticResistance{}
+	Conditions1 := []*flange_model.CalcConditionsForStrength{}
+	Static1 = append(Static1, static1)
+	Conditions1 = append(Conditions1, conditions1)
+	if len(req.FlangesData) > 1 {
+		static2 := s.staticResistanceCalculate(data.Flange2, auxiliary.Flange2, data.Type2, data, req, tightness.Pb, tightness.Pbr, tightness.Qd, tightness.Qfm)
+		conditions2 := s.conditionsForStrengthCalculate(data.Type2, data.Flange2, auxiliary.Flange2, static2, req.IsWork, false)
+		Static1 = append(Static1, static2)
+		Conditions1 = append(Conditions1, conditions2)
+	}
+
 	tigLoad := s.tightnessLoadCalculate(auxiliary, tightness, data, req)
 	bolt2 := s.boltStrengthCalculate(data, req, tigLoad.Pb, tigLoad.Pbr, auxiliary.A, auxiliary.Dcp)
 	moment2 := s.momentCalculate(data, bolt2.SigmaB1, bolt2.DSigmaM, tigLoad.Pb, auxiliary.A, auxiliary.Dcp, false)
-	static2 := s.staticResistanceCalculate(data.Flange2, auxiliary.Flange2, data.Type2, data, req, tigLoad.Pb, tigLoad.Pbr, tightness.Qd, tightness.Qfm)
-	conditins2 := s.conditionsForStrengthCalculate(data.Type2, data.Flange2, auxiliary.Flange2, static2, req.IsWork, true)
-	finalMoment := s.momentCalculate(data, bolt2.SigmaB1, bolt2.DSigmaM, tigLoad.Pb, auxiliary.A, auxiliary.Dcp, true)
+
+	static1 = s.staticResistanceCalculate(data.Flange1, auxiliary.Flange1, data.Type1, data, req, tigLoad.Pb, tigLoad.Pbr, tightness.Qd, tightness.Qfm)
+	conditions1 = s.conditionsForStrengthCalculate(data.Type1, data.Flange1, auxiliary.Flange1, static1, req.IsWork, true)
+	Static2 := []*flange_model.CalcStaticResistance{}
+	Conditions2 := []*flange_model.CalcConditionsForStrength{}
+	Static2 = append(Static2, static1)
+	Conditions2 = append(Conditions2, conditions1)
+	if len(req.FlangesData) > 1 {
+		static2 := s.staticResistanceCalculate(data.Flange2, auxiliary.Flange2, data.Type2, data, req, tigLoad.Pb, tigLoad.Pbr, tightness.Qd, tightness.Qfm)
+		conditions2 := s.conditionsForStrengthCalculate(data.Type2, data.Flange2, auxiliary.Flange2, static2, req.IsWork, true)
+		Static2 = append(Static2, static2)
+		Conditions2 = append(Conditions2, conditions2)
+	}
+
+	ok := (bolt2.VSigmaB1 && bolt2.VSigmaB2 && data.TypeGasket != flange_model.GasketData_Soft) ||
+		(bolt2.VSigmaB1 && bolt2.VSigmaB2 && bolt2.Q <= float64(data.Gasket.PermissiblePres) && data.TypeGasket == flange_model.GasketData_Soft)
+
+	if ok {
+		ok = false
+		var VTeta1, VTeta2, VTetaK1, VTetaK2 bool
+		if Conditions2[0].CondTeta.X <= Conditions2[0].CondTeta.Y {
+			VTeta1 = true
+		}
+
+		if data.Type1 == flange_model.FlangeData_free && Conditions2[0].CondTeta.X <= Conditions2[0].CondTeta.Y {
+			VTetaK1 = true
+		}
+
+		if !req.IsSameFlange {
+			if len(Conditions2) > 1 && Conditions2[1].CondTeta.X <= Conditions2[1].CondTeta.Y {
+				VTeta2 = true
+			}
+
+			if data.Type2 == flange_model.FlangeData_free && len(Conditions2) > 1 && Conditions2[1].CondTetaK.X <= Conditions2[1].CondTetaK.Y {
+				VTetaK2 = true
+			}
+		}
+
+		if !req.IsSameFlange {
+			commonCond := VTeta1 && VTeta2
+			cond1 := commonCond && data.Type1 != flange_model.FlangeData_free && data.Type2 != flange_model.FlangeData_free
+			cond2 := commonCond && data.Type1 == flange_model.FlangeData_free && data.Type2 != flange_model.FlangeData_free && VTetaK1
+			cond3 := commonCond && data.Type1 != flange_model.FlangeData_free && data.Type2 == flange_model.FlangeData_free && VTetaK2
+			cond4 := commonCond && data.Type1 == flange_model.FlangeData_free && data.Type2 == flange_model.FlangeData_free && VTetaK1 && VTetaK2
+
+			if cond1 || cond2 || cond3 || cond4 {
+				ok = true
+			}
+		} else {
+			if (VTeta1 && data.Type1 != flange_model.FlangeData_free) ||
+				(VTeta1 && data.Type1 == flange_model.FlangeData_free && VTetaK1) {
+				ok = true
+			}
+		}
+
+		logger.Debug("VTeta1 ", VTeta1, " VTeta2 ", VTeta2)
+	}
+
+	logger.Debug("ok ", ok)
+
+	finalMoment := &flange_model.CalcMoment{}
+	if ok {
+		finalMoment = s.momentCalculate(data, bolt2.SigmaB1, bolt2.DSigmaM, tigLoad.Pb, auxiliary.A, auxiliary.Dcp, true)
+	}
 
 	deformation := &flange_model.CalcDeformation{
 		B0:  auxiliary.B0,
@@ -48,13 +122,13 @@ func (s *FlangeService) strengthCalculate(data models.DataFlange, req *calc_api.
 		Tightness:              tightness,
 		BoltStrength1:          bolt1,
 		Moment1:                moment1,
-		StaticResistance1:      static1,
-		ConditionsForStrength1: conditins1,
+		StaticResistance1:      Static1,
+		ConditionsForStrength1: Conditions1,
 		TightnessLoad:          tigLoad,
 		BoltStrength2:          bolt2,
 		Moment2:                moment2,
-		StaticResistance2:      static2,
-		ConditionsForStrength2: conditins2,
+		StaticResistance2:      Static2,
+		ConditionsForStrength2: Conditions2,
 		Deformation:            deformation,
 		ForcesInBolts:          forces,
 		FinalMoment:            finalMoment,
@@ -262,7 +336,7 @@ func (s *FlangeService) tightnessCalculate(aux *flange_model.CalcAuxiliary, data
 	// Расчетная нагрузка на болты/шпильки фланцевых соединений
 	tightness.Pb = math.Max(tightness.Pb1, tightness.Pb2)
 	// Расчетная нагрузка на болты/шпильки фланцевых соединений в рабочих условиях
-	tightness.Pbr = tightness.Pb + (1-aux.Alpha)*(tightness.Qd+float64(req.AxialForce)) + 4*(1-aux.AlphaM)*math.Abs(float64(req.BendingMoment))/aux.Dcp
+	tightness.Pbr = tightness.Pb + (1-aux.Alpha)*(tightness.Qd+float64(req.AxialForce)) + 4*(1-aux.AlphaM*math.Abs(float64(req.BendingMoment)))/aux.Dcp
 
 	return tightness
 }
@@ -522,7 +596,10 @@ func (s *FlangeService) tightnessLoadCalculate(
 	tightness := &flange_model.CalcTightnessLoad{}
 
 	flange1 := aux.Flange1
-	flange2 := aux.Flange2
+	flange2 := flange1
+	if aux.Flange2 != nil {
+		flange2 = aux.Flange2
+	}
 
 	divider := aux.Yp + aux.Yb*data.Bolt.EpsilonAt20/data.Bolt.Epsilon + (flange1.Yf*data.Flange1.EpsilonAt20/data.Flange1.Epsilon)*math.Pow(flange1.B, 2) +
 		+(flange2.Yf*data.Flange2.EpsilonAt20/data.Flange2.Epsilon)*math.Pow(flange2.B, 2)
@@ -568,7 +645,7 @@ func (s *FlangeService) tightnessLoadCalculate(
 
 	tightness.Pb1 = math.Max(tig.Pb1, tig.Pb1-Qt)
 	tightness.Pb = math.Max(tightness.Pb1, tig.Pb2)
-	tightness.Pbr = tig.Pb + (1-aux.Alpha)*(tig.Qd+float64(req.AxialForce)) + Qt + 4*(1-aux.AlphaM)*math.Abs(float64(req.BendingMoment))/aux.Dcp
+	tightness.Pbr = tig.Pb + (1-aux.Alpha)*(tig.Qd+float64(req.AxialForce)) + Qt + 4*(1-aux.AlphaM*math.Abs(float64(req.BendingMoment)))/aux.Dcp
 
 	return tightness
 }

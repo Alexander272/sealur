@@ -18,18 +18,20 @@ services:
             - file_service
 
     pgamin:
-        image: dpage/pgadmin4:6.14
+        image: dpage/pgadmin4:6.15
         container_name: dev-pgamin
         environment:
             PGADMIN_DEFAULT_EMAIL: 856319@gmail.com
             PGADMIN_DEFAULT_PASSWORD: root
+        volumes:
+            - ./db:/var/lib/pgadmin/db
         ports:
             - "5050:80"
             - "5051:443"
 
     api_service:
         restart: on-failure:5
-        image: sealur/api_service:1.6.3
+        image: sealur/api_service:1.6.4
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images
@@ -50,7 +52,7 @@ services:
 
     moment_service:
         restart: on-failure:5
-        image: sealur/moment_service:0.8.1
+        image: sealur/moment_service:0.8.5
         container_name: dev-moment_service
         ports:
             - 9000:9000

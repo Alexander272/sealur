@@ -86,10 +86,10 @@ func (s *DataService) getFlangeData(ctx context.Context,
 		}
 	}
 
-	flangeData.Ds = 0.5 * (flangeData.DOut + flangeData.Dk + 2*flangeData.H0)
 	flangeData.Tf = s.typeFlangesTF[typeFlange] * temp
 
 	if fl.Type == flange_model.FlangeData_free {
+		flangeData.Ds = 0.5 * (flangeData.DOut + flangeData.Dk + 2*flangeData.H0)
 		flangeData.Ring.Tk = s.typeFlangesTK[typeFlange] * temp
 
 		//? при свободных фланцах добавляется еще один материал

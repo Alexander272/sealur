@@ -17,6 +17,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/pkg/auth"
 	"github.com/Alexander272/sealur/api_service/pkg/database/redis"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	_ "github.com/lib/pq"
 )
 
 // @title Sealur

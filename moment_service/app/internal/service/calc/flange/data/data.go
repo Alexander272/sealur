@@ -8,7 +8,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
-func (s *DataService) GetDataOld(ctx context.Context, data *calc_api.FlangeRequest) (result models.DataFlange, err error) {
+func (s *DataService) GetData(ctx context.Context, data *calc_api.FlangeRequest) (result models.DataFlange, err error) {
 	result.Gasket, result.TypeGasket, err = s.getGasketData(ctx, data.Gasket)
 	if err != nil {
 		return result, err

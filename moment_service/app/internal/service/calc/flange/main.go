@@ -61,7 +61,7 @@ func NewFlangeService(graphic *graphic.GraphicService, flange *flange.FlangeServ
 // расчет момента затяжки фланец-фланец по ГОСТ 34233.4 - 2017
 func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponse, error) {
 	// получение данных (либо из бд, либо либо их пердают с клиента) для расчетов (+ там пару формул записано)
-	d, err := s.data.GetDataOld(ctx, data)
+	d, err := s.data.GetData(ctx, data)
 	if err != nil {
 		return nil, err
 	}

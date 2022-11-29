@@ -191,7 +191,7 @@ func (s *FlangeService) forcesInBoltsCalculte(
 
 	forces.Pb1 = math.Max(forces.Pb1, forces.Pb1-Qt)
 	forces.Pb = math.Max(forces.Pb1, forces.Pb2)
-	forces.Pbr = forces.Pb + (1-forces.Alpha)*(forces.Qd+float64(req.AxialForce)) + Qt + 4*(1-forces.AlphaM)*math.Abs(float64(req.BendingMoment))/def.Dcp
+	forces.Pbr = forces.Pb + (1-forces.Alpha)*(forces.Qd+float64(req.AxialForce)) + Qt + 4*(1-forces.AlphaM*math.Abs(float64(req.BendingMoment)))/def.Dcp
 
 	return forces, aux
 }
