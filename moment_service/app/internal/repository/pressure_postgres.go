@@ -10,9 +10,9 @@ import (
 )
 
 func (r *DeviceRepo) GetPressure(ctx context.Context, req *device_api.GetPressureRequest) (pressure []models.PressureDTO, err error) {
-	query := fmt.Sprintf("SELECT id, value FROM %s", PressureTable)
+	query := fmt.Sprintf("SELECT id, value FROM %s ORDER BY id", PressureTable)
 
-	if err := r.db.Get(&pressure, query); err != nil {
+	if err := r.db.Select(&pressure, query); err != nil {
 		return pressure, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return pressure, nil

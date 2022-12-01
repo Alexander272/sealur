@@ -12,7 +12,7 @@ import (
 func (r *DeviceRepo) GetNumberOfMoves(ctx context.Context, req *device_api.GetNumberOfMovesRequest) (number []models.NumberOfMovesDTO, err error) {
 	query := fmt.Sprintf("SELECT id, count_id, value FROM %s WHERE dev_id=$1", NumberOfMovesTable)
 
-	if err := r.db.Get(&number, query, req.DevId); err != nil {
+	if err := r.db.Select(&number, query, req.DevId); err != nil {
 		return number, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return number, nil

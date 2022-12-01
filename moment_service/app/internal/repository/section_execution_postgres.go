@@ -12,7 +12,7 @@ import (
 func (r *DeviceRepo) GetSectionExecution(ctx context.Context, req *device_api.GetSectionExecutionRequest) (section []models.SectionExecutionDTO, err error) {
 	query := fmt.Sprintf("SELECT id, value FROM %s WHERE dev_id=$1", SectionExecutionTable)
 
-	if err := r.db.Get(&section, query, req.DevId); err != nil {
+	if err := r.db.Select(&section, query, req.DevId); err != nil {
 		return section, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return section, nil

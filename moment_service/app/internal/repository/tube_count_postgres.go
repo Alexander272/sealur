@@ -10,9 +10,9 @@ import (
 )
 
 func (r *DeviceRepo) GetTubeCount(ctx context.Context, req *device_api.GetTubeCountRequest) (tube []models.TubeCountDTO, err error) {
-	query := fmt.Sprintf("SELECT id, value FROM %s", TubeCountTable)
+	query := fmt.Sprintf("SELECT id, value FROM %s ORDER BY id", TubeCountTable)
 
-	if err := r.db.Get(&tube, query); err != nil {
+	if err := r.db.Select(&tube, query); err != nil {
 		return tube, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return tube, nil

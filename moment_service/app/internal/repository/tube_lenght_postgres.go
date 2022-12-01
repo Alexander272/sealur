@@ -12,7 +12,7 @@ import (
 func (r *DeviceRepo) GetTubeLength(ctx context.Context, req *device_api.GetTubeLengthRequest) (tube []models.TubeLengthDTO, err error) {
 	query := fmt.Sprintf("SELECT id, value FROM %s WHERE dev_id=$1", TubeLengthTable)
 
-	if err := r.db.Get(&tube, query, req.DevId); err != nil {
+	if err := r.db.Select(&tube, query, req.DevId); err != nil {
 		return tube, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return tube, nil

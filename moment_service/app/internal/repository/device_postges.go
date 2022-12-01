@@ -19,9 +19,9 @@ func NewDeviceRepo(db *sqlx.DB) *DeviceRepo {
 }
 
 func (r *DeviceRepo) GetDevices(ctx context.Context, req *device_api.GetDeviceRequest) (devices []models.DeviceDTO, err error) {
-	query := fmt.Sprintf("SELECT id, title FROM %s", DeviceModTable)
+	query := fmt.Sprintf("SELECT id, title FROM %s ORDER BY id", DeviceModTable)
 
-	if err := r.db.Get(&devices, query); err != nil {
+	if err := r.db.Select(&devices, query); err != nil {
 		return devices, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return devices, nil

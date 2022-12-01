@@ -12,7 +12,7 @@ import (
 func (r *DeviceRepo) GetFinningFactor(ctx context.Context, req *device_api.GetFinningFactorRequest) (factor []models.FinningFactorDTO, err error) {
 	query := fmt.Sprintf("SELECT id, value FROM %s WHERE dev_id=$1", FinningFactorTable)
 
-	if err := r.db.Get(&factor, query, req.DevId); err != nil {
+	if err := r.db.Select(&factor, query, req.DevId); err != nil {
 		return factor, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return factor, nil

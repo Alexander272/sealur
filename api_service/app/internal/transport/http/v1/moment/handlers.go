@@ -9,6 +9,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/device_api"
 	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/Alexander272/sealur_proto/api/moment/material_api"
@@ -24,6 +25,7 @@ type Handler struct {
 	gasketClient    gasket_api.GasketServiceClient
 	materialsClient material_api.MaterialsServiceClient
 	flangeClient    flange_api.FlangeServiceClient
+	deviceClient    device_api.DeviceServiceClient
 	readClient      read_api.ReadServiceClient
 	calcClient      calc_api.CalcServiceClient
 }
@@ -65,6 +67,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	gasketClient := gasket_api.NewGasketServiceClient(connect)
 	materialsClient := material_api.NewMaterialsServiceClient(connect)
 	flangeClient := flange_api.NewFlangeServiceClient(connect)
+	deviceClient := device_api.NewDeviceServiceClient(connect)
 	readClient := read_api.NewReadServiceClient(connect)
 	calcClient := calc_api.NewCalcServiceClient(connect)
 
@@ -72,6 +75,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.gasketClient = gasketClient
 	h.materialsClient = materialsClient
 	h.flangeClient = flangeClient
+	h.deviceClient = deviceClient
 	h.readClient = readClient
 	h.calcClient = calcClient
 
@@ -94,6 +98,15 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		h.initTypeFlangeRoutes(moment)
 		h.initStandartsRoutes(moment)
 		h.initFlangeRoutes(moment)
+
+		h.initDeviceRoutes(moment)
+		h.initPressureRoutes(moment)
+		h.initTubeCountRoutes(moment)
+		h.initFinningFactorRoutes(moment)
+		h.initSectionExecutionRoutes(moment)
+		h.initTubeLengthRoutes(moment)
+		h.initNumberOfMovesRoutes(moment)
+		h.initNameGasketRoutes(moment)
 
 		h.initReadRoutes(moment)
 

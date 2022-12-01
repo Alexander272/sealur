@@ -15,6 +15,7 @@ import (
 	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
+	"github.com/Alexander272/sealur_proto/api/moment/device_api"
 	"github.com/Alexander272/sealur_proto/api/moment/flange_api"
 	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/Alexander272/sealur_proto/api/moment/material_api"
@@ -71,6 +72,7 @@ func main() {
 	material_api.RegisterMaterialsServiceServer(server, handlers.Materials)
 	gasket_api.RegisterGasketServiceServer(server, handlers.Gasket)
 	flange_api.RegisterFlangeServiceServer(server, handlers.Flange)
+	device_api.RegisterDeviceServiceServer(server, handlers.Device)
 	read_api.RegisterReadServiceServer(server, handlers.Read)
 	calc_api.RegisterCalcServiceServer(server, handlers.Calc)
 
