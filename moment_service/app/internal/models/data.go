@@ -7,6 +7,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_rectangle_model"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/float_model"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/gas_cooling_model"
 )
 
 type DataFlange struct {
@@ -66,6 +67,13 @@ type DataDevCooling struct {
 	Bolt       *dev_cooling_model.BoltResult
 	Gasket     *dev_cooling_model.GasketResult
 	TypeGasket dev_cooling_model.GasketData_Type
+}
+
+type DataGasCooling struct {
+	Data       *gas_cooling_model.DataResult
+	Bolt       *gas_cooling_model.BoltResult
+	Gasket     *gas_cooling_model.GasketResult
+	TypeGasket gas_cooling_model.GasketData_Type
 }
 
 type DataExCircle struct {

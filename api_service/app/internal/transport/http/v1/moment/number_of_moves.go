@@ -21,13 +21,14 @@ func (h *Handler) initNumberOfMovesRoutes(api *gin.RouterGroup) {
 }
 
 func (h *Handler) getNumberOfMoves(c *gin.Context) {
-	id := c.Query("devId")
-	if id == "" {
+	devId := c.Query("devId")
+	if devId == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
 		return
 	}
+	countId := c.Query("countId")
 
-	data, err := h.deviceClient.GetNumberOfMoves(c, &device_api.GetNumberOfMovesRequest{DevId: id})
+	data, err := h.deviceClient.GetNumberOfMoves(c, &device_api.GetNumberOfMovesRequest{DevId: devId, CountId: countId})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

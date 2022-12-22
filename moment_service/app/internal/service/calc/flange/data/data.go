@@ -8,12 +8,15 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
+// Получение данных
 func (s *DataService) GetData(ctx context.Context, data *calc_api.FlangeRequest) (result models.DataFlange, err error) {
+	// Получение данных о прокладке
 	result.Gasket, result.TypeGasket, err = s.getGasketData(ctx, data.Gasket)
 	if err != nil {
 		return result, err
 	}
 
+	// Получение данных о фланце и болтах
 	flange1, boltSize, err := s.getFlangeData(ctx, data.FlangesData[0], data.Bolts, data.Flanges.String(), data.Temp)
 	if err != nil {
 		return result, err
@@ -33,6 +36,7 @@ func (s *DataService) GetData(ctx context.Context, data *calc_api.FlangeRequest)
 	result.Flange2 = flange2
 
 	if data.IsEmbedded {
+		// Получение данных для закладной детали
 		result.Embed, err = s.getEmbedData(ctx, data.Embed, data.Temp)
 		if err != nil {
 			return result, err
@@ -56,12 +60,14 @@ func (s *DataService) GetData(ctx context.Context, data *calc_api.FlangeRequest)
 		Lb0 += result.Gasket.Thickness + result.Embed.Thickness
 	}
 
+	// получение данных о болте (инфа о метериале, также размеры записываются в объект)
 	result.Bolt, err = s.getBoltData(ctx, data.Bolts, boltSize, Lb0, Tb)
 	if err != nil {
 		return result, err
 	}
 
 	if data.IsUseWasher {
+		// получение данных о шайбах
 		result.Washer1, err = s.getWasherData(ctx, data.Washer[0], flange1.Tf)
 		if err != nil {
 			return result, err

@@ -10,9 +10,15 @@ import (
 )
 
 func (r *DeviceRepo) GetFinningFactor(ctx context.Context, req *device_api.GetFinningFactorRequest) (factor []models.FinningFactorDTO, err error) {
-	query := fmt.Sprintf("SELECT id, value FROM %s WHERE dev_id=$1", FinningFactorTable)
+	query := fmt.Sprintf("SELECT id, dev_id, value FROM %s", FinningFactorTable)
 
-	if err := r.db.Select(&factor, query, req.DevId); err != nil {
+	var args []interface{}
+	if req.DevId != "" {
+		query += " WHERE dev_id=$1"
+		args = append(args, req.DevId)
+	}
+
+	if err := r.db.Select(&factor, query, args...); err != nil {
 		return factor, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return factor, nil
@@ -38,10 +44,10 @@ func (r *DeviceRepo) CreateFewFinningFactor(ctx context.Context, factor *device_
 	query := fmt.Sprintf("INSERT INTO %s (dev_id, value) VALUES ", FinningFactorTable)
 
 	args := make([]interface{}, 0)
-	values := make([]string, 0, len(factor.FinnigFactor))
+	values := make([]string, 0, len(factor.FinningFactor))
 
 	c := 2
-	for i, d := range factor.FinnigFactor {
+	for i, d := range factor.FinningFactor {
 		values = append(values, fmt.Sprintf("($%d, $%d)", i*c+1, i*c+2))
 		args = append(args, d.DevId, d.Value)
 	}

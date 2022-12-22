@@ -2,6 +2,7 @@
 *config.yaml
 *.build
 *.data
+*.vscode
 *vendor
 
 /storage

@@ -3,7 +3,7 @@ module github.com/Alexander272/sealur/moment_service
 go 1.17
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20221201105917-fa23531537e5
+	github.com/Alexander272/sealur_proto/api v0.0.0-20221222100606-e0bf1455c449
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.6
@@ -32,7 +32,7 @@ require (
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

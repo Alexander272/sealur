@@ -69,10 +69,10 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 	result := calc_api.FlangeResponse{
 		Data:    s.data.FormatInitData(data),
 		Bolt:    d.Bolt,
-		Calc:    &flange_model.Calculated{},
 		Flanges: []*flange_model.FlangeResult{d.Flange1},
 		Embed:   d.Embed,
 		Gasket:  d.Gasket,
+		Calc:    &flange_model.Calculated{},
 	}
 
 	if data.IsUseWasher {
@@ -88,12 +88,15 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 
 	aux := &flange_model.CalcAuxiliary{}
 	if data.Calculation == calc_api.FlangeRequest_basis {
+		// расчет основных величин
 		result.Calc.Basis, aux = s.basisCalculate(d, data)
 	} else {
+		// прочностной расчет
 		result.Calc.Strength = s.strengthCalculate(d, data)
 	}
 
 	if data.IsNeedFormulas {
+		// получение формул с подставленными значениями переменных
 		result.Formulas = s.formulas.GetFormulas(data, d, &result, aux)
 	}
 

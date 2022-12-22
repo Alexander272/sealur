@@ -14,6 +14,7 @@ func (h *Handler) initReadRoutes(api *gin.RouterGroup) {
 		read.GET("/flange", h.getFlange)
 		read.GET("/float", h.getFloat)
 		read.GET("/dev-cooling", h.getDevCooling)
+		read.GET("/avo", h.getAVO)
 	}
 }
 
@@ -39,6 +40,16 @@ func (h *Handler) getFloat(c *gin.Context) {
 
 func (h *Handler) getDevCooling(c *gin.Context) {
 	data, err := h.readClient.GetDevCooling(c, &read_api.GetDevCoolingtRequest{})
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: data})
+}
+
+func (h *Handler) getAVO(c *gin.Context) {
+	data, err := h.readClient.GetAVO(c, &read_api.GetAVORequest{})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

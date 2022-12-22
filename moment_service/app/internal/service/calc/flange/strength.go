@@ -137,6 +137,7 @@ func (s *FlangeService) strengthCalculate(data models.DataFlange, req *calc_api.
 	return res
 }
 
+// Расчет вспомогательных величин
 func (s *FlangeService) auxiliaryCalculate(data models.DataFlange, req *calc_api.FlangeRequest) *flange_model.CalcAuxiliary {
 	auxiliary := &flange_model.CalcAuxiliary{}
 
@@ -223,6 +224,7 @@ func (s *FlangeService) auxiliaryCalculate(data models.DataFlange, req *calc_api
 	return auxiliary
 }
 
+// дополнительные величины связанные с фланцем
 func (s *FlangeService) auxFlangeCalculate(
 	flangeType flange_model.FlangeData_Type,
 	data *flange_model.FlangeResult,
@@ -302,6 +304,7 @@ func (s *FlangeService) auxFlangeCalculate(
 	return flange
 }
 
+// Расчет фланцевого соединения на прочность и герметичность без учета нагрузки вызванной стесненностью температурных деформаций
 func (s *FlangeService) tightnessCalculate(aux *flange_model.CalcAuxiliary, data models.DataFlange, req *calc_api.FlangeRequest) *flange_model.CalcTightness {
 	tightness := &flange_model.CalcTightness{}
 
@@ -341,6 +344,7 @@ func (s *FlangeService) tightnessCalculate(aux *flange_model.CalcAuxiliary, data
 	return tightness
 }
 
+// Расчет фланца на статическую прочность
 func (s *FlangeService) staticResistanceCalculate(
 	flange *flange_model.FlangeResult,
 	calcFlange *flange_model.CalcAuxiliary_Flange,
@@ -450,6 +454,7 @@ func (s *FlangeService) staticResistanceCalculate(
 	return static
 }
 
+// Условия статической прочности фланцев
 func (s *FlangeService) conditionsForStrengthCalculate(
 	flangeType flange_model.FlangeData_Type,
 	flange *flange_model.FlangeResult,

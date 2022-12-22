@@ -54,11 +54,11 @@ require (
 	golang.org/x/net v0.0.0-20220407224826-aac1ed45d8e3 // indirect
 	golang.org/x/tools v0.1.9 // indirect
 	google.golang.org/genproto v0.0.0-20220201184016-50beb8ab5c44 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 )
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20221201105917-fa23531537e5
+	github.com/Alexander272/sealur_proto/api v0.0.0-20221222100606-e0bf1455c449
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/lib/pq v1.10.7
 	github.com/swaggo/swag v1.7.9

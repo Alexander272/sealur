@@ -43,3 +43,11 @@ func (h *ReadHandlers) GetDevCooling(ctx context.Context, req *read_api.GetDevCo
 	}
 	return res, nil
 }
+
+func (h *ReadHandlers) GetAVO(ctx context.Context, req *read_api.GetAVORequest) (*read_api.GetAVOResponse, error) {
+	res, err := h.service.GetAVO(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}

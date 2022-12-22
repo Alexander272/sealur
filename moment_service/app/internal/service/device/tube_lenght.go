@@ -34,7 +34,7 @@ func (s *DeviceService) CreateTubeLength(ctx context.Context, tube *device_api.C
 
 func (s *DeviceService) CreateFewTubeLength(ctx context.Context, tube *device_api.CreateFewTubeLengthRequest) error {
 	if err := s.repo.CreateFewTubeLength(ctx, tube); err != nil {
-		return fmt.Errorf("failed to create few tube length")
+		return fmt.Errorf("failed to create few tube length. error: %w", err)
 	}
 	return nil
 }

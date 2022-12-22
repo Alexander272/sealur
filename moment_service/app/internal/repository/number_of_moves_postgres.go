@@ -10,9 +10,19 @@ import (
 )
 
 func (r *DeviceRepo) GetNumberOfMoves(ctx context.Context, req *device_api.GetNumberOfMovesRequest) (number []models.NumberOfMovesDTO, err error) {
-	query := fmt.Sprintf("SELECT id, count_id, value FROM %s WHERE dev_id=$1", NumberOfMovesTable)
+	query := fmt.Sprintf("SELECT id, dev_id, count_id, value FROM %s", NumberOfMovesTable)
+	var args []interface{}
 
-	if err := r.db.Select(&number, query, req.DevId); err != nil {
+	if req.DevId != "" {
+		query += " WHERE dev_id=$1"
+		args = append(args, req.DevId)
+	}
+	if req.CountId != "" {
+		query += "AND count_id=$2"
+		args = append(args, req.CountId)
+	}
+
+	if err := r.db.Select(&number, query, args...); err != nil {
 		return number, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return number, nil

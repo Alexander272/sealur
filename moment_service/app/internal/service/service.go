@@ -25,8 +25,6 @@ import (
 
 type Calc interface {
 	// расчет момента затяжки фланец-фланец по ГОСТ 34233.4 - 2017
-	CalculationFlangeOld(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponseOld, error)
-	// расчет момента затяжки фланец-фланец по ГОСТ 34233.4 - 2017
 	CalculationFlange(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponse, error)
 	// расчет момента затяжка фланец-крышка по ГОСТ 34233.4 - 2017
 	CalculationCap(ctx context.Context, data *calc_api.CapRequest) (*calc_api.CapResponse, error)
@@ -189,6 +187,7 @@ type Read interface {
 	read.Flange
 	read.Float
 	read.DevCooling
+	read.GasCooling
 }
 
 type Services struct {
@@ -213,7 +212,7 @@ func NewServices(repos *repository.Repositories) *Services {
 		Gasket:    gasket,
 		Device:    device,
 		Graphic:   graphic.NewGraphicService(),
-		Read:      read.NewReadService(flange, materials, gasket),
+		Read:      read.NewReadService(flange, materials, gasket, device),
 		Calc:      calc.NewCalcServices(flange, gasket, materials),
 	}
 }

@@ -1,10 +1,16 @@
 version: "3.4"
 
 services:
-  redis:
-    image: "redis:6.2-alpine"
-    volumes:
-      - ./.data/redis/redis.conf:/usr/local/etc/redis/redis.conf
-      - ./.data/redis/data:/var/lib/redis
-    ports:
-      - 6379:6379
+    pgamin:
+        image: dpage/pgadmin4:6.17
+        container_name: dev-pgamin
+        environment:
+            PGADMIN_DEFAULT_EMAIL: 856319@gmail.com
+            PGADMIN_DEFAULT_PASSWORD: root
+        volumes:
+            - ./db:/var/lib/pgadmin/db
+        # extra_hosts:
+        #     - "host.docker.internal:127.0.0.1"
+        ports:
+            - "5050:80"
+            - "5051:443"

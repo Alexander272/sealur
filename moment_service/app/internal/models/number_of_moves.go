@@ -1,8 +1,8 @@
 package models
 
 type NumberOfMovesDTO struct {
-	Id      string `json:"id"`
-	DevId   string `json:"dev_id"`
-	CountId string `json:"count_id"`
-	Value   string `json:"value"`
+	Id      string `db:"id"`
+	DevId   string `db:"dev_id"`
+	CountId string `db:"count_id"`
+	Value   string `db:"value"`
 }

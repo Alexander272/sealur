@@ -27,15 +27,6 @@ func (h *CalcHandlers) CalculateFlange(ctx context.Context, req *calc_api.Flange
 	return res, nil
 }
 
-// TODO удалить
-func (h *CalcHandlers) CalculateFlangeOld(ctx context.Context, req *calc_api.FlangeRequest) (*calc_api.FlangeResponseOld, error) {
-	res, err := h.service.CalculationFlangeOld(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
 func (h *CalcHandlers) CalculateCap(ctx context.Context, req *calc_api.CapRequest) (*calc_api.CapResponse, error) {
 	res, err := h.service.CalculationCap(ctx, req)
 	if err != nil {

@@ -1,37 +1,25 @@
 version: '3.4'
 
 services:
-    nginx_service:
-        restart: on-failure:5
-        image: nginx_service:0.7.4b
-        container_name: dev-nginx_service
-        volumes:
-            - ./build:/usr/app
-        ports:
-            - 5000:80
-            - 5001:443
-        depends_on:
-            - api_service
-            - file_service
-        links:
-            - api_service
-            - file_service
-
-    pgamin:
-        image: dpage/pgadmin4:6.15
-        container_name: dev-pgamin
-        environment:
-            PGADMIN_DEFAULT_EMAIL: 856319@gmail.com
-            PGADMIN_DEFAULT_PASSWORD: root
-        volumes:
-            - ./db:/var/lib/pgadmin/db
-        ports:
-            - "5050:80"
-            - "5051:443"
+    # nginx_service:
+    #     restart: on-failure:5
+    #     image: nginx_service:0.7.4b
+    #     container_name: dev-nginx_service
+    #     volumes:
+    #         - ./build:/usr/app
+    #     ports:
+    #         - 5000:80
+    #         - 5001:443
+    #     depends_on:
+    #         - api_service
+    #         - file_service
+    #     links:
+    #         - api_service
+    #         - file_service
 
     api_service:
         restart: on-failure:5
-        image: sealur/api_service:1.7.0
+        image: sealur/api_service:1.7.4
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images
@@ -52,7 +40,7 @@ services:
 
     moment_service:
         restart: on-failure:5
-        image: sealur/moment_service:0.8.6
+        image: sealur/moment_service:0.8.8
         container_name: dev-moment_service
         ports:
             - 9000:9000

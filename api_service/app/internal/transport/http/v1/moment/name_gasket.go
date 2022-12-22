@@ -23,13 +23,15 @@ func (h *Handler) initNameGasketRoutes(api *gin.RouterGroup) {
 }
 
 func (h *Handler) getNameGasket(c *gin.Context) {
-	id := c.Query("finId")
-	if id == "" {
+	finId := c.Query("finId")
+	if finId == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty finId", "empty finIf param")
 		return
 	}
+	presId := c.Query("presId")
+	numId := c.Query("numId")
 
-	data, err := h.deviceClient.GetNameGasket(c, &device_api.GetNameGasketRequest{FinId: id})
+	data, err := h.deviceClient.GetNameGasket(c, &device_api.GetNameGasketRequest{FinId: finId, PresId: presId, NumId: numId})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -44,8 +46,10 @@ func (h *Handler) getFullNameGasket(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty finId", "empty finId param")
 		return
 	}
+	presId := c.Query("presId")
+	numId := c.Query("numId")
 
-	data, err := h.deviceClient.GetFullNameGasket(c, &device_api.GetFullNameGasketRequest{FinId: id})
+	data, err := h.deviceClient.GetFullNameGasket(c, &device_api.GetFullNameGasketRequest{FinId: id, PresId: presId, NumId: numId})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -147,6 +151,7 @@ func (h *Handler) updateNameGasket(c *gin.Context) {
 	}
 
 	gasket := &device_api.UpdateNameGasketRequest{
+		Id:        id,
 		FinId:     dto.FinId,
 		NumId:     dto.NumId,
 		PresId:    dto.PresId,
@@ -163,6 +168,7 @@ func (h *Handler) updateNameGasket(c *gin.Context) {
 	_, err := h.deviceClient.UpdateNameGasket(c, gasket)
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
 	}
 
 	c.JSON(http.StatusOK, models.IdResponse{Id: id, Message: "Updated"})

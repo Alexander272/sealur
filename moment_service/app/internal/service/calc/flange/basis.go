@@ -9,6 +9,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
+// Расчет основных величин
 func (s *FlangeService) basisCalculate(data models.DataFlange, req *calc_api.FlangeRequest) (*flange_model.Calculated_Basis, *flange_model.CalcAuxiliary) {
 	deformation := s.deformationCalculate(data, req.Pressure)
 	forces, aux := s.forcesInBoltsCalculte(data, deformation, req)
@@ -31,6 +32,7 @@ func (s *FlangeService) basisCalculate(data models.DataFlange, req *calc_api.Fla
 	return res, aux
 }
 
+// Усилия, необходимые для смятия прокладки и обеспечения герметичности фланцевого соединения
 func (s *FlangeService) deformationCalculate(data models.DataFlange, pressure float64) *flange_model.CalcDeformation {
 	deformation := &flange_model.CalcDeformation{}
 
@@ -65,6 +67,7 @@ func (s *FlangeService) deformationCalculate(data models.DataFlange, pressure fl
 	return deformation
 }
 
+// Усилия в болтах (шпильках) фланцевого соединения при затяжке и в рабочих условиях
 func (s *FlangeService) forcesInBoltsCalculte(
 	data models.DataFlange,
 	def *flange_model.CalcDeformation,
@@ -196,6 +199,7 @@ func (s *FlangeService) forcesInBoltsCalculte(
 	return forces, aux
 }
 
+// Проверка прочности болтов (шпилек) и прокладки
 func (s *FlangeService) boltStrengthCalculate(
 	data models.DataFlange,
 	req *calc_api.FlangeRequest,
@@ -228,6 +232,7 @@ func (s *FlangeService) boltStrengthCalculate(
 	return bolt
 }
 
+// Расчет момента затяжки (иногда требуется не полных расчет, а только 2 значения. для определения подобных ситуаций используется флаг fullCalculate)
 func (s *FlangeService) momentCalculate(
 	data models.DataFlange,
 	SigmaB1, DSigmaM, Pbm, Ab, Dcp float64,

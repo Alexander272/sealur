@@ -323,13 +323,19 @@ func (m *MaterialData) NewMaterial() (mat *cap_model.MaterialData, err error) {
 	if err != nil {
 		return nil, err
 	}
-	sAt20, err := strconv.ParseFloat(m.SigmaAt20, 64)
-	if err != nil {
-		return nil, err
+	var sAt20, s float64
+	if m.SigmaAt20 != "" {
+		sAt20, err = strconv.ParseFloat(m.SigmaAt20, 64)
+		if err != nil {
+			return nil, err
+		}
 	}
-	s, err := strconv.ParseFloat(m.Sigma, 64)
-	if err != nil {
-		return nil, err
+
+	if m.Sigma != "" {
+		s, err = strconv.ParseFloat(m.Sigma, 64)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	mat = &cap_model.MaterialData{

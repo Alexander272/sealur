@@ -10,6 +10,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/ex_rect_model"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/flange_model"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/float_model"
+	"github.com/Alexander272/sealur/api_service/internal/models/moment_model/gas_cooling_model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +21,7 @@ func (h *Handler) initCalcRoutes(api *gin.RouterGroup) {
 		calc.POST("/cap", h.calculateCap)
 		calc.POST("/float", h.calculateFloat)
 		calc.POST("/dev-cooling", h.calculateDevCooling)
+		calc.POST("/gas-cooling", h.calculateGasCooling)
 		calc.POST("/express-circle", h.calculateExCircle)
 		calc.POST("/express-rectangle", h.calculateExRectangle)
 	}
@@ -157,6 +159,28 @@ func (h *Handler) calculateDevCooling(c *gin.Context) {
 	}
 
 	res, err := h.calcClient.CalculateDevCooling(c, data)
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: res})
+}
+
+func (h *Handler) calculateGasCooling(c *gin.Context) {
+	var dto gas_cooling_model.Calc
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	data, err := dto.Parse()
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	res, err := h.calcClient.CalculateGasCooling(c, data)
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

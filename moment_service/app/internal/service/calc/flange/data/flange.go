@@ -63,6 +63,11 @@ func (s *DataService) getFlangeData(ctx context.Context,
 			return nil, nil, fmt.Errorf("failed to get size. error: %w", err)
 		}
 
+		if size.D == 0 {
+			size.D = fl.B
+			size.S0 = (size.A - fl.B) / 2
+			size.S1 = (size.X - fl.B) / 2
+		}
 		flangeData = &flange_model.FlangeResult{
 			DOut: size.DOut,
 			D:    size.D,
@@ -72,11 +77,6 @@ func (s *DataService) getFlangeData(ctx context.Context,
 			L:    size.Length,
 			D6:   size.D6,
 			C:    fl.Corrosion,
-		}
-		if size.D == 0 {
-			size.D = fl.B
-			size.S0 = (size.A - fl.B) / 2
-			size.S1 = (size.X - fl.B) / 2
 		}
 
 		boltSize = &flange_model.BoltResult{

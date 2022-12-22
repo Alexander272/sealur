@@ -33,7 +33,7 @@ func (h *Handler) getFinningFactor(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.DataResponse{Data: data, Count: len(data.Finning)})
+	c.JSON(http.StatusOK, models.DataResponse{Data: data.Finning, Count: len(data.Finning)})
 }
 
 func (h *Handler) createFinningFactor(c *gin.Context) {
@@ -64,7 +64,7 @@ func (h *Handler) createFewFinningFactor(c *gin.Context) {
 		finning = append(finning, &device_api.CreateFinningFactorRequest{DevId: d.DevId, Value: d.Value})
 	}
 
-	_, err := h.deviceClient.CreateFewFinningFactor(c, &device_api.CreateFewFinningFactorRequest{FinnigFactor: finning})
+	_, err := h.deviceClient.CreateFewFinningFactor(c, &device_api.CreateFewFinningFactorRequest{FinningFactor: finning})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

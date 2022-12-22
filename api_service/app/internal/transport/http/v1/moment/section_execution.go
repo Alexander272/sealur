@@ -33,7 +33,7 @@ func (h *Handler) getSectionExecution(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.DataResponse{Data: data, Count: len(data.Section)})
+	c.JSON(http.StatusOK, models.DataResponse{Data: data.Section, Count: len(data.Section)})
 }
 
 func (h *Handler) createSectionExecution(c *gin.Context) {

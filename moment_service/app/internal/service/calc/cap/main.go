@@ -58,6 +58,7 @@ func NewCapService(graphic *graphic.GraphicService, flange *flange.FlangeService
 	}
 }
 
+// TODO по хорошему это надо переписать, чтобы все расчеты не были один куском
 // расчет момента затяжка фланец-крышка по ГОСТ 34233.4 - 2017
 func (s *CapService) CalculationCap(ctx context.Context, data *calc_api.CapRequest) (*calc_api.CapResponse, error) {
 	// получение данных (либо из бд, либо либо их пердают с клиента) для расчетов (+ там пару формул записано)
