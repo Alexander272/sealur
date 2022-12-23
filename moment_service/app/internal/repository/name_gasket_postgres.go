@@ -56,10 +56,10 @@ func (r *DeviceRepo) GetFullNameGasket(ctx context.Context, req *device_api.GetF
 	return gasket, nil
 }
 
-func (r *DeviceRepo) GetNameGasketSize(ctx context.Context, req *device_api.GetNameGasketSizeRequest) (gasket []models.NameGasketSizeDTO, err error) {
+func (r *DeviceRepo) GetNameGasketSize(ctx context.Context, req *device_api.GetNameGasketSizeRequest) (gasket models.NameGasketSizeDTO, err error) {
 	query := fmt.Sprintf("SELECT id, size_long, size_trans, width, thick1, thick2, thick3, thick4 FROM %s WHERE id=$1", NameGasketTable)
 
-	if err := r.db.Select(&gasket, query, req.Id); err != nil {
+	if err := r.db.Get(&gasket, query, req.Id); err != nil {
 		return gasket, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return gasket, nil

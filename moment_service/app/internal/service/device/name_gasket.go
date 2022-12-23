@@ -52,23 +52,21 @@ func (s *DeviceService) GetFullNameGasket(ctx context.Context, req *device_api.G
 	return gasket, nil
 }
 
-func (s *DeviceService) GetNameGasketSize(ctx context.Context, req *device_api.GetNameGasketSizeRequest) (gasket []*device_model.NameGasketSize, err error) {
+func (s *DeviceService) GetNameGasketSize(ctx context.Context, req *device_api.GetNameGasketSizeRequest) (gasket *device_model.NameGasketSize, err error) {
 	data, err := s.repo.GetNameGasketSize(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get name gasket. error: %w", err)
 	}
 
-	for _, item := range data {
-		gasket = append(gasket, &device_model.NameGasketSize{
-			Id:        item.Id,
-			SizeLong:  math.Round(item.SizeLong*1000) / 1000,
-			SizeTrans: math.Round(item.SizeTrans*1000) / 1000,
-			Width:     math.Round(item.Width*1000) / 1000,
-			Thick1:    math.Round(item.Thick1*1000) / 1000,
-			Thick2:    math.Round(item.Thick2*1000) / 1000,
-			Thick3:    math.Round(item.Thick3*1000) / 1000,
-			Thick4:    math.Round(item.Thick4*1000) / 1000,
-		})
+	gasket = &device_model.NameGasketSize{
+		Id:        data.Id,
+		SizeLong:  math.Round(data.SizeLong*1000) / 1000,
+		SizeTrans: math.Round(data.SizeTrans*1000) / 1000,
+		Width:     math.Round(data.Width*1000) / 1000,
+		Thick1:    math.Round(data.Thick1*1000) / 1000,
+		Thick2:    math.Round(data.Thick2*1000) / 1000,
+		Thick3:    math.Round(data.Thick3*1000) / 1000,
+		Thick4:    math.Round(data.Thick4*1000) / 1000,
 	}
 	return gasket, nil
 }
@@ -95,9 +93,9 @@ func (s *DeviceService) UpdateNameGasket(ctx context.Context, gasket *device_api
 	return nil
 }
 
-func (s *DeviceService) DeleteNameGsket(ctx context.Context, gasket *device_api.DeleteNameGasketRequest) error {
+func (s *DeviceService) DeleteNameGasket(ctx context.Context, gasket *device_api.DeleteNameGasketRequest) error {
 	if err := s.repo.DeleteNameGasket(ctx, gasket); err != nil {
-		return fmt.Errorf("failed to delete name gasker. error: %w", err)
+		return fmt.Errorf("failed to delete name gasket. error: %w", err)
 	}
 	return nil
 }

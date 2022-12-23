@@ -9,6 +9,8 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/express_rectangle"
 	calc_flange "github.com/Alexander272/sealur/moment_service/internal/service/calc/flange"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/float"
+	"github.com/Alexander272/sealur/moment_service/internal/service/calc/gas_cooling"
+	"github.com/Alexander272/sealur/moment_service/internal/service/device"
 	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
@@ -17,27 +19,31 @@ import (
 )
 
 type Flange interface {
-	CalculationFlange(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponse, error)
+	CalculationFlange(context.Context, *calc_api.FlangeRequest) (*calc_api.FlangeResponse, error)
 }
 
 type Cap interface {
-	CalculationCap(ctx context.Context, data *calc_api.CapRequest) (*calc_api.CapResponse, error)
+	CalculationCap(context.Context, *calc_api.CapRequest) (*calc_api.CapResponse, error)
 }
 
 type Float interface {
-	CalculationFloat(ctx context.Context, data *calc_api.FloatRequest) (*calc_api.FloatResponse, error)
+	CalculationFloat(context.Context, *calc_api.FloatRequest) (*calc_api.FloatResponse, error)
 }
 
 type DevCooling interface {
-	CalculateDevCooling(ctx context.Context, data *calc_api.DevCoolingRequest) (*calc_api.DevCoolingResponse, error)
+	CalculateDevCooling(context.Context, *calc_api.DevCoolingRequest) (*calc_api.DevCoolingResponse, error)
+}
+
+type GasCooling interface {
+	CalculateGasCooling(context.Context, *calc_api.GasCoolingRequest) (*calc_api.GasCoolingResponse, error)
 }
 
 type ExCircle interface {
-	CalculateExCircle(ctx context.Context, data *calc_api.ExpressCircleRequest) (*calc_api.ExpressCircleResponse, error)
+	CalculateExCircle(context.Context, *calc_api.ExpressCircleRequest) (*calc_api.ExpressCircleResponse, error)
 }
 
 type ExRect interface {
-	CalculateExRect(ctx context.Context, data *calc_api.ExpressRectangleRequest) (*calc_api.ExpressRectangleResponse, error)
+	CalculateExRect(context.Context, *calc_api.ExpressRectangleRequest) (*calc_api.ExpressRectangleResponse, error)
 }
 
 type CalcService struct {
@@ -45,11 +51,12 @@ type CalcService struct {
 	Cap
 	Float
 	DevCooling
+	GasCooling
 	ExCircle
 	ExRect
 }
 
-func NewCalcServices(flange *flange.FlangeService, gasket *gasket.GasketService, materials *materials.MaterialsService) *CalcService {
+func NewCalcServices(flange *flange.FlangeService, gasket *gasket.GasketService, materials *materials.MaterialsService, device *device.DeviceService) *CalcService {
 	graphic := graphic.NewGraphicService()
 
 	return &CalcService{
@@ -57,6 +64,7 @@ func NewCalcServices(flange *flange.FlangeService, gasket *gasket.GasketService,
 		Cap:        cap.NewCapService(graphic, flange, gasket, materials),
 		Float:      float.NewFloatService(graphic, flange, gasket, materials),
 		DevCooling: dev_cooling.NewCoolingService(graphic, flange, gasket, materials),
+		GasCooling: gas_cooling.NewCoolingService(graphic, flange, gasket, materials, device),
 		ExCircle:   express_circle.NewExCircleService(graphic, flange, gasket, materials),
 		ExRect:     express_rectangle.NewExRectServiceService(graphic, flange, gasket, materials),
 	}

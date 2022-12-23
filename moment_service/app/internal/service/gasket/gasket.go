@@ -160,7 +160,7 @@ func (s *GasketService) DeleteGasket(ctx context.Context, gasket *gasket_api.Del
 	return nil
 }
 
-//---
+// ---
 func (s *GasketService) CreateManyGasketData(ctx context.Context, data *gasket_api.CreateManyGasketDataRequest) error {
 	if err := s.repo.CreateManyGasketData(ctx, data); err != nil {
 		return fmt.Errorf("failed to create many gasket data. error: %w", err)

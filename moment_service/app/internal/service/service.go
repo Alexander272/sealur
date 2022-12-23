@@ -169,11 +169,11 @@ type Device interface {
 
 	GetNameGasket(context.Context, *device_api.GetNameGasketRequest) ([]*device_model.NameGasket, error)
 	GetFullNameGasket(context.Context, *device_api.GetFullNameGasketRequest) ([]*device_model.FullNameGasket, error)
-	GetNameGasketSize(context.Context, *device_api.GetNameGasketSizeRequest) ([]*device_model.NameGasketSize, error)
+	GetNameGasketSize(context.Context, *device_api.GetNameGasketSizeRequest) (*device_model.NameGasketSize, error)
 	CreateNameGasket(context.Context, *device_api.CreateNameGasketRequest) (id string, err error)
 	CreateFewNameGasket(context.Context, *device_api.CreateFewNameGasketRequest) error
 	UpdateNameGasket(context.Context, *device_api.UpdateNameGasketRequest) error
-	DeleteNameGsket(context.Context, *device_api.DeleteNameGasketRequest) error
+	DeleteNameGasket(context.Context, *device_api.DeleteNameGasketRequest) error
 }
 
 type Graphic interface {
@@ -213,6 +213,6 @@ func NewServices(repos *repository.Repositories) *Services {
 		Device:    device,
 		Graphic:   graphic.NewGraphicService(),
 		Read:      read.NewReadService(flange, materials, gasket, device),
-		Calc:      calc.NewCalcServices(flange, gasket, materials),
+		Calc:      calc.NewCalcServices(flange, gasket, materials, device),
 	}
 }

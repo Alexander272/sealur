@@ -4,7 +4,7 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
-	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_rectangle_model"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/gas_cooling_model"
 )
 
 type FormulasService struct {
@@ -39,9 +39,9 @@ func NewFormulasService() *FormulasService {
 	}
 }
 
-func (s *FormulasService) GetFormulas(req calc_api.ExpressRectangleRequest, d models.DataExRect, result calc_api.ExpressRectangleResponse,
-) *express_rectangle_model.Formulas {
-	formulas := &express_rectangle_model.Formulas{
+func (s *FormulasService) GetFormulas(req *calc_api.GasCoolingRequest, d models.DataGasCooling, result *calc_api.GasCoolingResponse,
+) *gas_cooling_model.Formulas {
+	formulas := &gas_cooling_model.Formulas{
 		Auxiliary:     s.getAuxiliaryFormulas(req, d, result),
 		ForcesInBolts: s.getForcesFormulas(req, d, result),
 		Bolt:          s.getBoltFormulas(req, d, result),

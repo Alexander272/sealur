@@ -15,7 +15,7 @@ type Calc struct {
 	Section        SectionExecution `json:"section"`
 	TubeCount      TubeCount        `json:"tubeCount"`
 	NumberOfMoves  NumberOfMoves    `json:"numberOfMoves"`
-	TubeLenght     TubeLenght       `json:"tubeLength"`
+	TubeLength     TubeLength       `json:"tubeLength"`
 	TestPressure   string           `json:"testPressure"`
 	TypeBolt       string           `json:"type"`
 	Condition      string           `json:"condition"`
@@ -72,7 +72,7 @@ type SectionExecution struct {
 	Value string `json:"value"`
 }
 
-type TubeLenght struct {
+type TubeLength struct {
 	Id    string `json:"id"`
 	Value string `json:"value"`
 }
@@ -123,9 +123,9 @@ func (f *Calc) Parse() (ex *calc_api.GasCoolingRequest, err error) {
 		Id:    f.NumberOfMoves.Id,
 		Value: f.NumberOfMoves.Value,
 	}
-	tubeLenght := &device_model.TubeLength{
-		Id:    f.TubeLenght.Id,
-		Value: f.TubeLenght.Value,
+	tubeLength := &device_model.TubeLength{
+		Id:    f.TubeLength.Id,
+		Value: f.TubeLength.Value,
 	}
 
 	bolts, err := f.Bolts.Parse()
@@ -145,7 +145,7 @@ func (f *Calc) Parse() (ex *calc_api.GasCoolingRequest, err error) {
 		Section:       section,
 		TubeCount:     tubeCount,
 		NumberOfMoves: number,
-		TubeLength:    tubeLenght,
+		TubeLength:    tubeLength,
 		TestPressure:  testPressure,
 		TypeBolt:      gas_cooling_model.MainData_TypeBolt(typeBolt),
 		Condition:     gas_cooling_model.MainData_Condition(condition),

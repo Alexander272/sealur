@@ -139,7 +139,7 @@ type Device interface {
 
 	GetNameGasket(context.Context, *device_api.GetNameGasketRequest) ([]models.NameGasketDTO, error)
 	GetFullNameGasket(context.Context, *device_api.GetFullNameGasketRequest) ([]models.FullNameGasketDTO, error)
-	GetNameGasketSize(context.Context, *device_api.GetNameGasketSizeRequest) ([]models.NameGasketSizeDTO, error)
+	GetNameGasketSize(context.Context, *device_api.GetNameGasketSizeRequest) (models.NameGasketSizeDTO, error)
 	CreateNameGasket(context.Context, *device_api.CreateNameGasketRequest) (id string, err error)
 	CreateFewNameGasket(context.Context, *device_api.CreateFewNameGasketRequest) error
 	UpdateNameGasket(context.Context, *device_api.UpdateNameGasketRequest) error

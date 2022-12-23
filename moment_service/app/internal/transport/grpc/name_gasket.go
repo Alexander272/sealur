@@ -22,13 +22,14 @@ func (h *DeviceHandlers) GetFullNameGasket(ctx context.Context, req *device_api.
 	return &device_api.FullNameGasketResponse{Gasket: gasket}, nil
 }
 
-func (h *DeviceHandlers) GetNameGasketSize(ctx context.Context, req *device_api.GetNameGasketSizeRequest) (*device_api.NameGasketSizeResponse, error) {
-	gasket, err := h.service.GetNameGasketSize(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	return &device_api.NameGasketSizeResponse{Gasket: gasket}, nil
-}
+//TODO возвращать нужно объект, а не массив
+// func (h *DeviceHandlers) GetNameGasketSize(ctx context.Context, req *device_api.GetNameGasketSizeRequest) (*device_api.NameGasketSizeResponse, error) {
+// 	gasket, err := h.service.GetNameGasketSize(ctx, req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return &device_api.NameGasketSizeResponse{Gasket: gasket}, nil
+// }
 
 func (h *DeviceHandlers) CreateNameGasket(ctx context.Context, gasket *device_api.CreateNameGasketRequest) (*device_api.IdResponse, error) {
 	id, err := h.service.CreateNameGasket(ctx, gasket)
@@ -52,8 +53,8 @@ func (h *DeviceHandlers) UpdateNameGasket(ctx context.Context, gasket *device_ap
 	return &device_api.Response{}, nil
 }
 
-func (h *DeviceHandlers) DeleteNameGsket(ctx context.Context, gasket *device_api.DeleteNameGasketRequest) (*device_api.Response, error) {
-	if err := h.service.DeleteNameGsket(ctx, gasket); err != nil {
+func (h *DeviceHandlers) DeleteNameGasket(ctx context.Context, gasket *device_api.DeleteNameGasketRequest) (*device_api.Response, error) {
+	if err := h.service.DeleteNameGasket(ctx, gasket); err != nil {
 		return nil, err
 	}
 	return &device_api.Response{}, nil

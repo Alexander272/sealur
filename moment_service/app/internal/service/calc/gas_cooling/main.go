@@ -7,6 +7,8 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/gas_cooling/data"
+	"github.com/Alexander272/sealur/moment_service/internal/service/calc/gas_cooling/formulas"
+	"github.com/Alexander272/sealur/moment_service/internal/service/device"
 	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
@@ -16,16 +18,16 @@ import (
 )
 
 type CoolingService struct {
-	graphic *graphic.GraphicService
-	data    *data.DataService
-	// formulas *formulas.FormulasService
+	graphic  *graphic.GraphicService
+	data     *data.DataService
+	formulas *formulas.FormulasService
 	typeBolt map[string]float64
 	Kyp      map[bool]float64
 	Kyz      map[string]float64
 }
 
 func NewCoolingService(graphic *graphic.GraphicService, flange *flange.FlangeService, gasket *gasket.GasketService,
-	materials *materials.MaterialsService) *CoolingService {
+	materials *materials.MaterialsService, device *device.DeviceService) *CoolingService {
 	bolt := map[string]float64{
 		"bolt": constants.BoltD,
 		"pin":  constants.PinD,
@@ -44,8 +46,8 @@ func NewCoolingService(graphic *graphic.GraphicService, flange *flange.FlangeSer
 		"controllablePin": constants.ControllablePinKyz,
 	}
 
-	data := data.NewDataService(flange, materials, gasket, graphic)
-	// formulas := formulas.NewFormulasService()
+	data := data.NewDataService(flange, materials, gasket, device, graphic)
+	formulas := formulas.NewFormulasService()
 
 	return &CoolingService{
 		typeBolt: bolt,
@@ -53,11 +55,11 @@ func NewCoolingService(graphic *graphic.GraphicService, flange *flange.FlangeSer
 		Kyz:      kz,
 		graphic:  graphic,
 		data:     data,
-		// formulas: formulas,
+		formulas: formulas,
 	}
 }
 
-func (s *CoolingService) CalculateGasColling(ctx context.Context, data *calc_api.GasCoolingRequest) (*calc_api.GasCoolingResponse, error) {
+func (s *CoolingService) CalculateGasCooling(ctx context.Context, data *calc_api.GasCoolingRequest) (*calc_api.GasCoolingResponse, error) {
 	d, err := s.data.GetData(ctx, data)
 	if err != nil {
 		return nil, err
@@ -76,9 +78,9 @@ func (s *CoolingService) CalculateGasColling(ctx context.Context, data *calc_api
 	result.Calc.Bolt = s.CalcBolts(ctx, d, result.Calc.ForcesInBolts, result.Calc.Auxiliary)
 	result.Calc.Moment = s.CalcMoment(ctx, d, result.Calc.Bolt, result.Calc.ForcesInBolts, result.Calc.Auxiliary)
 
-	// if data.IsNeedFormulas {
-	// 	result.Formulas = s.formulas.GetFormulas(*data, d, result)
-	// }
+	if data.IsNeedFormulas {
+		result.Formulas = s.formulas.GetFormulas(data, d, result)
+	}
 
 	return result, nil
 }
