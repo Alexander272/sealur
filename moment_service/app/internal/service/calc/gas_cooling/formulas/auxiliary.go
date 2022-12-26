@@ -16,8 +16,8 @@ func (s *FormulasService) getAuxiliaryFormulas(req *calc_api.GasCoolingRequest, 
 
 	// перевод чисел в строки
 	width := strconv.FormatFloat(data.Gasket.Width, 'G', 3, 64)
-	sizeTrans := strconv.FormatFloat(data.Gasket.SizeTrans, 'G', 3, 64)
-	sizeLong := strconv.FormatFloat(data.Gasket.SizeLong, 'G', 3, 64)
+	sizeTrans := strconv.FormatFloat(data.Gasket.SizeTrans, 'f', -1, 64)
+	sizeLong := strconv.FormatFloat(data.Gasket.SizeLong, 'f', -1, 64)
 
 	EstimatedGasketWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedGasketWidth, 'G', 3, 64), "E", "*10^")
 

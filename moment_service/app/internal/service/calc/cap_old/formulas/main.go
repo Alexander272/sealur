@@ -43,9 +43,9 @@ func NewFormulasService() *FormulasService {
 func (s *FormulasService) GetFormulas(
 	TypeGasket, TypeBolt, Condition string,
 	IsWork, IsUseWasher, IsEmbedded bool,
-	data models.DataCap,
-	result calc_api.CapResponse,
-	calculation calc_api.CapRequest_Calcutation,
+	data models.DataCapOld,
+	result calc_api.CapResponseOld,
+	calculation calc_api.CapRequestOld_Calcutation,
 	gamma_, yb_, yp_ float64,
 ) *cap_model.CalcCapFormulas {
 	formulas := &cap_model.CalcCapFormulas{}
@@ -57,7 +57,7 @@ func (s *FormulasService) GetFormulas(
 	compression := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.Compression, 'G', 3, 64), "E", "*10^")
 	epsilon := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.Epsilon, 'G', 3, 64), "E", "*10^")
 	Dcp := strings.ReplaceAll(strconv.FormatFloat(data.Dcp, 'G', 3, 64), "E", "*10^")
-	Lb0 := strings.ReplaceAll(strconv.FormatFloat(result.Bolt.Lenght, 'G', 3, 64), "E", "*10^")
+	Lb0 := strings.ReplaceAll(strconv.FormatFloat(result.Bolt.Length, 'G', 3, 64), "E", "*10^")
 	typeBolt := strings.ReplaceAll(strconv.FormatFloat(s.typeBolt[TypeBolt], 'G', 3, 64), "E", "*10^")
 	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 3, 64)
 	bEpsilon := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Epsilon, 'G', 3, 64), "E", "*10^")
@@ -91,7 +91,7 @@ func (s *FormulasService) GetFormulas(
 	kyp := strconv.FormatFloat(s.Kyp[IsWork], 'G', 3, 64)
 	kyz := strconv.FormatFloat(s.Kyz[Condition], 'G', 3, 64)
 
-	lb := result.Bolt.Lenght + s.typeBolt[result.Data.Type]*float64(data.Bolt.Diameter)
+	lb := result.Bolt.Length + s.typeBolt[result.Data.Type]*float64(data.Bolt.Diameter)
 	Lb := strings.ReplaceAll(strconv.FormatFloat(lb, 'G', 3, 64), "E", "*10^")
 
 	yb := strings.ReplaceAll(strconv.FormatFloat(yb_, 'G', 3, 64), "E", "*10^")
@@ -167,7 +167,7 @@ func (s *FormulasService) GetFormulas(
 
 	pb1F := fmt.Sprintf("%s * (%s + %d) + %s", alpha, qd, axialForce, rp)
 
-	if calculation == calc_api.CapRequest_basis {
+	if calculation == calc_api.CapRequestOld_basis {
 		formulas.Basis = &cap_model.BasisFormulas{}
 
 		pb2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Basis.Pb2, 'G', 3, 64), "E", "*10^")

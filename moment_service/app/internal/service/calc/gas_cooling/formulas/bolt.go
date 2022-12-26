@@ -36,10 +36,8 @@ func (s *FormulasService) getBoltFormulas(req *calc_api.GasCoolingRequest, data 
 	// Условия прочности болтов шпилек - при затяжке
 	Bolts.AllowableVoltage = fmt.Sprintf("1.2 * %.f * %.1f * %.1f * %s", Kyp, Kyz, Kyt, sigmaAt20)
 
-	if data.TypeGasket == gas_cooling_model.GasketData_Soft {
-		// Условие прочности прокладки
-		Bolts.StrengthGasket = fmt.Sprintf("max(%s; %s) / (2 * (%s + %s) * %s)", WorkEffort, Effort, SizeLong, SizeTrans, width)
-	}
+	// Условие прочности прокладки
+	Bolts.StrengthGasket = fmt.Sprintf("max(%s; %s) / (2 * (%s + %s) * %s)", WorkEffort, Effort, SizeLong, SizeTrans, width)
 
 	return Bolts
 }

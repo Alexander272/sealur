@@ -10,7 +10,7 @@ import (
 
 func (s *FormulasService) getCapFormulas(
 	capType cap_model.CapData_Type,
-	data *cap_model.CapResult,
+	data *cap_model.CapResultOld,
 	h, D, S0, DOut, Dcp string,
 ) *cap_model.CapFormulas {
 	f := &cap_model.CapFormulas{}

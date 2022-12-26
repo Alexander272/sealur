@@ -40,7 +40,7 @@ services:
 
     moment_service:
         restart: on-failure:5
-        image: sealur/moment_service:0.8.8
+        image: sealur/moment_service:0.9.1d
         container_name: dev-moment_service
         ports:
             - 9000:9000

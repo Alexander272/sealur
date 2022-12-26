@@ -2,10 +2,10 @@ package data
 
 import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
-	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
-func (s *DataService) FormatInitData(data *calc_api.FlangeRequest) *flange_model.DataResult {
+func (s *DataService) FormatInitData(data *calc_api.CapRequestOld) *cap_model.DataResult {
 	work := map[bool]string{
 		true:  "Рабочие условия",
 		false: "Условия испытаний",
@@ -29,17 +29,15 @@ func (s *DataService) FormatInitData(data *calc_api.FlangeRequest) *flange_model
 		"controllablePin": "Контроль по вытяжке шпилек",
 	}
 
-	res := &flange_model.DataResult{
-		Pressure:      data.Pressure,
-		BendingMoment: data.BendingMoment,
-		AxialForce:    data.AxialForce,
-		Temp:          data.Temp,
-		Work:          work[data.IsWork],
-		Flanges:       flanges[data.Flanges.String()],
-		SameFlange:    sameFlange[data.IsSameFlange],
-		Embedded:      sameFlange[data.IsEmbedded],
-		Type:          typeD[data.Type.String()],
-		Condition:     condition[data.Condition.String()],
+	res := &cap_model.DataResult{
+		Pressure:   data.Pressure,
+		AxialForce: data.AxialForce,
+		Temp:       data.Temp,
+		Work:       work[data.IsWork],
+		Flanges:    flanges[data.Flanges.String()],
+		Embedded:   sameFlange[data.IsEmbedded],
+		Type:       typeD[data.Type.String()],
+		Condition:  condition[data.Condition.String()],
 	}
 	return res
 }

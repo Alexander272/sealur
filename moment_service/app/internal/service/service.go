@@ -30,6 +30,8 @@ type Calc interface {
 	CalculationCap(ctx context.Context, data *calc_api.CapRequest) (*calc_api.CapResponse, error)
 	// расчет плавающей головки теплообменного аппарата
 	CalculationFloat(ctx context.Context, data *calc_api.FloatRequest) (*calc_api.FloatResponse, error)
+	// Расчет прокладки АВО (выбор по типоразмеру аппарата)
+	CalculateGasCooling(ctx context.Context, data *calc_api.GasCoolingRequest) (*calc_api.GasCoolingResponse, error)
 	// расчет аппаратов воздушного охлаждения
 	CalculateDevCooling(ctx context.Context, data *calc_api.DevCoolingRequest) (*calc_api.DevCoolingResponse, error)
 	// экспресс оценка момента затяжки

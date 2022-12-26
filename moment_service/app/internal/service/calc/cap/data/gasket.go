@@ -7,18 +7,18 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
-func (s *DataService) getGasketData(ctx context.Context, data *cap_model.GasketData, bp float64) (*cap_model.GasketResult, string, error) {
+func (s *DataService) getGasketData(ctx context.Context, data *cap_model.GasketData, bp float64) (*cap_model.GasketResult, cap_model.GasketData_Type, error) {
 	if data.GasketId != "another" {
 		g := models.GetGasket{GasketId: data.GasketId, EnvId: data.EnvId, Thickness: data.Thickness}
 		gasket, err := s.gasket.GetFullData(ctx, g)
 		if err != nil {
-			return nil, "", err
+			return nil, 0, err
 		}
 
 		res := &cap_model.GasketResult{
 			Gasket:          gasket.Gasket,
 			Env:             gasket.Env,
-			Type:            gasket.TypeTitle,
+			Type:            gasket.Type,
 			Thickness:       data.Thickness,
 			DOut:            data.DOut,
 			Width:           bp,
@@ -28,14 +28,7 @@ func (s *DataService) getGasketData(ctx context.Context, data *cap_model.GasketD
 			Compression:     gasket.Compression,
 			Epsilon:         gasket.Epsilon,
 		}
-		return res, gasket.TypeTitle, nil
-	}
-
-	//? наверное это не лучшее решение
-	titles := map[string]string{
-		"Soft":  "Мягкая",
-		"Oval":  "Восьмигранная",
-		"Metal": "Металлическая",
+		return res, cap_model.GasketData_Type(cap_model.GasketData_Type_value[gasket.Type]), nil
 	}
 
 	res := &cap_model.GasketResult{
@@ -50,5 +43,5 @@ func (s *DataService) getGasketData(ctx context.Context, data *cap_model.GasketD
 		Compression:     data.Data.Compression,
 		Epsilon:         data.Data.Epsilon,
 	}
-	return res, titles[data.Data.Type.String()], nil
+	return res, data.Data.Type, nil
 }

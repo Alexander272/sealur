@@ -1,11 +1,10 @@
 package data
 
 import (
-	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
-func (s *DataService) FormatInitData(data *calc_api.CapRequest) *cap_model.DataResult {
+func (s *DataService) FormatInitData(data *cap_model.MainData) *cap_model.DataResult {
 	work := map[bool]string{
 		true:  "Рабочие условия",
 		false: "Условия испытаний",

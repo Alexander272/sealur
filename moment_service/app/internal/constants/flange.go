@@ -35,10 +35,10 @@ const (
 	MaxDiameter float64 = 52
 	MaxSigmaB   float64 = 120
 
-	MinD      float64 = 400
-	MaxD      float64 = 2000
-	MinDTetta float64 = 0.006
-	MaxDTetta float64 = 0.013
+	MinD     float64 = 400
+	MaxD     float64 = 2000
+	MinDTeta float64 = 0.006
+	MaxDTeta float64 = 0.013
 
 	MinKs float64 = 1
 	MaxKs float64 = 1.2

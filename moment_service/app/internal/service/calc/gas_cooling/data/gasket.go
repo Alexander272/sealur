@@ -39,6 +39,7 @@ func (s *DataService) getGasketData(ctx context.Context, gasket *gas_cooling_mod
 		PermissiblePres: g.PermissiblePres,
 		Compression:     g.Compression,
 		Epsilon:         g.Epsilon,
+		Name:            gasket.NameGasket.Title,
 	}
 	return res, gas_cooling_model.GasketData_Type(gas_cooling_model.GasketData_Type_value[g.Type]), nil
 

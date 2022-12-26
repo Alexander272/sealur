@@ -14,8 +14,8 @@ import (
 func (s *FormulasService) getStrengthFormulas(
 	typeF cap_model.FlangeData_Type,
 	AxialForce, BendingMoment int32,
-	data models.DataCap,
-	flange *cap_model.FlangeResult,
+	data models.DataCapOld,
+	flange *cap_model.FlangeResultOld,
 	res *cap_model.StrengthResult,
 	D6, Dcp, Pbm, Pbr, Qd, QFM, pressure string,
 	isWork, isTemp bool,

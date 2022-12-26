@@ -186,7 +186,7 @@ func (s *FormulasService) auxiliaryFormulas(data models.DataFlange, req *calc_ap
 	epsilon := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.Epsilon, 'G', 3, 64), "E", "*10^")
 	compression := strconv.FormatFloat(data.Gasket.Compression, 'G', 3, 64)
 
-	lenght := strconv.FormatFloat(data.Bolt.Lenght, 'G', 3, 64)
+	lenght := strconv.FormatFloat(data.Bolt.Length, 'G', 3, 64)
 	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 3, 64)
 	area := strconv.FormatFloat(data.Bolt.Area, 'G', 3, 64)
 	epsilonAt20 := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.EpsilonAt20, 'G', 3, 64), "E", "*10^")
@@ -668,15 +668,15 @@ func (s *FormulasService) conditionsForStrengthCalculate(
 	var DTeta float64
 	if flangeType == flange_model.FlangeData_welded {
 		if flange.D <= constants.MinD {
-			DTeta = constants.MinDTetta
+			DTeta = constants.MinDTeta
 		} else if flange.D > constants.MaxD {
-			DTeta = constants.MaxDTetta
+			DTeta = constants.MaxDTeta
 		} else {
 			DTeta = ((flange.D-constants.MinD)/(constants.MaxD-constants.MinD))*
-				(constants.MaxDTetta-constants.MinDTetta) + constants.MinDTetta
+				(constants.MaxDTeta-constants.MinDTeta) + constants.MinDTeta
 		}
 	} else {
-		DTeta = constants.MaxDTetta
+		DTeta = constants.MaxDTeta
 	}
 	tmp := strconv.FormatFloat(DTeta, 'G', 3, 64)
 	DTeta_ := fmt.Sprintf("%.1f * %s", teta[isWork], tmp)

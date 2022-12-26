@@ -5,7 +5,6 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
-	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
@@ -86,11 +85,7 @@ func (s *FlangeService) strengthCalculate(data models.DataFlange, req *calc_api.
 				ok = true
 			}
 		}
-
-		logger.Debug("VTeta1 ", VTeta1, " VTeta2 ", VTeta2)
 	}
-
-	logger.Debug("ok ", ok)
 
 	finalMoment := &flange_model.CalcMoment{}
 	if ok {
@@ -142,20 +137,20 @@ func (s *FlangeService) auxiliaryCalculate(data models.DataFlange, req *calc_api
 	auxiliary := &flange_model.CalcAuxiliary{}
 
 	if data.TypeGasket == flange_model.GasketData_Oval {
-		// фомула 4
+		// формула 4
 		auxiliary.B0 = data.Gasket.Width / 4
-		// фомула ?
+		// формула ?
 		auxiliary.Dcp = data.Gasket.DOut - data.Gasket.Width/2
 
 	} else {
 		if data.Gasket.Width <= constants.Bp {
-			// фомула 2
+			// формула 2
 			auxiliary.B0 = data.Gasket.Width
 		} else {
-			// фомула 3
+			// формула 3
 			auxiliary.B0 = constants.B0 * math.Sqrt(data.Gasket.Width)
 		}
-		// фомула 5
+		// формула 5
 		auxiliary.Dcp = data.Gasket.DOut - auxiliary.B0
 	}
 
@@ -164,12 +159,12 @@ func (s *FlangeService) auxiliaryCalculate(data models.DataFlange, req *calc_api
 		auxiliary.Yp = (data.Gasket.Thickness * data.Gasket.Compression) / (data.Gasket.Epsilon * math.Pi * auxiliary.Dcp * data.Gasket.Width)
 	}
 	// приложение К пояснение к формуле К.2
-	auxiliary.Lb = data.Bolt.Lenght + s.typeBolt[req.Type.String()]*data.Bolt.Diameter
+	auxiliary.Lb = data.Bolt.Length + s.typeBolt[req.Type.String()]*data.Bolt.Diameter
 	// формула К.2
 	// Податливость болтов/шпилек
 	auxiliary.Yb = auxiliary.Lb / (data.Bolt.EpsilonAt20 * data.Bolt.Area * float64(data.Bolt.Count))
 
-	// фомула 8
+	// формула 8
 	// Суммарная площадь сечения болтов/шпилек
 	auxiliary.A = float64(data.Bolt.Count) * data.Bolt.Area
 
@@ -438,7 +433,7 @@ func (s *FlangeService) staticResistanceCalculate(
 		4*math.Abs(float64(req.BendingMoment)/(flange.D+flange.S0))) / temp
 
 	// Окружные мембранные напряжения от действия давления во втулке приварного встык фланца обечайке
-	// трубе плоского фланца или обечайке трубе бурта свободного фланца в сечениии S0
+	// трубе плоского фланца или обечайке трубе бурта свободного фланца в сечении S0
 	static.SigmaMop = req.Pressure * flange.D / (2.0 * (flange.S0 - flange.C))
 
 	// Напряжения в тарелке приварного встык фланца плоского фланца и бурте свободного фланца в рабочих условиях
@@ -484,15 +479,15 @@ func (s *FlangeService) conditionsForStrengthCalculate(
 	var DTeta, DTetaK float64
 	if flangeType == flange_model.FlangeData_welded {
 		if flange.D <= constants.MinD {
-			DTeta = constants.MinDTetta
+			DTeta = constants.MinDTeta
 		} else if flange.D > constants.MaxD {
-			DTeta = constants.MaxDTetta
+			DTeta = constants.MaxDTeta
 		} else {
 			DTeta = ((flange.D-constants.MinD)/(constants.MaxD-constants.MinD))*
-				(constants.MaxDTetta-constants.MinDTetta) + constants.MinDTetta
+				(constants.MaxDTeta-constants.MinDTeta) + constants.MinDTeta
 		}
 	} else {
-		DTeta = constants.MaxDTetta
+		DTeta = constants.MaxDTeta
 	}
 	DTeta = teta[isWork] * DTeta
 

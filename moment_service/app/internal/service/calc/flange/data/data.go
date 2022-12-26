@@ -60,7 +60,7 @@ func (s *DataService) GetData(ctx context.Context, data *calc_api.FlangeRequest)
 		Lb0 += result.Gasket.Thickness + result.Embed.Thickness
 	}
 
-	// получение данных о болте (инфа о метериале, также размеры записываются в объект)
+	// получение данных о болте (инфа о материале, также размеры записываются в объект)
 	result.Bolt, err = s.getBoltData(ctx, data.Bolts, boltSize, Lb0, Tb)
 	if err != nil {
 		return result, err

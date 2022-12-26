@@ -37,6 +37,10 @@ func (s *DataService) FormatInitData(data *gas_cooling_model.MainData) *gas_cool
 		"controllable":    "Контроль по крутящему моменту",
 		"controllablePin": "Контроль по вытяжке шпилек",
 	}
+	testPressure := data.TestPressure
+	if testPressure == 0 {
+		testPressure = 1.5 * data.Pressure.Value
+	}
 
 	res := &gas_cooling_model.DataResult{
 		Device:        data.Device.Title,
@@ -46,7 +50,7 @@ func (s *DataService) FormatInitData(data *gas_cooling_model.MainData) *gas_cool
 		TubeCount:     fmt.Sprintf("%d", data.TubeCount.Value),
 		NumberOfMoves: data.NumberOfMoves.Value,
 		TubeLength:    data.TubeLength.Value,
-		TestPressure:  data.TestPressure,
+		TestPressure:  testPressure,
 		Type:          typeBolt[data.TypeBolt.String()],
 		Condition:     condition[data.Condition.String()],
 	}

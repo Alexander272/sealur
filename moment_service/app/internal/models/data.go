@@ -23,23 +23,22 @@ type DataFlange struct {
 	TypeGasket flange_model.GasketData_Type
 }
 
-type DataFlangeOld struct {
-	Flange1    *flange_model.OldFlangeResult
-	Flange2    *flange_model.OldFlangeResult
-	Type1      flange_model.FlangeData_Type
-	Type2      flange_model.FlangeData_Type
-	Washer1    *flange_model.WasherResult
-	Washer2    *flange_model.WasherResult
-	Embed      *flange_model.EmbedResult
-	Bolt       *flange_model.BoltResult
-	Gasket     *flange_model.GasketResult
-	TypeGasket string
-	Dcp, B0    float64
-}
-
 type DataCap struct {
 	Flange     *cap_model.FlangeResult
 	Cap        *cap_model.CapResult
+	FlangeType cap_model.FlangeData_Type
+	CapType    cap_model.CapData_Type
+	Washer1    *cap_model.WasherResult
+	Washer2    *cap_model.WasherResult
+	Embed      *cap_model.EmbedResult
+	Bolt       *cap_model.BoltResult
+	Gasket     *cap_model.GasketResult
+	TypeGasket cap_model.GasketData_Type
+}
+
+type DataCapOld struct {
+	Flange     *cap_model.FlangeResultOld
+	Cap        *cap_model.CapResultOld
 	FType      cap_model.FlangeData_Type
 	CType      cap_model.CapData_Type
 	Washer1    *cap_model.WasherResult

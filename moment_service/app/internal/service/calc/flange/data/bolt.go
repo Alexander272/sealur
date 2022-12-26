@@ -6,13 +6,13 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
 )
 
-func (s *DataService) getBoltData(ctx context.Context, data *flange_model.BoltData, bolt *flange_model.BoltResult, lenght, temp float64,
+func (s *DataService) getBoltData(ctx context.Context, data *flange_model.BoltData, bolt *flange_model.BoltResult, length, temp float64,
 ) (*flange_model.BoltResult, error) {
 	res := &flange_model.BoltResult{
 		Diameter: bolt.Diameter,
 		Area:     bolt.Area,
 		Count:    bolt.Count,
-		Lenght:   lenght,
+		Length:   length,
 		Temp:     temp,
 	}
 	if data.MarkId != "another" {

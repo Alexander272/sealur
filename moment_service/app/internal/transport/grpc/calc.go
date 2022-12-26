@@ -43,6 +43,14 @@ func (h *CalcHandlers) CalculateFloat(ctx context.Context, req *calc_api.FloatRe
 	return res, nil
 }
 
+func (h *CalcHandlers) CalculateGasCooling(ctx context.Context, req *calc_api.GasCoolingRequest) (*calc_api.GasCoolingResponse, error) {
+	res, err := h.service.CalculateGasCooling(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (h *CalcHandlers) CalculateDevCooling(ctx context.Context, req *calc_api.DevCoolingRequest) (*calc_api.DevCoolingResponse, error) {
 	res, err := h.service.CalculateDevCooling(ctx, req)
 	if err != nil {
