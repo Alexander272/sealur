@@ -5,22 +5,23 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/cap/data"
+	"github.com/Alexander272/sealur/moment_service/internal/service/calc/cap/formulas"
 	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
-	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
 type CapService struct {
-	graphic *graphic.GraphicService
-	data    *data.DataService
-	// formulas *formulas.FormulasService
+	graphic  *graphic.GraphicService
+	data     *data.DataService
+	formulas *formulas.FormulasService
 	typeBolt map[string]float64
 	Kyp      map[bool]float64
 	Kyz      map[string]float64
+	Kyt      map[bool]float64
 }
 
 func NewCapService(graphic *graphic.GraphicService, flange *flange.FlangeService, gasket *gasket.GasketService,
@@ -44,16 +45,22 @@ func NewCapService(graphic *graphic.GraphicService, flange *flange.FlangeService
 		"controllablePin": constants.ControllablePinKyz,
 	}
 
+	kt := map[bool]float64{
+		true:  constants.LoadKyt,
+		false: constants.NoLoadKyt,
+	}
+
 	data := data.NewDataService(flange, materials, gasket, graphic)
-	// formulas := formulas.NewFormulasService()
+	formulas := formulas.NewFormulasService()
 
 	return &CapService{
-		graphic: graphic,
-		data:    data,
-		// formulas: formulas,
+		graphic:  graphic,
+		data:     data,
+		formulas: formulas,
 		typeBolt: bolt,
 		Kyp:      kp,
 		Kyz:      kz,
+		Kyt:      kt,
 	}
 }
 
@@ -91,9 +98,7 @@ func (s *CapService) CalculationCap(ctx context.Context, data *calc_api.CapReque
 
 	if data.IsNeedFormulas {
 		// получение формул с подставленными значениями переменных
-		// result.Formulas = s.formulas.GetFormulas(data, d, &result, aux)
-		//TODO
-		logger.Debug(aux.A)
+		result.Formulas = s.formulas.GetFormulas(data, d, &result, aux)
 	}
 
 	return &result, nil

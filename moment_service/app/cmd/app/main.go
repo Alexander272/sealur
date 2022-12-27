@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"net"
 	"os"
 	"os/signal"
@@ -21,6 +22,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/read_api"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func main() {
@@ -55,13 +57,13 @@ func main() {
 
 	//* GRPC Server
 
-	// cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
-	// if err != nil {
-	// 	logger.Fatalf("failed to load certificate. error: %s", err.Error())
-	// }
+	cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
+	if err != nil {
+		logger.Fatalf("failed to load certificate. error: %s", err.Error())
+	}
 
 	opts := []grpc.ServerOption{
-		// grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
+		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
 		// grpc.UnaryInterceptor(handlers.UnaryInterceptor),
 	}
 

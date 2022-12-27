@@ -4,7 +4,7 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
-	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
+	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
 type FormulasService struct {
@@ -42,11 +42,11 @@ func NewFormulasService() *FormulasService {
 	}
 }
 
-func (s *FormulasService) GetFormulas(req *calc_api.FlangeRequest, d models.DataFlange, result *calc_api.FlangeResponse, aux *flange_model.CalcAuxiliary,
-) *flange_model.Formulas {
-	formulas := &flange_model.Formulas{}
+func (s *FormulasService) GetFormulas(req *calc_api.CapRequest, d models.DataCap, result *calc_api.CapResponse, aux *cap_model.CalcAuxiliary,
+) *cap_model.Formulas {
+	formulas := &cap_model.Formulas{}
 
-	if req.Calculation == calc_api.FlangeRequest_basis {
+	if req.Data.Calculation == cap_model.MainData_basis {
 		formulas.Basis = s.basisFormulas(req, d, result, aux)
 	} else {
 		formulas.Strength = s.strengthFormulas(req, d, result)

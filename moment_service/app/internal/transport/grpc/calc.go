@@ -35,6 +35,14 @@ func (h *CalcHandlers) CalculateCap(ctx context.Context, req *calc_api.CapReques
 	return res, nil
 }
 
+func (h *CalcHandlers) CalculateCapOld(ctx context.Context, req *calc_api.CapRequestOld) (*calc_api.CapResponseOld, error) {
+	res, err := h.service.CalculationCapOld(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (h *CalcHandlers) CalculateFloat(ctx context.Context, req *calc_api.FloatRequest) (*calc_api.FloatResponse, error) {
 	res, err := h.service.CalculationFloat(ctx, req)
 	if err != nil {

@@ -13,7 +13,7 @@ import (
 func (s *CapService) basisCalculate(data models.DataCap, req *calc_api.CapRequest) (*cap_model.Calculated_Basis, *cap_model.CalcAuxiliary) {
 	deformation := s.deformationCalculate(data, req.Data.Pressure)
 	forces, aux := s.forcesInBoltsCalculate(data, deformation, req)
-	bolts := s.boltStrengthCalculate(data, req, forces.Pb, forces.Pbr, forces.A, deformation.Dcp)
+	bolts := s.boltStrengthCalculate(data, req, forces.Pb, forces.Pbr, forces.A, deformation.Dcp, true)
 	moment := &cap_model.CalcMoment{}
 
 	ok := (bolts.VSigmaB1 && bolts.VSigmaB2 && data.TypeGasket != cap_model.GasketData_Soft) ||
@@ -116,7 +116,7 @@ func (s *CapService) forcesInBoltsCalculate(
 	} else {
 		// формула (Е.11)
 		// Коэффициент жесткости
-		forces.Alpha = 1 - (yp-(flange.Yf*flange.E*flange.B+cap.Y*flange.B))/(yp+yb+(flange.Yf+cap.Y)*math.Pow(flange.B, 2))
+		forces.Alpha = 1 - (yp-(flange.Yf*flange.E+cap.Y*flange.B)*flange.B)/(yp+yb+(flange.Yf+cap.Y)*math.Pow(flange.B, 2))
 	}
 
 	minB := 0.4 * forces.A * data.Bolt.SigmaAt20
@@ -175,6 +175,7 @@ func (s *CapService) boltStrengthCalculate(
 	data models.DataCap,
 	req *calc_api.CapRequest,
 	Pbm, Pbr, Ab, Dcp float64,
+	isLoad bool,
 ) *cap_model.CalcBoltStrength {
 	bolt := &cap_model.CalcBoltStrength{}
 
@@ -183,7 +184,7 @@ func (s *CapService) boltStrengthCalculate(
 
 	Kyp := s.Kyp[req.Data.IsWork]
 	Kyz := s.Kyz[req.Data.Condition.String()]
-	Kyt := constants.LoadKyt
+	Kyt := s.Kyt[isLoad]
 	// формула Г.3
 	bolt.DSigmaM = 1.2 * Kyp * Kyz * Kyt * data.Bolt.SigmaAt20
 	// формула Г.4

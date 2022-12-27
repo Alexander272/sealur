@@ -28,6 +28,7 @@ type Calc interface {
 	CalculationFlange(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponse, error)
 	// расчет момента затяжка фланец-крышка по ГОСТ 34233.4 - 2017
 	CalculationCap(ctx context.Context, data *calc_api.CapRequest) (*calc_api.CapResponse, error)
+	CalculationCapOld(ctx context.Context, data *calc_api.CapRequestOld) (*calc_api.CapResponseOld, error)
 	// расчет плавающей головки теплообменного аппарата
 	CalculationFloat(ctx context.Context, data *calc_api.FloatRequest) (*calc_api.FloatResponse, error)
 	// Расчет прокладки АВО (выбор по типоразмеру аппарата)

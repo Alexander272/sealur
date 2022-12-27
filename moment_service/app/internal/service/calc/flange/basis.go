@@ -13,7 +13,7 @@ import (
 func (s *FlangeService) basisCalculate(data models.DataFlange, req *calc_api.FlangeRequest) (*flange_model.Calculated_Basis, *flange_model.CalcAuxiliary) {
 	deformation := s.deformationCalculate(data, req.Pressure)
 	forces, aux := s.forcesInBoltsCalculate(data, deformation, req)
-	bolts := s.boltStrengthCalculate(data, req, forces.Pb, forces.Pbr, forces.A, deformation.Dcp)
+	bolts := s.boltStrengthCalculate(data, req, forces.Pb, forces.Pbr, forces.A, deformation.Dcp, true)
 	moment := &flange_model.CalcMoment{}
 
 	ok := (bolts.VSigmaB1 && bolts.VSigmaB2 && data.TypeGasket != flange_model.GasketData_Soft) ||
@@ -204,6 +204,7 @@ func (s *FlangeService) boltStrengthCalculate(
 	data models.DataFlange,
 	req *calc_api.FlangeRequest,
 	Pbm, Pbr, Ab, Dcp float64,
+	isLoad bool,
 ) *flange_model.CalcBoltStrength {
 	bolt := &flange_model.CalcBoltStrength{}
 
@@ -212,7 +213,7 @@ func (s *FlangeService) boltStrengthCalculate(
 
 	Kyp := s.Kyp[req.IsWork]
 	Kyz := s.Kyz[req.Condition.String()]
-	Kyt := constants.LoadKyt
+	Kyt := s.Kyt[isLoad]
 	// формула Г.3
 	bolt.DSigmaM = 1.2 * Kyp * Kyz * Kyt * data.Bolt.SigmaAt20
 	// формула Г.4

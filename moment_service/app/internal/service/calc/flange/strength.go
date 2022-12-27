@@ -12,7 +12,7 @@ import (
 func (s *FlangeService) strengthCalculate(data models.DataFlange, req *calc_api.FlangeRequest) *flange_model.Calculated_Strength {
 	auxiliary := s.auxiliaryCalculate(data, req)
 	tightness := s.tightnessCalculate(auxiliary, data, req)
-	bolt1 := s.boltStrengthCalculate(data, req, tightness.Pb, tightness.Pbr, auxiliary.A, auxiliary.Dcp)
+	bolt1 := s.boltStrengthCalculate(data, req, tightness.Pb, tightness.Pbr, auxiliary.A, auxiliary.Dcp, false)
 	moment1 := s.momentCalculate(data, bolt1.SigmaB1, bolt1.DSigmaM, tightness.Pb, auxiliary.A, auxiliary.Dcp, false)
 
 	static1 := s.staticResistanceCalculate(data.Flange1, auxiliary.Flange1, data.Type1, data, req, tightness.Pb, tightness.Pbr, tightness.Qd, tightness.Qfm)
@@ -29,7 +29,7 @@ func (s *FlangeService) strengthCalculate(data models.DataFlange, req *calc_api.
 	}
 
 	tigLoad := s.tightnessLoadCalculate(auxiliary, tightness, data, req)
-	bolt2 := s.boltStrengthCalculate(data, req, tigLoad.Pb, tigLoad.Pbr, auxiliary.A, auxiliary.Dcp)
+	bolt2 := s.boltStrengthCalculate(data, req, tigLoad.Pb, tigLoad.Pbr, auxiliary.A, auxiliary.Dcp, true)
 	moment2 := s.momentCalculate(data, bolt2.SigmaB1, bolt2.DSigmaM, tigLoad.Pb, auxiliary.A, auxiliary.Dcp, false)
 
 	static1 = s.staticResistanceCalculate(data.Flange1, auxiliary.Flange1, data.Type1, data, req, tigLoad.Pb, tigLoad.Pbr, tightness.Qd, tightness.Qfm)

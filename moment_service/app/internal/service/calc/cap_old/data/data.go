@@ -34,7 +34,7 @@ func (s *DataService) GetData(ctx context.Context, data *calc_api.CapRequestOld)
 		return result, err
 	}
 
-	//? я использую температуру фланца. хз верно илил нет.
+	//? я использую температуру фланца. хз верно или нет.
 	if data.IsUseWasher {
 		result.Washer1, err = s.getWasherData(ctx, data.Washer[0], flange.Tf)
 		if err != nil {

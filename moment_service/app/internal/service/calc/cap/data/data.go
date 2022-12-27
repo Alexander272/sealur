@@ -15,6 +15,12 @@ func (s *DataService) GetData(ctx context.Context, data *calc_api.CapRequest) (r
 		Tb = s.typeFlangesTB[data.Data.Flanges.String()+"-free"] * data.Data.Temp
 	}
 
+	bp := (data.Gasket.DOut - data.Gasket.DIn) / 2
+	result.Gasket, result.TypeGasket, err = s.getGasketData(ctx, data.Gasket, bp)
+	if err != nil {
+		return result, err
+	}
+
 	flange, boltSize, err := s.getDataFlange(ctx, data.FlangeData, data.Bolts, data.Data.Flanges.String(), data.Data.Temp)
 	if err != nil {
 		return result, err
@@ -27,7 +33,16 @@ func (s *DataService) GetData(ctx context.Context, data *calc_api.CapRequest) (r
 	result.FlangeType = data.FlangeData.Type
 	result.CapType = data.CapData.Type
 
-	result.Bolt, err = s.getBoltData(ctx, data.Bolts, boltSize, flange.L, Tb)
+	Lb0 := result.Gasket.Thickness + flange.H + cap.H
+
+	if data.FlangeData.Type == cap_model.FlangeData_free {
+		Lb0 += flange.Ring.Hk
+	}
+	if data.Data.IsEmbedded {
+		Lb0 += result.Gasket.Thickness + result.Embed.Thickness
+	}
+
+	result.Bolt, err = s.getBoltData(ctx, data.Bolts, boltSize, Lb0, Tb)
 	if err != nil {
 		return result, err
 	}
@@ -49,11 +64,6 @@ func (s *DataService) GetData(ctx context.Context, data *calc_api.CapRequest) (r
 		if err != nil {
 			return result, err
 		}
-	}
-	bp := (data.Gasket.DOut - data.Gasket.DIn) / 2
-	result.Gasket, result.TypeGasket, err = s.getGasketData(ctx, data.Gasket, bp)
-	if err != nil {
-		return result, err
 	}
 
 	result.Flange = flange

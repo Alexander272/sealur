@@ -22,6 +22,7 @@ type FlangeService struct {
 	typeBolt map[string]float64
 	Kyp      map[bool]float64
 	Kyz      map[string]float64
+	Kyt      map[bool]float64
 }
 
 func NewFlangeService(graphic *graphic.GraphicService, flange *flange.FlangeService, gasket *gasket.GasketService,
@@ -32,7 +33,7 @@ func NewFlangeService(graphic *graphic.GraphicService, flange *flange.FlangeServ
 		"pin":  constants.PinD,
 	}
 
-	// занчение зависит от поля "Условия работы"
+	// значение зависит от поля "Условия работы"
 	kp := map[bool]float64{
 		true:  constants.WorkKyp,
 		false: constants.TestKyp,
@@ -45,6 +46,11 @@ func NewFlangeService(graphic *graphic.GraphicService, flange *flange.FlangeServ
 		"controllablePin": constants.ControllablePinKyz,
 	}
 
+	kt := map[bool]float64{
+		true:  constants.LoadKyt,
+		false: constants.NoLoadKyt,
+	}
+
 	data := data.NewDataService(flange, materials, gasket, graphic)
 	formulas := formulas.NewFormulasService()
 
@@ -55,12 +61,13 @@ func NewFlangeService(graphic *graphic.GraphicService, flange *flange.FlangeServ
 		typeBolt: bolt,
 		Kyp:      kp,
 		Kyz:      kz,
+		Kyt:      kt,
 	}
 }
 
 // расчет момента затяжки фланец-фланец по ГОСТ 34233.4 - 2017
 func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.FlangeRequest) (*calc_api.FlangeResponse, error) {
-	// получение данных (либо из бд, либо либо их пердают с клиента) для расчетов (+ там пару формул записано)
+	// получение данных (либо из бд, либо либо их передают с клиента) для расчетов (+ там пару формул записано)
 	d, err := s.data.GetData(ctx, data)
 	if err != nil {
 		return nil, err

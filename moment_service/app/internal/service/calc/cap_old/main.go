@@ -60,7 +60,7 @@ func NewCapService(graphic *graphic.GraphicService, flange *flange.FlangeService
 
 // TODO по хорошему это надо переписать, чтобы все расчеты не были один куском
 // расчет момента затяжка фланец-крышка по ГОСТ 34233.4 - 2017
-func (s *CapService) CalculationCap(ctx context.Context, data *calc_api.CapRequestOld) (*calc_api.CapResponseOld, error) {
+func (s *CapService) CalculationCapOld(ctx context.Context, data *calc_api.CapRequestOld) (*calc_api.CapResponseOld, error) {
 	// получение данных (либо из бд, либо либо их передают с клиента) для расчетов (+ там пару формул записано)
 	d, err := s.data.GetData(ctx, data)
 	if err != nil {
@@ -106,7 +106,7 @@ func (s *CapService) CalculationCap(ctx context.Context, data *calc_api.CapReque
 	Lb := Lb0 + s.typeBolt[data.Type.String()]*d.Bolt.Diameter
 	// формула К.2
 	yb := Lb / (d.Bolt.EpsilonAt20 * d.Bolt.Area * float64(d.Bolt.Count))
-	// фомула 8
+	// формула 8
 	Ab := float64(d.Bolt.Count) * d.Bolt.Area
 	result.Calc.A = Ab
 
@@ -169,7 +169,7 @@ func (s *CapService) CalculationCap(ctx context.Context, data *calc_api.CapReque
 		result.Calc.Strength.FDSigmaR = Kyp * Kyz * Kyt * d.Bolt.Sigma
 
 		if result.Calc.Strength.FSigmaB1 > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {
-			result.Calc.Strength.FMkp = s.graphic.CalculateMkp(d.Bolt.Diameter, result.Calc.Strength.FSigmaB2)
+			result.Calc.Strength.FMkp = s.graphic.CalculateMkp(d.Bolt.Diameter, result.Calc.Strength.FSigmaB1)
 		} else {
 			result.Calc.Strength.FMkp = (0.3 * Pbm * float64(d.Bolt.Diameter) / float64(d.Bolt.Count)) / 1000.0
 		}

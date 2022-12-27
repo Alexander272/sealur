@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/cap"
+	cap_old "github.com/Alexander272/sealur/moment_service/internal/service/calc/cap_old"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/dev_cooling"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/express_circle"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/express_rectangle"
@@ -24,6 +25,10 @@ type Flange interface {
 
 type Cap interface {
 	CalculationCap(context.Context, *calc_api.CapRequest) (*calc_api.CapResponse, error)
+}
+
+type CapOld interface {
+	CalculationCapOld(context.Context, *calc_api.CapRequestOld) (*calc_api.CapResponseOld, error)
 }
 
 type Float interface {
@@ -49,6 +54,7 @@ type ExRect interface {
 type CalcService struct {
 	Flange
 	Cap
+	CapOld
 	Float
 	DevCooling
 	GasCooling
@@ -62,6 +68,7 @@ func NewCalcServices(flange *flange.FlangeService, gasket *gasket.GasketService,
 	return &CalcService{
 		Flange:     calc_flange.NewFlangeService(graphic, flange, gasket, materials),
 		Cap:        cap.NewCapService(graphic, flange, gasket, materials),
+		CapOld:     cap_old.NewCapService(graphic, flange, gasket, materials),
 		Float:      float.NewFloatService(graphic, flange, gasket, materials),
 		DevCooling: dev_cooling.NewCoolingService(graphic, flange, gasket, materials),
 		GasCooling: gas_cooling.NewCoolingService(graphic, flange, gasket, materials, device),
