@@ -1,6 +1,7 @@
 package cap_model
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
 )
 
-type CalcCap struct {
+type CalcCapOld struct {
 	Pressure       string         `json:"pressure"`
 	AxialForce     string         `json:"axialForce"`
 	Temp           string         `json:"temp"`
@@ -26,6 +27,30 @@ type CalcCap struct {
 	IsUseWasher    bool           `json:"isUseWasher"`
 	Washer         WasherData     `json:"washer"`
 	IsNeedFormulas bool           `json:"isNeedFormulas"`
+}
+
+type CalcCap struct {
+	Data           MainData       `json:"data"`
+	Gasket         GasketFullData `json:"gasket"`
+	Bolts          BoltsData      `json:"bolts"`
+	Embed          EmbedData      `json:"embed"`
+	FlangeData     Flanges        `json:"flangeData"`
+	CapData        Cap            `json:"capData"`
+	IsUseWasher    bool           `json:"isUseWasher"`
+	Washer         WasherData     `json:"washer"`
+	IsNeedFormulas bool           `json:"isNeedFormulas"`
+}
+
+type MainData struct {
+	Pressure    string `json:"pressure"`
+	AxialForce  string `json:"axialForce"`
+	Temp        string `json:"temp"`
+	IsWork      bool   `json:"isWork"`
+	Flanges     string `json:"flanges"`
+	IsEmbedded  bool   `json:"isEmbedded"`
+	TypeB       string `json:"type"`
+	Condition   string `json:"condition"`
+	Calculation string `json:"calculation"`
 }
 
 type Cap struct {
@@ -129,7 +154,7 @@ type FlangeSize struct {
 	Hk   string `json:"hk"`
 }
 
-func (c *CalcCap) NewCap() (cap *calc_api.CapRequest, err error) {
+func (c *CalcCapOld) NewCap() (cap *calc_api.CapRequestOld, err error) {
 	pressure, err := strconv.ParseFloat(c.Pressure, 64)
 	if err != nil {
 		return nil, err
@@ -143,10 +168,10 @@ func (c *CalcCap) NewCap() (cap *calc_api.CapRequest, err error) {
 		return nil, err
 	}
 
-	flanges := calc_api.CapRequest_Flanges_value[c.Flanges]
-	typeB := calc_api.CapRequest_Type_value[c.TypeB]
-	condition := calc_api.CapRequest_Condition_value[c.Condition]
-	calculation := calc_api.CapRequest_Calcutation_value[c.Calculation]
+	flanges := calc_api.CapRequestOld_Flanges_value[c.Flanges]
+	typeB := calc_api.CapRequestOld_Type_value[c.TypeB]
+	condition := calc_api.CapRequestOld_Condition_value[c.Condition]
+	calculation := calc_api.CapRequestOld_Calcutation_value[c.Calculation]
 
 	flangeData, err := c.FlangeData.NewFlangeData()
 	if err != nil {
@@ -184,16 +209,16 @@ func (c *CalcCap) NewCap() (cap *calc_api.CapRequest, err error) {
 		}
 	}
 
-	cap = &calc_api.CapRequest{
+	cap = &calc_api.CapRequestOld{
 		Pressure:       pressure,
 		AxialForce:     int32(axialForce),
 		Temp:           temp,
 		IsWork:         c.IsWork,
-		Flanges:        calc_api.CapRequest_Flanges(flanges),
+		Flanges:        calc_api.CapRequestOld_Flanges(flanges),
 		IsEmbedded:     c.IsEmbedded,
-		Type:           calc_api.CapRequest_Type(typeB),
-		Condition:      calc_api.CapRequest_Condition(condition),
-		Calculation:    calc_api.CapRequest_Calcutation(calculation),
+		Type:           calc_api.CapRequestOld_Type(typeB),
+		Condition:      calc_api.CapRequestOld_Condition(condition),
+		Calculation:    calc_api.CapRequestOld_Calcutation(calculation),
 		IsUseWasher:    c.IsUseWasher,
 		IsNeedFormulas: c.IsNeedFormulas,
 		FlangeData:     flangeData,
@@ -204,6 +229,95 @@ func (c *CalcCap) NewCap() (cap *calc_api.CapRequest, err error) {
 		Embed:          embed,
 	}
 	return cap, nil
+}
+
+func (c *CalcCap) Parse() (cap *calc_api.CapRequest, err error) {
+	data, err := c.Data.Parse()
+	if err != nil {
+		return nil, err
+	}
+
+	flangeData, err := c.FlangeData.NewFlangeData()
+	if err != nil {
+		return nil, err
+	}
+
+	capData, err := c.CapData.NewCapData()
+	if err != nil {
+		return nil, err
+	}
+
+	bolts, err := c.Bolts.NewBolts()
+	if err != nil {
+		return nil, err
+	}
+
+	gasket, err := c.Gasket.NewGasket()
+	if err != nil {
+		return nil, err
+	}
+
+	var embed *cap_model.EmbedData
+	if c.Data.IsEmbedded {
+		embed, err = c.Embed.NewEmbed()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var washer []*cap_model.WasherData
+	if c.IsUseWasher {
+		washer, err = c.Washer.NewWasher()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	cap = &calc_api.CapRequest{
+		Data:           data,
+		IsUseWasher:    c.IsUseWasher,
+		IsNeedFormulas: c.IsNeedFormulas,
+		FlangeData:     flangeData,
+		CapData:        capData,
+		Bolts:          bolts,
+		Gasket:         gasket,
+		Washer:         washer,
+		Embed:          embed,
+	}
+	return cap, nil
+}
+
+func (d *MainData) Parse() (data *cap_model.MainData, err error) {
+	pressure, err := strconv.ParseFloat(d.Pressure, 64)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse pressure. error: %w", err)
+	}
+	axialForce, err := strconv.Atoi(d.AxialForce)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse axial force. error: %w", err)
+	}
+	temp, err := strconv.ParseFloat(d.Temp, 64)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse temp. error: %w", err)
+	}
+
+	flanges := cap_model.MainData_Flanges_value[d.Flanges]
+	typeB := cap_model.MainData_Type_value[d.TypeB]
+	condition := cap_model.MainData_Condition_value[d.Condition]
+	calculation := cap_model.MainData_Calcutation_value[d.Calculation]
+
+	data = &cap_model.MainData{
+		Pressure:    pressure,
+		AxialForce:  int32(axialForce),
+		Temp:        temp,
+		IsWork:      d.IsWork,
+		Flanges:     cap_model.MainData_Flanges(flanges),
+		IsEmbedded:  d.IsEmbedded,
+		Type:        cap_model.MainData_Type(typeB),
+		Condition:   cap_model.MainData_Condition(condition),
+		Calculation: cap_model.MainData_Calcutation(calculation),
+	}
+	return data, nil
 }
 
 func (c *Cap) NewCapData() (cap *cap_model.CapData, err error) {
@@ -273,20 +387,20 @@ func (f *Flanges) NewFlangeData() (flange *cap_model.FlangeData, err error) {
 	typeF := cap_model.FlangeData_Type_value[f.TypeF]
 	corrosion, err := strconv.ParseFloat(f.Corrosion, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse corrosion. error: %w", err)
 	}
 
 	var temp, b float64
 	if f.Temp != "" {
 		temp, err = strconv.ParseFloat(f.Temp, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse flange temp. error: %w", err)
 		}
 	}
 	if f.B != "" {
 		b, err = strconv.ParseFloat(f.B, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse flange b. error: %w", err)
 		}
 	}
 
@@ -312,29 +426,29 @@ func (f *Flanges) NewFlangeData() (flange *cap_model.FlangeData, err error) {
 func (m *MaterialData) NewMaterial() (mat *cap_model.MaterialData, err error) {
 	alpha, err := strconv.ParseFloat(m.AlphaF, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse alpha. error: %w", err)
 	}
 	alpha = alpha * math.Pow(10, -6)
 	eAt20, err := strconv.ParseFloat(m.EpsilonAt20, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse epsilonAt20. error: %w", err)
 	}
 	e, err := strconv.ParseFloat(m.Epsilon, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse epsilon. error: %w", err)
 	}
 	var sAt20, s float64
 	if m.SigmaAt20 != "" {
 		sAt20, err = strconv.ParseFloat(m.SigmaAt20, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse sigmaAt20. error: %w", err)
 		}
 	}
 
 	if m.Sigma != "" {
 		s, err = strconv.ParseFloat(m.Sigma, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse sigma. error: %w", err)
 		}
 	}
 
@@ -353,65 +467,65 @@ func (m *MaterialData) NewMaterial() (mat *cap_model.MaterialData, err error) {
 func (s *FlangeSize) NewSize() (size *cap_model.FlangeData_Size, err error) {
 	dOut, err := strconv.ParseFloat(s.DOut, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse size dOut. error: %w", err)
 	}
 	d, err := strconv.ParseFloat(s.D, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse size d. error: %w", err)
 	}
 	h, err := strconv.ParseFloat(s.H, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse size h. error: %w", err)
 	}
 	d6, err := strconv.ParseFloat(s.D6, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse size d6. error: %w", err)
 	}
 	s0, err := strconv.ParseFloat(s.S0, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse size s0. error: %w", err)
 	}
 	var s1, l, dnk, dk, ds, h0, hk float64
 	if s.S1 != "" {
 		s1, err = strconv.ParseFloat(s.S1, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse size s1. error: %w", err)
 		}
 	}
 	if s.L != "" {
 		l, err = strconv.ParseFloat(s.L, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse size l. error: %w", err)
 		}
 	}
 	if s.Dnk != "" {
 		dnk, err = strconv.ParseFloat(s.Dnk, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse size dnk. error: %w", err)
 		}
 	}
 	if s.Dk != "" {
 		dk, err = strconv.ParseFloat(s.Dk, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse size dk. error: %w", err)
 		}
 	}
 	if s.Ds != "" {
 		ds, err = strconv.ParseFloat(s.Ds, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse size ds. error: %w", err)
 		}
 	}
 	if s.H0 != "" {
 		h0, err = strconv.ParseFloat(s.H0, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse size h0. error: %w", err)
 		}
 	}
 	if s.Hk != "" {
 		hk, err = strconv.ParseFloat(s.Hk, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse size hk. error: %w", err)
 		}
 	}
 
@@ -442,25 +556,25 @@ func (b *BoltsData) NewBolts() (bolts *cap_model.BoltData, err error) {
 	if b.Count != "" {
 		count, err := strconv.Atoi(b.Count)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bolt count. error: %w", err)
 		}
 		bolts.Count = int32(count)
 	}
 	if b.Temp != "" {
 		temp, err := strconv.ParseFloat(b.Temp, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bolt temp. error: %w", err)
 		}
 		bolts.Temp = temp
 	}
 	if b.BoltId == "another" {
 		diameter, err := strconv.ParseFloat(b.Diameter, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bolt diameter. error: %w", err)
 		}
 		area, err := strconv.ParseFloat(b.Area, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bolt area. error: %w", err)
 		}
 		bolts.Diameter = diameter
 		bolts.Area = area
@@ -478,15 +592,15 @@ func (b *BoltsData) NewBolts() (bolts *cap_model.BoltData, err error) {
 func (g *GasketFullData) NewGasket() (gasket *cap_model.GasketData, err error) {
 	thickness, err := strconv.ParseFloat(g.Thickness, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket thickness. error: %w", err)
 	}
 	dOut, err := strconv.ParseFloat(g.DOut, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket dOut. error: %w", err)
 	}
 	dIn, err := strconv.ParseFloat(g.DIn, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket dIn. error: %w", err)
 	}
 	gasket = &cap_model.GasketData{
 		GasketId:  g.GasketId,
@@ -510,23 +624,23 @@ func (g *GasketFullData) NewGasket() (gasket *cap_model.GasketData, err error) {
 func (g *GasketData) NewGasketData() (data *cap_model.GasketData_Data, err error) {
 	q, err := strconv.ParseFloat(g.Qo, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket data q. error: %w", err)
 	}
 	m, err := strconv.ParseFloat(g.M, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket data m. error: %w", err)
 	}
 	compression, err := strconv.ParseFloat(g.Compression, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket data compression. error: %w", err)
 	}
 	e, err := strconv.ParseFloat(g.Epsilon, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket data e. error: %w", err)
 	}
 	permissiblePres, err := strconv.ParseFloat(g.PermissiblePres, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket data permissiblePres. error: %w", err)
 	}
 
 	typeG := cap_model.GasketData_Type_value[g.TypeG]
@@ -547,7 +661,7 @@ func (g *GasketData) NewGasketData() (data *cap_model.GasketData_Data, err error
 func (w *WasherData) NewWasher() (washers []*cap_model.WasherData, err error) {
 	thickness, err := strconv.ParseFloat(w.Thickness, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse washer thickness. error: %w", err)
 	}
 
 	var material *cap_model.MaterialData
@@ -586,7 +700,7 @@ func (w *WasherData) NewWasher() (washers []*cap_model.WasherData, err error) {
 func (e *EmbedData) NewEmbed() (embed *cap_model.EmbedData, err error) {
 	thickness, err := strconv.ParseFloat(e.Thickness, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse embed thickness. error: %w", err)
 	}
 
 	var material *cap_model.MaterialData

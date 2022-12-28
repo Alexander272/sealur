@@ -816,6 +816,7 @@ func (s *FormulasService) tightnessLoadFormulas(
 	AlphaM := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.AlphaM, 'G', 3, 64), "E", "*10^")
 	Dcp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Dcp, 'G', 3, 64), "E", "*10^")
 
+	Rp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Rp, 'G', 3, 64), "E", "*10^")
 	Pb1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb1, 'G', 3, 64), "E", "*10^")
 	Pb2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb2, 'G', 3, 64), "E", "*10^")
 	Pb := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb, 'G', 3, 64), "E", "*10^")
@@ -842,24 +843,24 @@ func (s *FormulasService) tightnessLoadFormulas(
 		fH := strconv.FormatFloat(data.Flange1.Hk, 'G', 3, 64)
 		fT := strconv.FormatFloat(data.Flange1.Ring.Tk, 'G', 3, 64)
 
-		temp1 += fmt.Sprintf("%s * %s * (%s - 20)", fAlpha, fH, fT)
-		temp2 += fH
+		temp1 += fmt.Sprintf(" + (%s * %s) * (%s - 20)", fAlpha, fH, fT)
+		temp2 += " + " + fH
 	}
 	if data.Type2 == flange_model.FlangeData_free {
 		fAlpha := strings.ReplaceAll(strconv.FormatFloat(data.Flange2.Ring.AlphaK, 'G', 3, 64), "E", "*10^")
 		fH := strconv.FormatFloat(data.Flange2.Hk, 'G', 3, 64)
 		fT := strconv.FormatFloat(data.Flange2.Ring.Tk, 'G', 3, 64)
 
-		temp1 += fmt.Sprintf("%s * %s * (%s - 20)", fAlpha, fH, fT)
-		temp2 += fH
+		temp1 += fmt.Sprintf(" + (%s * %s) * (%s - 20)", fAlpha, fH, fT)
+		temp2 += " + " + fH
 	}
 	if req.IsEmbedded {
 		eAlpha := strings.ReplaceAll(strconv.FormatFloat(data.Embed.Alpha, 'G', 3, 64), "E", "*10^")
 		eThick := strconv.FormatFloat(data.Embed.Thickness, 'G', 3, 64)
 		temp := strconv.FormatFloat(req.Temp, 'G', 3, 64)
 
-		temp1 += fmt.Sprintf("%s * %s * (%s - 20)", eAlpha, eThick, temp)
-		temp2 += eThick
+		temp1 += fmt.Sprintf(" + (%s * %s) * (%s - 20)", eAlpha, eThick, temp)
+		temp2 += " + " + eThick
 	}
 
 	//? должно быть два варианта формулы с шайбой и без нее
@@ -868,7 +869,9 @@ func (s *FormulasService) tightnessLoadFormulas(
 	//формула 11 (в старом 13)
 	tightness.Qt = fmt.Sprintf("%s * (%s - %s * %s * (%s - 20))", Gamma, temp1, bAlpha, temp2, bTemp)
 
-	tightness.Pb1 = fmt.Sprintf("max(%s; %s - %s)", Pb1, Pb1, Qt)
+	pb1 := fmt.Sprintf("%s * (%s + %d) + %s", Alpha, Qd, req.AxialForce, Rp)
+
+	tightness.Pb1 = fmt.Sprintf("max(%s; %s - %s)", pb1, pb1, Qt)
 	tightness.Pb = fmt.Sprintf("max(%s; %s)", Pb1, Pb2)
 	tightness.Pbr = fmt.Sprintf("%s + (1 - %s) * (%s + %d) + %s + 4 * (1 - %s * |%d|) / %s",
 		Pb, Alpha, Qd, req.AxialForce, Qt, AlphaM, req.BendingMoment, Dcp)

@@ -32,7 +32,7 @@ func NewCapService(graphic *graphic.GraphicService, flange *flange.FlangeService
 		"pin":  constants.PinD,
 	}
 
-	// занчение зависит от поля "Условия работы"
+	// значение зависит от поля "Условия работы"
 	kp := map[bool]float64{
 		true:  constants.WorkKyp,
 		false: constants.TestKyp,

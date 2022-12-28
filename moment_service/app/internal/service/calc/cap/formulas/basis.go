@@ -85,7 +85,7 @@ func (s *FormulasService) deformationFormulas(req *calc_api.CapRequest, d models
 	if req.Data.Pressure >= 0 {
 		// формула 7
 		// Усилие на прокладке в рабочих условиях
-		deformation.Rp = fmt.Sprintf("%f * %s * %s * %s *|%s|", math.Pi, Dcp, B0, m, pressure)
+		deformation.Rp = fmt.Sprintf("%f * %s * %s * %s * |%s|", math.Pi, Dcp, B0, m, pressure)
 	}
 
 	return deformation
@@ -158,7 +158,7 @@ func (s *FormulasService) forcesInBoltsCalculate(
 
 	// формула 10
 	// Приведенная нагрузка, вызванная воздействием внешней силы и изгибающего момента
-	forces.Qfm = fmt.Sprintf("%d", axialForce)
+	// forces.Qfm = fmt.Sprintf("%d", axialForce)
 
 	if !(d.TypeGasket == cap_model.GasketData_Oval || d.FlangeType == cap_model.FlangeData_free) {
 		// формула (Е.11)
@@ -188,12 +188,12 @@ func (s *FormulasService) forcesInBoltsCalculate(
 		hk1 := strconv.FormatFloat(d.Flange.Ring.Hk, 'G', 3, 64)
 		tk1 := strconv.FormatFloat(d.Flange.Ring.T, 'G', 3, 64)
 
-		temp1 += fmt.Sprintf(" + %s * %s * (%s - 20)", alphaK1, hk1, tk1)
+		temp1 += fmt.Sprintf(" + (%s * %s) * (%s - 20)", alphaK1, hk1, tk1)
 		temp2 += fmt.Sprintf(" + %s", hk1)
 	}
 
 	if req.Data.IsEmbedded {
-		temp1 += fmt.Sprintf(" + %s * %s * (%s - 20)", eAlpha, eThick, temp)
+		temp1 += fmt.Sprintf(" + (%s * %s) * (%s - 20)", eAlpha, eThick, temp)
 		temp2 += fmt.Sprintf(" + %s", eThick)
 	}
 
@@ -232,13 +232,14 @@ func (s *FormulasService) boltStrengthFormulas(
 	bolt.SigmaB1 = fmt.Sprintf("%s / %s", Pb_, Ab_)
 	bolt.SigmaB2 = fmt.Sprintf("%s / %s", Pbr_, Ab_)
 
-	Kyp := s.Kyp[req.Data.IsWork]
-	Kyz := s.Kyz[req.Data.Condition.String()]
-	Kyt := s.Kyt[isLoad]
+	Kyp := strconv.FormatFloat(s.Kyp[req.Data.IsWork], 'G', 3, 64)
+	Kyz := strconv.FormatFloat(s.Kyz[req.Data.Condition.String()], 'G', 3, 64)
+	Kyt := strconv.FormatFloat(s.Kyt[isLoad], 'G', 3, 64)
+
 	// формула Г.3
-	bolt.DSigmaM = fmt.Sprintf("1.2 * %.2f * %.1f * %.1f * %s", Kyp, Kyz, Kyt, sigmaAt20)
+	bolt.DSigmaM = fmt.Sprintf("1.2 * %s * %s * %s * %s", Kyp, Kyz, Kyt, sigmaAt20)
 	// формула Г.4
-	bolt.DSigmaR = fmt.Sprintf("%.2f * %.1f * %.1f * %s", Kyp, Kyz, Kyt, sigma)
+	bolt.DSigmaR = fmt.Sprintf("%s * %s * %s * %s", Kyp, Kyz, Kyt, sigma)
 
 	if d.TypeGasket == cap_model.GasketData_Soft {
 		bolt.Q = fmt.Sprintf("max(%s; %s) / (%f * %s * %s)", Pb_, Pbr_, math.Pi, Dcp_, width)

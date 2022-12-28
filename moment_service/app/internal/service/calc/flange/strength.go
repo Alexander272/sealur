@@ -416,9 +416,9 @@ func (s *FlangeService) staticResistanceCalculate(
 		temp := math.Pi * (flange.D + flange.S1) * (flange.S1 - flange.C)
 		// формула (ф. 37)
 		static.SigmaMp = (0.785*math.Pow(flange.D, 2)*req.Pressure + float64(req.AxialForce) +
-			4*math.Abs(float64(req.BendingMoment)/(flange.D+flange.S1))) / temp
+			(4*math.Abs(float64(req.BendingMoment)))/(flange.D+flange.S1)) / temp
 		static.SigmaMpm = (0.785*math.Pow(flange.D, 2)*req.Pressure + float64(req.AxialForce) -
-			4*math.Abs(float64(req.BendingMoment)/(flange.D+flange.S1))) / temp
+			(4*math.Abs(float64(req.BendingMoment)))/(flange.D+flange.S1)) / temp
 	}
 
 	temp := math.Pi * (flange.D + flange.S0) * (flange.S0 - flange.C)
@@ -427,10 +427,10 @@ func (s *FlangeService) staticResistanceCalculate(
 	// формула (ф. 37)
 	// - для приварных встык фланцев с конической втулкой в сечении S1
 	static.SigmaMp0 = (0.785*math.Pow(flange.D, 2)*req.Pressure + float64(req.AxialForce) +
-		4*math.Abs(float64(req.BendingMoment)/(flange.D+flange.S0))) / temp
+		(4*math.Abs(float64(req.BendingMoment)))/(flange.D+flange.S0)) / temp
 	// - для приварных встык фланцев с конической втулкой в сечении S0 приварных фланцев с прямой втулкой плоских фланцев и свободных фланцев
 	static.SigmaMpm0 = (0.785*math.Pow(flange.D, 2)*req.Pressure + float64(req.AxialForce) -
-		4*math.Abs(float64(req.BendingMoment)/(flange.D+flange.S0))) / temp
+		(4*math.Abs(float64(req.BendingMoment)))/(flange.D+flange.S0)) / temp
 
 	// Окружные мембранные напряжения от действия давления во втулке приварного встык фланца обечайке
 	// трубе плоского фланца или обечайке трубе бурта свободного фланца в сечении S0

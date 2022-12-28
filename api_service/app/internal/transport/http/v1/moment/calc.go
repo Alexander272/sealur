@@ -19,6 +19,7 @@ func (h *Handler) initCalcRoutes(api *gin.RouterGroup) {
 	{
 		calc.POST("/flange", h.calculateFlange)
 		calc.POST("/cap", h.calculateCap)
+		calc.POST("/cap/old", h.calculateCapOld)
 		calc.POST("/float", h.calculateFloat)
 		calc.POST("/dev-cooling", h.calculateDevCooling)
 		calc.POST("/gas-cooling", h.calculateGasCooling)
@@ -82,13 +83,48 @@ func (h *Handler) calculateCap(c *gin.Context) {
 		return
 	}
 
-	data, err := dto.NewCap()
+	data, err := dto.Parse()
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
 
 	res, err := h.calcClient.CalculateCap(c, data)
+	if err != nil {
+		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: res})
+}
+
+// @Summary Calculate Cap
+// @Tags Sealur Moment -> calc-cap
+// @Security ApiKeyAuth
+// @Description расчет момента затяжки соединения фланец-крышка
+// @ModuleID calculateCap
+// @Accept json
+// @Produce json
+// @Param data body cap_model.CalcCapOld true "cap data"
+// @Success 200 {object} models.DataResponse{data=calc_api.CapResponse}
+// @Failure 400,404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Failure default {object} models.ErrorResponse
+// @Router /sealur-moment/calc/cap/old [post]
+func (h *Handler) calculateCapOld(c *gin.Context) {
+	var dto cap_model.CalcCapOld
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	data, err := dto.NewCap()
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	res, err := h.calcClient.CalculateCapOld(c, data)
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

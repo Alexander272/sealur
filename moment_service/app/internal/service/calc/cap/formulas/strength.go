@@ -400,7 +400,7 @@ func (s *FormulasService) tightnessFormulas(data models.DataCap, req *calc_api.C
 	if req.Data.Pressure >= 0 {
 		// формула 7
 		// Усилие на прокладке в рабочих условиях
-		tightness.Rp = fmt.Sprintf("%f * %s * %s * %s *|%s|", math.Pi, Dcp, B0, m, pressure)
+		tightness.Rp = fmt.Sprintf("%f * %s * %s * %s * |%s|", math.Pi, Dcp, B0, m, pressure)
 	}
 
 	// формула 9
@@ -409,7 +409,7 @@ func (s *FormulasService) tightnessFormulas(data models.DataCap, req *calc_api.C
 
 	// формула 10
 	// Приведенная нагрузка, вызванная воздействием внешней силы и изгибающего момента
-	tightness.Qfm = fmt.Sprintf("%d", axialForce)
+	// tightness.Qfm = fmt.Sprintf("%d", axialForce)
 
 	// minB := 0.4 * aux.A * data.Bolt.SigmaAt20
 	minB := fmt.Sprintf("0.4 * %s * %s", Ab, sigmaAt20)
@@ -518,7 +518,7 @@ func (s *FormulasService) staticResistanceFormulas(
 	// Радиальное напряжение в тарелке приварного встык фланца плоского фланца и бурте свободного фланца в условиях затяжки
 	static.SigmaR = fmt.Sprintf("((1.33 * %s * %s + %s) / (%s * (%s)^2 * %s * %s)) * %s", BetaF, fH, L0, Lymda, fH, L0, fD, MM)
 	// Окружное напряжение в тарелке приварного встык фланца плоского фланца и бурте свободного фланца в условиях затяжки
-	static.SigmaT = fmt.Sprintf("%s * %s / ((%s)^2 * %s) - %s * %s", BetaY, MM, fH, fD, BetaZ, SigmaR)
+	static.SigmaT = fmt.Sprintf("(%s * %s) / ((%s)^2 * %s) - %s * %s", BetaY, MM, fH, fD, BetaZ, SigmaR)
 
 	if typeFlange == cap_model.FlangeData_free {
 		Hk := strconv.FormatFloat(flange.Ring.Hk, 'G', 3, 64)
@@ -543,7 +543,7 @@ func (s *FormulasService) staticResistanceFormulas(
 	if typeFlange == cap_model.FlangeData_welded {
 		temp := fmt.Sprintf("%f * (%s + %s) * (%s - %s)", math.Pi, fD, fS1, fS1, fC)
 		// формула (ф. 37)
-		static.SigmaMp = fmt.Sprintf("(0.785 * (%s)^2 * %s + %d + 4 * |%d / (%s + %s)|) / %s", fD, pressure, axialForce, 0, fD, fS1, temp)
+		static.SigmaMp = fmt.Sprintf("(0.785 * (%s)^2 * %s + %d + (4 * |%d|) / (%s + %s)) / %s", fD, pressure, axialForce, 0, fD, fS1, temp)
 	}
 
 	temp := fmt.Sprintf("%f * (%s + %s) * (%s - %s)", math.Pi, fD, fS0, fS0, fC)
@@ -551,7 +551,7 @@ func (s *FormulasService) staticResistanceFormulas(
 	// плоского фланца или обечайке трубе бурта свободного фланца в рабочих условиях
 	// формула (ф. 37)
 	// - для приварных встык фланцев с конической втулкой в сечении S1
-	static.SigmaMp0 = fmt.Sprintf("(0.785 * (%s)^2 * %s + %d + 4 * |%d / (%s + %s)|) / %s", fD, pressure, axialForce, 0, fD, fS0, temp)
+	static.SigmaMp0 = fmt.Sprintf("(0.785 * (%s)^2 * %s + %d + (4 * |%d|) / (%s + %s)) / %s", fD, pressure, axialForce, 0, fD, fS0, temp)
 
 	// Окружные мембранные напряжения от действия давления во втулке приварного встык фланца обечайке
 	// трубе плоского фланца или обечайке трубе бурта свободного фланца в сечении S0
@@ -610,7 +610,7 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 	SigmaTp := strings.ReplaceAll(strconv.FormatFloat(static.SigmaTp, 'G', 3, 64), "E", "*10^")
 	SigmaMop := strings.ReplaceAll(strconv.FormatFloat(static.SigmaMop, 'G', 3, 64), "E", "*10^")
 
-	teta := map[bool]float64{
+	chooseTeta := map[bool]float64{
 		true:  constants.WorkTeta,
 		false: constants.TestTeta,
 	}
@@ -627,6 +627,10 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 		false: constants.Kt,
 	}
 
+	kt := strconv.FormatFloat(Kt[isTemp], 'G', 3, 64)
+	ks := strconv.FormatFloat(Ks, 'G', 3, 64)
+	teta := strconv.FormatFloat(chooseTeta[isWork], 'G', 3, 64)
+
 	var DTeta float64
 	if flangeType == cap_model.FlangeData_welded {
 		if flange.D <= constants.MinD {
@@ -641,7 +645,7 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 		DTeta = constants.MaxDTeta
 	}
 	tmp := strconv.FormatFloat(DTeta, 'G', 3, 64)
-	DTeta_ := fmt.Sprintf("%.1f * %s", teta[isWork], tmp)
+	DTeta_ := fmt.Sprintf("%s * %s", teta, tmp)
 
 	conditions.Teta = fmt.Sprintf("%s * %s * %s / %s", Mp, Yf, fEpsilonAt20, fEpsilon)
 	conditions.CondTeta = &cap_model.ConditionFormulas{
@@ -655,7 +659,7 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 		Yk := strings.ReplaceAll(strconv.FormatFloat(calcFlange.Yk, 'G', 3, 64), "E", "*10^")
 		Mpk := strings.ReplaceAll(strconv.FormatFloat(static.Mpk, 'G', 3, 64), "E", "*10^")
 
-		DTetaK := fmt.Sprintf("%.1f * 0.02", teta[isWork])
+		DTetaK := fmt.Sprintf("%s * 0.02", teta)
 		conditions.TetaK = fmt.Sprintf("%s * %s * %s / %s", Mpk, Yk, fEpsilonKAt20, fEpsilonK)
 		conditions.CondTetaK = &cap_model.ConditionFormulas{
 			X: conditions.TetaK,
@@ -666,26 +670,26 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 	//* Условия статической прочности фланцев
 	if flangeType == cap_model.FlangeData_welded && flange.S1 != flange.S0 {
 		Max1 := fmt.Sprintf("max(|%s + %s|; |%s + %s|)", SigmaM1, SigmaR, SigmaM1, SigmaT)
-		max1Y := fmt.Sprintf("%f * %.1f * %s", Ks, Kt[isTemp], fSigmaMAt20)
+		max1Y := fmt.Sprintf("%s * %s * %s", ks, kt, fSigmaMAt20)
 
-		t1 := fmt.Sprintf("max(|%s - %s + %s|; |%s - %s + %s|)", SigmaP1, SigmaMp, SigmaRp, SigmaP1, SigmaMpm, SigmaRp)
-		t2 := fmt.Sprintf("max(|%s - %s + %s|; |%s - %s + %s|)", SigmaP1, SigmaMp, SigmaTp, SigmaP1, SigmaMpm, SigmaTp)
+		t1 := fmt.Sprintf("|%s - %s + %s|; |%s - %s + %s|", SigmaP1, SigmaMp, SigmaRp, SigmaP1, SigmaMpm, SigmaRp)
+		t2 := fmt.Sprintf("|%s - %s + %s|; |%s - %s + %s|", SigmaP1, SigmaMp, SigmaTp, SigmaP1, SigmaMpm, SigmaTp)
 		t1 = fmt.Sprintf("%s; %s", t1, t2)
-		t2 = fmt.Sprintf("max(|%s + %s|; |%s + %s|)", SigmaP1, SigmaMp, SigmaP1, SigmaMpm)
+		t2 = fmt.Sprintf("|%s + %s|; |%s + %s|", SigmaP1, SigmaMp, SigmaP1, SigmaMpm)
 
 		Max2 := fmt.Sprintf("max(%s; %s)", t1, t2)
-		max2Y := fmt.Sprintf("%f * %.1f * %s", Ks, Kt[isTemp], fSigmaM)
+		max2Y := fmt.Sprintf("%s * %s * %s", ks, kt, fSigmaM)
 
 		max3Y := fmt.Sprintf("1.3 * %s", fSigmaRAt20)
 
-		t1 = fmt.Sprintf("max(|%s + %s|; |%s - %s|)", SigmaP0, SigmaMp0, SigmaP0, SigmaMp0)
-		t2 = fmt.Sprintf("max(|%s + %s|; |%s - %s|)", SigmaP0, SigmaMpm0, SigmaP0, SigmaMpm0)
+		t1 = fmt.Sprintf("|%s + %s|; |%s - %s|", SigmaP0, SigmaMp0, SigmaP0, SigmaMp0)
+		t2 = fmt.Sprintf("|%s + %s|; |%s - %s|", SigmaP0, SigmaMpm0, SigmaP0, SigmaMpm0)
 		t1 = fmt.Sprintf("%s; %s", t1, t2)
-		t2 = fmt.Sprintf("max(|0.3 * %s + %s); |0.3 * %s - %s|)", SigmaP0, SigmaMop, SigmaP0, SigmaMop)
+		t2 = fmt.Sprintf("|0.3 * %s + %s|; |0.3 * %s - %s|", SigmaP0, SigmaMop, SigmaP0, SigmaMop)
 		t1 = fmt.Sprintf("%s; %s", t1, t2)
-		t2 = fmt.Sprintf("max(|0.7 * %s + (%s - %s)|; |0.7 * %s - (%s - %s)|)", SigmaP0, SigmaMp0, SigmaMop, SigmaP0, SigmaMp0, SigmaMop)
+		t2 = fmt.Sprintf("|0.7 * %s + (%s - %s)|; |0.7 * %s - (%s - %s)|", SigmaP0, SigmaMp0, SigmaMop, SigmaP0, SigmaMp0, SigmaMop)
 		t1 = fmt.Sprintf("%s; %s", t1, t2)
-		t2 = fmt.Sprintf("max(|0.7 * %s + (%s - %s)|; |0.7 * %s - (%s - %s)|)", SigmaP0, SigmaMpm0, SigmaMop, SigmaP0, SigmaMpm0, SigmaMop)
+		t2 = fmt.Sprintf("|0.7 * %s + (%s - %s)|; |0.7 * %s - (%s - %s)|", SigmaP0, SigmaMpm0, SigmaMop, SigmaP0, SigmaMpm0, SigmaMop)
 
 		Max4 := fmt.Sprintf("max(%s; %s)", t1, t2)
 		max4Y := fmt.Sprintf("1.3 * %s", fSigmaR)
@@ -709,10 +713,10 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 	} else {
 		Max5 := fmt.Sprintf("max(|%s + %s|; |%s + %s|)", SigmaM0, SigmaR, SigmaM0, SigmaT)
 
-		t1 := fmt.Sprintf("max(|%s - %s + %s); |%s - %s + %s|)", SigmaP0, SigmaMp0, SigmaTp, SigmaP0, SigmaMpm0, SigmaTp)
-		t2 := fmt.Sprintf("max(|%s - %s + %s|; |%s - %s + %s|)", SigmaP0, SigmaMp0, SigmaRp, SigmaP0, SigmaMpm0, SigmaRp)
+		t1 := fmt.Sprintf("|%s - %s + %s); |%s - %s + %s|", SigmaP0, SigmaMp0, SigmaTp, SigmaP0, SigmaMpm0, SigmaTp)
+		t2 := fmt.Sprintf("|%s - %s + %s|; |%s - %s + %s|", SigmaP0, SigmaMp0, SigmaRp, SigmaP0, SigmaMpm0, SigmaRp)
 		t1 = fmt.Sprintf("%s; %s", t1, t2)
-		t2 = fmt.Sprintf("max(|%s + %s|; |%s + %s|)", SigmaP0, SigmaMp0, SigmaP0, SigmaMpm0)
+		t2 = fmt.Sprintf("|%s + %s|; |%s + %s|", SigmaP0, SigmaMp0, SigmaP0, SigmaMpm0)
 
 		Max6 := fmt.Sprintf("max(%s; %s)", t1, t2)
 
@@ -729,9 +733,9 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 	max7 := fmt.Sprintf("|%s|; |%s|", SigmaMp0, SigmaMpm0)
 	Max7 := fmt.Sprintf("max(%s; |%s|)", max7, SigmaMop)
 	Max8 := fmt.Sprintf("max(|%s|; |%s|)", SigmaR, SigmaT)
-	max8Y := fmt.Sprintf("%.1f * %s", Kt[isTemp], fSigmaAt20)
+	max8Y := fmt.Sprintf("%s * %s", kt, fSigmaAt20)
 	Max9 := fmt.Sprintf("max(|%s|; |%s|)", SigmaRp, SigmaTp)
-	max9Y := fmt.Sprintf("%.1f * %s", Kt[isTemp], fSigma)
+	max9Y := fmt.Sprintf("%s * %s", kt, fSigma)
 
 	conditions.Max7 = &cap_model.ConditionFormulas{X: Max7, Y: fSigma}
 	conditions.Max8 = &cap_model.ConditionFormulas{X: Max8, Y: max8Y}
@@ -743,8 +747,8 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 		fSigmaKAt20 := strconv.FormatFloat(flange.Ring.SigmaAt20, 'G', 3, 64)
 		fSigmaK := strconv.FormatFloat(flange.Ring.Sigma, 'G', 3, 64)
 
-		max10Y := fmt.Sprintf("%.1f * %s", Kt[isTemp], fSigmaKAt20)
-		max11Y := fmt.Sprintf("%.1f * %s", Kt[isTemp], fSigmaK)
+		max10Y := fmt.Sprintf("%s * %s", kt, fSigmaKAt20)
+		max11Y := fmt.Sprintf("%s * %s", kt, fSigmaK)
 
 		conditions.Max10 = &cap_model.ConditionFormulas{X: SigmaK, Y: max10Y}
 		conditions.Max11 = &cap_model.ConditionFormulas{X: SigmaKp, Y: max11Y}
@@ -774,6 +778,7 @@ func (s *FormulasService) tightnessLoadFormulas(
 	Gamma := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Gamma, 'G', 3, 64), "E", "*10^")
 	Alpha := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Alpha, 'G', 3, 64), "E", "*10^")
 
+	Rp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Rp, 'G', 3, 64), "E", "*10^")
 	Pb1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb1, 'G', 3, 64), "E", "*10^")
 	Pb2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb2, 'G', 3, 64), "E", "*10^")
 	Pb := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb, 'G', 3, 64), "E", "*10^")
@@ -800,8 +805,8 @@ func (s *FormulasService) tightnessLoadFormulas(
 		fH := strconv.FormatFloat(data.Flange.Ring.Hk, 'G', 3, 64)
 		fT := strconv.FormatFloat(data.Flange.Ring.T, 'G', 3, 64)
 
-		temp1 += fmt.Sprintf("%s * %s * (%s - 20)", fAlpha, fH, fT)
-		temp2 += fH
+		temp1 += fmt.Sprintf(" + (%s * %s) * (%s - 20)", fAlpha, fH, fT)
+		temp2 += " + " + fH
 	}
 
 	if req.Data.IsEmbedded {
@@ -809,17 +814,19 @@ func (s *FormulasService) tightnessLoadFormulas(
 		eThick := strconv.FormatFloat(data.Embed.Thickness, 'G', 3, 64)
 		temp := strconv.FormatFloat(req.Data.Temp, 'G', 3, 64)
 
-		temp1 += fmt.Sprintf("%s * %s * (%s - 20)", eAlpha, eThick, temp)
-		temp2 += eThick
+		temp1 += fmt.Sprintf(" + (%s * %s) * (%s - 20)", eAlpha, eThick, temp)
+		temp2 += " + " + eThick
 	}
 
 	//? должно быть два варианта формулы с шайбой и без нее
 	// шайба будет задаваться так же как и болты + толщина шайбы
 
 	//формула 11 (в старом 13)
-	tightness.Qt = fmt.Sprintf("%s * (%s - %s * %s * (%s - 20))", Gamma, temp1, bAlpha, temp2, bTemp)
+	tightness.Qt = fmt.Sprintf("%s * (%s - %s * (%s) * (%s - 20))", Gamma, temp1, bAlpha, temp2, bTemp)
 
-	tightness.Pb1 = fmt.Sprintf("max(%s; %s - %s)", Pb1, Pb1, Qt)
+	pb1 := fmt.Sprintf("%s * (%s + %d) + %s", Alpha, Qd, req.Data.AxialForce, Rp)
+
+	tightness.Pb1 = fmt.Sprintf("max(%s; %s - %s)", pb1, pb1, Qt)
 	tightness.Pb = fmt.Sprintf("max(%s; %s)", Pb1, Pb2)
 	tightness.Pbr = fmt.Sprintf("%s + (1 - %s) * (%s + %d) + %s", Pb, Alpha, Qd, req.Data.AxialForce, Qt)
 
