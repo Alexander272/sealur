@@ -1,6 +1,7 @@
 package ex_rect_model
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
@@ -59,13 +60,13 @@ type MaterialData struct {
 func (f *Calc) Parse() (ex *calc_api.ExpressRectangleRequest, err error) {
 	pressure, err := strconv.ParseFloat(f.Pressure, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse pressure. error: %w", err)
 	}
 	var testPressure float64
 	if f.TestPressure != "" {
 		testPressure, err = strconv.ParseFloat(f.TestPressure, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse test pressure. error: %w", err)
 		}
 	}
 
@@ -74,12 +75,12 @@ func (f *Calc) Parse() (ex *calc_api.ExpressRectangleRequest, err error) {
 
 	bolts, err := f.Bolts.Parse()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse bolts. error: %w", err)
 	}
 
 	gasket, err := f.Gasket.Parse()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket. error: %w", err)
 	}
 
 	ex = &calc_api.ExpressRectangleRequest{
@@ -97,11 +98,11 @@ func (f *Calc) Parse() (ex *calc_api.ExpressRectangleRequest, err error) {
 func (m *MaterialData) Parse() (mat *express_rectangle_model.MaterialData, err error) {
 	eAt20, err := strconv.ParseFloat(m.EpsilonAt20, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse epsilon at 20. error: %w", err)
 	}
 	sAt20, err := strconv.ParseFloat(m.SigmaAt20, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse sigma at 20. error: %w", err)
 	}
 
 	mat = &express_rectangle_model.MaterialData{
@@ -121,18 +122,18 @@ func (b *BoltsData) Parse() (bolts *express_rectangle_model.BoltData, err error)
 
 	count, err := strconv.Atoi(b.Count)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse bolt count. error: %w", err)
 	}
 	bolts.Count = int32(count)
 
 	if b.BoltId == "another" {
 		diameter, err := strconv.ParseFloat(b.Diameter, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bolt diameter. error: %w", err)
 		}
 		area, err := strconv.ParseFloat(b.Area, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bolt area. error: %w", err)
 		}
 		bolts.Diameter = diameter
 		bolts.Area = area
@@ -140,7 +141,7 @@ func (b *BoltsData) Parse() (bolts *express_rectangle_model.BoltData, err error)
 	if b.MarkId == "another" {
 		bolts.Material, err = b.Material.Parse()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bolt materials. error: %w", err)
 		}
 	}
 
@@ -150,19 +151,19 @@ func (b *BoltsData) Parse() (bolts *express_rectangle_model.BoltData, err error)
 func (g *GasketFullData) Parse() (gasket *express_rectangle_model.GasketData, err error) {
 	thickness, err := strconv.ParseFloat(g.Thickness, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket thickness. error: %w", err)
 	}
 	width, err := strconv.ParseFloat(g.Width, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket width. error: %w", err)
 	}
 	sizeTrans, err := strconv.ParseFloat(g.SizeTrans, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket size trans. error: %w", err)
 	}
 	sizeLong, err := strconv.ParseFloat(g.SizeLong, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket size long. error: %w", err)
 	}
 	gasket = &express_rectangle_model.GasketData{
 		GasketId:  g.GasketId,
@@ -175,7 +176,7 @@ func (g *GasketFullData) Parse() (gasket *express_rectangle_model.GasketData, er
 	if g.GasketId == "another" {
 		data, err := g.Data.Parse()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse gasket data. error: %w", err)
 		}
 
 		gasket.Data = data
@@ -187,23 +188,23 @@ func (g *GasketFullData) Parse() (gasket *express_rectangle_model.GasketData, er
 func (g *GasketData) Parse() (data *express_rectangle_model.GasketData_Data, err error) {
 	q, err := strconv.ParseFloat(g.Qo, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket q. error: %w", err)
 	}
 	m, err := strconv.ParseFloat(g.M, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket m. error: %w", err)
 	}
 	compression, err := strconv.ParseFloat(g.Compression, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket compression. error: %w", err)
 	}
 	e, err := strconv.ParseFloat(g.Epsilon, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket epsilon. error: %w", err)
 	}
 	permissiblePres, err := strconv.ParseFloat(g.PermissiblePres, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket permissible pres. error: %w", err)
 	}
 
 	typeG := express_rectangle_model.GasketData_Type_value[g.TypeG]

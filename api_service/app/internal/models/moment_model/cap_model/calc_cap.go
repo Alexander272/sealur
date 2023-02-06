@@ -429,15 +429,22 @@ func (m *MaterialData) NewMaterial() (mat *cap_model.MaterialData, err error) {
 		return nil, fmt.Errorf("failed to parse alpha. error: %w", err)
 	}
 	alpha = alpha * math.Pow(10, -6)
-	eAt20, err := strconv.ParseFloat(m.EpsilonAt20, 64)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse epsilonAt20. error: %w", err)
+	var eAt20, e, sAt20, s float64
+
+	if m.EpsilonAt20 != "" {
+		eAt20, err = strconv.ParseFloat(m.EpsilonAt20, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse epsilonAt20. error: %w", err)
+		}
 	}
-	e, err := strconv.ParseFloat(m.Epsilon, 64)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse epsilon. error: %w", err)
+
+	if m.Epsilon != "" {
+		e, err = strconv.ParseFloat(m.Epsilon, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse epsilon. error: %w", err)
+		}
 	}
-	var sAt20, s float64
+
 	if m.SigmaAt20 != "" {
 		sAt20, err = strconv.ParseFloat(m.SigmaAt20, 64)
 		if err != nil {

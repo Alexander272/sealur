@@ -1,6 +1,7 @@
 package gas_cooling_model
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
@@ -92,7 +93,7 @@ func (f *Calc) Parse() (ex *calc_api.GasCoolingRequest, err error) {
 	if f.TestPressure != "" {
 		testPressure, err = strconv.ParseFloat(f.TestPressure, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse test pressure. error: %w", err)
 		}
 	}
 
@@ -130,12 +131,12 @@ func (f *Calc) Parse() (ex *calc_api.GasCoolingRequest, err error) {
 
 	bolts, err := f.Bolts.Parse()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse bolts. error: %w", err)
 	}
 
 	gasket, err := f.Gasket.Parse()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket. error: %w", err)
 	}
 
 	data := &gas_cooling_model.MainData{
@@ -163,11 +164,11 @@ func (f *Calc) Parse() (ex *calc_api.GasCoolingRequest, err error) {
 func (m *MaterialData) Parse() (mat *gas_cooling_model.MaterialData, err error) {
 	eAt20, err := strconv.ParseFloat(m.EpsilonAt20, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse material epsilon at 20. error: %w", err)
 	}
 	sAt20, err := strconv.ParseFloat(m.SigmaAt20, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse material sigma at 20. error: %w", err)
 	}
 
 	mat = &gas_cooling_model.MaterialData{
@@ -187,18 +188,18 @@ func (b *BoltsData) Parse() (bolts *gas_cooling_model.BoltData, err error) {
 
 	count, err := strconv.Atoi(b.Count)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse bolt count. error: %w", err)
 	}
 	bolts.Count = int32(count)
 
 	if b.BoltId == "another" {
 		diameter, err := strconv.ParseFloat(b.Diameter, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bolt diameter. error: %w", err)
 		}
 		area, err := strconv.ParseFloat(b.Area, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bolt area. error: %w", err)
 		}
 		bolts.Diameter = diameter
 		bolts.Area = area
@@ -206,7 +207,7 @@ func (b *BoltsData) Parse() (bolts *gas_cooling_model.BoltData, err error) {
 	if b.MarkId == "another" {
 		bolts.Material, err = b.Material.Parse()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse bolt materials. error: %w", err)
 		}
 	}
 
@@ -216,7 +217,7 @@ func (b *BoltsData) Parse() (bolts *gas_cooling_model.BoltData, err error) {
 func (g *GasketFullData) Parse() (gasket *gas_cooling_model.GasketData, err error) {
 	thickness, err := strconv.ParseFloat(g.Thickness, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse gasket thickness. error: %w", err)
 	}
 
 	name := &device_model.NameGasket{
