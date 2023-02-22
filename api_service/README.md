@@ -33,4 +33,5 @@
         ttl: ttl
 
 Команда для генерации документации
+
     swag init -g ./cmd/app/main.go

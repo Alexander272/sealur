@@ -13,7 +13,7 @@ func (h *Handler) initAdditRoutes(api *gin.RouterGroup) {
 	addit := api.Group("/additionals")
 	{
 		addit.GET("/", h.getAddit)
-		addit = addit.Group("", h.middleware.AccessForProAdmin)
+		addit = addit.Group("", h.middleware.UserIdentity, h.middleware.AccessForProAdmin)
 		{
 			addit.POST("/", h.createAddit)
 			addit.PATCH("/:id/mat", h.updateMat)

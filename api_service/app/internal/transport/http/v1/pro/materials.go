@@ -14,7 +14,7 @@ func (h *Handler) initMaterialsRoutes(api *gin.RouterGroup) {
 	materials := api.Group("/materials")
 	{
 		materials.GET("/", h.getMaterials)
-		materials = materials.Group("/", h.middleware.AccessForProAdmin)
+		materials = materials.Group("/", h.middleware.UserIdentity, h.middleware.AccessForProAdmin)
 		{
 			materials.POST("/", h.createMaterials)
 			materials.PUT("/:id", h.updateMaterials)

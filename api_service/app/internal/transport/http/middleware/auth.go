@@ -55,11 +55,13 @@ func (m *Middleware) AccessForProAdmin(c *gin.Context) {
 	role, exists := c.Get(fmt.Sprintf("%s_pro", userRolesCtx))
 	if !exists {
 		models.NewErrorResponse(c, http.StatusUnauthorized, "roles empty", "failed to get role")
+		return
 	}
 
 	if role != "admin" {
 		models.NewErrorResponse(c, http.StatusForbidden, role.(string), "access not allowed")
 		logger.Error(userId)
+		return
 	}
 }
 
@@ -68,11 +70,13 @@ func (m *Middleware) AccessForMomentAdmin(c *gin.Context) {
 	role, exists := c.Get(fmt.Sprintf("%s_moment", userRolesCtx))
 	if !exists {
 		models.NewErrorResponse(c, http.StatusUnauthorized, "roles empty", "failed to get role")
+		return
 	}
 
 	if role != "admin" {
 		models.NewErrorResponse(c, http.StatusForbidden, role.(string), "access not allowed")
 		logger.Error(userId)
+		return
 	}
 }
 
@@ -81,10 +85,12 @@ func (m *Middleware) AccessForSuperUser(c *gin.Context) {
 	role, exists := c.Get(fmt.Sprintf("%s_sealur", userRolesCtx))
 	if !exists {
 		models.NewErrorResponse(c, http.StatusUnauthorized, "roles empty", "failed to get role")
+		return
 	}
 
 	if role != "superuser" {
 		models.NewErrorResponse(c, http.StatusForbidden, role.(string), "access not allowed")
 		logger.Error(userId)
+		return
 	}
 }

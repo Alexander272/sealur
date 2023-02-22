@@ -15,7 +15,7 @@ func (h *Handler) initStandRoutes(api *gin.RouterGroup) {
 	stand := api.Group("/standards")
 	{
 		stand.GET("/", h.getStands)
-		stand = stand.Group("/", h.middleware.AccessForProAdmin)
+		stand = stand.Group("/", h.middleware.UserIdentity, h.middleware.AccessForProAdmin)
 		{
 			stand.POST("/", h.createStand)
 			stand.PUT("/:id", h.updateStand)

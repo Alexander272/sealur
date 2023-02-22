@@ -323,6 +323,7 @@ func (s *FormulasService) momentFormulas(
 
 		if d.TypeGasket == flange_model.GasketData_Soft && mom.Qmax > d.Gasket.PermissiblePres {
 			Pmax = fmt.Sprintf("%s * (%f * %s * %s)", perPres, math.Pi, Dcp_, width)
+			moment.Qmax = ""
 		}
 
 		moment.Mmax = fmt.Sprintf("(0.3 * %s * %s / %d) / 1000", Pmax, diameter, count)

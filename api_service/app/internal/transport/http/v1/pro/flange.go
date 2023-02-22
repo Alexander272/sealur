@@ -15,7 +15,7 @@ func (h *Handler) initFlangeRoutes(api *gin.RouterGroup) {
 	flanges := api.Group("/flanges")
 	{
 		flanges.GET("/", h.getFlanges)
-		flanges = flanges.Group("/", h.middleware.AccessForProAdmin)
+		flanges = flanges.Group("/", h.middleware.UserIdentity, h.middleware.AccessForProAdmin)
 		{
 			flanges.POST("/", h.createFlange)
 			flanges.PUT("/:id", h.updateFlange)

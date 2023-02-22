@@ -191,6 +191,12 @@ func (h *Handler) refresh(c *gin.Context) {
 		return
 	}
 
+	// удаление записей из редиса
+	if err := h.services.Session.SingOut(c, user.Id); err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
 	// запись в редисе и генерация токенов
 	newToken, err := h.services.SignIn(c, user)
 	if err != nil {

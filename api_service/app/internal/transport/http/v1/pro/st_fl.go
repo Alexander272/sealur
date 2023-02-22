@@ -14,7 +14,7 @@ func (h *Handler) initStFlRoutes(api *gin.RouterGroup) {
 	st := api.Group("st-fl")
 	{
 		st.GET("/", h.getStFl)
-		st = st.Group("/", h.middleware.AccessForProAdmin)
+		st = st.Group("/", h.middleware.UserIdentity, h.middleware.AccessForProAdmin)
 		{
 			st.POST("/", h.createStFl)
 			st.PUT("/:id", h.updateStFl)
