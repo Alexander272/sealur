@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -15,6 +17,30 @@ type SnpDataRepo struct {
 
 func NewSnpDataRepo(db *sqlx.DB) *SnpDataRepo {
 	return &SnpDataRepo{db: db}
+}
+
+func (r *SnpDataRepo) Get(ctx context.Context, req *snp_data_api.GetSnpData) (snp []*snp_data_model.SnpData, err error) {
+	var data []models.SnpData
+	query := fmt.Sprintf("SELECT id, type_id, has_inner_ring, has_frame, has_outer_ring, has_hole, has_jumper, has_mounting FROM %s", SnpDataTable)
+
+	if err := r.db.Select(&data, query, req.StandardId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for _, sd := range data {
+		snp = append(snp, &snp_data_model.SnpData{
+			Id:           sd.Id,
+			TypeId:       sd.TypeId,
+			HasInnerRing: sd.HasInnerRing,
+			HasFrame:     sd.HasFrame,
+			HasOuterRing: sd.HasOuterRing,
+			HasHole:      sd.HasHole,
+			HasJumper:    sd.HasJumper,
+			HasMounting:  sd.HasMounting,
+		})
+	}
+
+	return snp, nil
 }
 
 func (r *SnpDataRepo) Create(ctx context.Context, snp *snp_data_api.CreateSnpData) error {

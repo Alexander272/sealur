@@ -12,7 +12,10 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_snp_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_type_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/temperature_model"
@@ -229,7 +232,7 @@ type SnpFiller interface {
 }
 
 type SnpStandard interface {
-	//TODO get
+	GetAll(context.Context, *snp_standard_api.GetAllSnpStandards) ([]*snp_standard_model.SnpStandard, error)
 	Create(context.Context, *snp_standard_api.CreateSnpStandard) error
 	CreateSeveral(context.Context, *snp_standard_api.CreateSeveralSnpStandard) error
 	Update(context.Context, *snp_standard_api.UpdateSnpStandard) error
@@ -245,14 +248,14 @@ type SnpType interface {
 }
 
 type SnpMaterial interface {
-	//TODO get
+	Get(context.Context, *snp_material_api.GetSnpMaterial) ([]*snp_material_model.SnpMaterial, error)
 	Create(context.Context, *snp_material_api.CreateSnpMaterial) error
 	Update(context.Context, *snp_material_api.UpdateSnpMaterial) error
 	Delete(context.Context, *snp_material_api.DeleteSnpMaterial) error
 }
 
 type SnpData interface {
-	//TODO
+	Get(context.Context, *snp_data_api.GetSnpData) ([]*snp_data_model.SnpData, error)
 	Create(context.Context, *snp_data_api.CreateSnpData) error
 	Update(context.Context, *snp_data_api.UpdateSnpData) error
 	Delete(context.Context, *snp_data_api.DeleteSnpData) error

@@ -6,7 +6,9 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/pro/models/flange_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_standard_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_standard_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -32,12 +34,19 @@ func (r *SnpStandardRepo) GetAll(ctx context.Context, req *snp_standard_api.GetA
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	//TODO добавить все поля
 	for _, s := range data {
 		standards = append(standards, &snp_standard_model.SnpStandard{
 			Id:      s.Id,
 			DnTitle: s.DnTitle,
 			PnTitle: s.PnTitle,
+			Standard: &standard_model.Standard{
+				Title:  s.StandardTitle,
+				Format: s.StandardFormat,
+			},
+			FlangeStandard: &flange_standard_model.FlangeStandard{
+				Title: s.FlangeTitle,
+				Code:  s.FlangeCode,
+			},
 		})
 	}
 

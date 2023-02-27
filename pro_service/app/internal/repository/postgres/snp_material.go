@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -16,6 +18,26 @@ type SnpMaterialRepo struct {
 
 func NewSnpMaterialRepo(db *sqlx.DB) *SnpMaterialRepo {
 	return &SnpMaterialRepo{db: db}
+}
+
+func (r *SnpMaterialRepo) Get(ctx context.Context, req *snp_material_api.GetSnpMaterial) (materials []*snp_material_model.SnpMaterial, err error) {
+	var data []models.SNPMaterial
+	query := fmt.Sprintf(`SELECT id, material_id, default_id, type FROM %s WHERE standard_id=$1`, SnpMaterialTable)
+
+	if err := r.db.Select(&data, query, req.StandardId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for _, s := range data {
+		materials = append(materials, &snp_material_model.SnpMaterial{
+			Id:         s.Id,
+			MaterialId: s.MaterialId,
+			Default:    s.Default,
+			Type:       s.Type,
+		})
+	}
+
+	return materials, nil
 }
 
 func (r *SnpMaterialRepo) Create(ctx context.Context, material *snp_material_api.CreateSnpMaterial) error {

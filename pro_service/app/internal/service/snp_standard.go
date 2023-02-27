@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_standard_api"
 )
 
@@ -16,13 +17,13 @@ func NewSnpStandardService(repo repository.SnpStandard) *SnpStandardService {
 	return &SnpStandardService{repo: repo}
 }
 
-// func (s *SnpStandardService) Get(ctx context.Context, standard *snp_standard_api.GetAllSnpStandards) ([]*snp_standard_model.SnpStandard, error) {
-// 	standards, err := s.repo.Get(ctx, standard)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to get snp standard. error: %w", err)
-// 	}
-// 	return standards, err
-// }
+func (s *SnpStandardService) GetAll(ctx context.Context, standard *snp_standard_api.GetAllSnpStandards) ([]*snp_standard_model.SnpStandard, error) {
+	standards, err := s.repo.GetAll(ctx, standard)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get snp standard. error: %w", err)
+	}
+	return standards, err
+}
 
 func (s *SnpStandardService) Create(ctx context.Context, standard *snp_standard_api.CreateSnpStandard) error {
 	if err := s.repo.Create(ctx, standard); err != nil {

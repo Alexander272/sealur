@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
 )
 
@@ -16,13 +17,13 @@ func NewSnpMaterialService(repo repository.SnpMaterial) *SnpMaterialService {
 	return &SnpMaterialService{repo: repo}
 }
 
-// func (s *SnpMaterialService) Get(ctx context.Context, material *snp_material_api.GetAllSnpMaterials) ([]*material_standard_model.SnpMaterial, error) {
-// 	materials, err := s.repo.GetAll(ctx, material)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to get snp material. error: %w", err)
-// 	}
-// 	return materials, err
-// }
+func (s *SnpMaterialService) Get(ctx context.Context, material *snp_material_api.GetSnpMaterial) ([]*snp_material_model.SnpMaterial, error) {
+	materials, err := s.repo.Get(ctx, material)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get snp material. error: %w", err)
+	}
+	return materials, err
+}
 
 func (s *SnpMaterialService) Create(ctx context.Context, material *snp_material_api.CreateSnpMaterial) error {
 	if err := s.repo.Create(ctx, material); err != nil {

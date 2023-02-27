@@ -20,6 +20,7 @@ func NewSNPTypeRepo(db *sqlx.DB) *SNPTypeRepo {
 	return &SNPTypeRepo{db: db}
 }
 
+// TODO возможно надо переделать получаемые данные
 func (r *SNPTypeRepo) Get(ctx context.Context, req *snp_type_api.GetSnpTypes) (snp []*snp_type_model.SnpType, err error) {
 	var data []models.SNPType
 	query := fmt.Sprintf("SELECT id, title FROM %s WHERE flange_type_id=$1", SnpTypeTable)

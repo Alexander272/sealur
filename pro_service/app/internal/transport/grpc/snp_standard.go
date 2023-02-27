@@ -19,14 +19,14 @@ func NewSnpStandardHandlers(service service.SnpStandard) *SnpStandardHandlers {
 	}
 }
 
-// func (h *SnpStandardHandlers) Get(ctx context.Context, req *snp_standard_api.GetAllSnpStandards) (*snp_standard_api.SnpStandards, error) {
-// 	standards, err := h.service.Get(ctx, req)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (h *SnpStandardHandlers) GetAll(ctx context.Context, req *snp_standard_api.GetAllSnpStandards) (*snp_standard_api.SnpStandards, error) {
+	standards, err := h.service.GetAll(ctx, req)
+	if err != nil {
+		return nil, err
+	}
 
-// 	return &snp_standard_api.SnpStandards{SnpStandards: standards}, nil
-// }
+	return &snp_standard_api.SnpStandards{SnpStandards: standards}, nil
+}
 
 func (h *SnpStandardHandlers) Create(ctx context.Context, standard *snp_standard_api.CreateSnpStandard) (*response_model.Response, error) {
 	if err := h.service.Create(ctx, standard); err != nil {

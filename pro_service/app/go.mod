@@ -11,6 +11,7 @@ require (
 	github.com/lukasjarosch/go-docx v0.4.4
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.15.0
+	github.com/subosito/gotenv v1.4.2
 	github.com/xuri/excelize/v2 v2.7.0
 	google.golang.org/grpc v1.53.0
 )
@@ -29,7 +30,6 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
