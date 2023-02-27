@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/pro/flange_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/models/flange_standard_model"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -19,12 +20,22 @@ func NewFlangeStandardRepo(db *sqlx.DB) *FlangeStandardRepo {
 	return &FlangeStandardRepo{db: db}
 }
 
-func (r *FlangeStandardRepo) Get(ctx context.Context, flange *flange_standard_api.GetAllFlangeStandards) (flanges []models.FlangeStandard, err error) {
+func (r *FlangeStandardRepo) GetAll(ctx context.Context, flange *flange_standard_api.GetAllFlangeStandards) (flanges []*flange_standard_model.FlangeStandard, err error) {
+	var data []models.FlangeStandard
 	query := fmt.Sprintf("SELECT id, title, code FROM %s", FlangeStandardTable)
 
-	if err := r.db.Select(&flanges, query); err != nil {
+	if err := r.db.Select(&data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
+
+	for _, fs := range data {
+		flanges = append(flanges, &flange_standard_model.FlangeStandard{
+			Id:    fs.Id,
+			Title: fs.Title,
+			Code:  fs.Code,
+		})
+	}
+
 	return flanges, nil
 }
 

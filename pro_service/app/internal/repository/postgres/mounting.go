@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -19,12 +20,21 @@ func NewMountingRepo(db *sqlx.DB) *MountingRepo {
 	return &MountingRepo{db: db}
 }
 
-func (r *MountingRepo) GetAll(ctx context.Context, m *mounting_api.GetAllMountings) (mounting []models.Mounting, err error) {
+func (r *MountingRepo) GetAll(ctx context.Context, mount *mounting_api.GetAllMountings) (mounting []*mounting_model.Mounting, err error) {
+	var data []models.Mounting
 	query := fmt.Sprintf("SELECT id, title FROM %s", MountingTable)
 
-	if err := r.db.Select(&mounting, query); err != nil {
+	if err := r.db.Select(&data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
+
+	for _, m := range data {
+		mounting = append(mounting, &mounting_model.Mounting{
+			Id:    m.Id,
+			Title: m.Title,
+		})
+	}
+
 	return mounting, nil
 }
 

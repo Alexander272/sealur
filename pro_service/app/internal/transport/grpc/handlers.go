@@ -5,19 +5,88 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/config"
 	"github.com/Alexander272/sealur/pro_service/internal/service"
+	"github.com/Alexander272/sealur_proto/api/pro/flange_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/flange_type_snp_api"
+	"github.com/Alexander272/sealur_proto/api/pro/material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_type_api"
+	"github.com/Alexander272/sealur_proto/api/pro/standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/temperature_api"
 	"github.com/Alexander272/sealur_proto/api/pro_api"
 )
+
+type FlangeStandard interface {
+	flange_standard_api.FlangeStandardServiceServer
+}
+type FlangeTypeSnp interface {
+	flange_type_snp_api.FlangeTypeSnpServiceServer
+}
+type Material interface {
+	material_api.MaterialServiceServer
+}
+type Mounting interface {
+	mounting_api.MountingServiceServer
+}
+type SnpData interface {
+	snp_data_api.SnpDataServiceServer
+}
+type SnpFiller interface {
+	snp_filler_api.SnpFillerServiceServer
+}
+type SnpMaterial interface {
+	snp_material_api.SnpMaterialServiceServer
+}
+type SnpStandard interface {
+	snp_standard_api.SnpStandardServiceServer
+}
+type SnpType interface {
+	snp_type_api.SnpTypeServiceServer
+}
+type Standard interface {
+	standard_api.StandardServiceServer
+}
+type Temperature interface {
+	temperature_api.TemperatureServiceServer
+}
 
 type Handler struct {
 	service *service.Services
 	conf    config.ApiConfig
 	pro_api.UnimplementedProServiceServer
+
+	FlangeStandard
+	FlangeTypeSnp
+	Material
+	Mounting
+	SnpData
+	SnpFiller
+	SnpMaterial
+	SnpStandard
+	SnpType
+	Standard
+	Temperature
 }
 
 func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 	return &Handler{
 		service: service,
 		conf:    conf,
+
+		FlangeStandard: NewFlangeStandardHandlers(service.FlangeStandard),
+		FlangeTypeSnp:  NewFlangeTypeSnpHandlers(service.FlangeTypeSnp),
+		Material:       NewMaterialHandlers(service.Material),
+		Mounting:       NewMountingHandlers(service.Mounting),
+		SnpData:        NewSnpDataHandlers(service.SnpData),
+		SnpFiller:      NewSnpFillerHandlers(service.SnpFiller),
+		SnpMaterial:    NewSnpMaterialHandlers(service.SnpMaterial),
+		SnpStandard:    NewSnpStandardHandlers(service.SnpStandard),
+		SnpType:        NewSnpTypeHandlers(service.SnpType),
+		Standard:       NewStandardHandlers(service.Standard),
+		Temperature:    NewTemperatureHandlers(service.Temperature),
 	}
 }
 

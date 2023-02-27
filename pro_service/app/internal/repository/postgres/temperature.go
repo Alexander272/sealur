@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/pro/models/temperature_model"
 	"github.com/Alexander272/sealur_proto/api/pro/temperature_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -19,12 +20,21 @@ func NewTemperatureRepo(db *sqlx.DB) *TemperatureRepo {
 	return &TemperatureRepo{db: db}
 }
 
-func (r *TemperatureRepo) GetAll(ctx context.Context, temp *temperature_api.GetAllTemperatures) (temperatures []models.Temperature, err error) {
+func (r *TemperatureRepo) GetAll(ctx context.Context, temp *temperature_api.GetAllTemperatures) (temperatures []*temperature_model.Temperature, err error) {
+	var data []models.Temperature
 	query := fmt.Sprintf("SELECT id, title FROM %s", TemperatureTable)
 
-	if err := r.db.Select(&temperatures, query); err != nil {
+	if err := r.db.Select(&data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
+
+	for _, t := range data {
+		temperatures = append(temperatures, &temperature_model.Temperature{
+			Id:    t.Id,
+			Title: t.Title,
+		})
+	}
+
 	return temperatures, nil
 }
 

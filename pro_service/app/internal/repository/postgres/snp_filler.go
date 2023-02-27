@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -19,15 +20,33 @@ func NewSNPFillerRepo(db *sqlx.DB) *SNPFillerRepo {
 	return &SNPFillerRepo{db: db}
 }
 
-func (r *SNPFillerRepo) GetAll(ctx context.Context, fil *snp_filler_api.GetSnpFillers) (fillers []models.SNPFiller, err error) {
-	query := fmt.Sprintf("SELECT id, title, code, description FROM %s", SnpFillerTable)
+func (r *SNPFillerRepo) GetAll(ctx context.Context, fil *snp_filler_api.GetSnpFillers) (fillers []*snp_filler_model.SnpFiller, err error) {
+	var data []models.SNPFiller
+	query := fmt.Sprintf(`SELECT %s.id, %s.title, code, description, temperature_id, another_title, designation, %s.title as temperature
+		FROM %s INNER JOIN %s on %s.id=temperature_id`,
+		SnpFillerTable, SnpFillerTable, TemperatureTable, SnpFillerTable, TemperatureTable, TemperatureTable,
+	)
 
-	if err := r.db.Select(&fillers, query); err != nil {
+	if err := r.db.Select(&data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
+
+	for _, s := range data {
+		fillers = append(fillers, &snp_filler_model.SnpFiller{
+			Id:           s.Id,
+			Title:        s.Title,
+			AnotherTitle: s.AnotherTitle,
+			Code:         s.Code,
+			Description:  s.Description,
+			Designation:  s.Designation,
+			Temperature:  s.Temperature,
+		})
+	}
+
 	return fillers, nil
 }
 
+// TODO обновить создание, обновление в соответствии с новой структурой
 func (r *SNPFillerRepo) Create(ctx context.Context, filler *snp_filler_api.CreateSnpFiller) error {
 	query := fmt.Sprintf("INSERT INTO %s (id, title, code, description) VALUES ($1, $2, $3, $4)", SnpFillerTable)
 	id := uuid.New()

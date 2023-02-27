@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/pro/models/standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/standard_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -20,12 +21,22 @@ func NewStandardRepo(db *sqlx.DB) *StandardRepo {
 	return &StandardRepo{db: db}
 }
 
-func (r *StandardRepo) GetAll(ctx context.Context, standard *standard_api.GetAllStandards) (standards []models.Standard, err error) {
+func (r *StandardRepo) GetAll(ctx context.Context, standard *standard_api.GetAllStandards) (standards []*standard_model.Standard, err error) {
+	var data []models.Standard
 	query := fmt.Sprintf("SELECT id, title, format FROM %s", StandardTable)
 
-	if err := r.db.Select(&standards, query); err != nil {
+	if err := r.db.Select(&data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
+
+	for _, s := range data {
+		standards = append(standards, &standard_model.Standard{
+			Id:     s.Id,
+			Title:  s.Title,
+			Format: s.Format,
+		})
+	}
+
 	return standards, nil
 }
 

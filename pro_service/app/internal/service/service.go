@@ -7,6 +7,25 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/file_api"
+	"github.com/Alexander272/sealur_proto/api/pro/flange_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/flange_type_snp_api"
+	"github.com/Alexander272/sealur_proto/api/pro/material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/models/flange_standard_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_snp_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/material_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_type_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/standard_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/temperature_model"
+	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_type_api"
+	"github.com/Alexander272/sealur_proto/api/pro/standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/temperature_api"
 	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/Alexander272/sealur_proto/api/user_api"
 )
@@ -177,6 +196,94 @@ type OrderPosition interface {
 	Remove(*pro_api.RemovePositionRequest) (*pro_api.IdResponse, error)
 }
 
+//* New
+
+type FlangeStandard interface {
+	GetAll(context.Context, *flange_standard_api.GetAllFlangeStandards) ([]*flange_standard_model.FlangeStandard, error)
+	Create(context.Context, *flange_standard_api.CreateFlangeStandard) error
+	CreateSeveral(context.Context, *flange_standard_api.CreateSeveralFlangeStandard) error
+	Update(context.Context, *flange_standard_api.UpdateFlangeStandard) error
+	Delete(context.Context, *flange_standard_api.DeleteFlangeStandard) error
+}
+
+type Material interface {
+	GetAll(context.Context, *material_api.GetAllMaterials) ([]*material_model.Material, error)
+	Create(context.Context, *material_api.CreateMaterial) error
+	CreateSeveral(context.Context, *material_api.CreateSeveralMaterial) error
+	Update(context.Context, *material_api.UpdateMaterial) error
+	Delete(context.Context, *material_api.DeleteMaterial) error
+}
+
+type Mounting interface {
+	GetAll(context.Context, *mounting_api.GetAllMountings) ([]*mounting_model.Mounting, error)
+	Create(context.Context, *mounting_api.CreateMounting) error
+	CreateSeveral(context.Context, *mounting_api.CreateSeveralMounting) error
+	Update(context.Context, *mounting_api.UpdateMounting) error
+	Delete(context.Context, *mounting_api.DeleteMounting) error
+}
+
+type Standard interface {
+	GetAll(context.Context, *standard_api.GetAllStandards) ([]*standard_model.Standard, error)
+	Create(context.Context, *standard_api.CreateStandard) error
+	CreateSeveral(context.Context, *standard_api.CreateSeveralStandard) error
+	Update(context.Context, *standard_api.UpdateStandard) error
+	Delete(context.Context, *standard_api.DeleteStandard) error
+}
+
+type Temperature interface {
+	GetAll(context.Context, *temperature_api.GetAllTemperatures) ([]*temperature_model.Temperature, error)
+	Create(context.Context, *temperature_api.CreateTemperature) error
+	CreateSeveral(context.Context, *temperature_api.CreateSeveralTemperature) error
+	Update(context.Context, *temperature_api.UpdateTemperature) error
+	Delete(context.Context, *temperature_api.DeleteTemperature) error
+}
+
+type FlangeTypeSnp interface {
+	Get(context.Context, *flange_type_snp_api.GetFlangeTypeSnp) ([]*flange_type_snp_model.FlangeTypeSnp, error)
+	Create(context.Context, *flange_type_snp_api.CreateFlangeTypeSnp) error
+	CreateSeveral(context.Context, *flange_type_snp_api.CreateSeveralFlangeTypeSnp) error
+	Update(context.Context, *flange_type_snp_api.UpdateFlangeTypeSnp) error
+	Delete(context.Context, *flange_type_snp_api.DeleteFlangeTypeSnp) error
+}
+
+type SnpFiller interface {
+	GetAll(context.Context, *snp_filler_api.GetSnpFillers) ([]*snp_filler_model.SnpFiller, error)
+	Create(context.Context, *snp_filler_api.CreateSnpFiller) error
+	CreateSeveral(context.Context, *snp_filler_api.CreateSeveralSnpFiller) error
+	Update(context.Context, *snp_filler_api.UpdateSnpFiller) error
+	Delete(context.Context, *snp_filler_api.DeleteSnpFiller) error
+}
+
+type SnpStandard interface {
+	//TODO get
+	Create(context.Context, *snp_standard_api.CreateSnpStandard) error
+	CreateSeveral(context.Context, *snp_standard_api.CreateSeveralSnpStandard) error
+	Update(context.Context, *snp_standard_api.UpdateSnpStandard) error
+	Delete(context.Context, *snp_standard_api.DeleteSnpStandard) error
+}
+
+type SnpType interface {
+	Get(context.Context, *snp_type_api.GetSnpTypes) ([]*snp_type_model.SnpType, error)
+	Create(context.Context, *snp_type_api.CreateSnpType) error
+	CreateSeveral(context.Context, *snp_type_api.CreateSeveralSnpType) error
+	Update(context.Context, *snp_type_api.UpdateSnpType) error
+	Delete(context.Context, *snp_type_api.DeleteSnpType) error
+}
+
+type SnpMaterial interface {
+	//TODO get
+	Create(context.Context, *snp_material_api.CreateSnpMaterial) error
+	Update(context.Context, *snp_material_api.UpdateSnpMaterial) error
+	Delete(context.Context, *snp_material_api.DeleteSnpMaterial) error
+}
+
+type SnpData interface {
+	//TODO
+	Create(context.Context, *snp_data_api.CreateSnpData) error
+	Update(context.Context, *snp_data_api.UpdateSnpData) error
+	Delete(context.Context, *snp_data_api.DeleteSnpData) error
+}
+
 type Services struct {
 	Stand
 	Flange
@@ -195,6 +302,19 @@ type Services struct {
 	Interview
 	Order
 	OrderPosition
+
+	//* new
+	FlangeStandard
+	Material
+	Mounting
+	Standard
+	Temperature
+	FlangeTypeSnp
+	SnpFiller
+	SnpStandard
+	SnpType
+	SnpMaterial
+	SnpData
 }
 
 func NewServices(repos *repository.Repositories, email email_api.EmailServiceClient,
@@ -217,5 +337,17 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		Interview:     NewInterviewService(email, file),
 		Order:         NewOrderService(repos.Order, email, file, user),
 		OrderPosition: NewPositionService(repos.OrderPosition, file),
+
+		FlangeStandard: NewFlangeStandardService(repos.FlangeStandard),
+		Material:       NewMaterialService(repos.Material),
+		Mounting:       NewMountingService(repos.Mounting),
+		Standard:       NewStandardService(repos.Standard),
+		Temperature:    NewTemperatureService(repos.Temperature),
+		FlangeTypeSnp:  NewFlangeTypeSnpService(repos.FlangeTypeSnp),
+		SnpFiller:      NewSnpFillerService(repos.SnpFiller),
+		SnpStandard:    NewSnpStandardService(repos.SnpStandard),
+		SnpType:        NewSnpTypeService(repos.SnpType),
+		SnpMaterial:    NewSnpMaterialService(repos.SnpMaterial),
+		SnpData:        NewSnpDataService(repos.SnpData),
 	}
 }

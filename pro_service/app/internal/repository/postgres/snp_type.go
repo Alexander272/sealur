@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_type_model"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_type_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -19,13 +20,22 @@ func NewSNPTypeRepo(db *sqlx.DB) *SNPTypeRepo {
 	return &SNPTypeRepo{db: db}
 }
 
-func (r *SNPTypeRepo) Get(ctx context.Context, snp *snp_type_api.GetSnpTypes) (s []models.SNPType, err error) {
+func (r *SNPTypeRepo) Get(ctx context.Context, req *snp_type_api.GetSnpTypes) (snp []*snp_type_model.SnpType, err error) {
+	var data []models.SNPType
 	query := fmt.Sprintf("SELECT id, title FROM %s WHERE flange_type_id=$1", SnpTypeTable)
 
-	if err := r.db.Select(&s, query, snp.FlangeTypeId); err != nil {
+	if err := r.db.Select(&data, query, req.FlangeTypeId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
-	return s, nil
+
+	for _, s := range data {
+		snp = append(snp, &snp_type_model.SnpType{
+			Id:    s.Id,
+			Title: s.Title,
+		})
+	}
+
+	return snp, nil
 }
 
 func (r *SNPTypeRepo) Create(ctx context.Context, snp *snp_type_api.CreateSnpType) error {
@@ -60,20 +70,20 @@ func (r *SNPTypeRepo) CreateSeveral(ctx context.Context, snp *snp_type_api.Creat
 	return nil
 }
 
-func (r *SNPTypeRepo) Update(ctx context.Context, flange *snp_type_api.UpdateSnpType) error {
+func (r *SNPTypeRepo) Update(ctx context.Context, snp *snp_type_api.UpdateSnpType) error {
 	query := fmt.Sprintf("UPDATE %s	SET title=$1, flange_type_id=$2 WHERE id=$4", SnpTypeTable)
 
-	_, err := r.db.Exec(query, flange.Title, flange.FlangeTypeId, flange.Id)
+	_, err := r.db.Exec(query, snp.Title, snp.FlangeTypeId, snp.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return nil
 }
 
-func (r *SNPTypeRepo) Delete(ctx context.Context, flange *snp_type_api.DeleteSnpType) error {
+func (r *SNPTypeRepo) Delete(ctx context.Context, snp *snp_type_api.DeleteSnpType) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", SnpTypeTable)
 
-	if _, err := r.db.Exec(query, flange.Id); err != nil {
+	if _, err := r.db.Exec(query, snp.Id); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return nil

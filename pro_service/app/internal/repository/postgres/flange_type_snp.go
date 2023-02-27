@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/pro/flange_type_snp_api"
+	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_snp_model"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -19,12 +20,22 @@ func NewFlangeTypeRepo(db *sqlx.DB) *FlangeTypeRepo {
 	return &FlangeTypeRepo{db: db}
 }
 
-func (r *FlangeTypeRepo) Get(ctx context.Context, flange *flange_type_snp_api.GetFlangeTypeSnp) (flanges []models.FlangeTypeSnp, err error) {
+func (r *FlangeTypeRepo) Get(ctx context.Context, flange *flange_type_snp_api.GetFlangeTypeSnp) (flanges []*flange_type_snp_model.FlangeTypeSnp, err error) {
+	var data []models.FlangeTypeSnp
 	query := fmt.Sprintf("SELECT id, title, code FROM %s WHERE standard_id=$1", FlangeTypeSNPTable)
 
-	if err := r.db.Select(&flanges, query, flange.StandardId); err != nil {
+	if err := r.db.Select(&data, query, flange.StandardId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
+
+	for _, fts := range data {
+		flanges = append(flanges, &flange_type_snp_model.FlangeTypeSnp{
+			Id:    fts.Id,
+			Title: fts.Title,
+			Code:  fts.Code,
+		})
+	}
+
 	return flanges, nil
 }
 

@@ -16,17 +16,29 @@ import (
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/file_api"
+	"github.com/Alexander272/sealur_proto/api/pro/flange_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/flange_type_snp_api"
+	"github.com/Alexander272/sealur_proto/api/pro/material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_type_api"
+	"github.com/Alexander272/sealur_proto/api/pro/standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/temperature_api"
 	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/Alexander272/sealur_proto/api/user_api"
 	_ "github.com/lib/pq"
+	"github.com/subosito/gotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 func main() {
-	// if err := gotenv.Load("../../.env"); err != nil {
-	// 	logger.Fatalf("error loading env variables: %s", err.Error())
-	// }
+	if err := gotenv.Load("../../.env"); err != nil {
+		logger.Fatalf("error loading env variables: %s", err.Error())
+	}
 	conf, err := config.Init("configs")
 	if err != nil {
 		logger.Fatalf("error initializing configs: %s", err.Error())
@@ -126,11 +138,22 @@ func main() {
 
 	opts := []grpc.ServerOption{
 		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
-		grpc.UnaryInterceptor(handlers.UnaryInterceptor),
+		// grpc.UnaryInterceptor(handlers.UnaryInterceptor),
 	}
 
 	server := grpc.NewServer(opts...)
 	pro_api.RegisterProServiceServer(server, handlers)
+	flange_standard_api.RegisterFlangeStandardServiceServer(server, handlers.FlangeStandard)
+	flange_type_snp_api.RegisterFlangeTypeSnpServiceServer(server, handlers.FlangeTypeSnp)
+	material_api.RegisterMaterialServiceServer(server, handlers.Material)
+	mounting_api.RegisterMountingServiceServer(server, handlers.Mounting)
+	snp_data_api.RegisterSnpDataServiceServer(server, handlers.SnpData)
+	snp_filler_api.RegisterSnpFillerServiceServer(server, handlers.SnpFiller)
+	snp_material_api.RegisterSnpMaterialServiceServer(server, handlers.SnpMaterial)
+	snp_standard_api.RegisterSnpStandardServiceServer(server, handlers.SnpStandard)
+	snp_type_api.RegisterSnpTypeServiceServer(server, handlers.SnpType)
+	standard_api.RegisterStandardServiceServer(server, handlers.Standard)
+	temperature_api.RegisterTemperatureServiceServer(server, handlers.Temperature)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {

@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -32,7 +32,7 @@ func (r *SnpMaterialRepo) Create(ctx context.Context, material *snp_material_api
 func (r *SnpMaterialRepo) Update(ctx context.Context, material *snp_material_api.UpdateSnpMaterial) error {
 	query := fmt.Sprintf("UPDATE %s	SET material_id=$1, default_id=$2, type=$3, standard_id=$4 WHERE id=$5", SnpMaterialTable)
 
-	_, err := r.db.Exec(query, pq.Array(material.MaterialId), material.Default, material.Type, material.StandardId)
+	_, err := r.db.Exec(query, pq.Array(material.MaterialId), material.Default, material.Type, material.StandardId, material.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

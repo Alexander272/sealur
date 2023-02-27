@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/pro/material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/models/material_model"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -19,12 +20,24 @@ func NewMaterialRepo(db *sqlx.DB) *MaterialRepo {
 	return &MaterialRepo{db: db}
 }
 
-func (r *MaterialRepo) GetAll(ctx context.Context, mat *material_api.GetAllMaterials) (materials []models.Material, err error) {
+func (r *MaterialRepo) GetAll(ctx context.Context, mat *material_api.GetAllMaterials) (materials []*material_model.Material, err error) {
+	var data []models.Material
 	query := fmt.Sprintf("SELECT id, title, code, short_en, short_rus FROM %s", MaterialTable)
 
-	if err := r.db.Select(&materials, query); err != nil {
+	if err := r.db.Select(&data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
+
+	for _, m := range data {
+		materials = append(materials, &material_model.Material{
+			Id:       m.Id,
+			Title:    m.Title,
+			Code:     m.Code,
+			ShortEn:  m.ShortEn,
+			ShortRus: m.ShortRus,
+		})
+	}
+
 	return materials, nil
 }
 
