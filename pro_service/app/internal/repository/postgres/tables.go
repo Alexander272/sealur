@@ -4,6 +4,7 @@ const (
 	StandardTable       = "standard"
 	FlangeStandardTable = "flange_standard"
 	FlangeTypeSNPTable  = "flange_type_snp"
+	FlangeTypeTable     = "flange_type"
 	MaterialTable       = "material"
 	MountingTable       = "mounting"
 	SnpFillerTable      = "snp_filler"

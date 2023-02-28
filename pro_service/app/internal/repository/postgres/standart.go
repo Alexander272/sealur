@@ -40,6 +40,23 @@ func (r *StandardRepo) GetAll(ctx context.Context, standard *standard_api.GetAll
 	return standards, nil
 }
 
+func (r *StandardRepo) GetDefault(ctx context.Context) (standard *standard_model.Standard, err error) {
+	var data models.Standard
+	query := fmt.Sprintf("SELECT id, title, format FROM %s WHERE is_default=true LIMIT 1", StandardTable)
+
+	if err := r.db.Get(&data, query); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	standard = &standard_model.Standard{
+		Id:     data.Id,
+		Title:  data.Title,
+		Format: data.Format,
+	}
+
+	return standard, nil
+}
+
 func (r *StandardRepo) Create(ctx context.Context, standard *standard_api.CreateStandard) error {
 	query := fmt.Sprintf("INSERT INTO %s (id, title, format) VALUES ($1, $2, $3)", StandardTable)
 	id := uuid.New()

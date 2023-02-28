@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_type_model"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_type_api"
 )
 
@@ -21,6 +23,14 @@ func (s *SnpTypeService) Get(ctx context.Context, flange *snp_type_api.GetSnpTyp
 	types, err := s.repo.Get(ctx, flange)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get snp type. error: %w", err)
+	}
+	return types, err
+}
+
+func (s *SnpTypeService) GetWithFlange(ctx context.Context, req *snp_api.GetSnpData) ([]*snp_model.FlangeType, error) {
+	types, err := s.repo.GetWithFlange(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get snp type with flange. error: %w", err)
 	}
 	return types, err
 }

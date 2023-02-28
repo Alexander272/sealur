@@ -3,7 +3,7 @@ module github.com/Alexander272/sealur/pro_service
 go 1.19
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20221226120143-9c70fe5e32c2
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230228084519-12592a34b0bc
 	github.com/google/uuid v1.3.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0

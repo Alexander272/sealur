@@ -25,6 +25,14 @@ func (s *StandardService) GetAll(ctx context.Context, standard *standard_api.Get
 	return standards, err
 }
 
+func (s *StandardService) GetDefault(ctx context.Context) (*standard_model.Standard, error) {
+	standard, err := s.repo.GetDefault(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get default standard. error: %w", err)
+	}
+	return standard, err
+}
+
 func (s *StandardService) Create(ctx context.Context, standard *standard_api.CreateStandard) error {
 	if err := s.repo.Create(ctx, standard); err != nil {
 		return fmt.Errorf("failed to create standard. error: %w", err)

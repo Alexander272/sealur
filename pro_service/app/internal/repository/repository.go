@@ -15,11 +15,13 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_type_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/temperature_model"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
@@ -201,6 +203,7 @@ type Mounting interface {
 
 type Standard interface {
 	GetAll(context.Context, *standard_api.GetAllStandards) ([]*standard_model.Standard, error)
+	GetDefault(context.Context) (*standard_model.Standard, error)
 	Create(context.Context, *standard_api.CreateStandard) error
 	CreateSeveral(context.Context, *standard_api.CreateSeveralStandard) error
 	Update(context.Context, *standard_api.UpdateStandard) error
@@ -241,6 +244,7 @@ type SnpStandard interface {
 
 type SnpType interface {
 	Get(context.Context, *snp_type_api.GetSnpTypes) ([]*snp_type_model.SnpType, error)
+	GetWithFlange(context.Context, *snp_api.GetSnpData) ([]*snp_model.FlangeType, error)
 	Create(context.Context, *snp_type_api.CreateSnpType) error
 	CreateSeveral(context.Context, *snp_type_api.CreateSeveralSnpType) error
 	Update(context.Context, *snp_type_api.UpdateSnpType) error
