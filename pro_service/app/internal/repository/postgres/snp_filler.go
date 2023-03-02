@@ -23,7 +23,7 @@ func NewSNPFillerRepo(db *sqlx.DB) *SNPFillerRepo {
 func (r *SNPFillerRepo) GetAll(ctx context.Context, fil *snp_filler_api.GetSnpFillers) (fillers []*snp_filler_model.SnpFiller, err error) {
 	var data []models.SNPFiller
 	query := fmt.Sprintf(`SELECT %s.id, %s.title, code, description, another_title, designation, %s.title as temperature
-		FROM %s INNER JOIN %s on %s.id=temperature_id`,
+		FROM %s INNER JOIN %s on %s.id=temperature_id ORDER BY code`,
 		SnpFillerTable, SnpFillerTable, TemperatureTable, SnpFillerTable, TemperatureTable, TemperatureTable,
 	)
 

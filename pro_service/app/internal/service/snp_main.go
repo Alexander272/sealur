@@ -11,36 +11,49 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_size_api"
 )
 
 type SnpService struct {
-	filler   SnpFiller
-	material SnpMaterial
-	snpType  SnpType
-	mounting Mounting
-	standard Standard
-	snpData  SnpData
+	filler      SnpFiller
+	material    SnpMaterial
+	snpType     SnpType
+	mounting    Mounting
+	standard    Standard
+	snpStandard SnpStandard
+	snpData     SnpData
+	snpSize     SnpSize
 }
 
-func NewSnpService(filler SnpFiller, material SnpMaterial, snpType SnpType, mounting Mounting, standard Standard, snpData SnpData) *SnpService {
+func NewSnpService(filler SnpFiller, material SnpMaterial, snpType SnpType, mounting Mounting, standard Standard, snpData SnpData,
+	snpStandard SnpStandard, snpSize SnpSize,
+) *SnpService {
 	return &SnpService{
-		filler:   filler,
-		material: material,
-		snpType:  snpType,
-		mounting: mounting,
-		standard: standard,
-		snpData:  snpData,
+		filler:      filler,
+		material:    material,
+		snpType:     snpType,
+		mounting:    mounting,
+		standard:    standard,
+		snpData:     snpData,
+		snpStandard: snpStandard,
+		snpSize:     snpSize,
 	}
 }
 
 func (s *SnpService) Get(ctx context.Context, req *snp_api.GetSnp) (snp *snp_api.Snp, err error) {
-	snpData, err := s.snpData.Get(ctx, &snp_data_api.GetSnpData{StandardId: req.SnpStandardId})
+	snpData, err := s.snpData.Get(ctx, &snp_data_api.GetSnpData{TypeId: req.SnpTypeId})
+	if err != nil {
+		return nil, err
+	}
+
+	snpSize, err := s.snpSize.Get(ctx, &snp_size_api.GetSnpSize{TypeId: req.SnpTypeId, HasD2: req.HasD2})
 	if err != nil {
 		return nil, err
 	}
 
 	snp = &snp_api.Snp{
-		Snp: snpData[0],
+		Snp:   snpData,
+		Sizes: snpSize,
 	}
 
 	return snp, nil
@@ -52,11 +65,12 @@ func (s *SnpService) GetData(ctx context.Context, req *snp_api.GetSnpData) (snpD
 	snpData = &snp_model.SnpData{}
 
 	if req.StandardId == "" {
-		standard, err := s.standard.GetDefault(ctx)
+		standard, err := s.snpStandard.GetDefault(ctx)
 		if err != nil {
 			return nil, err
 		}
-		req.StandardId = standard.Id
+		req.StandardId = standard.Standard.Id
+		req.SnpStandardId = standard.Id
 
 		mounting, err = s.mounting.GetAll(ctx, &mounting_api.GetAllMountings{})
 		if err != nil {

@@ -13,4 +13,5 @@ const (
 	SnpTypeTable        = "snp_type"
 	TemperatureTable    = "temperature"
 	SnpDataTable        = "snp_data"
+	SnpSizeTable        = "snp_size"
 )

@@ -22,7 +22,15 @@ func (s *SnpStandardService) GetAll(ctx context.Context, standard *snp_standard_
 	if err != nil {
 		return nil, fmt.Errorf("failed to get snp standard. error: %w", err)
 	}
-	return standards, err
+	return standards, nil
+}
+
+func (s *SnpStandardService) GetDefault(ctx context.Context) (*snp_standard_model.SnpStandard, error) {
+	standard, err := s.repo.GetDefault(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get default snp standard. error: %w", err)
+	}
+	return standard, nil
 }
 
 func (s *SnpStandardService) Create(ctx context.Context, standard *snp_standard_api.CreateSnpStandard) error {

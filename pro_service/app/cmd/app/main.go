@@ -24,6 +24,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/standard_api"
@@ -31,15 +32,14 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/Alexander272/sealur_proto/api/user_api"
 	_ "github.com/lib/pq"
-	"github.com/subosito/gotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 func main() {
-	if err := gotenv.Load("../../.env"); err != nil {
-		logger.Fatalf("error loading env variables: %s", err.Error())
-	}
+	// if err := gotenv.Load("../../.env"); err != nil {
+	// 	logger.Fatalf("error loading env variables: %s", err.Error())
+	// }
 	conf, err := config.Init("configs")
 	if err != nil {
 		logger.Fatalf("error initializing configs: %s", err.Error())
@@ -155,6 +155,7 @@ func main() {
 	snp_type_api.RegisterSnpTypeServiceServer(server, handlers.SnpType)
 	standard_api.RegisterStandardServiceServer(server, handlers.Standard)
 	temperature_api.RegisterTemperatureServiceServer(server, handlers.Temperature)
+	snp_size_api.RegisterSnpSizeServiceServer(server, handlers.SnpSize)
 	snp_api.RegisterSnpDataServiceServer(server, handlers.Snp)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)

@@ -17,7 +17,7 @@ func NewSnpDataService(repo repository.SnpData) *SnpDataService {
 	return &SnpDataService{repo: repo}
 }
 
-func (s *SnpDataService) Get(ctx context.Context, req *snp_data_api.GetSnpData) ([]*snp_data_model.SnpData, error) {
+func (s *SnpDataService) Get(ctx context.Context, req *snp_data_api.GetSnpData) (*snp_data_model.SnpData, error) {
 	snp, err := s.repo.Get(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get snp data. error: %w", err)

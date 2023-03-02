@@ -13,6 +13,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/standard_api"
@@ -53,6 +54,9 @@ type Standard interface {
 type Temperature interface {
 	temperature_api.TemperatureServiceServer
 }
+type SnpSize interface {
+	snp_size_api.SnpSizeServiceServer
+}
 type Snp interface {
 	snp_api.SnpDataServiceServer
 }
@@ -73,6 +77,7 @@ type Handler struct {
 	SnpType
 	Standard
 	Temperature
+	SnpSize
 	Snp
 }
 
@@ -92,6 +97,7 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		SnpType:        NewSnpTypeHandlers(service.SnpType),
 		Standard:       NewStandardHandlers(service.Standard),
 		Temperature:    NewTemperatureHandlers(service.Temperature),
+		SnpSize:        NewSnpSizeHandlers(service.SnpSize),
 		Snp:            NewSnpHandlers(service.Snp),
 	}
 }

@@ -16,6 +16,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_size_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_type_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/standard_model"
@@ -25,6 +26,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/standard_api"
@@ -236,6 +238,7 @@ type SnpFiller interface {
 
 type SnpStandard interface {
 	GetAll(context.Context, *snp_standard_api.GetAllSnpStandards) ([]*snp_standard_model.SnpStandard, error)
+	GetDefault(context.Context) (*snp_standard_model.SnpStandard, error)
 	Create(context.Context, *snp_standard_api.CreateSnpStandard) error
 	CreateSeveral(context.Context, *snp_standard_api.CreateSeveralSnpStandard) error
 	Update(context.Context, *snp_standard_api.UpdateSnpStandard) error
@@ -259,10 +262,15 @@ type SnpMaterial interface {
 }
 
 type SnpData interface {
-	Get(context.Context, *snp_data_api.GetSnpData) ([]*snp_data_model.SnpData, error)
+	Get(context.Context, *snp_data_api.GetSnpData) (*snp_data_model.SnpData, error)
 	Create(context.Context, *snp_data_api.CreateSnpData) error
 	Update(context.Context, *snp_data_api.UpdateSnpData) error
 	Delete(context.Context, *snp_data_api.DeleteSnpData) error
+}
+
+type SnpSize interface {
+	Get(context.Context, *snp_size_api.GetSnpSize) ([]*snp_size_model.SnpSize, error)
+	Create(context.Context, *snp_size_api.CreateSnpSize) error
 }
 
 type Repositories struct {
@@ -295,6 +303,7 @@ type Repositories struct {
 	SnpType
 	SnpMaterial
 	SnpData
+	SnpSize
 }
 
 func NewRepo(db *sqlx.DB) *Repositories {
@@ -327,5 +336,6 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		SnpType:        postgres.NewSNPTypeRepo(db),
 		SnpMaterial:    postgres.NewSnpMaterialRepo(db),
 		SnpData:        postgres.NewSnpDataRepo(db),
+		SnpSize:        postgres.NewSnpSizeRepo(db),
 	}
 }

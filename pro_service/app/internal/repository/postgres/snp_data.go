@@ -19,25 +19,24 @@ func NewSnpDataRepo(db *sqlx.DB) *SnpDataRepo {
 	return &SnpDataRepo{db: db}
 }
 
-func (r *SnpDataRepo) Get(ctx context.Context, req *snp_data_api.GetSnpData) (snp []*snp_data_model.SnpData, err error) {
-	var data []models.SnpData
-	query := fmt.Sprintf("SELECT id, type_id, has_inner_ring, has_frame, has_outer_ring, has_hole, has_jumper, has_mounting FROM %s", SnpDataTable)
+func (r *SnpDataRepo) Get(ctx context.Context, req *snp_data_api.GetSnpData) (snp *snp_data_model.SnpData, err error) {
+	var data models.SnpData
+	query := fmt.Sprintf(`SELECT id, has_inner_ring, has_frame, has_outer_ring, has_hole, has_jumper, has_mounting FROM %s 
+		WHERE type_id=$1 LIMIT 1`, SnpDataTable)
 
-	if err := r.db.Select(&data, query, req.StandardId); err != nil {
+	if err := r.db.Get(&data, query, req.TypeId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	for _, sd := range data {
-		snp = append(snp, &snp_data_model.SnpData{
-			Id:           sd.Id,
-			TypeId:       sd.TypeId,
-			HasInnerRing: sd.HasInnerRing,
-			HasFrame:     sd.HasFrame,
-			HasOuterRing: sd.HasOuterRing,
-			HasHole:      sd.HasHole,
-			HasJumper:    sd.HasJumper,
-			HasMounting:  sd.HasMounting,
-		})
+	snp = &snp_data_model.SnpData{
+		Id: data.Id,
+		// TypeId:       sd.TypeId,
+		HasInnerRing: data.HasInnerRing,
+		HasFrame:     data.HasFrame,
+		HasOuterRing: data.HasOuterRing,
+		HasHole:      data.HasHole,
+		HasJumper:    data.HasJumper,
+		HasMounting:  data.HasMounting,
 	}
 
 	return snp, nil

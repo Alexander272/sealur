@@ -24,7 +24,7 @@ func NewSNPTypeRepo(db *sqlx.DB) *SNPTypeRepo {
 
 func (r *SNPTypeRepo) Get(ctx context.Context, req *snp_type_api.GetSnpTypes) (snp []*snp_type_model.SnpType, err error) {
 	var data []models.SNPType
-	query := fmt.Sprintf("SELECT id, title, code FROM %s WHERE standard_id=$1", SnpTypeTable)
+	query := fmt.Sprintf("SELECT id, title, code FROM %s WHERE snp_standard_id=$1", SnpTypeTable)
 
 	if err := r.db.Select(&data, query, req.StandardId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -44,12 +44,12 @@ func (r *SNPTypeRepo) Get(ctx context.Context, req *snp_type_api.GetSnpTypes) (s
 func (r *SNPTypeRepo) GetWithFlange(ctx context.Context, req *snp_api.GetSnpData) (types []*snp_model.FlangeType, err error) {
 	var data []models.SNPTypeWithFlange
 	query := fmt.Sprintf(`SELECT %s.id as type_id, %s.title as type_title, %s.code as type_code, %s.id, %s.title, %s.code
-		FROM %s INNER JOIN %s ON %s.id=flange_type_id WHERE %s.standard_id=$1`,
+		FROM %s INNER JOIN %s ON %s.id=flange_type_id WHERE %s.snp_standard_id=$1 ORDER BY %s.code`,
 		SnpTypeTable, SnpTypeTable, SnpTypeTable, FlangeTypeTable, FlangeTypeTable, FlangeTypeTable,
-		SnpTypeTable, FlangeTypeTable, FlangeTypeTable, SnpTypeTable,
+		SnpTypeTable, FlangeTypeTable, FlangeTypeTable, SnpTypeTable, SnpTypeTable,
 	)
 
-	if err := r.db.Select(&data, query, req.StandardId); err != nil {
+	if err := r.db.Select(&data, query, req.SnpStandardId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
@@ -78,7 +78,7 @@ func (r *SNPTypeRepo) GetWithFlange(ctx context.Context, req *snp_api.GetSnpData
 }
 
 func (r *SNPTypeRepo) Create(ctx context.Context, snp *snp_type_api.CreateSnpType) error {
-	query := fmt.Sprintf("INSERT INTO %s (id, title, flange_type_id, code, standard_id) VALUES ($1, $2, $3, $4, $5)", SnpTypeTable)
+	query := fmt.Sprintf("INSERT INTO %s (id, title, flange_type_id, code, snp_standard_id) VALUES ($1, $2, $3, $4, $5)", SnpTypeTable)
 	id := uuid.New()
 
 	_, err := r.db.Exec(query, id, snp.Title, snp.FlangeTypeId, snp.Code, snp.StandardId)
@@ -89,7 +89,7 @@ func (r *SNPTypeRepo) Create(ctx context.Context, snp *snp_type_api.CreateSnpTyp
 }
 
 func (r *SNPTypeRepo) CreateSeveral(ctx context.Context, snp *snp_type_api.CreateSeveralSnpType) error {
-	query := fmt.Sprintf("INSERT INTO %s (id, title, code, flange_type_id, code, standard_id) VALUES ", SnpTypeTable)
+	query := fmt.Sprintf("INSERT INTO %s (id, title, code, flange_type_id, code, snp_standard_id) VALUES ", SnpTypeTable)
 
 	args := make([]interface{}, 0)
 	values := make([]string, 0, len(snp.SnpTypes))
@@ -110,7 +110,7 @@ func (r *SNPTypeRepo) CreateSeveral(ctx context.Context, snp *snp_type_api.Creat
 }
 
 func (r *SNPTypeRepo) Update(ctx context.Context, snp *snp_type_api.UpdateSnpType) error {
-	query := fmt.Sprintf("UPDATE %s	SET title=$1, flange_type_id=$2, code=$3, standard_id=$4 WHERE id=$5", SnpTypeTable)
+	query := fmt.Sprintf("UPDATE %s	SET title=$1, flange_type_id=$2, code=$3, snp_standard_id=$4 WHERE id=$5", SnpTypeTable)
 
 	_, err := r.db.Exec(query, snp.Title, snp.FlangeTypeId, snp.Code, snp.StandardId, snp.Id)
 	if err != nil {
