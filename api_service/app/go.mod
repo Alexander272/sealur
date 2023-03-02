@@ -1,6 +1,6 @@
 module github.com/Alexander272/sealur/api_service
 
-go 1.17
+go 1.19
 
 require github.com/spf13/viper v1.10.1
 
@@ -58,7 +58,7 @@ require (
 )
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20221226120143-9c70fe5e32c2
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230302111925-1f19bda72f65
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/lib/pq v1.10.7
 	github.com/swaggo/swag v1.7.9

@@ -6,6 +6,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/file"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/moment"
+	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/new_pro"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/pro"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/v1/user"
 	"github.com/gin-gonic/gin"
@@ -42,6 +43,7 @@ func (h *Handler) Init(conf config.ServicesConfig, auth config.AuthConfig, api *
 
 		v1.GET("/", h.notImplemented)
 	}
+	new_pro.NewHandler(h.middleware).InitRoutes(conf, v1)
 }
 
 func (h *Handler) notImplemented(c *gin.Context) {}
