@@ -14,6 +14,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_snp_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/order_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
@@ -307,16 +308,18 @@ type Snp interface {
 }
 
 type OrderNew interface {
-	Save(ctx context.Context, order order_api.CreateOrder) (*order_api.OrderNumber, error)
-	Create(ctx context.Context, order order_api.CreateOrder) error
+	Get(context.Context, *order_api.GetOrder) (*order_model.FullOrder, error)
+	GetAll(context.Context, *order_api.GetAllOrders) ([]*order_model.Order, error)
+	Save(ctx context.Context, order *order_api.CreateOrder) (*order_api.OrderNumber, error)
+	Create(ctx context.Context, order *order_api.CreateOrder) error
 }
 
 type Position interface {
-	CreateSeveral(ctx context.Context, positions []*position_model.Position, orderId string) error
+	CreateSeveral(ctx context.Context, positions []*position_model.FullPosition, orderId string) error
 }
 
 type PositionSnp interface {
-	CreateSeveral(ctx context.Context, positions []*position_model.Position) error
+	CreateSeveral(ctx context.Context, positions []*position_model.FullPosition) error
 }
 
 type Services struct {

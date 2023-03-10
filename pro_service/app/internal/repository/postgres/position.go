@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/jmoiron/sqlx"
 )
@@ -17,9 +18,29 @@ func NewPositionRepo(db *sqlx.DB) *PositionRepo {
 	return &PositionRepo{db: db}
 }
 
-func (r *PositionRepo) Get(ctx context.Context) {}
+func (r *PositionRepo) Get(ctx context.Context, orderId string) (positions []*position_model.FullPosition, err error) {
+	var data []models.PositionNew
+	query := fmt.Sprintf(`SELECT id, title, amount, type, count FROM %s WHERE order_id=$1 ORDER BY count`, PositionTable)
 
-func (r *PositionRepo) CreateSeveral(ctx context.Context, positions []*position_model.Position) error {
+	if err := r.db.Select(&data, query, orderId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for _, p := range data {
+		positionType := position_model.PositionType_value[p.Type]
+		positions = append(positions, &position_model.FullPosition{
+			Id:     p.Id,
+			Title:  p.Title,
+			Count:  p.Count,
+			Amount: p.Amount,
+			Type:   position_model.PositionType(positionType),
+		})
+	}
+
+	return positions, nil
+}
+
+func (r *PositionRepo) CreateSeveral(ctx context.Context, positions []*position_model.FullPosition) error {
 	query := fmt.Sprintf("INSERT INTO %s (id, order_id, title, amount, type, count) VALUES ", PositionTable)
 
 	args := make([]interface{}, 0)

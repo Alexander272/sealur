@@ -12,6 +12,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_snp_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/order_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
@@ -276,16 +277,18 @@ type SnpSize interface {
 }
 
 type OrderNew interface {
+	Get(context.Context, *order_api.GetOrder) (*order_model.FullOrder, error)
+	GetAll(context.Context, *order_api.GetAllOrders) ([]*order_model.Order, error)
 	GetNumber(ctx context.Context, orderId, date string) (int64, error)
-	Create(ctx context.Context, order order_api.CreateOrder, date string) error
+	Create(ctx context.Context, order *order_api.CreateOrder, date string) error
 }
 
 type Position interface {
-	CreateSeveral(context.Context, []*position_model.Position) error
+	CreateSeveral(context.Context, []*position_model.FullPosition) error
 }
 
 type PositionSnp interface {
-	CreateSeveral(context.Context, []*position_model.Position) error
+	CreateSeveral(context.Context, []*position_model.FullPosition) error
 }
 
 type Repositories struct {

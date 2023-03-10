@@ -21,8 +21,12 @@ func NewPositionService_New(repo repository.Position, snp PositionSnp) *Position
 	}
 }
 
-func (s *PositionServiceNew) CreateSeveral(ctx context.Context, positions []*position_model.Position, orderId string) error {
-	var positionSnp []*position_model.Position
+// func (s *PositionServiceNew) Get(ctx context.Context, orderId string) ([]*position_model.FullPosition, error) {
+
+// }
+
+func (s *PositionServiceNew) CreateSeveral(ctx context.Context, positions []*position_model.FullPosition, orderId string) error {
+	var positionSnp []*position_model.FullPosition
 
 	for _, p := range positions {
 		id := uuid.New()

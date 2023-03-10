@@ -6,12 +6,20 @@ type Order struct {
 	Count int32  `db:"count_position"`
 }
 
-type Position struct {
-	Id          string `db:"id"`
-	Designation string `db:"designation"`
-	Descriprion string `db:"description"`
-	Count       int32  `db:"count"`
-	Sizes       string `db:"sizes"`
-	Drawing     string `db:"drawing"`
-	OrderId     string `db:"order_id"`
+type OrderNew struct {
+	Id     string `db:"id"`
+	Date   string `db:"date"`
+	Count  int64  `db:"count_position"`
+	Number int64  `db:"number"`
+}
+
+type OrderWithPosition struct {
+	Id            string `db:"id"`
+	Date          string `db:"date"`
+	Count         int64  `db:"count_position"`
+	Number        int64  `db:"number"`
+	PositionId    string `db:"position_id"`
+	Title         string `db:"title"`
+	Amount        string `db:"amount"`
+	PositionCount int64  `db:"position_count"`
 }

@@ -16,7 +16,7 @@ func NewPositionSnpService(repo repository.PositionSnp) *PositionSnpService {
 	return &PositionSnpService{repo: repo}
 }
 
-func (s *PositionSnpService) CreateSeveral(ctx context.Context, positions []*position_model.Position) error {
+func (s *PositionSnpService) CreateSeveral(ctx context.Context, positions []*position_model.FullPosition) error {
 	if err := s.repo.CreateSeveral(ctx, positions); err != nil {
 		return fmt.Errorf("failed to create several position snp. error: %w", err)
 	}

@@ -18,9 +18,14 @@ func NewPositionSnpRepo(db *sqlx.DB) *PositionSnpRepo {
 	return &PositionSnpRepo{db: db}
 }
 
-func (r *PositionSnpRepo) Get(ctx context.Context) {}
+func (r *PositionSnpRepo) Get(ctx context.Context, positionId []string) ([]*position_model.PositionSnp, error) {
+	//? можно не делать запрос в position, а в этом запросе забрать данные из всех 5 таблиц через inner join
+	// query := fmt.Sprintf(``)
 
-func (r *PositionSnpRepo) CreateSeveral(ctx context.Context, positions []*position_model.Position) error {
+	return nil, fmt.Errorf("not implemented")
+}
+
+func (r *PositionSnpRepo) CreateSeveral(ctx context.Context, positions []*position_model.FullPosition) error {
 	mainQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, snp_standard_id, snp_type_id, flange_type_code, flange_type_title) VALUES `, PositionMainSnpTable)
 	sizeQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another) VALUES `, PositionSizeSnpTable)
 	materialQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, filler_id, frame_id, inner_ring_id, outer_ring_id) VALUES `, PositionMaterialSnpTable)

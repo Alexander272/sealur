@@ -20,6 +20,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/flange_type_snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
+	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -157,6 +158,7 @@ func main() {
 	temperature_api.RegisterTemperatureServiceServer(server, handlers.Temperature)
 	snp_size_api.RegisterSnpSizeServiceServer(server, handlers.SnpSize)
 	snp_api.RegisterSnpDataServiceServer(server, handlers.Snp)
+	order_api.RegisterOrderServiceServer(server, handlers.Order)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {
