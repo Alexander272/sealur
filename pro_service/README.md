@@ -2,6 +2,8 @@
 
 Сервис отвечающий за логику работы серверной части Sealur Pro
 
+go mod edit -replace github.com/Alexander272/sealur_proto/api ../../../sealur_proto/api
+
 #### шаблон файла config.yaml
     http:
         serviceName: "pro-service"

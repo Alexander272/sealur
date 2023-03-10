@@ -1,18 +1,14 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/Alexander272/sealur/api_service/docs"
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/service"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	httpV1 "github.com/Alexander272/sealur/api_service/internal/transport/http/v1"
 	"github.com/Alexander272/sealur/api_service/pkg/limiter"
 	"github.com/gin-gonic/gin"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 type Handler struct {
@@ -42,14 +38,14 @@ func (h *Handler) Init(conf *config.Config) *gin.Engine {
 		// }),
 	)
 
-	docs.SwaggerInfo_swagger.Host = fmt.Sprintf("%s:%s", conf.Http.Host, conf.Http.Port)
-	if conf.Environment != "dev" {
-		docs.SwaggerInfo_swagger.Host = conf.Http.Host
-	}
+	// docs.SwaggerInfo_swagger.Host = fmt.Sprintf("%s:%s", conf.Http.Host, conf.Http.Port)
+	// if conf.Environment != "dev" {
+	// 	docs.SwaggerInfo_swagger.Host = conf.Http.Host
+	// }
 
-	if conf.Environment != "prod" {
-		router.GET("/api/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	}
+	// if conf.Environment != "prod" {
+	// 	router.GET("/api/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// }
 
 	// Init router
 	router.GET("/api/ping", func(c *gin.Context) {

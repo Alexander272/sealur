@@ -12,6 +12,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_snp_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
@@ -22,6 +23,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/temperature_model"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
+	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -273,6 +275,19 @@ type SnpSize interface {
 	Create(context.Context, *snp_size_api.CreateSnpSize) error
 }
 
+type OrderNew interface {
+	GetNumber(ctx context.Context, orderId, date string) (int64, error)
+	Create(ctx context.Context, order order_api.CreateOrder, date string) error
+}
+
+type Position interface {
+	CreateSeveral(context.Context, []*position_model.Position) error
+}
+
+type PositionSnp interface {
+	CreateSeveral(context.Context, []*position_model.Position) error
+}
+
 type Repositories struct {
 	Stand
 	Flange
@@ -304,6 +319,9 @@ type Repositories struct {
 	SnpMaterial
 	SnpData
 	SnpSize
+	OrderNew
+	Position
+	PositionSnp
 }
 
 func NewRepo(db *sqlx.DB) *Repositories {
@@ -337,5 +355,8 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		SnpMaterial:    postgres.NewSnpMaterialRepo(db),
 		SnpData:        postgres.NewSnpDataRepo(db),
 		SnpSize:        postgres.NewSnpSizeRepo(db),
+		OrderNew:       postgres.NewOrderRepo(db),
+		Position:       postgres.NewPositionRepo(db),
+		PositionSnp:    postgres.NewPositionSnpRepo(db),
 	}
 }

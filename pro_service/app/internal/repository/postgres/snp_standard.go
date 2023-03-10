@@ -24,8 +24,8 @@ func NewSnpStandardRepo(db *sqlx.DB) *SnpStandardRepo {
 
 func (r *SnpStandardRepo) GetAll(ctx context.Context, req *snp_standard_api.GetAllSnpStandards) (standards []*snp_standard_model.SnpStandard, err error) {
 	var data []models.SnpStandard
-	query := fmt.Sprintf(`SELECT %s.id, dn_title, pn_title, standard_id, flange_standard_id, %s.title as standard_title, %s.format as standard_format, 
-		%s.title as flange_title, %s.code as flange_code
+	query := fmt.Sprintf(`SELECT %s.id, dn_title, pn_title, has_d2, standard_id, flange_standard_id, %s.title as standard_title, 
+		%s.format as standard_format, %s.title as flange_title, %s.code as flange_code
 		FROM %s INNER JOIN %s ON %s.id=standard_id INNER JOIN %s ON %s.id=flange_standard_id ORDER BY count`,
 		SnpStandardTable, StandardTable, StandardTable, FlangeStandardTable, FlangeStandardTable,
 		SnpStandardTable, StandardTable, StandardTable, FlangeStandardTable, FlangeStandardTable,
@@ -40,6 +40,7 @@ func (r *SnpStandardRepo) GetAll(ctx context.Context, req *snp_standard_api.GetA
 			Id:      s.Id,
 			DnTitle: s.DnTitle,
 			PnTitle: s.PnTitle,
+			HasD2:   s.HasD2,
 			Standard: &standard_model.Standard{
 				Id:     s.StandardId,
 				Title:  s.StandardTitle,

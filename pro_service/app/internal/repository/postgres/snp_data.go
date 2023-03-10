@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
@@ -24,7 +26,7 @@ func (r *SnpDataRepo) Get(ctx context.Context, req *snp_data_api.GetSnpData) (sn
 	query := fmt.Sprintf(`SELECT id, has_inner_ring, has_frame, has_outer_ring, has_hole, has_jumper, has_mounting FROM %s 
 		WHERE type_id=$1 LIMIT 1`, SnpDataTable)
 
-	if err := r.db.Get(&data, query, req.TypeId); err != nil {
+	if err := r.db.Get(&data, query, req.TypeId); err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 

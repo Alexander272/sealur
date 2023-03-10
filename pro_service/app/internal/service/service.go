@@ -14,6 +14,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_snp_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
@@ -24,6 +25,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/temperature_model"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
+	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -304,6 +306,19 @@ type Snp interface {
 	GetData(context.Context, *snp_api.GetSnpData) (*snp_model.SnpData, error)
 }
 
+type OrderNew interface {
+	Save(ctx context.Context, order order_api.CreateOrder) (*order_api.OrderNumber, error)
+	Create(ctx context.Context, order order_api.CreateOrder) error
+}
+
+type Position interface {
+	CreateSeveral(ctx context.Context, positions []*position_model.Position, orderId string) error
+}
+
+type PositionSnp interface {
+	CreateSeveral(ctx context.Context, positions []*position_model.Position) error
+}
+
 type Services struct {
 	Stand
 	Flange
@@ -337,6 +352,9 @@ type Services struct {
 	SnpData
 	SnpSize
 	Snp
+	OrderNew
+	Position
+	PositionSnp
 }
 
 func NewServices(repos *repository.Repositories, email email_api.EmailServiceClient,
@@ -350,6 +368,10 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 	snpMaterial := NewSnpMaterialService(repos.SnpMaterial)
 	snpData := NewSnpDataService(repos.SnpData)
 	snpSize := NewSnpSizeService(repos.SnpSize)
+
+	positionSnp := NewPositionSnpService(repos.PositionSnp)
+	position := NewPositionService_New(repos.Position, positionSnp)
+	order := NewOrderService_New(repos.OrderNew, position)
 
 	return &Services{
 		Stand:         NewStandService(repos.Stand),
@@ -383,5 +405,9 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		SnpData:        snpData,
 		SnpSize:        snpSize,
 		Snp:            NewSnpService(filler, snpMaterial, snpType, mounting, standard, snpData, snpStandard, snpSize),
+
+		PositionSnp: positionSnp,
+		Position:    position,
+		OrderNew:    order,
 	}
 }
