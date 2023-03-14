@@ -310,15 +310,18 @@ type Snp interface {
 type OrderNew interface {
 	Get(context.Context, *order_api.GetOrder) (*order_model.FullOrder, error)
 	GetAll(context.Context, *order_api.GetAllOrders) ([]*order_model.Order, error)
+	GetFile(ctx context.Context, req *order_api.GetOrder) (*bytes.Buffer, string, error)
 	Save(ctx context.Context, order *order_api.CreateOrder) (*order_api.OrderNumber, error)
 	Create(ctx context.Context, order *order_api.CreateOrder) error
 }
 
 type Position interface {
+	Get(ctx context.Context, orderId string) (positions []*position_model.FullPosition, err error)
 	CreateSeveral(ctx context.Context, positions []*position_model.FullPosition, orderId string) error
 }
 
 type PositionSnp interface {
+	Get(ctx context.Context, orderId string) ([]*position_model.FullPosition, error)
 	CreateSeveral(ctx context.Context, positions []*position_model.FullPosition) error
 }
 

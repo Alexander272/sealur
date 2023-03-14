@@ -3,6 +3,7 @@
 Сервис отвечающий за логику работы серверной части Sealur Pro
 
 go mod edit -replace github.com/Alexander272/sealur_proto/api ../../../sealur_proto/api
+replace github.com/Alexander272/sealur_proto/api => ../../../sealur_proto/api
 
 #### шаблон файла config.yaml
     http:
@@ -26,3 +27,6 @@ go mod edit -replace github.com/Alexander272/sealur_proto/api ../../../sealur_pr
 #### генерация proto файлов
 
     protoc -I internal/transport/grpc internal/transport/grpc/proto/pro.proto --go_out=plugins=grpc:internal/transport/grpc/proto
+
+    openssl req -x509 -nodes -new -sha256 -days 1024 -newkey rsa:2048 -keyout localhost.key -out localhost.pem -subj "/C=RU/CN=localhost"
+    openssl x509 -outform pem -in localhost.pem -out localhost.crt

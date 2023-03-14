@@ -10,7 +10,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Handler struct {
@@ -26,10 +26,10 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	//* pro service connect
 	//TODO стоит ли так оставлять сертификат?
 	//* определение сертификата
-	creds, err := credentials.NewClientTLSFromFile("cert/server.crt", "localhost")
-	if err != nil {
-		logger.Fatalf("failed to load certificate. error: %w", err)
-	}
+	// creds, err := credentials.NewClientTLSFromFile("cert/server.crt", "localhost")
+	// if err != nil {
+	// 	logger.Fatalf("failed to load certificate. error: %w", err)
+	// }
 
 	//* данные для аутентификации
 	auth := models.Authentication{
@@ -39,7 +39,8 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 
 	//* опции grpc
 	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(creds),
+		// grpc.WithTransportCredentials(creds),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithPerRPCCredentials(&auth),
 	}
 

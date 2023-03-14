@@ -62,10 +62,9 @@ require (
 )
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230303102041-07e54677929f
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230314041415-6f9bc824463b
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/lib/pq v1.10.7
-	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
 	github.com/swaggo/swag v1.8.10
 )
 
@@ -75,7 +74,6 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.3.0
 	github.com/subosito/gotenv v1.4.2 // indirect
-	github.com/swaggo/gin-swagger v1.5.3
 	github.com/xuri/excelize/v2 v2.7.0
 	google.golang.org/grpc v1.53.0
 )

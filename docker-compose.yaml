@@ -19,7 +19,7 @@ services:
 
     api_service:
         restart: on-failure:5
-        image: sealur/api_service:1.8.4d
+        image: sealur/api_service:1.8.6d
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images
@@ -49,7 +49,7 @@ services:
 
     pro_service:
         restart: on-failure:5
-        image: sealur/pro_service:1.2.5d
+        image: sealur/pro_service:1.2.8d
         container_name: dev-pro_service
         env_file:
             - .env
@@ -60,7 +60,7 @@ services:
 
     user_service:
         restart: on-failure:5
-        image: sealur/user_service:1.1.3-1
+        image: sealur/user_service:1.1.3d
         container_name: dev-user_service
         env_file:
             - .env
@@ -69,7 +69,7 @@ services:
 
     email_service:
         restart: on-failure:5
-        image: sealur/email_service:1.2.0-1
+        image: sealur/email_service:1.2.0d
         container_name: dev-email_service
         # ports:
         #     - 12000:12000
@@ -80,7 +80,7 @@ services:
 
     file_service:
         restart: on-failure:5
-        image: sealur/file_service:1.1.0-1
+        image: sealur/file_service:1.1.0d
         container_name: dev-file_service
         env_file:
             - .env

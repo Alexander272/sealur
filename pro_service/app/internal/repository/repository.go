@@ -284,10 +284,12 @@ type OrderNew interface {
 }
 
 type Position interface {
+	Get(ctx context.Context, orderId string) ([]*position_model.FullPosition, error)
 	CreateSeveral(context.Context, []*position_model.FullPosition) error
 }
 
 type PositionSnp interface {
+	Get(ctx context.Context, orderId string) ([]*position_model.FullPosition, error)
 	CreateSeveral(context.Context, []*position_model.FullPosition) error
 }
 

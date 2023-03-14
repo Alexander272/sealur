@@ -21,7 +21,7 @@ func NewOrderRepo(db *sqlx.DB) *OrderRepo {
 
 func (r *OrderRepo) Get(ctx context.Context, req *order_api.GetOrder) (order *order_model.FullOrder, err error) {
 	var data models.OrderNew
-	query := fmt.Sprintf("SELECT id, date, count_position, number FROM %s WHERE id=$1", OrderTable)
+	query := fmt.Sprintf("SELECT id, date, count_position, number FROM \"%s\" WHERE id=$1", OrderTable)
 
 	if err := r.db.Get(&data, query, req.Id); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -39,8 +39,8 @@ func (r *OrderRepo) Get(ctx context.Context, req *order_api.GetOrder) (order *or
 
 func (r *OrderRepo) GetAll(ctx context.Context, req *order_api.GetAllOrders) (orders []*order_model.Order, err error) {
 	var data []models.OrderWithPosition
-	query := fmt.Sprintf(`SELECT %s.id, user_id, date, count_position, number, %s.id as position_id, title, amount, %s.count as position_count
-		FROM %s INNER JOIN %s on order_id=%s.id WHERE user_id=$1 ORDER BY number`,
+	query := fmt.Sprintf(`SELECT "%s".id, user_id, date, count_position, number, %s.id as position_id, title, amount, %s.count as position_count
+		FROM "%s" INNER JOIN %s on order_id="%s".id WHERE user_id=$1 ORDER BY number`,
 		OrderTable, PositionTable, PositionTable, OrderTable, PositionTable, OrderTable,
 	)
 
@@ -77,7 +77,7 @@ func (r *OrderRepo) GetAll(ctx context.Context, req *order_api.GetAllOrders) (or
 }
 
 func (r *OrderRepo) GetNumber(ctx context.Context, orderId, date string) (int64, error) {
-	query := fmt.Sprintf(`UPDATE %s	SET date=$1	WHERE id=$2 RETURNING number`, OrderTable)
+	query := fmt.Sprintf(`UPDATE "%s" SET date=$1 WHERE id=$2 RETURNING number`, OrderTable)
 
 	row, err := r.db.Query(query, orderId, date)
 	if err != nil {
@@ -92,7 +92,7 @@ func (r *OrderRepo) GetNumber(ctx context.Context, orderId, date string) (int64,
 }
 
 func (r *OrderRepo) Create(ctx context.Context, order *order_api.CreateOrder, date string) error {
-	query := fmt.Sprintf(`INSERT INTO %s(id, user_id, date, count_position) VALUES ($1, $2, $3, $4)`, OrderTable)
+	query := fmt.Sprintf(`INSERT INTO "%s" (id, user_id, date, count_position) VALUES ($1, $2, $3, $4)`, OrderTable)
 
 	_, err := r.db.Exec(query, order.Id, order.UserId, date, order.Count)
 	if err != nil {

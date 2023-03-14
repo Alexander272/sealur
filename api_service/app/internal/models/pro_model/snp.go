@@ -22,3 +22,6 @@ type DefResponse struct {
 	Snp    []*pro_api.SNP        `json:"snp"`
 	Sizes  *pro_api.SizeResponse `json:"sizes"`
 }
+
+type SnpData struct {
+}

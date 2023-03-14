@@ -3,7 +3,7 @@ module github.com/Alexander272/sealur/pro_service
 go 1.19
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230303102041-07e54677929f
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230314041415-6f9bc824463b
 	github.com/google/uuid v1.3.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -41,5 +41,3 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/Alexander272/sealur_proto/api => ../../../sealur_proto/api

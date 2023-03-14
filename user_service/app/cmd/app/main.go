@@ -62,6 +62,7 @@ func main() {
 	//* опции grpc
 	optsEmail := []grpc.DialOption{
 		grpc.WithTransportCredentials(creds),
+		// grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithPerRPCCredentials(&authEmail),
 	}
 
@@ -91,6 +92,7 @@ func main() {
 
 	opts := []grpc.ServerOption{
 		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
+		// grpc.Creds(insecure.NewCredentials()),
 		grpc.UnaryInterceptor(handlers.UnaryInterceptor),
 	}
 

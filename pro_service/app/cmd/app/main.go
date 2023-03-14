@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"net"
 	"os"
 	"os/signal"
@@ -75,6 +74,7 @@ func main() {
 	//* опции grpc
 	optsEmail := []grpc.DialOption{
 		grpc.WithTransportCredentials(creds),
+		// grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithPerRPCCredentials(&authEmail),
 	}
 
@@ -94,6 +94,7 @@ func main() {
 	//* опции grpc
 	optsFile := []grpc.DialOption{
 		grpc.WithTransportCredentials(creds),
+		// grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithPerRPCCredentials(&authFile),
 	}
 
@@ -113,6 +114,7 @@ func main() {
 	//* опции grpc
 	optsUser := []grpc.DialOption{
 		grpc.WithTransportCredentials(creds),
+		// grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithPerRPCCredentials(&authUser),
 	}
 
@@ -133,13 +135,14 @@ func main() {
 
 	//* GRPC Server
 
-	cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
-	if err != nil {
-		logger.Fatalf("failed to load certificate. error: %w", err)
-	}
+	// cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
+	// if err != nil {
+	// 	logger.Fatalf("failed to load certificate. error: %w", err)
+	// }
 
 	opts := []grpc.ServerOption{
-		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
+		// grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
+		// grpc.Creds(insecure.NewCredentials()),
 		// grpc.UnaryInterceptor(handlers.UnaryInterceptor),
 	}
 
