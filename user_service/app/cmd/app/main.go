@@ -16,7 +16,7 @@ import (
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
 	"github.com/Alexander272/sealur/user_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
-	"github.com/Alexander272/sealur_proto/api/user_api"
+	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -97,7 +97,7 @@ func main() {
 	}
 
 	server := grpc.NewServer(opts...)
-	user_api.RegisterUserServiceServer(server, handlers)
+	user_api.RegisterUserServiceServer(server, handlers.User)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {
