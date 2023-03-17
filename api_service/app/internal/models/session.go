@@ -30,3 +30,16 @@ type LimitData struct {
 func (i LimitData) MarshalBinary() ([]byte, error) {
 	return json.Marshal(i)
 }
+
+type ConfirmData struct {
+	UserId string
+	Code   string
+	Exp    time.Duration
+}
+
+func (i *ConfirmData) MarshalBinary() ([]byte, error) {
+	return json.Marshal(i)
+}
+func (i *ConfirmData) UnMarshalBinary(str string) {
+	json.Unmarshal([]byte(str), &i)
+}

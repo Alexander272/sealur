@@ -2,9 +2,13 @@ package grpc
 
 import (
 	"context"
+	"errors"
 
+	"github.com/Alexander272/sealur/user_service/internal/models"
 	"github.com/Alexander272/sealur/user_service/internal/service"
+	"github.com/Alexander272/sealur/user_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/pro/models/response_model"
+	"github.com/Alexander272/sealur_proto/api/user/models/user_model"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 )
 
@@ -19,11 +23,41 @@ func NewUserHandler(service service.User) *UserHandler {
 	}
 }
 
-func (h *UserHandler) Create(ctx context.Context, user *user_api.CreateUser) (*response_model.Response, error) {
-	if err := h.service.Create(ctx, user); err != nil {
+func (h *UserHandler) Get(ctx context.Context, req *user_api.GetUser) (*user_model.User, error) {
+	user, err := h.service.Get(ctx, req)
+	if err != nil {
 		return nil, err
 	}
-	return &response_model.Response{}, nil
+	return user, nil
+}
+
+func (h *UserHandler) GetByEmail(ctx context.Context, req *user_api.GetUserByEmail) (*user_model.User, error) {
+	user, err := h.service.GetByEmail(ctx, req)
+	if err != nil {
+		if errors.Is(err, models.ErrPassword) || errors.Is(err, models.ErrUserNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (h *UserHandler) Create(ctx context.Context, user *user_api.CreateUser) (*response_model.IdResponse, error) {
+	logger.Info("create")
+	id, err := h.service.Create(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	return &response_model.IdResponse{Id: id}, nil
+}
+
+func (h *UserHandler) Confirm(ctx context.Context, user *user_api.ConfirmUser) (*user_model.User, error) {
+	u, err := h.service.Confirm(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
 }
 
 // func (h *Handler) GetUser(ctx context.Context, req *user_api.GetUserRequest) (*user_api.UserResponse, error) {

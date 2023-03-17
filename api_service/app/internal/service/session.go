@@ -9,7 +9,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/repository"
 	"github.com/Alexander272/sealur/api_service/pkg/auth"
-	"github.com/Alexander272/sealur_proto/api/user_api"
+	"github.com/Alexander272/sealur_proto/api/user/models/user_model"
 )
 
 type SessionService struct {
@@ -28,8 +28,8 @@ func NewSessionService(repo repository.Session, manager auth.TokenManager, acces
 	}
 }
 
-func (s *SessionService) SignIn(ctx context.Context, user *user_api.User) (string, error) {
-	_, accessToken, err := s.tokenManager.NewJWT(user.Id, user.Email, user.Roles, s.accessTokenTTL)
+func (s *SessionService) SignIn(ctx context.Context, user *user_model.User) (string, error) {
+	_, accessToken, err := s.tokenManager.NewJWT(user.Id, user.Email, user.RoleCode, s.accessTokenTTL)
 	if err != nil {
 		return "", err
 	}
@@ -40,7 +40,7 @@ func (s *SessionService) SignIn(ctx context.Context, user *user_api.User) (strin
 
 	accessData := repository.SessionData{
 		UserId:      user.Id,
-		Roles:       user.Roles,
+		RoleCode:    user.RoleCode,
 		AccessToken: accessToken,
 		Exp:         s.accessTokenTTL,
 	}
@@ -50,7 +50,7 @@ func (s *SessionService) SignIn(ctx context.Context, user *user_api.User) (strin
 
 	refreshData := repository.SessionData{
 		UserId:       user.Id,
-		Roles:        user.Roles,
+		RoleCode:     user.RoleCode,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		Exp:          s.refreshTokenTTL,
@@ -76,7 +76,7 @@ func (s *SessionService) SingOut(ctx context.Context, userId string) error {
 	return nil
 }
 
-func (s *SessionService) CheckSession(ctx context.Context, u *user_api.User, token string) (bool, error) {
+func (s *SessionService) CheckSession(ctx context.Context, u *user_model.User, token string) (bool, error) {
 	user, err := s.repo.Get(ctx, u.Id)
 	if err != nil && !errors.Is(err, models.ErrSessionEmpty) {
 		return false, fmt.Errorf("failed to get session. error: %w", err)
@@ -97,27 +97,28 @@ func (s *SessionService) CheckSession(ctx context.Context, u *user_api.User, tok
 	return false, nil
 }
 
-func (s *SessionService) TokenParse(token string) (user *user_api.User, err error) {
+func (s *SessionService) TokenParse(token string) (user *user_model.User, err error) {
 	claims, err := s.tokenManager.Parse(token)
 	if err != nil {
 		return nil, err
 	}
 
-	var roles []*user_api.Role
-	r := claims["roles"].([]interface{})
-	for _, v := range r {
-		m := v.(map[string]interface{})
-		roles = append(roles, &user_api.Role{
-			Id:      m["id"].(string),
-			Service: m["service"].(string),
-			Role:    m["role"].(string),
-		})
-	}
+	// var roles []*user_api.Role
+	// r := claims["roles"].([]interface{})
+	// for _, v := range r {
+	// 	m := v.(map[string]interface{})
+	// 	roles = append(roles, &user_api.Role{
+	// 		Id:      m["id"].(string),
+	// 		Service: m["service"].(string),
+	// 		Role:    m["role"].(string),
+	// 	})
+	// }
 
-	user = &user_api.User{
+	user = &user_model.User{
 		Id:    claims["userId"].(string),
 		Email: claims["email"].(string),
-		Roles: roles,
+		// Roles: roles,
+		RoleCode: claims["roleCode"].(string),
 	}
 
 	return user, nil

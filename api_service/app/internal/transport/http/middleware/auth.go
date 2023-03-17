@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	userIdCtx    = "userId"
-	userRolesCtx = "roles"
+	UserIdCtx    = "userId"
+	UserRolesCtx = "roles"
 )
 
 func (m *Middleware) UserIdentity(c *gin.Context) {
@@ -43,16 +43,17 @@ func (m *Middleware) UserIdentity(c *gin.Context) {
 		c.SetCookie(m.CookieName, token, int(m.auth.RefreshTokenTTL.Seconds()), "/", m.auth.Domain, m.auth.Secure, true)
 	}
 
-	c.Set(userIdCtx, user.Id)
-	for _, r := range user.Roles {
-		c.Set(fmt.Sprintf("%s_%s", userRolesCtx, r.Service), r.Role)
-	}
-	// c.Set(userRolesCtx, user.Roles)
+	c.Set(UserIdCtx, user.Id)
+	// for _, r := range user.Roles {
+	// 	c.Set(fmt.Sprintf("%s_%s", userRolesCtx, r.Service), r.Role)
+	// }
+	c.Set(UserRolesCtx, user.RoleCode)
 }
 
+// TODO переписать Middleware
 func (m *Middleware) AccessForProAdmin(c *gin.Context) {
-	userId, _ := c.Get(userIdCtx)
-	role, exists := c.Get(fmt.Sprintf("%s_pro", userRolesCtx))
+	userId, _ := c.Get(UserIdCtx)
+	role, exists := c.Get(fmt.Sprintf("%s_pro", UserRolesCtx))
 	if !exists {
 		models.NewErrorResponse(c, http.StatusUnauthorized, "roles empty", "failed to get role")
 		return
@@ -66,8 +67,8 @@ func (m *Middleware) AccessForProAdmin(c *gin.Context) {
 }
 
 func (m *Middleware) AccessForMomentAdmin(c *gin.Context) {
-	userId, _ := c.Get(userIdCtx)
-	role, exists := c.Get(fmt.Sprintf("%s_moment", userRolesCtx))
+	userId, _ := c.Get(UserIdCtx)
+	role, exists := c.Get(fmt.Sprintf("%s_moment", UserRolesCtx))
 	if !exists {
 		models.NewErrorResponse(c, http.StatusUnauthorized, "roles empty", "failed to get role")
 		return
@@ -81,8 +82,8 @@ func (m *Middleware) AccessForMomentAdmin(c *gin.Context) {
 }
 
 func (m *Middleware) AccessForSuperUser(c *gin.Context) {
-	userId, _ := c.Get(userIdCtx)
-	role, exists := c.Get(fmt.Sprintf("%s_sealur", userRolesCtx))
+	userId, _ := c.Get(UserIdCtx)
+	role, exists := c.Get(fmt.Sprintf("%s_sealur", UserRolesCtx))
 	if !exists {
 		models.NewErrorResponse(c, http.StatusUnauthorized, "roles empty", "failed to get role")
 		return

@@ -2,7 +2,6 @@ package service
 
 import (
 	"archive/zip"
-	"bufio"
 	"bytes"
 	"context"
 	"database/sql"
@@ -17,7 +16,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/Alexander272/sealur_proto/api/pro_api"
-	"github.com/Alexander272/sealur_proto/api/user_api"
+	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -113,80 +112,80 @@ func (s *OrderService) Save(ctx context.Context, order *pro_api.SaveOrderRequest
 }
 
 func (s *OrderService) Send(ctx context.Context, order *pro_api.SaveOrderRequest) error {
-	user, err := s.user.GetUser(ctx, &user_api.GetUserRequest{Id: order.UserId})
-	if err != nil {
-		return err
-	}
+	// user, err := s.user.GetUser(ctx, &user_api.GetUserRequest{Id: order.UserId})
+	// if err != nil {
+	// 	return err
+	// }
 
-	file, names, err := s.createZip(ctx, order)
-	if err != nil {
-		return err
-	}
+	// file, names, err := s.createZip(ctx, order)
+	// if err != nil {
+	// 	return err
+	// }
 
-	data := &email_api.SendOrderRequest{
-		Request: &email_api.SendOrderRequest_Data{
-			Data: &email_api.OrderData{
-				User: &email_api.User{
-					Organization: user.User.Organization,
-					Name:         user.User.Name,
-					Email:        user.User.Email,
-					Phone:        user.User.Phone,
-					Position:     user.User.Position,
-					City:         user.User.City,
-				},
-				File: &email_api.FileData{
-					Name: names,
-					Type: ".zip",
-					Size: int64(file.Cap()),
-				},
-			},
-		},
-	}
+	// data := &email_api.SendOrderRequest{
+	// 	Request: &email_api.SendOrderRequest_Data{
+	// 		Data: &email_api.OrderData{
+	// 			User: &email_api.User{
+	// 				Organization: user.User.Organization,
+	// 				Name:         user.User.Name,
+	// 				Email:        user.User.Email,
+	// 				Phone:        user.User.Phone,
+	// 				Position:     user.User.Position,
+	// 				City:         user.User.City,
+	// 			},
+	// 			File: &email_api.FileData{
+	// 				Name: names,
+	// 				Type: ".zip",
+	// 				Size: int64(file.Cap()),
+	// 			},
+	// 		},
+	// 	},
+	// }
 
-	stream, err := s.email.SendOrder(ctx)
-	if err != nil {
-		return fmt.Errorf("error while connect wuth service. err: %w", err)
-	}
+	// stream, err := s.email.SendOrder(ctx)
+	// if err != nil {
+	// 	return fmt.Errorf("error while connect wuth service. err: %w", err)
+	// }
 
-	err = stream.Send(data)
-	if err != nil {
-		logger.Errorf("cannot send docx info to server: %w %w", err, stream.RecvMsg(nil))
-		return fmt.Errorf("cannot send docx info to server. err: %w", err)
-	}
+	// err = stream.Send(data)
+	// if err != nil {
+	// 	logger.Errorf("cannot send docx info to server: %w %w", err, stream.RecvMsg(nil))
+	// 	return fmt.Errorf("cannot send docx info to server. err: %w", err)
+	// }
 
-	reader := bufio.NewReader(file)
-	buffer := make([]byte, 1024)
+	// reader := bufio.NewReader(file)
+	// buffer := make([]byte, 1024)
 
-	for {
-		n, err := reader.Read(buffer)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			logger.Errorf("cannot read chunk to buffer: %w", err)
-			return fmt.Errorf("cannot read chunk to buffer: %w", err)
-		}
+	// for {
+	// 	n, err := reader.Read(buffer)
+	// 	if err == io.EOF {
+	// 		break
+	// 	}
+	// 	if err != nil {
+	// 		logger.Errorf("cannot read chunk to buffer: %w", err)
+	// 		return fmt.Errorf("cannot read chunk to buffer: %w", err)
+	// 	}
 
-		reqChunk := &email_api.SendOrderRequest{
-			Request: &email_api.SendOrderRequest_File{
-				File: &email_api.File{
-					Content: buffer[:n],
-				},
-			},
-		}
+	// 	reqChunk := &email_api.SendOrderRequest{
+	// 		Request: &email_api.SendOrderRequest_File{
+	// 			File: &email_api.File{
+	// 				Content: buffer[:n],
+	// 			},
+	// 		},
+	// 	}
 
-		err = stream.Send(reqChunk)
-		if err != nil {
-			logger.Errorf("cannot send chunk to server: %w", err)
-			return fmt.Errorf("cannot send chunk to server: %w", err)
-		}
-	}
+	// 	err = stream.Send(reqChunk)
+	// 	if err != nil {
+	// 		logger.Errorf("cannot send chunk to server: %w", err)
+	// 		return fmt.Errorf("cannot send chunk to server: %w", err)
+	// 	}
+	// }
 
-	_, err = stream.CloseAndRecv()
-	if err != nil {
-		logger.Errorf("cannot receive response: %w", err)
-		return fmt.Errorf("cannot receive response: %w", err)
-	}
+	// _, err = stream.CloseAndRecv()
+	// if err != nil {
+	// 	logger.Errorf("cannot receive response: %w", err)
+	// 	return fmt.Errorf("cannot receive response: %w", err)
+	// }
 
 	return nil
 }

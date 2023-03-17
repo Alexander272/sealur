@@ -20,6 +20,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
+	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -30,7 +31,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/temperature_api"
 	"github.com/Alexander272/sealur_proto/api/pro_api"
-	"github.com/Alexander272/sealur_proto/api/user_api"
+	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -162,6 +163,7 @@ func main() {
 	snp_size_api.RegisterSnpSizeServiceServer(server, handlers.SnpSize)
 	snp_api.RegisterSnpDataServiceServer(server, handlers.Snp)
 	order_api.RegisterOrderServiceServer(server, handlers.Order)
+	position_api.RegisterPositionServiceServer(server, handlers.Position)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {

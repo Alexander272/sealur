@@ -16,6 +16,12 @@ type ConfirmTemplate struct {
 	Link         string
 }
 
+type ConfirmTemplateNew struct {
+	Name  string
+	Link  string
+	Email string
+}
+
 type RejectTemplate struct {
 	Name  string
 	Email string

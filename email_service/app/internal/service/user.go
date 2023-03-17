@@ -24,7 +24,7 @@ func NewUserService(sender email.Sender, conf config.RecipientsConfig) *UserServ
 	}
 }
 
-func (s *UserService) SendConfirm(ctx context.Context, req *email_api.ConfirmUserRequest) error {
+func (s *UserService) SendConfirm(ctx context.Context, req *email_api.ConfirmUserRequestOld) error {
 	input := email.SendEmailInput{
 		Subject: s.conf.ConfirmSubject,
 		To:      []string{s.conf.Confirm},
@@ -42,6 +42,25 @@ func (s *UserService) SendConfirm(ctx context.Context, req *email_api.ConfirmUse
 	}
 
 	if err := input.GenerateBodyFromHTML(constants.ConfirmTemplate, data); err != nil {
+		return err
+	}
+
+	return s.sender.Send(input)
+}
+
+func (s *UserService) SendConfirmNew(ctx context.Context, req *email_api.ConfirmUserRequest) error {
+	input := email.SendEmailInput{
+		Subject: s.conf.ConfirmSubjectNew,
+		To:      []string{req.Email},
+	}
+
+	data := models.ConfirmTemplateNew{
+		Name:  req.Name,
+		Link:  req.Link,
+		Email: s.conf.Support,
+	}
+
+	if err := input.GenerateBodyFromHTML(constants.NewConfirmTemplate, data); err != nil {
 		return err
 	}
 

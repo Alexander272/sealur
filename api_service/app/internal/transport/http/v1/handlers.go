@@ -16,7 +16,7 @@ type Handler struct {
 	middleware *middleware.Middleware
 }
 
-const CookieName = "session"
+const CookieName = "sealur_pro_session"
 
 func NewHandler(services *service.Services, middleware *middleware.Middleware) *Handler {
 	middleware.CookieName = CookieName

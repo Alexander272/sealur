@@ -278,19 +278,27 @@ type SnpSize interface {
 
 type OrderNew interface {
 	Get(context.Context, *order_api.GetOrder) (*order_model.FullOrder, error)
+	GetCurrent(context.Context, *order_api.GetCurrentOrder) (*order_model.CurrentOrder, error)
 	GetAll(context.Context, *order_api.GetAllOrders) ([]*order_model.Order, error)
-	GetNumber(ctx context.Context, orderId, date string) (int64, error)
+	GetNumber(ctx context.Context, order *order_api.CreateOrder, date string) (int64, error)
 	Create(ctx context.Context, order *order_api.CreateOrder, date string) error
 }
 
 type Position interface {
-	Get(ctx context.Context, orderId string) ([]*position_model.FullPosition, error)
+	Get(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error)
+	Create(context.Context, *position_model.FullPosition) (string, error)
 	CreateSeveral(context.Context, []*position_model.FullPosition) error
+	Update(context.Context, *position_model.FullPosition) error
+	Delete(ctx context.Context, positionId string) error
 }
 
 type PositionSnp interface {
 	Get(ctx context.Context, orderId string) ([]*position_model.FullPosition, error)
+	GetFull(ctx context.Context, positionsId []string) ([]*position_model.OrderPositionSnp, error)
+	Create(ctx context.Context, position *position_model.FullPosition) error
 	CreateSeveral(context.Context, []*position_model.FullPosition) error
+	Update(ctx context.Context, position *position_model.FullPosition) error
+	Delete(ctx context.Context, positionId string) error
 }
 
 type Repositories struct {

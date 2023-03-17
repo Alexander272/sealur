@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"net"
 	"os"
 	"os/signal"
@@ -14,7 +13,6 @@ import (
 	"github.com/Alexander272/sealur/email_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 func main() {
@@ -38,18 +36,19 @@ func main() {
 
 	//* GRPC Server
 
-	cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
-	if err != nil {
-		logger.Fatalf("failed to load certificate. error: %w", err)
-	}
+	// cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
+	// if err != nil {
+	// 	logger.Fatalf("failed to load certificate. error: %w", err)
+	// }
 
-	opts := []grpc.ServerOption{
-		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
-		// grpc.Creds(insecure.NewCredentials()),
-		grpc.UnaryInterceptor(handlers.UnaryInterceptor),
-	}
+	// opts := []grpc.ServerOption{
+	// 	// grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
+	// 	// grpc.Creds(insecure.NewCredentials()),
+	// 	grpc.UnaryInterceptor(handlers.UnaryInterceptor),
+	// }
 
-	server := grpc.NewServer(opts...)
+	// server := grpc.NewServer(opts...)
+	server := grpc.NewServer()
 	email_api.RegisterEmailServiceServer(server, handlers)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)

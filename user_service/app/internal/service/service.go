@@ -7,11 +7,15 @@ import (
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/user/models/role_model"
+	"github.com/Alexander272/sealur_proto/api/user/models/user_model"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 )
 
 type User interface {
-	Create(context.Context, *user_api.CreateUser) error
+	Get(context.Context, *user_api.GetUser) (*user_model.User, error)
+	GetByEmail(context.Context, *user_api.GetUserByEmail) (*user_model.User, error)
+	Create(context.Context, *user_api.CreateUser) (string, error)
+	Confirm(context.Context, *user_api.ConfirmUser) (*user_model.User, error)
 	// Get(context.Context, *user_api.GetUserRequest) (*user_api.User, error)
 	// GetAll(context.Context, *user_api.GetAllUserRequest) ([]*user_api.User, int, error)
 	// GetNew(context.Context, *user_api.GetNewUserRequest) ([]*user_api.User, error)
@@ -47,7 +51,12 @@ type Deps struct {
 }
 
 func NewServices(deps Deps) *Services {
+	role := NewRoleService(deps.Repos.Role)
+	user := NewUserService(deps.Repos.Users, deps.Hasher, deps.Repos.Role)
+
 	return &Services{
+		Role: role,
+		User: user,
 		// User: NewUserService(deps.Repos.Users, deps.Repos.Role, deps.Repos.IP, deps.Hasher, deps.Email),
 		// Role: NewRoleService(deps.Repos.Role),
 		// IP:   NewIpService(deps.Repos.IP),

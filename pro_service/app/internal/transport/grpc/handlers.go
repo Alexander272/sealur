@@ -10,6 +10,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
+	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -64,6 +65,9 @@ type Snp interface {
 type Order interface {
 	order_api.OrderServiceServer
 }
+type Position interface {
+	position_api.PositionServiceServer
+}
 
 type Handler struct {
 	service *service.Services
@@ -84,6 +88,7 @@ type Handler struct {
 	SnpSize
 	Snp
 	Order
+	Position
 }
 
 func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
@@ -105,6 +110,7 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		SnpSize:        NewSnpSizeHandlers(service.SnpSize),
 		Snp:            NewSnpHandlers(service.Snp),
 		Order:          NewOrderHandlers(service.OrderNew),
+		Position:       NewPositionHandlers(service.Position),
 	}
 }
 

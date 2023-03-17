@@ -65,6 +65,7 @@ func main() {
 		TokenManager:    tokenManager,
 		AccessTokenTTL:  conf.Auth.AccessTokenTTL,
 		RefreshTokenTTL: conf.Auth.RefreshTokenTTL,
+		ConfirmTTL:      conf.Auth.ConfirmTTL,
 	})
 	handlers := transport.NewHandler(services)
 

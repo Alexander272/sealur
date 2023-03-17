@@ -2,10 +2,15 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
+	"strings"
 
+	"github.com/Alexander272/sealur/user_service/internal/models"
 	"github.com/Alexander272/sealur/user_service/internal/repo"
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
+	"github.com/Alexander272/sealur_proto/api/user/models/user_model"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 )
 
@@ -23,26 +28,72 @@ func NewUserService(repo repo.Users, hasher hasher.PasswordHasher, role Role) *U
 	}
 }
 
-func (s *UserService) Create(ctx context.Context, user *user_api.CreateUser) error {
+func (s *UserService) Get(ctx context.Context, req *user_api.GetUser) (*user_model.User, error) {
+	user, err := s.repo.Get(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user. error: %w", err)
+	}
+
+	return user, nil
+}
+
+func (s *UserService) GetByEmail(ctx context.Context, req *user_api.GetUserByEmail) (*user_model.User, error) {
+	user, password, err := s.repo.GetByEmail(ctx, req)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, models.ErrUserNotFound
+		}
+		return nil, fmt.Errorf("failed to get user. error: %w", err)
+	}
+
+	salt := strings.Split(password, ".")[1]
+	pass, err := s.hasher.Hash(req.Password, salt)
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash password. error: %w", err)
+	}
+
+	if fmt.Sprintf("%s.%s", pass, salt) != password {
+		return nil, models.ErrPassword
+	}
+
+	return user, nil
+}
+
+func (s *UserService) Create(ctx context.Context, user *user_api.CreateUser) (string, error) {
+	//TODO проверять есть ли уже пользователь с такой почтой
+
 	role, err := s.role.GetDefault(ctx)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	salt, err := s.hasher.GenerateSalt()
 	if err != nil {
-		return fmt.Errorf("failed to create salt. error: %w", err)
+		return "", fmt.Errorf("failed to create salt. error: %w", err)
 	}
 	pass, err := s.hasher.Hash(user.Password, salt)
 	if err != nil {
-		return fmt.Errorf("failed to hash password. error: %w", err)
+		return "", fmt.Errorf("failed to hash password. error: %w", err)
 	}
 	user.Password = fmt.Sprintf("%s.%s", pass, salt)
 
-	if err := s.repo.Create(ctx, user, role.Id); err != nil {
-		return fmt.Errorf("failed to create user. error: %w", err)
+	id, err := s.repo.Create(ctx, user, role.Id)
+	if err != nil {
+		return "", fmt.Errorf("failed to create user. error: %w", err)
 	}
-	return nil
+	return id, nil
+}
+
+func (s *UserService) Confirm(ctx context.Context, user *user_api.ConfirmUser) (*user_model.User, error) {
+	if err := s.repo.Confirm(ctx, user); err != nil {
+		return nil, fmt.Errorf("failed to confirm user. error: %w", err)
+	}
+
+	u, err := s.Get(ctx, &user_api.GetUser{Id: user.Id})
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
 }
 
 // type UserService struct {

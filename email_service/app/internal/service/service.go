@@ -18,7 +18,8 @@ type Order interface {
 }
 
 type User interface {
-	SendConfirm(ctx context.Context, req *email_api.ConfirmUserRequest) error
+	SendConfirm(ctx context.Context, req *email_api.ConfirmUserRequestOld) error
+	SendConfirmNew(ctx context.Context, req *email_api.ConfirmUserRequest) error
 	SendReject(ctx context.Context, req *email_api.RejectUserRequest) error
 	SendJoin(ctx context.Context, user *email_api.JoinUserRequest) error
 }

@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
@@ -32,6 +34,25 @@ func (r *OrderRepo) Get(ctx context.Context, req *order_api.GetOrder) (order *or
 		Date:          data.Date,
 		CountPosition: data.Count,
 		Number:        data.Number,
+	}
+
+	return order, nil
+}
+
+func (r *OrderRepo) GetCurrent(ctx context.Context, req *order_api.GetCurrentOrder) (order *order_model.CurrentOrder, err error) {
+	var data models.OrderNew
+	query := fmt.Sprintf("SELECT id, number FROM \"%s\" WHERE user_id=$1 AND date=''", OrderTable)
+
+	if err := r.db.Get(&data, query, req.UserId); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	order = &order_model.CurrentOrder{
+		Id:     data.Id,
+		Number: data.Number,
 	}
 
 	return order, nil
@@ -76,10 +97,10 @@ func (r *OrderRepo) GetAll(ctx context.Context, req *order_api.GetAllOrders) (or
 	return orders, nil
 }
 
-func (r *OrderRepo) GetNumber(ctx context.Context, orderId, date string) (int64, error) {
-	query := fmt.Sprintf(`UPDATE "%s" SET date=$1 WHERE id=$2 RETURNING number`, OrderTable)
+func (r *OrderRepo) GetNumber(ctx context.Context, order *order_api.CreateOrder, date string) (int64, error) {
+	query := fmt.Sprintf(`UPDATE "%s" SET date=$1, count_position=$2 WHERE id=$3 RETURNING number`, OrderTable)
 
-	row, err := r.db.Query(query, orderId, date)
+	row, err := r.db.Query(query, date, order.Count, order.Id)
 	if err != nil {
 		return 0, fmt.Errorf("failed to execute query. error: %w", err)
 	}

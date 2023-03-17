@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
+	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/gin-gonic/gin"
@@ -26,9 +27,10 @@ func NewOrderHandler(orderApi order_api.OrderServiceClient) *OrderHandler {
 func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 	handler := NewOrderHandler(h.orderApi)
 
-	order := api.Group("/orders")
+	order := api.Group("/orders", h.middleware.UserIdentity)
 	{
 		order.GET("/:id", handler.get)
+		order.GET("/current", handler.getCurrent)
 		order.GET("/all", handler.getAll)
 		order.GET("/:id/заявка.zip", handler.getFile)
 		order.POST("/", handler.create)
@@ -40,10 +42,30 @@ func (h *OrderHandler) get(c *gin.Context) {
 	//TODO
 }
 
-func (h *OrderHandler) getAll(c *gin.Context) {
-	userId := "f8a778bc-8195-46a9-874b-ec8a72358f0e"
+func (h *OrderHandler) getCurrent(c *gin.Context) {
+	userId, exists := c.Get(middleware.UserIdCtx)
+	if !exists {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty user id param")
+		return
+	}
 
-	orders, err := h.orderApi.GetAll(c, &order_api.GetAllOrders{UserId: userId})
+	order, err := h.orderApi.GetCurrent(c, &order_api.GetCurrentOrder{UserId: userId.(string)})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: order})
+}
+
+func (h *OrderHandler) getAll(c *gin.Context) {
+	userId, exists := c.Get(middleware.UserIdCtx)
+	if !exists {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty user id param")
+		return
+	}
+
+	orders, err := h.orderApi.GetAll(c, &order_api.GetAllOrders{UserId: userId.(string)})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -115,8 +137,11 @@ func (h *OrderHandler) getFile(c *gin.Context) {
 }
 
 func (h *OrderHandler) create(c *gin.Context) {
-	//TODO определять userId
-	userId := "f8a778bc-8195-46a9-874b-ec8a72358f0e"
+	userId, exists := c.Get(middleware.UserIdCtx)
+	if !exists {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty user id param")
+		return
+	}
 
 	var dto *order_api.CreateOrder
 	if err := c.BindJSON(&dto); err != nil {
@@ -124,7 +149,7 @@ func (h *OrderHandler) create(c *gin.Context) {
 		return
 	}
 
-	dto.UserId = userId
+	dto.UserId = userId.(string)
 
 	// _, err := h.orderApi.Create(c, &order_api.CreateOrder{
 	// 	Id:     dto.Id,
@@ -144,8 +169,11 @@ func (h *OrderHandler) create(c *gin.Context) {
 }
 
 func (h *OrderHandler) save(c *gin.Context) {
-	//TODO определять userId
-	userId := "f8a778bc-8195-46a9-874b-ec8a72358f0e"
+	userId, exists := c.Get(middleware.UserIdCtx)
+	if !exists {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty user id param")
+		return
+	}
 
 	var dto *order_api.CreateOrder
 	if err := c.BindJSON(&dto); err != nil {
@@ -153,7 +181,7 @@ func (h *OrderHandler) save(c *gin.Context) {
 		return
 	}
 
-	dto.UserId = userId
+	dto.UserId = userId.(string)
 
 	_, err := h.orderApi.Save(c, dto)
 	if err != nil {

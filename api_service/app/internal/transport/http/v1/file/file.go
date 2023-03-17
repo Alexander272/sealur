@@ -172,7 +172,7 @@ func (h *Handler) createDrawing(c *gin.Context) {
 
 	stream, err := h.fileClient.Upload(c)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "error while connect wuth service")
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "error while connect with service")
 		return
 	}
 

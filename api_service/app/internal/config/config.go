@@ -31,6 +31,7 @@ type (
 		RefreshTokenTTL time.Duration `mapstructure:"refreshTokenTTL"`
 		LimitAuthTTL    time.Duration `mapstructure:"limitAuthTTL"`
 		CountAttempt    int32         `mapstructure:"countAttempt"`
+		ConfirmTTL      time.Duration `mapstructure:"confirmTTL"`
 		Secure          bool          `mapstructure:"secure"`
 		Domain          string        `mapstructure:"domain"`
 		Key             string

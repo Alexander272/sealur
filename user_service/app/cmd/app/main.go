@@ -1,25 +1,21 @@
 package main
 
 import (
-	"crypto/tls"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/Alexander272/sealur/user_service/internal/config"
-	"github.com/Alexander272/sealur/user_service/internal/models"
 	"github.com/Alexander272/sealur/user_service/internal/repo"
 	"github.com/Alexander272/sealur/user_service/internal/service"
 	handlers "github.com/Alexander272/sealur/user_service/internal/transport/grpc"
 	"github.com/Alexander272/sealur/user_service/pkg/database/postgres"
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
 	"github.com/Alexander272/sealur/user_service/pkg/logger"
-	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 func main() {
@@ -48,55 +44,57 @@ func main() {
 
 	hasher := hasher.NewSHA256Hasher(10)
 
-	creds, err := credentials.NewClientTLSFromFile("cert/server.crt", "localhost")
-	if err != nil {
-		logger.Fatalf("failed to load certificate. error: %w", err)
-	}
+	// creds, err := credentials.NewClientTLSFromFile("cert/server.crt", "localhost")
+	// if err != nil {
+	// 	logger.Fatalf("failed to load certificate. error: %w", err)
+	// }
 
 	//* данные для аутентификации
-	authEmail := models.Authentication{
-		ServiceName: conf.Services.EmailService.AuthName,
-		Password:    conf.Services.EmailService.AuthPassword,
-	}
+	// authEmail := models.Authentication{
+	// 	ServiceName: conf.Services.EmailService.AuthName,
+	// 	Password:    conf.Services.EmailService.AuthPassword,
+	// }
 
 	//* опции grpc
-	optsEmail := []grpc.DialOption{
-		grpc.WithTransportCredentials(creds),
-		// grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithPerRPCCredentials(&authEmail),
-	}
+	// optsEmail := []grpc.DialOption{
+	// 	grpc.WithTransportCredentials(creds),
+	// 	// grpc.WithTransportCredentials(insecure.NewCredentials()),
+	// 	grpc.WithPerRPCCredentials(&authEmail),
+	// }
 
 	//* подключение к сервису
-	connectEmail, err := grpc.Dial(conf.Services.EmailService.Url, optsEmail...)
-	if err != nil {
-		logger.Fatalf("failed connection to email service. error: %w", err)
-	}
-	emailClient := email_api.NewEmailServiceClient(connectEmail)
+	// connectEmail, err := grpc.Dial(conf.Services.EmailService.Url, optsEmail...)
+	// connectEmail, err := grpc.Dial(conf.Services.EmailService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// if err != nil {
+	// 	logger.Fatalf("failed connection to email service. error: %w", err)
+	// }
+	// emailClient := email_api.NewEmailServiceClient(connectEmail)
 
 	//* Services, Repos & API Handlers
 
 	repos := repo.NewRepo(db, conf)
 	services := service.NewServices(service.Deps{
-		Repos:  repos,
-		Email:  emailClient,
+		Repos: repos,
+		// Email:  emailClient,
 		Hasher: hasher,
 	})
 	handlers := handlers.NewHandler(services, conf.Api)
 
 	//* GRPC Server
 
-	cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
-	if err != nil {
-		logger.Fatalf("failed to load certificate. error: %w", err)
-	}
+	// cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
+	// if err != nil {
+	// 	logger.Fatalf("failed to load certificate. error: %w", err)
+	// }
 
-	opts := []grpc.ServerOption{
-		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
-		// grpc.Creds(insecure.NewCredentials()),
-		grpc.UnaryInterceptor(handlers.UnaryInterceptor),
-	}
+	// opts := []grpc.ServerOption{
+	// 	// grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
+	// 	// grpc.Creds(insecure.NewCredentials()),
+	// 	grpc.UnaryInterceptor(handlers.UnaryInterceptor),
+	// }
 
-	server := grpc.NewServer(opts...)
+	// server := grpc.NewServer(opts...)
+	server := grpc.NewServer()
 	user_api.RegisterUserServiceServer(server, handlers.User)
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)

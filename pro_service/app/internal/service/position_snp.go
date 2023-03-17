@@ -24,9 +24,38 @@ func (s *PositionSnpService) Get(ctx context.Context, orderId string) ([]*positi
 	return positions, nil
 }
 
+func (s *PositionSnpService) GetFull(ctx context.Context, positionsId []string) ([]*position_model.OrderPositionSnp, error) {
+	positions, err := s.repo.GetFull(ctx, positionsId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get full snp positions. error: %w", err)
+	}
+	return positions, nil
+}
+
+func (s *PositionSnpService) Create(ctx context.Context, position *position_model.FullPosition) error {
+	if err := s.repo.Create(ctx, position); err != nil {
+		return fmt.Errorf("failed to create snp position. error: %w", err)
+	}
+	return nil
+}
+
 func (s *PositionSnpService) CreateSeveral(ctx context.Context, positions []*position_model.FullPosition) error {
 	if err := s.repo.CreateSeveral(ctx, positions); err != nil {
-		return fmt.Errorf("failed to create several position snp. error: %w", err)
+		return fmt.Errorf("failed to create several snp position. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PositionSnpService) Update(ctx context.Context, position *position_model.FullPosition) error {
+	if err := s.repo.Update(ctx, position); err != nil {
+		return fmt.Errorf("failed to update snp position. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PositionSnpService) Delete(ctx context.Context, positionId string) error {
+	if err := s.repo.Delete(ctx, positionId); err != nil {
+		return fmt.Errorf("failed to delete snp position. error: %w", err)
 	}
 	return nil
 }

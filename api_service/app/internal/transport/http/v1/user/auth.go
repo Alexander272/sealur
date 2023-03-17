@@ -5,13 +5,49 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur/api_service/internal/models/user_model"
+	"github.com/Alexander272/sealur/api_service/internal/service"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
-	"github.com/Alexander272/sealur_proto/api/user_api"
+	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	"github.com/gin-gonic/gin"
 )
+
+type AuthHandler struct {
+	userApi    user_api.UserServiceClient
+	emailApi   email_api.EmailServiceClient
+	auth       config.AuthConfig
+	services   *service.Services
+	cookieName string
+}
+
+func NewAuthHandler(
+	userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient,
+	auth config.AuthConfig,
+	services *service.Services,
+	cookieName string,
+) *AuthHandler {
+	return &AuthHandler{
+		userApi:    userApi,
+		emailApi:   emailApi,
+		auth:       auth,
+		services:   services,
+		cookieName: cookieName,
+	}
+}
+
+func (h *Handler) initAuthRoutes(api *gin.RouterGroup) {
+	handler := NewAuthHandler(h.userApi, h.emailApi, h.auth, h.services, h.cookieName)
+
+	auth := api.Group("/auth")
+	{
+		auth.POST("/sign-in", handler.signIn)
+		auth.POST("/sign-up", handler.singUp)
+		auth.POST("/sign-out", handler.signOut)
+		auth.POST("/refresh", handler.refresh)
+	}
+}
 
 // @Summary SignIn
 // @Tags Auth
@@ -25,8 +61,8 @@ import (
 // @Failure 500 {object} models.ErrorResponse
 // @Failure default {object} models.ErrorResponse
 // @Router /auth/sign-in [post]
-func (h *Handler) signIn(c *gin.Context) {
-	var dto user_model.SignIn
+func (h *AuthHandler) signIn(c *gin.Context) {
+	var dto *user_api.GetUserByEmail
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
@@ -41,12 +77,13 @@ func (h *Handler) signIn(c *gin.Context) {
 		h.services.Limit.Create(c, c.ClientIP())
 	}
 
-	if limit.Count == h.auth.CountAttempt {
-		h.emailClient.SendBlocked(c, &email_api.BlockedUserRequest{Ip: c.ClientIP(), Login: dto.Login})
-	}
+	//TODO
+	// if limit.Count == h.auth.CountAttempt {
+	// 	h.emailApi.SendBlocked(c, &email_api.BlockedUserRequest{Ip: c.ClientIP(), Login: dto.Login})
+	// }
 
 	if limit.Count >= h.auth.CountAttempt {
-		h.services.AddAttempt(c, c.ClientIP())
+		h.services.Limit.AddAttempt(c, c.ClientIP())
 		models.NewErrorResponse(
 			c, http.StatusTooManyRequests,
 			fmt.Sprintf("too many request (%d >= %d)", limit.Count, h.auth.CountAttempt),
@@ -55,91 +92,82 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userClient.GetUser(c, &user_api.GetUserRequest{Login: dto.Login, Password: dto.Password})
+	user, err := h.userApi.GetByEmail(c, dto)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
-	if user.User == nil {
-		h.services.AddAttempt(c, c.ClientIP())
-		models.NewErrorResponse(c, http.StatusBadRequest, "invalid crenditails", "invalid data send")
+	if user == nil {
+		h.services.Limit.AddAttempt(c, c.ClientIP())
+		models.NewErrorResponse(c, http.StatusBadRequest, "invalid credentials", "invalid data send")
 		return
 	}
-	h.services.Remove(c, c.ClientIP())
+	h.services.Limit.Remove(c, c.ClientIP())
 
 	// запись в редисе и генерация токенов
-	token, err := h.services.SignIn(c, user.User)
+	token, err := h.services.Session.SignIn(c, user)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
 
-	_, err = h.userClient.AddIp(c, &user_api.AddIpRequest{
-		UserId: user.User.Id,
-		Ip:     c.ClientIP(),
-	})
-	if err != nil {
-		logger.Error(err)
-	}
+	// _, err = h.userClient.AddIp(c, &user_api.AddIpRequest{
+	// 	UserId: user.User.Id,
+	// 	Ip:     c.ClientIP(),
+	// })
+	// if err != nil {
+	// 	logger.Error(err)
+	// }
 
 	c.SetCookie(h.cookieName, token, int(h.auth.RefreshTokenTTL.Seconds()), "/", c.Request.Host, h.auth.Secure, true)
-	c.JSON(http.StatusOK, models.DataResponse{Data: user.User})
+	c.JSON(http.StatusOK, models.DataResponse{Data: user})
 }
 
-// @Summary SignUp
-// @Tags Auth
-// @Description регистрация
-// @ModuleID singUp
-// @Accept json
-// @Produce json
-// @Param data body user_model.SignUp true "user info"
-// @Success 200 {object} models.IdResponse
-// @Failure 400,404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
-// @Failure default {object} models.ErrorResponse
-// @Router /auth/sign-up [post]
-func (h *Handler) singUp(c *gin.Context) {
-	var dto user_model.SignUp
+func (h *AuthHandler) singUp(c *gin.Context) {
+	var dto *user_api.CreateUser
 	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "введены некорректные данные")
 		return
 	}
 
-	req := user_api.CreateUserRequest{
-		Organization: dto.Organization,
-		Name:         dto.Name,
-		Email:        dto.Email,
-		City:         dto.City,
-		Position:     dto.Position,
-		Phone:        dto.Phone,
+	id, err := h.userApi.Create(c, dto)
+	if err != nil {
+		// TODO добавить проверку (может прилететь ошибка, что пользователь с таким email уже есть)
+		if errors.Is(err, models.ErrFlangeAlreadyExists) {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), err.Error())
+			return
+		}
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка")
+		return
 	}
 
-	_, err := h.userClient.CreateUser(c, &req)
+	// генерировать код для подтверждения и записывать его в редис (с id пользователя)
+	code, err := h.services.Confirm.Create(c, id.Id)
 	if err != nil {
-		// if errors.Is(err, models.ErrFlangeAlreadyExists) {
-		// 	models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), err.Error())
-		// 	return
-		// }
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка")
+		return
+	}
+
+	logger.Info(fmt.Sprintf("%s/auth/confirm?code=%s", c.Request.Host, code))
+
+	data := &email_api.ConfirmUserRequest{
+		Name:  dto.Name,
+		Email: dto.Email,
+		//TODO
+		// Link:  fmt.Sprintf("%s/auth/confirm?code=%s", c.Request.Host, code),
+		Link: fmt.Sprintf("%s/auth/confirm?code=%s", "http://pro.sealur.ru", code),
+	}
+	_, err = h.emailApi.ConfirmUser(c, data)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка при отправлении письма")
 		return
 	}
 
 	c.JSON(http.StatusCreated, models.IdResponse{Message: "Registration completed successfully"})
 }
 
-// @Summary SignOut
-// @Tags Auth
-// @Description выход из аккаунта
-// @ModuleID signOut
-// @Accept json
-// @Produce json
-// @Success 204 {object} models.IdResponse
-// @Failure 400,404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
-// @Failure default {object} models.ErrorResponse
-// @Router /auth/sign-out [post]
-func (h *Handler) signOut(c *gin.Context) {
+func (h *AuthHandler) signOut(c *gin.Context) {
 	token, err := c.Cookie(h.cookieName)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error(), "user is not authorized")
@@ -161,18 +189,7 @@ func (h *Handler) signOut(c *gin.Context) {
 	c.JSON(http.StatusNoContent, models.IdResponse{Message: "Sign-out completed successfully"})
 }
 
-// @Summary Refresh
-// @Tags Auth
-// @Description вход в систему (при обновлении страницы)
-// @ModuleID refresh
-// @Accept json
-// @Produce json
-// @Success 200 {object} models.DataResponse{data=user_api.UserResponse}
-// @Failure 400,404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
-// @Failure default {object} models.ErrorResponse
-// @Router /auth/refresh [post]
-func (h *Handler) refresh(c *gin.Context) {
+func (h *AuthHandler) refresh(c *gin.Context) {
 	token, err := c.Cookie(h.cookieName)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error(), "user is not authorized")

@@ -31,6 +31,14 @@ func (h *OrderHandlers) Get(ctx context.Context, req *order_api.GetOrder) (*orde
 	return order, nil
 }
 
+func (h *OrderHandlers) GetCurrent(ctx context.Context, req *order_api.GetCurrentOrder) (*order_model.CurrentOrder, error) {
+	order, err := h.service.GetCurrent(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return order, nil
+}
+
 func (h *OrderHandlers) GetAll(ctx context.Context, req *order_api.GetAllOrders) (*order_api.Orders, error) {
 	orders, err := h.service.GetAll(ctx, req)
 	if err != nil {
@@ -94,9 +102,10 @@ func (h *OrderHandlers) Save(ctx context.Context, order *order_api.CreateOrder) 
 	return number, nil
 }
 
-func (h *OrderHandlers) Create(ctx context.Context, order *order_api.CreateOrder) (*response_model.Response, error) {
-	if err := h.service.Create(ctx, order); err != nil {
+func (h *OrderHandlers) Create(ctx context.Context, order *order_api.CreateOrder) (*response_model.IdResponse, error) {
+	id, err := h.service.Create(ctx, order)
+	if err != nil {
 		return nil, err
 	}
-	return &response_model.Response{}, nil
+	return &response_model.IdResponse{Id: id}, nil
 }

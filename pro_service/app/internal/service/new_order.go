@@ -4,6 +4,8 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -42,6 +44,34 @@ func (s *OrderServiceNew) Get(ctx context.Context, req *order_api.GetOrder) (*or
 	return order, nil
 }
 
+func (s *OrderServiceNew) GetCurrent(ctx context.Context, req *order_api.GetCurrentOrder) (*order_model.CurrentOrder, error) {
+	empty := false
+	order, err := s.repo.GetCurrent(ctx, req)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			empty = true
+		} else {
+			return nil, fmt.Errorf("failed to get current order. error: %w", err)
+		}
+	}
+	if empty {
+		id, err := s.Create(ctx, &order_api.CreateOrder{UserId: req.UserId})
+		if err != nil {
+			return nil, err
+		}
+
+		order = &order_model.CurrentOrder{Id: id}
+	}
+
+	positions, err := s.position.GetFull(ctx, order.Id)
+	if err != nil {
+		return nil, err
+	}
+	order.Positions = positions
+
+	return order, nil
+}
+
 func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) (*bytes.Buffer, string, error) {
 	order, err := s.Get(ctx, req)
 	if err != nil {
@@ -57,7 +87,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 	if err = file.SetSheetRow(sheetName, "A1", &mainColumn); err != nil {
 		return nil, "", fmt.Errorf("failed to create header table. error: %w", err)
 	}
-	if err = file.SetSheetRow(sheetName, "A6", &snpColumn); err != nil {
+	if err = file.SetSheetRow(sheetName, "F1", &snpColumn); err != nil {
 		return nil, "", fmt.Errorf("failed to create snp header table. error: %w", err)
 	}
 
@@ -200,7 +230,7 @@ func (s *OrderServiceNew) Save(ctx context.Context, order *order_api.CreateOrder
 		}
 	} else {
 		var err error
-		number, err = s.repo.GetNumber(ctx, orderId, fmt.Sprintf("%d", time.Now().UnixMilli()))
+		number, err = s.repo.GetNumber(ctx, order, fmt.Sprintf("%d", time.Now().UnixMilli()))
 		if err != nil {
 			return nil, fmt.Errorf("failed to get order number. error: %w", err)
 		}
@@ -213,20 +243,22 @@ func (s *OrderServiceNew) Save(ctx context.Context, order *order_api.CreateOrder
 	return &order_api.OrderNumber{Number: number}, nil
 }
 
-func (s *OrderServiceNew) Create(ctx context.Context, order *order_api.CreateOrder) error {
+func (s *OrderServiceNew) Create(ctx context.Context, order *order_api.CreateOrder) (string, error) {
 	var orderId = order.Id
 	if orderId == "" {
 		orderId = uuid.New().String()
 
 		order.Id = orderId
 		if err := s.repo.Create(ctx, order, ""); err != nil {
-			return fmt.Errorf("failed to create order. error: %w", err)
+			return "", fmt.Errorf("failed to create order. error: %w", err)
 		}
 	}
 
-	if err := s.position.CreateSeveral(ctx, order.Positions, orderId); err != nil {
-		return err
+	if len(order.Positions) > 0 {
+		if err := s.position.CreateSeveral(ctx, order.Positions, orderId); err != nil {
+			return "", err
+		}
 	}
 
-	return nil
+	return orderId, nil
 }

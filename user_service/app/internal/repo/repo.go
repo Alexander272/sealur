@@ -6,15 +6,18 @@ import (
 	"github.com/Alexander272/sealur/user_service/internal/config"
 	"github.com/Alexander272/sealur/user_service/internal/repo/postgres"
 	"github.com/Alexander272/sealur_proto/api/user/models/role_model"
+	"github.com/Alexander272/sealur_proto/api/user/models/user_model"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	"github.com/jmoiron/sqlx"
 )
 
 type Users interface {
+	Get(ctx context.Context, req *user_api.GetUser) (*user_model.User, error)
+	GetByEmail(ctx context.Context, req *user_api.GetUserByEmail) (*user_model.User, string, error)
 	// Get(context.Context, *user_api.GetUser) (models.User, error)
 	// GetAll(context.Context, *user_api.GetAllUser) ([]models.User, error)
 	// GetNew(context.Context, *user_api.GetNewUser) ([]models.User, error)
-	Create(context.Context, *user_api.CreateUser, string) error
+	Create(context.Context, *user_api.CreateUser, string) (string, error)
 	Confirm(context.Context, *user_api.ConfirmUser) error
 	// Update(context.Context, *user_api.UpdateUser) error
 	// Delete(context.Context, *user_api.DeleteUser) error
