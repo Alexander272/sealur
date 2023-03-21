@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
 	"net"
 	"net/http"
@@ -21,7 +20,6 @@ import (
 	"github.com/Alexander272/sealur/file_service/pkg/storage"
 	"github.com/Alexander272/sealur_proto/api/file_api"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 func main() {
@@ -49,18 +47,19 @@ func main() {
 
 	//* GRPC Server
 
-	cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
-	if err != nil {
-		logger.Fatalf("failed to load certificate. error: %w", err)
-	}
+	// cert, err := tls.LoadX509KeyPair("cert/server.crt", "cert/server.key")
+	// if err != nil {
+	// 	logger.Fatalf("failed to load certificate. error: %w", err)
+	// }
 
-	opts := []grpc.ServerOption{
-		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
-		// grpc.Creds(insecure.NewCredentials()),
-		grpc.UnaryInterceptor(handlers.UnaryInterceptor),
-	}
+	// opts := []grpc.ServerOption{
+	// grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
+	// grpc.Creds(insecure.NewCredentials()),
+	// grpc.UnaryInterceptor(handlers.UnaryInterceptor),
+	// }
 
-	grpcServer := grpc.NewServer(opts...)
+	// grpcServer := grpc.NewServer(opts...)
+	grpcServer := grpc.NewServer()
 	file_api.RegisterFileServiceServer(grpcServer, handlers)
 
 	listener, err := net.Listen("tcp", ":"+conf.Tcp.Port)

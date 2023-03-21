@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 
@@ -44,4 +45,11 @@ func (h *Handler) SendOrder(stream email_api.EmailService_SendOrderServer) error
 	}
 
 	return stream.SendAndClose(&email_api.SuccessResponse{Success: true})
+}
+
+func (h *Handler) SendNotification(ctx context.Context, data *email_api.NotificationData) (*email_api.SuccessResponse, error) {
+	if err := h.service.Order.SendNotification(ctx, data); err != nil {
+		return nil, fmt.Errorf("failed to send notification to manager. error: %w", err)
+	}
+	return &email_api.SuccessResponse{Success: true}, nil
 }

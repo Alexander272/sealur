@@ -43,12 +43,13 @@ type (
 		InterviewSubject  string
 		Order             string
 		OrderSubject      string
+		OrderLink         string // ссылка для скачивания заказа
 		Blocked           string
 		BlockedSubject    string
 		Confirm           string
 		ConfirmSubject    string
 		ConfirmSubjectNew string
-		JoinSubject       string // Заголовок письма отпрявляемого пользователю после подтверждения
+		JoinSubject       string // Заголовок письма отправляемого пользователю после подтверждения
 		RejectSubject     string // Заголовок письма - если регистрацию отклонили
 		Support           string
 		Link              string // Ссылка на кореневой ендпоинт приложения

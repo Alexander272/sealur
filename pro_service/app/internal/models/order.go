@@ -11,6 +11,17 @@ type OrderNew struct {
 	Date   string `db:"date"`
 	Count  int64  `db:"count_position"`
 	Number int64  `db:"number"`
+	Status string `db:"status"`
+}
+
+type ManagerOrder struct {
+	Id      string `db:"id"`
+	Date    string `db:"date"`
+	UserId  string `db:"user_id"`
+	Company string `db:"company"`
+	Count   int64  `db:"count_position"`
+	Number  int64  `db:"number"`
+	Status  string `db:"status"`
 }
 
 type OrderWithPosition struct {

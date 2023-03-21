@@ -10,8 +10,10 @@ import (
 	"github.com/Alexander272/sealur/user_service/internal/models"
 	"github.com/Alexander272/sealur/user_service/internal/repo"
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
+	"github.com/Alexander272/sealur/user_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/user/models/user_model"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
+	"github.com/google/uuid"
 )
 
 type UserService struct {
@@ -57,6 +59,31 @@ func (s *UserService) GetByEmail(ctx context.Context, req *user_api.GetUserByEma
 	}
 
 	return user, nil
+}
+
+func (s *UserService) GetManager(ctx context.Context, req *user_api.GetUser) (manager *user_api.Manager, err error) {
+	user, err := s.repo.Get(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user. error: %w", err)
+	}
+
+	m := &user_model.User{}
+	if user.ManagerId != uuid.Nil.String() {
+		m, err = s.repo.Get(ctx, &user_api.GetUser{Id: user.ManagerId})
+		if err != nil {
+			return nil, fmt.Errorf("failed to get manager. error: %w", err)
+		}
+	} else {
+		logger.Debug("not implemented")
+		// TODO получить id менеджера по региону пользователя
+	}
+
+	manager = &user_api.Manager{
+		Email: m.Email,
+		User:  user,
+	}
+
+	return manager, nil
 }
 
 func (s *UserService) Create(ctx context.Context, user *user_api.CreateUser) (string, error) {

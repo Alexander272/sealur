@@ -419,6 +419,14 @@ func (r *PositionSnpRepo) Update(ctx context.Context, position *position_model.F
 	material := position.SnpData.Material
 	design := position.SnpData.Design
 
+	nilId := uuid.Nil.String()
+	if material.InnerRingId == "" {
+		material.InnerRingId = nilId
+	}
+	if material.OuterRingId == "" {
+		material.OuterRingId = nilId
+	}
+
 	_, err = tx.Exec(mainQuery, main.SnpStandardId, main.SnpTypeId, main.FlangeTypeCode, main.FlangeTypeTitle, position.Id)
 	if err != nil {
 		tx.Rollback()

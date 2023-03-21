@@ -24,7 +24,7 @@ func NewUserRepo(db *sqlx.DB) *UserRepo {
 
 func (r *UserRepo) Get(ctx context.Context, req *user_api.GetUser) (*user_model.User, error) {
 	var data models.User
-	query := fmt.Sprintf(`SELECT "%s".id, company, inn, kpp, region, city, "position", phone, password, email, %s.code as role_code, name, address
+	query := fmt.Sprintf(`SELECT "%s".id, company, inn, kpp, region, city, "position", phone, password, email, %s.code as role_code, name, address, manager_id
 		FROM "%s" INNER JOIN %s on %s.id=role_id WHERE "%s".id=$1`,
 		UserTable, RoleTable, UserTable, RoleTable, RoleTable, UserTable,
 	)
@@ -34,18 +34,19 @@ func (r *UserRepo) Get(ctx context.Context, req *user_api.GetUser) (*user_model.
 	}
 
 	user := &user_model.User{
-		Id:       data.Id,
-		Company:  data.Company,
-		Inn:      data.Inn,
-		Kpp:      data.Kpp,
-		Region:   data.Region,
-		City:     data.City,
-		Position: data.Position,
-		Phone:    data.Phone,
-		Email:    data.Email,
-		RoleCode: data.RoleCode,
-		Name:     data.Name,
-		Address:  data.Address,
+		Id:        data.Id,
+		Company:   data.Company,
+		Inn:       data.Inn,
+		Kpp:       data.Kpp,
+		Region:    data.Region,
+		City:      data.City,
+		Position:  data.Position,
+		Phone:     data.Phone,
+		Email:     data.Email,
+		RoleCode:  data.RoleCode,
+		Name:      data.Name,
+		Address:   data.Address,
+		ManagerId: data.ManagerId,
 	}
 
 	return user, nil
@@ -81,12 +82,17 @@ func (r *UserRepo) GetByEmail(ctx context.Context, req *user_api.GetUserByEmail)
 }
 
 func (r *UserRepo) Create(ctx context.Context, user *user_api.CreateUser, roleId string) (string, error) {
-	query := fmt.Sprintf(`INSERT INTO "%s"(id, company, inn, kpp, region, city, "position", phone, password, email, role_id, name, address)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`, UserTable)
+	query := fmt.Sprintf(`INSERT INTO "%s"(id, company, inn, kpp, region, city, "position", phone, password, email, role_id, name, address, manager_id)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`, UserTable)
 	id := uuid.New()
 
+	managerId := user.ManagerId
+	if managerId == "" {
+		managerId = uuid.Nil.String()
+	}
+
 	_, err := r.db.Exec(query, id, user.Company, user.Inn, user.Kpp, user.Region, user.City, user.Position, user.Phone, user.Password,
-		user.Email, roleId, user.Name, user.Address,
+		user.Email, roleId, user.Name, user.Address, managerId,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

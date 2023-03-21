@@ -22,8 +22,8 @@ func NewOrderRepo(db *sqlx.DB) *OrderRepo {
 }
 
 func (r *OrderRepo) Get(ctx context.Context, req *order_api.GetOrder) (order *order_model.FullOrder, err error) {
-	var data models.OrderNew
-	query := fmt.Sprintf("SELECT id, date, count_position, number FROM \"%s\" WHERE id=$1", OrderTable)
+	var data models.ManagerOrder
+	query := fmt.Sprintf("SELECT id, date, count_position, number, user_id FROM \"%s\" WHERE id=$1", OrderTable)
 
 	if err := r.db.Get(&data, query, req.Id); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -34,6 +34,7 @@ func (r *OrderRepo) Get(ctx context.Context, req *order_api.GetOrder) (order *or
 		Date:          data.Date,
 		CountPosition: data.Count,
 		Number:        data.Number,
+		UserId:        data.UserId,
 	}
 
 	return order, nil
@@ -60,12 +61,12 @@ func (r *OrderRepo) GetCurrent(ctx context.Context, req *order_api.GetCurrentOrd
 
 func (r *OrderRepo) GetAll(ctx context.Context, req *order_api.GetAllOrders) (orders []*order_model.Order, err error) {
 	var data []models.OrderWithPosition
-	query := fmt.Sprintf(`SELECT "%s".id, user_id, date, count_position, number, %s.id as position_id, title, amount, %s.count as position_count
+	query := fmt.Sprintf(`SELECT "%s".id, date, count_position, number, %s.id as position_id, title, amount, %s.count as position_count
 		FROM "%s" INNER JOIN %s on order_id="%s".id WHERE user_id=$1 ORDER BY number`,
 		OrderTable, PositionTable, PositionTable, OrderTable, PositionTable, OrderTable,
 	)
 
-	if err := r.db.Get(&data, query, req.UserId); err != nil {
+	if err := r.db.Select(&data, query, req.UserId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
@@ -100,9 +101,9 @@ func (r *OrderRepo) GetAll(ctx context.Context, req *order_api.GetAllOrders) (or
 func (r *OrderRepo) GetNumber(ctx context.Context, order *order_api.CreateOrder, date string) (int64, error) {
 	query := fmt.Sprintf(`UPDATE "%s" SET date=$1, count_position=$2 WHERE id=$3 RETURNING number`, OrderTable)
 
-	row, err := r.db.Query(query, date, order.Count, order.Id)
-	if err != nil {
-		return 0, fmt.Errorf("failed to execute query. error: %w", err)
+	row := r.db.QueryRow(query, date, order.Count, order.Id)
+	if row.Err() != nil {
+		return 0, fmt.Errorf("failed to execute query. error: %w", row.Err())
 	}
 
 	var number int64
@@ -110,6 +111,38 @@ func (r *OrderRepo) GetNumber(ctx context.Context, order *order_api.CreateOrder,
 		return 0, fmt.Errorf("failed to scan result. error: %w", err)
 	}
 	return number, nil
+}
+
+func (r *OrderRepo) GetOpen(ctx context.Context, managerId string) (orders []*order_model.ManagerOrder, err error) {
+	var data []models.ManagerOrder
+	// query := fmt.Sprintf(`SELECT "%s".id, user_id, "%s".company, "%s".date, count_position, "number", status FROM "%s"
+	// 	INNER JOIN "%s" ON "%s".id=user_id WHERE manager_id=$1 AND status != '%s' AND "%s".date !='' ORDER BY status, "%s".date`,
+	// 	OrderTable, UserTable, OrderTable, OrderTable, UserTable, UserTable, order_model.OrderStatus_finish.String(), OrderTable, OrderTable,
+	// )
+	query := fmt.Sprintf(`SELECT "%s".id, user_id, "%s".company, "%s".date, count_position, "number", status FROM "%s" 
+		INNER JOIN "%s" ON "%s".id=user_id WHERE manager_id=$1 AND status != '%s' AND "%s".date !='' ORDER BY "%s".date`,
+		OrderTable, UserTable, OrderTable, OrderTable, UserTable, UserTable, order_model.OrderStatus_finish.String(), OrderTable, OrderTable,
+	)
+
+	if err := r.db.Select(&data, query, managerId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for _, o := range data {
+		status := order_model.OrderStatus_value[o.Status]
+
+		orders = append(orders, &order_model.ManagerOrder{
+			Id:            o.Id,
+			Date:          o.Date,
+			UserId:        o.UserId,
+			Company:       o.Company,
+			CountPosition: o.Count,
+			Number:        o.Number,
+			Status:        order_model.OrderStatus(status),
+		})
+	}
+
+	return orders, nil
 }
 
 func (r *OrderRepo) Create(ctx context.Context, order *order_api.CreateOrder, date string) error {

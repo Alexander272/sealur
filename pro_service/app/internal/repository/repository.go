@@ -281,6 +281,7 @@ type OrderNew interface {
 	GetCurrent(context.Context, *order_api.GetCurrentOrder) (*order_model.CurrentOrder, error)
 	GetAll(context.Context, *order_api.GetAllOrders) ([]*order_model.Order, error)
 	GetNumber(ctx context.Context, order *order_api.CreateOrder, date string) (int64, error)
+	GetOpen(ctx context.Context, managerId string) (orders []*order_model.ManagerOrder, err error)
 	Create(ctx context.Context, order *order_api.CreateOrder, date string) error
 }
 

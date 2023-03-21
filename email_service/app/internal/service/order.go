@@ -3,11 +3,13 @@ package service
 import (
 	"archive/zip"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/Alexander272/sealur/email_service/internal/config"
 	"github.com/Alexander272/sealur/email_service/internal/constants"
+	"github.com/Alexander272/sealur/email_service/internal/models"
 	"github.com/Alexander272/sealur/email_service/pkg/email"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 )
@@ -67,6 +69,29 @@ func (s *OrderService) SendOrder(data *email_api.OrderData, file *bytes.Buffer) 
 			Filename: data.File.Name[0],
 			Blob:     file.Bytes(),
 		})
+	}
+
+	return s.sender.Send(input)
+}
+
+func (s *OrderService) SendNotification(ctx context.Context, req *email_api.NotificationData) error {
+	input := email.SendEmailInput{
+		Subject: s.conf.OrderSubject,
+		To:      []string{req.Email},
+	}
+
+	data := models.OrderTemplate{
+		Name:     req.User.Name,
+		Position: req.User.Position,
+		Company:  req.User.Company,
+		Address:  req.User.Address,
+		Email:    req.User.Email,
+		Phone:    req.User.Phone,
+		Link:     fmt.Sprintf("%s/%s?action=save", s.conf.OrderLink, req.OrderId),
+	}
+
+	if err := input.GenerateBodyFromHTML(constants.OrderNewTemplate, data); err != nil {
+		return err
 	}
 
 	return s.sender.Send(input)

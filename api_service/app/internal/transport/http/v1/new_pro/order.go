@@ -10,28 +10,35 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
+	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	"github.com/gin-gonic/gin"
 )
 
 type OrderHandler struct {
 	orderApi order_api.OrderServiceClient
+	userApi  user_api.UserServiceClient
+	emailApi email_api.EmailServiceClient
 }
 
-func NewOrderHandler(orderApi order_api.OrderServiceClient) *OrderHandler {
+func NewOrderHandler(orderApi order_api.OrderServiceClient, userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient) *OrderHandler {
 	return &OrderHandler{
 		orderApi: orderApi,
+		userApi:  userApi,
+		emailApi: emailApi,
 	}
 }
 
 func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
-	handler := NewOrderHandler(h.orderApi)
+	handler := NewOrderHandler(h.orderApi, h.userApi, h.emailApi)
 
 	order := api.Group("/orders", h.middleware.UserIdentity)
 	{
 		order.GET("/:id", handler.get)
 		order.GET("/current", handler.getCurrent)
 		order.GET("/all", handler.getAll)
+		order.GET("/open", handler.getOpen)
 		order.GET("/:id/заявка.zip", handler.getFile)
 		order.POST("/", handler.create)
 		order.POST("/save", handler.save)
@@ -39,7 +46,26 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 }
 
 func (h *OrderHandler) get(c *gin.Context) {
-	//TODO
+	id := c.Param("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty id param")
+		return
+	}
+
+	order, err := h.orderApi.Get(c, &order_api.GetOrder{Id: id})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	user, err := h.userApi.Get(c, &user_api.GetUser{Id: order.Order.UserId})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+	order.User = user
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: order})
 }
 
 func (h *OrderHandler) getCurrent(c *gin.Context) {
@@ -66,6 +92,22 @@ func (h *OrderHandler) getAll(c *gin.Context) {
 	}
 
 	orders, err := h.orderApi.GetAll(c, &order_api.GetAllOrders{UserId: userId.(string)})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: orders.Orders, Count: len(orders.Orders)})
+}
+
+func (h *OrderHandler) getOpen(c *gin.Context) {
+	userId, exists := c.Get(middleware.UserIdCtx)
+	if !exists {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty user id param")
+		return
+	}
+
+	orders, err := h.orderApi.GetOpen(c, &order_api.GetManagerOrders{ManagerId: userId.(string)})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -155,8 +197,8 @@ func (h *OrderHandler) create(c *gin.Context) {
 	// 	Id:     dto.Id,
 	// 	Count:  dto.Count,
 	// 	UserId: dto.UserId,
-	// 	//TODO дописать преобразование позиций
-	// 	// Positions: dto.Positions,
+	// дописать преобразование позиций
+	// Positions: dto.Positions,
 	// })
 	_, err := h.orderApi.Create(c, dto)
 	if err != nil {
@@ -189,6 +231,20 @@ func (h *OrderHandler) save(c *gin.Context) {
 		return
 	}
 
+	data, err := h.userApi.GetManagerEmail(c, &user_api.GetUser{Id: dto.UserId})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	logger.Debug(data.Email)
+	// send message to manager
+	_, err = h.emailApi.SendNotification(c, &email_api.NotificationData{Email: data.Email, User: data.User})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "failed to send email")
+		return
+	}
+
 	// c.Header("Location", fmt.Sprintf("/api/v1/sealur-pro/orders/%s", order.Id))
-	c.JSON(http.StatusCreated, models.IdResponse{Message: "Saved"})
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Saved"})
 }

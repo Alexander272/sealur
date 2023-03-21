@@ -14,19 +14,20 @@ package models
 // }
 
 type User struct {
-	Id       string `db:"id"`
-	Company  string `db:"company"`
-	Address  string `db:"address"`
-	Inn      string `db:"inn"`
-	Kpp      string `db:"kpp"`
-	Region   string `db:"region"`
-	City     string `db:"city"`
-	Name     string `db:"name"`
-	Position string `db:"position"`
-	Email    string `db:"email"`
-	Phone    string `db:"phone"`
-	RoleCode string `db:"role_code"`
-	Password string `db:"password"`
+	Id        string `db:"id"`
+	Company   string `db:"company"`
+	Address   string `db:"address"`
+	Inn       string `db:"inn"`
+	Kpp       string `db:"kpp"`
+	Region    string `db:"region"`
+	City      string `db:"city"`
+	Name      string `db:"name"`
+	Position  string `db:"position"`
+	Email     string `db:"email"`
+	Phone     string `db:"phone"`
+	RoleCode  string `db:"role_code"`
+	Password  string `db:"password"`
+	ManagerId string `db:"manager_id"`
 }
 
 type ConfirmUser struct {

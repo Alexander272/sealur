@@ -23,12 +23,12 @@ func NewOrderHandlers(service service.OrderNew) *OrderHandlers {
 	}
 }
 
-func (h *OrderHandlers) Get(ctx context.Context, req *order_api.GetOrder) (*order_model.FullOrder, error) {
+func (h *OrderHandlers) Get(ctx context.Context, req *order_api.GetOrder) (*order_api.Order, error) {
 	order, err := h.service.Get(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	return order, nil
+	return &order_api.Order{Order: order}, nil
 }
 
 func (h *OrderHandlers) GetCurrent(ctx context.Context, req *order_api.GetCurrentOrder) (*order_model.CurrentOrder, error) {
@@ -45,6 +45,14 @@ func (h *OrderHandlers) GetAll(ctx context.Context, req *order_api.GetAllOrders)
 		return nil, err
 	}
 	return &order_api.Orders{Orders: orders}, nil
+}
+
+func (h *OrderHandlers) GetOpen(ctx context.Context, req *order_api.GetManagerOrders) (*order_api.ManagerOrders, error) {
+	orders, err := h.service.GetOpen(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &order_api.ManagerOrders{Orders: orders}, nil
 }
 
 func (h *OrderHandlers) GetFile(req *order_api.GetOrder, stream order_api.OrderService_GetFileServer) error {

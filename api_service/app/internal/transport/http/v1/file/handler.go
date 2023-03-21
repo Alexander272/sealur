@@ -10,7 +10,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Handler struct {
@@ -26,27 +26,28 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	//* file service connect
 	//TODO стоит ли так оставлять сертификат?
 	//* определение сертификата
-	creds, err := credentials.NewClientTLSFromFile("cert/server.crt", "localhost")
-	if err != nil {
-		logger.Fatalf("failed to load certificate. error: %w", err)
-	}
+	// creds, err := credentials.NewClientTLSFromFile("cert/server.crt", "localhost")
+	// if err != nil {
+	// 	logger.Fatalf("failed to load certificate. error: %w", err)
+	// }
 
 	//* данные для аутентификации
-	auth := models.Authentication{
-		ServiceName: conf.FileService.AuthName,
-		Password:    conf.FileService.AuthPassword,
-	}
+	// auth := models.Authentication{
+	// 	ServiceName: conf.FileService.AuthName,
+	// 	Password:    conf.FileService.AuthPassword,
+	// }
 
 	//* опции grpc
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(creds),
-		grpc.WithPerRPCCredentials(&auth),
-	}
+	// opts := []grpc.DialOption{
+	// 	grpc.WithTransportCredentials(creds),
+	// 	grpc.WithPerRPCCredentials(&auth),
+	// }
 
 	//* подключение к сервису
-	connect, err := grpc.Dial(conf.FileService.Url, opts...)
+	// connect, err := grpc.Dial(conf.FileService.Url, opts...)
+	connect, err := grpc.Dial(conf.FileService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatalf("failed connection to pro service. error: %w", err)
+		logger.Fatalf("failed connection to file service. error: %w", err)
 	}
 
 	fileClient := file_api.NewFileServiceClient(connect)

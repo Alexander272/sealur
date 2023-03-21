@@ -14,6 +14,7 @@ import (
 type User interface {
 	Get(context.Context, *user_api.GetUser) (*user_model.User, error)
 	GetByEmail(context.Context, *user_api.GetUserByEmail) (*user_model.User, error)
+	GetManager(context.Context, *user_api.GetUser) (*user_api.Manager, error)
 	Create(context.Context, *user_api.CreateUser) (string, error)
 	Confirm(context.Context, *user_api.ConfirmUser) (*user_model.User, error)
 	// Get(context.Context, *user_api.GetUserRequest) (*user_api.User, error)

@@ -31,8 +31,8 @@ func (h *Handler) Download(req *file_api.FileDownloadRequest, stream file_api.Fi
 	}
 	err = stream.Send(reqMeta)
 	if err != nil {
-		logger.Errorf("cannot send metadata to clinet: %w", err)
-		return fmt.Errorf("cannot send metadata to clinet %w", err)
+		logger.Errorf("cannot send metadata to client: %w", err)
+		return fmt.Errorf("cannot send metadata to client %w", err)
 	}
 
 	f := bytes.NewReader(file.Bytes)
@@ -57,8 +57,8 @@ func (h *Handler) Download(req *file_api.FileDownloadRequest, stream file_api.Fi
 
 		err = stream.Send(reqChunk)
 		if err != nil {
-			logger.Errorf("cannot send chunk to clinet: %w", err)
-			return fmt.Errorf("cannot send chunk to clinet %w", err)
+			logger.Errorf("cannot send chunk to client: %w", err)
+			return fmt.Errorf("cannot send chunk to client %w", err)
 		}
 	}
 
@@ -101,8 +101,8 @@ func (h *Handler) GroupDownload(req *file_api.GroupDownloadRequest, stream file_
 	}
 	err = stream.Send(reqMeta)
 	if err != nil {
-		logger.Errorf("cannot send metadata to clinet: %w", err)
-		return fmt.Errorf("cannot send metadata to clinet %w", err)
+		logger.Errorf("cannot send metadata to client: %w", err)
+		return fmt.Errorf("cannot send metadata to client %w", err)
 	}
 
 	reader := bufio.NewReader(buf)
@@ -126,8 +126,8 @@ func (h *Handler) GroupDownload(req *file_api.GroupDownloadRequest, stream file_
 
 		err = stream.Send(reqChunk)
 		if err != nil {
-			logger.Errorf("cannot send chunk to clinet: %w", err)
-			return fmt.Errorf("cannot send chunk to clinet %w", err)
+			logger.Errorf("cannot send chunk to client: %w", err)
+			return fmt.Errorf("cannot send chunk to client %w", err)
 		}
 	}
 

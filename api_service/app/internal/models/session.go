@@ -37,7 +37,7 @@ type ConfirmData struct {
 	Exp    time.Duration
 }
 
-func (i *ConfirmData) MarshalBinary() ([]byte, error) {
+func (i ConfirmData) MarshalBinary() ([]byte, error) {
 	return json.Marshal(i)
 }
 func (i *ConfirmData) UnMarshalBinary(str string) {

@@ -43,6 +43,14 @@ func (h *UserHandler) GetByEmail(ctx context.Context, req *user_api.GetUserByEma
 	return user, nil
 }
 
+func (h *UserHandler) GetManagerEmail(ctx context.Context, req *user_api.GetUser) (*user_api.Manager, error) {
+	user, err := h.service.GetManager(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (h *UserHandler) Create(ctx context.Context, user *user_api.CreateUser) (*response_model.IdResponse, error) {
 	logger.Info("create")
 	id, err := h.service.Create(ctx, user)

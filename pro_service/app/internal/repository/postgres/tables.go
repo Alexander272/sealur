@@ -20,4 +20,5 @@ const (
 	PositionSizeSnpTable     = "position_snp_size"
 	PositionMaterialSnpTable = "position_snp_material"
 	PositionDesignSnpTable   = "position_snp_design"
+	UserTable                = "user"
 )

@@ -9,6 +9,16 @@ type JoinTemplate struct {
 	Email    string
 }
 
+type OrderTemplate struct {
+	Name     string
+	Position string
+	Company  string
+	Address  string
+	Email    string
+	Phone    string
+	Link     string
+}
+
 type ConfirmTemplate struct {
 	Name         string
 	Organization string

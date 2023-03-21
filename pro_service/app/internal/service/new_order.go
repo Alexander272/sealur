@@ -28,18 +28,23 @@ func NewOrderService_New(repo repository.OrderNew, position Position) *OrderServ
 	}
 }
 
-func (s *OrderServiceNew) Get(ctx context.Context, req *order_api.GetOrder) (*order_model.FullOrder, error) {
-	order, err := s.repo.Get(ctx, req)
+func (s *OrderServiceNew) Get(ctx context.Context, req *order_api.GetOrder) (*order_model.CurrentOrder, error) {
+	o, err := s.repo.Get(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get order by id. error: %w", err)
+		return nil, fmt.Errorf("failed to get order. error: %w", err)
 	}
 
-	positions, err := s.position.Get(ctx, order.Id)
+	positions, err := s.position.GetFull(ctx, o.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	order.Positions = positions
+	order := &order_model.CurrentOrder{
+		Id:        o.Id,
+		Number:    o.Number,
+		UserId:    o.UserId,
+		Positions: positions,
+	}
 
 	return order, nil
 }
@@ -72,8 +77,23 @@ func (s *OrderServiceNew) GetCurrent(ctx context.Context, req *order_api.GetCurr
 	return order, nil
 }
 
+func (s *OrderServiceNew) GetForFile(ctx context.Context, req *order_api.GetOrder) (*order_model.FullOrder, error) {
+	order, err := s.repo.Get(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get order by id. error: %w", err)
+	}
+
+	positions, err := s.position.Get(ctx, order.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	order.Positions = positions
+
+	return order, nil
+}
 func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) (*bytes.Buffer, string, error) {
-	order, err := s.Get(ctx, req)
+	order, err := s.GetForFile(ctx, req)
 	if err != nil {
 		return nil, "", err
 	}
@@ -218,6 +238,14 @@ func (s *OrderServiceNew) GetAll(ctx context.Context, req *order_api.GetAllOrder
 	return orders, nil
 }
 
+func (s *OrderServiceNew) GetOpen(ctx context.Context, req *order_api.GetManagerOrders) ([]*order_model.ManagerOrder, error) {
+	orders, err := s.repo.GetOpen(ctx, req.ManagerId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get open orders. error: %w", err)
+	}
+	return orders, nil
+}
+
 func (s *OrderServiceNew) Save(ctx context.Context, order *order_api.CreateOrder) (*order_api.OrderNumber, error) {
 	var orderId = order.Id
 	var number int64
@@ -236,8 +264,10 @@ func (s *OrderServiceNew) Save(ctx context.Context, order *order_api.CreateOrder
 		}
 	}
 
-	if err := s.position.CreateSeveral(ctx, order.Positions, orderId); err != nil {
-		return nil, err
+	if len(order.Positions) > 0 {
+		if err := s.position.CreateSeveral(ctx, order.Positions, orderId); err != nil {
+			return nil, err
+		}
 	}
 
 	return &order_api.OrderNumber{Number: number}, nil

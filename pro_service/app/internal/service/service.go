@@ -308,10 +308,11 @@ type Snp interface {
 }
 
 type OrderNew interface {
-	Get(context.Context, *order_api.GetOrder) (*order_model.FullOrder, error)
+	Get(context.Context, *order_api.GetOrder) (*order_model.CurrentOrder, error)
 	GetCurrent(context.Context, *order_api.GetCurrentOrder) (*order_model.CurrentOrder, error)
 	GetAll(context.Context, *order_api.GetAllOrders) ([]*order_model.Order, error)
 	GetFile(context.Context, *order_api.GetOrder) (*bytes.Buffer, string, error)
+	GetOpen(context.Context, *order_api.GetManagerOrders) ([]*order_model.ManagerOrder, error)
 	Save(context.Context, *order_api.CreateOrder) (*order_api.OrderNumber, error)
 	Create(context.Context, *order_api.CreateOrder) (string, error)
 }
