@@ -110,6 +110,13 @@ func (h *OrderHandlers) Save(ctx context.Context, order *order_api.CreateOrder) 
 	return number, nil
 }
 
+func (h *OrderHandlers) Copy(ctx context.Context, order *order_api.CopyOrder) (*response_model.Response, error) {
+	if err := h.service.Copy(ctx, *order); err != nil {
+		return nil, err
+	}
+	return &response_model.Response{}, nil
+}
+
 func (h *OrderHandlers) Create(ctx context.Context, order *order_api.CreateOrder) (*response_model.IdResponse, error) {
 	id, err := h.service.Create(ctx, order)
 	if err != nil {

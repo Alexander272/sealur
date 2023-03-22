@@ -6,6 +6,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
+	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 )
 
 type PositionSnpService struct {
@@ -51,6 +52,14 @@ func (s *PositionSnpService) Update(ctx context.Context, position *position_mode
 		return fmt.Errorf("failed to update snp position. error: %w", err)
 	}
 	return nil
+}
+
+func (s *PositionSnpService) Copy(ctx context.Context, targetId string, position *position_api.CopyPosition) (string, error) {
+	drawing, err := s.repo.Copy(ctx, targetId, position)
+	if err != nil {
+		return "", fmt.Errorf("failed to copy snp position. error: %w", err)
+	}
+	return drawing, nil
 }
 
 func (s *PositionSnpService) Delete(ctx context.Context, positionId string) error {

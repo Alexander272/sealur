@@ -5,6 +5,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
+	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
@@ -23,6 +24,7 @@ type Handler struct {
 	positionApi    position_api.PositionServiceClient
 	userApi        user_api.UserServiceClient
 	emailApi       email_api.EmailServiceClient
+	fileApi        file_api.FileServiceClient
 	// pingClient      moment.PingServiceClient
 	// gasketClient    gasket_api.GasketServiceClient
 	// materialsClient material_api.MaterialsServiceClient
@@ -71,6 +73,12 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		logger.Fatalf("failed connection to email service. error: %w", err)
 	}
 	h.emailApi = email_api.NewEmailServiceClient(emailConnect)
+
+	fileConnect, err := grpc.Dial(conf.FileService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Fatalf("failed connection to file service. error: %w", err)
+	}
+	h.fileApi = file_api.NewFileServiceClient(fileConnect)
 
 	//* подключение к сервису
 	connect, err := grpc.Dial(conf.ProService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))

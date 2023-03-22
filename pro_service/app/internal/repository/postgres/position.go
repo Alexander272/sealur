@@ -7,6 +7,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
+	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -17,6 +18,26 @@ type PositionRepo struct {
 
 func NewPositionRepo(db *sqlx.DB) *PositionRepo {
 	return &PositionRepo{db: db}
+}
+
+func (r *PositionRepo) GetById(ctx context.Context, positionId string) (position *position_model.FullPosition, err error) {
+	var data models.PositionNew
+	query := fmt.Sprintf(`SELECT id, title, amount, type, count FROM %s WHERE id=$1`, PositionTable)
+
+	if err := r.db.Get(&data, query, positionId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	positionType := position_model.PositionType_value[data.Type]
+	position = &position_model.FullPosition{
+		Id:     data.Id,
+		Title:  data.Title,
+		Count:  data.Count,
+		Amount: data.Amount,
+		Type:   position_model.PositionType(positionType),
+	}
+
+	return position, nil
 }
 
 func (r *PositionRepo) Get(ctx context.Context, orderId string) (positions []*position_model.OrderPosition, err error) {
@@ -39,6 +60,25 @@ func (r *PositionRepo) Get(ctx context.Context, orderId string) (positions []*po
 	}
 
 	return positions, nil
+}
+
+func (r *PositionRepo) Copy(ctx context.Context, position *position_api.CopyPosition) (string, error) {
+	amount := position.Amount
+	if amount == "" {
+		amount = "amount"
+	}
+
+	query := fmt.Sprintf(`INSERT INTO "%s"(id, order_id, title, amount, type, count)
+		SELECT $1, $2, title, %s, type, $3 FROM %s WHERE id=$4`,
+		PositionTable, amount, PositionTable,
+	)
+	id := uuid.New()
+
+	_, err := r.db.Exec(query, id, position.OrderId, position.Count, position.Id)
+	if err != nil {
+		return "", fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return id.String(), nil
 }
 
 func (r *PositionRepo) Create(ctx context.Context, position *position_model.FullPosition) (string, error) {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
+	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/google/uuid"
 )
 
@@ -29,6 +30,14 @@ func (s *PositionServiceNew) Get(ctx context.Context, orderId string) (positions
 
 	positions = append(positions, snpPosition...)
 
+	return positions, nil
+}
+
+func (s *PositionServiceNew) GetAll(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error) {
+	positions, err := s.repo.Get(ctx, orderId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get positions. error: %w", err)
+	}
 	return positions, nil
 }
 
@@ -112,6 +121,21 @@ func (s *PositionServiceNew) Update(ctx context.Context, position *position_mode
 	}
 
 	return nil
+}
+
+func (s *PositionServiceNew) Copy(ctx context.Context, position *position_api.CopyPosition) (string, error) {
+	id, err := s.repo.Copy(ctx, position)
+	if err != nil {
+		return "", fmt.Errorf("failed to copy position. error: %w", err)
+	}
+
+	//TODO По сути я могу возвращать drawing и из него вырезать id файла, а id заявки (старой и новой) буду принимать с клиента
+	drawing, err := s.snp.Copy(ctx, id, position)
+	if err != nil {
+		return "", err
+	}
+
+	return drawing, nil
 }
 
 func (s *PositionServiceNew) Delete(ctx context.Context, positionId string) error {

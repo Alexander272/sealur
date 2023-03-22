@@ -12,6 +12,7 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur_proto/api/pro/models/order_model"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
+	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/google/uuid"
 	"github.com/xuri/excelize/v2"
 )
@@ -271,6 +272,21 @@ func (s *OrderServiceNew) Save(ctx context.Context, order *order_api.CreateOrder
 	}
 
 	return &order_api.OrderNumber{Number: number}, nil
+}
+
+func (s *OrderServiceNew) Copy(ctx context.Context, order order_api.CopyOrder) error {
+	positions, err := s.position.GetAll(ctx, order.FromId)
+	if err != nil {
+		return fmt.Errorf("failed to get positions. error: %w", err)
+	}
+
+	for i, fp := range positions {
+		_, err := s.position.Copy(ctx, &position_api.CopyPosition{Id: fp.Id, Count: order.Count + int64(i), OrderId: order.TargetId, FromOrderId: order.FromId})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *OrderServiceNew) Create(ctx context.Context, order *order_api.CreateOrder) (string, error) {

@@ -34,6 +34,14 @@ func (h *PositionHandlers) Update(ctx context.Context, position *position_api.Up
 	return &response_model.Response{}, nil
 }
 
+func (h *PositionHandlers) Copy(ctx context.Context, position *position_api.CopyPosition) (*position_api.CopyDrawing, error) {
+	drawing, err := h.service.Copy(ctx, position)
+	if err != nil {
+		return nil, err
+	}
+	return &position_api.CopyDrawing{Drawing: drawing}, nil
+}
+
 func (h *PositionHandlers) Delete(ctx context.Context, position *position_api.DeletePosition) (*response_model.Response, error) {
 	if err := h.service.Delete(ctx, position.Id); err != nil {
 		return nil, err

@@ -62,7 +62,7 @@ func (r *OrderRepo) GetCurrent(ctx context.Context, req *order_api.GetCurrentOrd
 func (r *OrderRepo) GetAll(ctx context.Context, req *order_api.GetAllOrders) (orders []*order_model.Order, err error) {
 	var data []models.OrderWithPosition
 	query := fmt.Sprintf(`SELECT "%s".id, date, count_position, number, %s.id as position_id, title, amount, %s.count as position_count
-		FROM "%s" INNER JOIN %s on order_id="%s".id WHERE user_id=$1 ORDER BY number`,
+		FROM "%s" INNER JOIN %s on order_id="%s".id WHERE user_id=$1 AND date != '' ORDER BY number`,
 		OrderTable, PositionTable, PositionTable, OrderTable, PositionTable, OrderTable,
 	)
 

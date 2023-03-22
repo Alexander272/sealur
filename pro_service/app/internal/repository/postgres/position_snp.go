@@ -13,6 +13,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_size_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/standard_model"
+	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -30,7 +31,7 @@ func (r *PositionSnpRepo) Get(ctx context.Context, orderId string) (positions []
 	//? можно не делать запрос в position, а в этом запросе забрать данные из всех 5 таблиц через inner join
 	var data []models.FullPosition
 	query := fmt.Sprintf(`SELECT %s.id, title, amount, type, count, filler_code, frame_code, inner_ring_code, outer_ring_code, d4, d3, d2, d1, h, another, 
-		has_jumper, jumper_code, jumper_width, has_hole, has_mounting, mounting_code
+		has_jumper, jumper_code, jumper_width, has_hole, has_mounting, mounting_code, drawing
 		FROM %s	INNER JOIN %s ON %s.position_id=%s.id INNER JOIN %s ON %s.position_id=%s.id INNER JOIN %s ON %s.position_id=%s.id
 		WHERE order_id=$1 ORDER BY count`,
 		PositionTable, PositionTable, PositionMaterialSnpTable, PositionMaterialSnpTable, PositionTable,
@@ -69,6 +70,7 @@ func (r *PositionSnpRepo) Get(ctx context.Context, orderId string) (positions []
 					HasHole:      fp.HasHole,
 					HasMounting:  fp.HasMounting,
 					MountingCode: fp.MountingCode,
+					Drawing:      fp.Drawing,
 				},
 			},
 		})
@@ -455,6 +457,67 @@ func (r *PositionSnpRepo) Update(ctx context.Context, position *position_model.F
 		return fmt.Errorf("failed to finish transaction. error: %w", err)
 	}
 	return nil
+}
+
+func (r *PositionSnpRepo) Copy(ctx context.Context, targetPositionId string, position *position_api.CopyPosition) (string, error) {
+	mainQuery := fmt.Sprintf(`INSERT INTO %s (id, position_id, snp_standard_id, snp_type_id, flange_type_code, flange_type_title)
+		SELECT $1, $2, snp_standard_id, snp_type_id, flange_type_code, flange_type_title FROM %s WHERE position_id=$3`, PositionMainSnpTable, PositionMainSnpTable,
+	)
+	materialQuery := fmt.Sprintf(`INSERT INTO %s (id, position_id, filler_id, frame_id, inner_ring_id, outer_ring_id, 
+		filler_code, frame_code, inner_ring_code, outer_ring_code) SELECT $1, $2, filler_id, frame_id, inner_ring_id, outer_ring_id, 
+		filler_code, frame_code, inner_ring_code, outer_ring_code FROM %s WHERE position_id=$3`,
+		PositionMaterialSnpTable, PositionMaterialSnpTable,
+	)
+	sizeQuery := fmt.Sprintf(`INSERT INTO %s (id, position_id, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another)
+		SELECT $1, $2, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another FROM %s WHERE position_id=$3`,
+		PositionSizeSnpTable, PositionSizeSnpTable,
+	)
+	//TODO надо что-то думать с чертежом (ели он есть)
+	designQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, has_jumper, jumper_code, jumper_width, has_hole, has_mounting, mounting_code, drawing)
+		SELECT $1, $2, has_jumper, jumper_code, jumper_width, has_hole, has_mounting, mounting_code, replace(drawing, $3, $4) 
+		FROM %s WHERE position_id=$5 RETURNING drawing`,
+		PositionDesignSnpTable, PositionDesignSnpTable,
+	)
+
+	id := uuid.New()
+
+	tx, err := r.db.Begin()
+	if err != nil {
+		return "", fmt.Errorf("failed to start transaction. error: %w", err)
+	}
+
+	_, err = tx.Exec(mainQuery, id, targetPositionId, position.Id)
+	if err != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("failed to complete query main. error: %w", err)
+	}
+	_, err = tx.Exec(materialQuery, id, targetPositionId, position.Id)
+	if err != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("failed to complete query material. error: %w", err)
+	}
+	_, err = tx.Exec(sizeQuery, id, targetPositionId, position.Id)
+	if err != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("failed to complete query size. error: %w", err)
+	}
+	row := tx.QueryRow(designQuery, id, targetPositionId, position.FromOrderId, position.OrderId, position.Id)
+	if row.Err() != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("failed to complete query design. error: %w", row.Err())
+	}
+
+	drawing := ""
+	if err := row.Scan(&drawing); err != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("failed to scan result query design. error: %w", row.Err())
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return "", fmt.Errorf("failed to finish transaction. error: %w", err)
+	}
+	return drawing, nil
 }
 
 func (r *PositionSnpRepo) Delete(ctx context.Context, positionId string) error {

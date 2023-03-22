@@ -48,4 +48,5 @@ type FullPosition struct {
 	HasHole      bool   `db:"has_hole"`
 	HasMounting  bool   `db:"has_mounting"`
 	MountingCode string `db:"mounting_code"`
+	Drawing      string `db:"drawing"`
 }

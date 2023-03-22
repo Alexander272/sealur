@@ -27,6 +27,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/temperature_model"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
+	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -314,15 +315,18 @@ type OrderNew interface {
 	GetFile(context.Context, *order_api.GetOrder) (*bytes.Buffer, string, error)
 	GetOpen(context.Context, *order_api.GetManagerOrders) ([]*order_model.ManagerOrder, error)
 	Save(context.Context, *order_api.CreateOrder) (*order_api.OrderNumber, error)
+	Copy(context.Context, order_api.CopyOrder) error
 	Create(context.Context, *order_api.CreateOrder) (string, error)
 }
 
 type Position interface {
 	Get(ctx context.Context, orderId string) (positions []*position_model.FullPosition, err error)
+	GetAll(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error)
 	GetFull(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error)
-	Create(ctx context.Context, position *position_model.FullPosition) (string, error)
+	Create(context.Context, *position_model.FullPosition) (string, error)
 	CreateSeveral(ctx context.Context, positions []*position_model.FullPosition, orderId string) error
-	Update(ctx context.Context, position *position_model.FullPosition) error
+	Update(context.Context, *position_model.FullPosition) error
+	Copy(context.Context, *position_api.CopyPosition) (string, error)
 	Delete(ctx context.Context, positionId string) error
 }
 
@@ -332,6 +336,7 @@ type PositionSnp interface {
 	Create(context.Context, *position_model.FullPosition) error
 	CreateSeveral(context.Context, []*position_model.FullPosition) error
 	Update(context.Context, *position_model.FullPosition) error
+	Copy(ctx context.Context, targetId string, position *position_api.CopyPosition) (string, error)
 	Delete(ctx context.Context, positionId string) error
 }
 

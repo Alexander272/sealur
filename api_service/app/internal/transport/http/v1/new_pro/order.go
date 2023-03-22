@@ -11,6 +11,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
+	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	"github.com/gin-gonic/gin"
@@ -20,18 +21,22 @@ type OrderHandler struct {
 	orderApi order_api.OrderServiceClient
 	userApi  user_api.UserServiceClient
 	emailApi email_api.EmailServiceClient
+	fileApi  file_api.FileServiceClient
 }
 
-func NewOrderHandler(orderApi order_api.OrderServiceClient, userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient) *OrderHandler {
+func NewOrderHandler(orderApi order_api.OrderServiceClient, userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient,
+	fileApi file_api.FileServiceClient,
+) *OrderHandler {
 	return &OrderHandler{
 		orderApi: orderApi,
 		userApi:  userApi,
 		emailApi: emailApi,
+		fileApi:  fileApi,
 	}
 }
 
 func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
-	handler := NewOrderHandler(h.orderApi, h.userApi, h.emailApi)
+	handler := NewOrderHandler(h.orderApi, h.userApi, h.emailApi, h.fileApi)
 
 	order := api.Group("/orders", h.middleware.UserIdentity)
 	{
@@ -41,6 +46,7 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 		order.GET("/open", handler.getOpen)
 		order.GET("/:id/заявка.zip", handler.getFile)
 		order.POST("/", handler.create)
+		order.POST("/copy", handler.copy)
 		order.POST("/save", handler.save)
 	}
 }
@@ -208,6 +214,32 @@ func (h *OrderHandler) create(c *gin.Context) {
 
 	// c.Header("Location", fmt.Sprintf("/api/v1/sealur-pro/orders/%s", order.Id))
 	c.JSON(http.StatusCreated, models.IdResponse{Message: "Created"})
+}
+
+func (h *OrderHandler) copy(c *gin.Context) {
+	var dto *order_api.CopyOrder
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	_, err := h.orderApi.Copy(c, dto)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка во время копирования")
+		return
+	}
+
+	_, err = h.fileApi.CopyGroup(c, &file_api.CopyGroupRequest{
+		Bucket:   "pro",
+		Group:    dto.FromId,
+		NewGroup: dto.TargetId,
+	})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка во время копирования чертежей")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Copied successfully"})
 }
 
 func (h *OrderHandler) save(c *gin.Context) {

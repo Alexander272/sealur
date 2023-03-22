@@ -25,6 +25,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/temperature_model"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
+	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -286,10 +287,12 @@ type OrderNew interface {
 }
 
 type Position interface {
+	GetById(ctx context.Context, positionId string) (position *position_model.FullPosition, err error)
 	Get(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error)
 	Create(context.Context, *position_model.FullPosition) (string, error)
 	CreateSeveral(context.Context, []*position_model.FullPosition) error
 	Update(context.Context, *position_model.FullPosition) error
+	Copy(context.Context, *position_api.CopyPosition) (string, error)
 	Delete(ctx context.Context, positionId string) error
 }
 
@@ -299,6 +302,7 @@ type PositionSnp interface {
 	Create(ctx context.Context, position *position_model.FullPosition) error
 	CreateSeveral(context.Context, []*position_model.FullPosition) error
 	Update(ctx context.Context, position *position_model.FullPosition) error
+	Copy(ctx context.Context, targetPositionId string, position *position_api.CopyPosition) (string, error)
 	Delete(ctx context.Context, positionId string) error
 }
 
