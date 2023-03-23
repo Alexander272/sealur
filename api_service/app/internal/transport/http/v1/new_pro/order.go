@@ -12,6 +12,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/file_api"
+	"github.com/Alexander272/sealur_proto/api/pro/models/order_model"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	"github.com/gin-gonic/gin"
@@ -48,6 +49,7 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 		order.POST("/", handler.create)
 		order.POST("/copy", handler.copy)
 		order.POST("/save", handler.save)
+		order.POST("/finish", handler.finish)
 	}
 }
 
@@ -269,9 +271,7 @@ func (h *OrderHandler) save(c *gin.Context) {
 		return
 	}
 
-	logger.Debug(data.Email)
-	// send message to manager
-	_, err = h.emailApi.SendNotification(c, &email_api.NotificationData{Email: data.Email, User: data.User})
+	_, err = h.emailApi.SendNotification(c, &email_api.NotificationData{Email: data.Email, User: data.User, OrderId: dto.Id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "failed to send email")
 		return
@@ -279,4 +279,20 @@ func (h *OrderHandler) save(c *gin.Context) {
 
 	// c.Header("Location", fmt.Sprintf("/api/v1/sealur-pro/orders/%s", order.Id))
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Saved"})
+}
+
+func (h *OrderHandler) finish(c *gin.Context) {
+	var dto *order_api.Status
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+	dto.Status = order_model.OrderStatus_finish
+
+	_, err := h.orderApi.SetStatus(c, dto)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated status successfully"})
 }

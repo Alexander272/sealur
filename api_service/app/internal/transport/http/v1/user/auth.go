@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
@@ -49,28 +50,16 @@ func (h *Handler) initAuthRoutes(api *gin.RouterGroup) {
 	}
 }
 
-// @Summary SignIn
-// @Tags Auth
-// @Description вход в систему
-// @ModuleID signIn
-// @Accept json
-// @Produce json
-// @Param data body user_model.SignIn true "credentials"
-// @Success 200 {object} models.DataResponse{data=user_api.User}
-// @Failure 400,404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
-// @Failure default {object} models.ErrorResponse
-// @Router /auth/sign-in [post]
 func (h *AuthHandler) signIn(c *gin.Context) {
 	var dto *user_api.GetUserByEmail
 	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Введены некорректные данные")
 		return
 	}
 
 	limit, err := h.services.Limit.Get(c, c.ClientIP())
 	if err != nil && !errors.Is(err, models.ErrClientIPNotFound) {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 		return
 	}
 	if errors.Is(err, models.ErrClientIPNotFound) {
@@ -87,20 +76,20 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 		models.NewErrorResponse(
 			c, http.StatusTooManyRequests,
 			fmt.Sprintf("too many request (%d >= %d)", limit.Count, h.auth.CountAttempt),
-			"too many request",
+			"Много некорректных запросов",
 		)
 		return
 	}
 
 	user, err := h.userApi.GetByEmail(c, dto)
-	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+	if err != nil && !strings.Contains(err.Error(), "invalid credentials") {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 		return
 	}
 
 	if user == nil {
 		h.services.Limit.AddAttempt(c, c.ClientIP())
-		models.NewErrorResponse(c, http.StatusBadRequest, "invalid credentials", "invalid data send")
+		models.NewErrorResponse(c, http.StatusBadRequest, "invalid credentials", "Введены некорректные данные")
 		return
 	}
 	h.services.Limit.Remove(c, c.ClientIP())
@@ -108,7 +97,7 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 	// запись в редисе и генерация токенов
 	token, err := h.services.Session.SignIn(c, user)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 		return
 	}
 
@@ -127,25 +116,25 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 func (h *AuthHandler) singUp(c *gin.Context) {
 	var dto *user_api.CreateUser
 	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "введены некорректные данные")
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Введены некорректные данные")
 		return
 	}
 
 	id, err := h.userApi.Create(c, dto)
 	if err != nil {
-		// TODO добавить проверку (может прилететь ошибка, что пользователь с таким email уже есть)
-		if errors.Is(err, models.ErrFlangeAlreadyExists) {
-			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), err.Error())
+		// if errors.Is(err, models.ErrUserExist) {
+		if strings.Contains(err.Error(), models.ErrUserExist.Error()) {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Пользователь с таким email уже зарегистрирован")
 			return
 		}
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 		return
 	}
 
 	// генерировать код для подтверждения и записывать его в редис (с id пользователя)
 	code, err := h.services.Confirm.Create(c, id.Id)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 		return
 	}
 
@@ -160,7 +149,7 @@ func (h *AuthHandler) singUp(c *gin.Context) {
 	}
 	_, err = h.emailApi.ConfirmUser(c, data)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка при отправлении письма")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка при отправлении письма")
 		return
 	}
 

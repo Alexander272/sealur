@@ -3,7 +3,7 @@ module github.com/Alexander272/sealur/user_service
 go 1.19
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230320065221-113f331fdd24
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230323044821-205fdd3cac3f
 	github.com/google/uuid v1.1.2
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0

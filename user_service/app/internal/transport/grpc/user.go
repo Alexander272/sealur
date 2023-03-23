@@ -35,7 +35,7 @@ func (h *UserHandler) GetByEmail(ctx context.Context, req *user_api.GetUserByEma
 	user, err := h.service.GetByEmail(ctx, req)
 	if err != nil {
 		if errors.Is(err, models.ErrPassword) || errors.Is(err, models.ErrUserNotFound) {
-			return nil, nil
+			return nil, errors.New("invalid credentials")
 		}
 		return nil, err
 	}

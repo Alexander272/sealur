@@ -315,8 +315,9 @@ type OrderNew interface {
 	GetFile(context.Context, *order_api.GetOrder) (*bytes.Buffer, string, error)
 	GetOpen(context.Context, *order_api.GetManagerOrders) ([]*order_model.ManagerOrder, error)
 	Save(context.Context, *order_api.CreateOrder) (*order_api.OrderNumber, error)
-	Copy(context.Context, order_api.CopyOrder) error
+	Copy(context.Context, *order_api.CopyOrder) error
 	Create(context.Context, *order_api.CreateOrder) (string, error)
+	SetStatus(ctx context.Context, status *order_api.Status) error
 }
 
 type Position interface {

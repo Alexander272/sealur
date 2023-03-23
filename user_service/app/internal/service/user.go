@@ -87,7 +87,14 @@ func (s *UserService) GetManager(ctx context.Context, req *user_api.GetUser) (ma
 }
 
 func (s *UserService) Create(ctx context.Context, user *user_api.CreateUser) (string, error) {
-	//TODO проверять есть ли уже пользователь с такой почтой
+	candidate, _, err := s.repo.GetByEmail(ctx, &user_api.GetUserByEmail{Email: user.Email})
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return "", fmt.Errorf("failed to get user. error: %w", err)
+	}
+
+	if candidate != nil {
+		return "", models.ErrUserExist
+	}
 
 	role, err := s.role.GetDefault(ctx)
 	if err != nil {

@@ -284,6 +284,7 @@ type OrderNew interface {
 	GetNumber(ctx context.Context, order *order_api.CreateOrder, date string) (int64, error)
 	GetOpen(ctx context.Context, managerId string) (orders []*order_model.ManagerOrder, err error)
 	Create(ctx context.Context, order *order_api.CreateOrder, date string) error
+	SetStatus(ctx context.Context, status *order_api.Status) error
 }
 
 type Position interface {

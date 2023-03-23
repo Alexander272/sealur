@@ -94,6 +94,10 @@ func (s *OrderServiceNew) GetForFile(ctx context.Context, req *order_api.GetOrde
 	return order, nil
 }
 func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) (*bytes.Buffer, string, error) {
+	if err := s.SetStatus(ctx, &order_api.Status{Status: order_model.OrderStatus_work, OrderId: req.Id}); err != nil {
+		return nil, "", err
+	}
+
 	order, err := s.GetForFile(ctx, req)
 	if err != nil {
 		return nil, "", err
@@ -274,7 +278,7 @@ func (s *OrderServiceNew) Save(ctx context.Context, order *order_api.CreateOrder
 	return &order_api.OrderNumber{Number: number}, nil
 }
 
-func (s *OrderServiceNew) Copy(ctx context.Context, order order_api.CopyOrder) error {
+func (s *OrderServiceNew) Copy(ctx context.Context, order *order_api.CopyOrder) error {
 	positions, err := s.position.GetAll(ctx, order.FromId)
 	if err != nil {
 		return fmt.Errorf("failed to get positions. error: %w", err)
@@ -289,6 +293,7 @@ func (s *OrderServiceNew) Copy(ctx context.Context, order order_api.CopyOrder) e
 	return nil
 }
 
+// TODO можно для заказа запоминать id менеджера, для более точной статистики и для того, чтобы можно было передать только один заказ, а не все заказы от данного клиента
 func (s *OrderServiceNew) Create(ctx context.Context, order *order_api.CreateOrder) (string, error) {
 	var orderId = order.Id
 	if orderId == "" {
@@ -307,4 +312,13 @@ func (s *OrderServiceNew) Create(ctx context.Context, order *order_api.CreateOrd
 	}
 
 	return orderId, nil
+}
+
+func (s *OrderServiceNew) SetStatus(ctx context.Context, status *order_api.Status) error {
+	status.Date = fmt.Sprintf("%d", time.Now().UnixMilli())
+
+	if err := s.repo.SetStatus(ctx, status); err != nil {
+		return fmt.Errorf("failed to set status order. error: %w", err)
+	}
+	return nil
 }

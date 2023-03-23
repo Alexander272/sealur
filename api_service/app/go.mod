@@ -62,7 +62,7 @@ require (
 )
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230322104702-2b546fc17d14
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230323044821-205fdd3cac3f
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/lib/pq v1.10.7
 	github.com/swaggo/swag v1.8.10
