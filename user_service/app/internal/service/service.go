@@ -15,8 +15,10 @@ type User interface {
 	Get(context.Context, *user_api.GetUser) (*user_model.User, error)
 	GetByEmail(context.Context, *user_api.GetUserByEmail) (*user_model.User, error)
 	GetManager(context.Context, *user_api.GetUser) (*user_api.Manager, error)
+	GetManagers(ctx context.Context, req *user_api.GetNewUser) ([]*user_model.User, error)
 	Create(context.Context, *user_api.CreateUser) (string, error)
 	Confirm(context.Context, *user_api.ConfirmUser) (*user_model.User, error)
+	SetManager(context.Context, *user_api.UserManager) error
 	// Get(context.Context, *user_api.GetUserRequest) (*user_api.User, error)
 	// GetAll(context.Context, *user_api.GetAllUserRequest) ([]*user_api.User, int, error)
 	// GetNew(context.Context, *user_api.GetNewUserRequest) ([]*user_api.User, error)

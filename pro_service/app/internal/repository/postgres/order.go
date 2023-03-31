@@ -119,9 +119,11 @@ func (r *OrderRepo) GetOpen(ctx context.Context, managerId string) (orders []*or
 	// 	INNER JOIN "%s" ON "%s".id=user_id WHERE manager_id=$1 AND status != '%s' AND "%s".date !='' ORDER BY status, "%s".date`,
 	// 	OrderTable, UserTable, OrderTable, OrderTable, UserTable, UserTable, order_model.OrderStatus_finish.String(), OrderTable, OrderTable,
 	// )
+
+	//
 	query := fmt.Sprintf(`SELECT "%s".id, user_id, "%s".company, "%s".date, count_position, "number", status FROM "%s" 
-		INNER JOIN "%s" ON "%s".id=user_id WHERE manager_id=$1 AND status != '%s' AND "%s".date !='' ORDER BY "%s".date`,
-		OrderTable, UserTable, OrderTable, OrderTable, UserTable, UserTable, order_model.OrderStatus_finish.String(), OrderTable, OrderTable,
+		INNER JOIN "%s" ON "%s".id=user_id WHERE "%s".manager_id=$1 AND status != '%s' AND "%s".date !='' ORDER BY "%s".date`,
+		OrderTable, UserTable, OrderTable, OrderTable, UserTable, UserTable, OrderTable, order_model.OrderStatus_finish.String(), OrderTable, OrderTable,
 	)
 
 	if err := r.db.Select(&data, query, managerId); err != nil {
@@ -146,9 +148,9 @@ func (r *OrderRepo) GetOpen(ctx context.Context, managerId string) (orders []*or
 }
 
 func (r *OrderRepo) Create(ctx context.Context, order *order_api.CreateOrder, date string) error {
-	query := fmt.Sprintf(`INSERT INTO "%s" (id, user_id, date, count_position) VALUES ($1, $2, $3, $4)`, OrderTable)
+	query := fmt.Sprintf(`INSERT INTO "%s" (id, user_id, date, count_position, manager_id) VALUES ($1, $2, $3, $4, $5)`, OrderTable)
 
-	_, err := r.db.Exec(query, order.Id, order.UserId, date, order.Count)
+	_, err := r.db.Exec(query, order.Id, order.UserId, date, order.Count, order.ManagerId)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -159,6 +161,16 @@ func (r *OrderRepo) SetStatus(ctx context.Context, status *order_api.Status) err
 	query := fmt.Sprintf(`UPDATE "%s" SET status=$1, %s_date=$2 WHERE id=$3`, OrderTable, status.Status.String())
 
 	_, err := r.db.Exec(query, status.Status.String(), status.Date, status.OrderId)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *OrderRepo) SetManager(ctx context.Context, manager *order_api.Manager) error {
+	query := fmt.Sprintf(`UPDATE "%s" SET manager_id=$1 WHERE id=$2`, OrderTable)
+
+	_, err := r.db.Exec(query, manager.ManagerId, manager.OrderId)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

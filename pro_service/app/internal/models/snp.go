@@ -36,10 +36,14 @@ type SnpMainBlock struct {
 	SnpTypeId        string         `db:"snp_type_id"`
 	SnpTypeCode      string         `db:"code"`
 	SnpTypeTitle     string         `db:"title"`
+	SnpTypeHasD4     bool           `db:"has_d4"`
+	SnpTypeHasD3     bool           `db:"has_d3"`
+	SnpTypeHasD2     bool           `db:"has_d2"`
+	SnpTypeHasD1     bool           `db:"has_d1"`
 	SnpStandardId    string         `db:"snp_standard_id"`
 	SnpStandardDn    string         `db:"dn_title"`
 	SnpStandardPn    string         `db:"pn_title"`
-	SnpStandardHasD2 bool           `db:"has_d2"`
+	SnpStandardHasD2 bool           `db:"st_has_d2"`
 	StandardId       string         `db:"standard_id"`
 	StandardTitle    string         `db:"standard_title"`
 	StandardFormat   pq.StringArray `db:"standard_format"`
@@ -49,29 +53,29 @@ type SnpMainBlock struct {
 }
 
 type SnpMaterialBlock struct {
-	Id                 string  `db:"id"`
-	PositionId         string  `db:"position_id"`
-	FillerId           string  `db:"filler_id"`
-	FillerCode         string  `db:"code"`
-	FillerTitle        string  `db:"title"`
-	FillerAnotherTitle string  `db:"another_title"`
-	FillerDescription  string  `db:"description"`
-	FillerDesignation  string  `db:"designation"`
-	FrameId            string  `db:"m1_id"`
-	FrameCode          *string `db:"m1_code"`
-	FrameTitle         *string `db:"m1_title"`
-	FrameShortEn       *string `db:"m1_short_en"`
-	FrameShortRus      *string `db:"m1_short_rus"`
-	InnerRingId        string  `db:"m2_id"`
-	InnerRingCode      *string `db:"m2_code"`
-	InnerRingTitle     *string `db:"m2_title"`
-	InnerRingShortEn   *string `db:"m2_short_en"`
-	InnerRingShortRus  *string `db:"m2_short_rus"`
-	OuterRingId        string  `db:"m3_id"`
-	OuterRingCode      *string `db:"m3_code"`
-	OuterRingTitle     *string `db:"m3_title"`
-	OuterRingShortEn   *string `db:"m3_short_en"`
-	OuterRingShortRus  *string `db:"m3_short_rus"`
+	Id                string  `db:"id"`
+	PositionId        string  `db:"position_id"`
+	FillerId          string  `db:"filler_id"`
+	FillerBaseCode    string  `db:"base_code"`
+	FillerCode        string  `db:"code"`
+	FillerTitle       string  `db:"title"`
+	FillerDescription string  `db:"description"`
+	FillerDesignation string  `db:"designation"`
+	FrameId           string  `db:"m1_id"`
+	FrameCode         *string `db:"m1_code"`
+	FrameTitle        *string `db:"m1_title"`
+	FrameShortEn      *string `db:"m1_short_en"`
+	FrameShortRus     *string `db:"m1_short_rus"`
+	InnerRingId       string  `db:"m2_id"`
+	InnerRingCode     *string `db:"m2_code"`
+	InnerRingTitle    *string `db:"m2_title"`
+	InnerRingShortEn  *string `db:"m2_short_en"`
+	InnerRingShortRus *string `db:"m2_short_rus"`
+	OuterRingId       string  `db:"m3_id"`
+	OuterRingCode     *string `db:"m3_code"`
+	OuterRingTitle    *string `db:"m3_title"`
+	OuterRingShortEn  *string `db:"m3_short_en"`
+	OuterRingShortRus *string `db:"m3_short_rus"`
 }
 
 type SnpSizeBlock struct {

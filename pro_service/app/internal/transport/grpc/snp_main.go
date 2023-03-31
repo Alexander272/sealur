@@ -35,3 +35,11 @@ func (h *SnpHandlers) GetData(ctx context.Context, req *snp_api.GetSnpData) (*sn
 
 	return &snp_api.SnpData{SnpData: snpData}, nil
 }
+
+func (h *SnpHandlers) GetDataNew(ctx context.Context, req *snp_api.GetSnpData) (*snp_api.SnpDataNew, error) {
+	snpData, err := h.service.GetDataNew(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &snp_api.SnpDataNew{SnpData: snpData}, nil
+}

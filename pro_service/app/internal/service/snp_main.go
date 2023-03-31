@@ -101,3 +101,47 @@ func (s *SnpService) GetData(ctx context.Context, req *snp_api.GetSnpData) (snpD
 
 	return snpData, nil
 }
+
+func (s *SnpService) GetDataNew(ctx context.Context, req *snp_api.GetSnpData) (snpData *snp_model.SnpDataNew, err error) {
+	var mounting []*mounting_model.Mounting
+	// var fillers []*snp_filler_model.SnpFiller
+	snpData = &snp_model.SnpDataNew{}
+
+	if req.StandardId == "" {
+		standard, err := s.snpStandard.GetDefault(ctx)
+		if err != nil {
+			return nil, err
+		}
+		req.StandardId = standard.Standard.Id
+		req.SnpStandardId = standard.Id
+
+		mounting, err = s.mounting.GetAll(ctx, &mounting_api.GetAllMountings{})
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	snpData.Mounting = mounting
+
+	materials, err := s.material.Get(ctx, &snp_material_api.GetSnpMaterial{StandardId: req.StandardId})
+	if err != nil {
+		return nil, err
+	}
+
+	snpTypes, err := s.snpType.GetWithFlange(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	fillers, err := s.filler.GetAllNew(ctx, &snp_filler_api.GetSnpFillers{StandardId: req.StandardId})
+	if err != nil {
+		return nil, err
+	}
+
+	snpData.Materials = materials
+	snpData.FlangeTypes = snpTypes
+	snpData.Fillers = fillers
+
+	return snpData, nil
+}

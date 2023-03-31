@@ -147,6 +147,7 @@ func (s *CapService) auxiliaryCalculate(data models.DataCap, req *calc_api.CapRe
 	if data.FlangeType == cap_model.FlangeData_free {
 		divider += (flange.Yk * data.Flange.Ring.EpsilonAt20 / data.Flange.Ring.Epsilon) * math.Pow(flange.A, 2)
 	}
+	//smb://martynov@192.168.5.24/documents/ИМЕННЫЕ%20ПАПКИ/Холкин%20В.А/Работа/Велесстрой
 
 	// формула (Е.8)
 	auxiliary.Gamma = 1 / divider
@@ -244,7 +245,7 @@ func (s *CapService) auxCapCalculate(
 
 	if capType == cap_model.CapData_flat {
 		cap.K = flange.DOut / Dcp
-		cap.X = (0.67*math.Pow(cap.K, 2)*(1+8.55*math.Log10(cap.K)) - 1) / ((cap.K - 1) *
+		cap.X = (0.67 * (math.Pow(cap.K, 2)*(1+8.55*math.Log10(cap.K)) - 1)) / ((cap.K - 1) *
 			(math.Pow(cap.K, 2) - 1 + (1.857*math.Pow(cap.K, 2)+1)*(math.Pow(data.H, 3)/math.Pow(data.Delta, 3))))
 		cap.Y = cap.X / (math.Pow(data.Delta, 3) * data.EpsilonAt20)
 	} else {

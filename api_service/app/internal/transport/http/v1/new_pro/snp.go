@@ -26,7 +26,7 @@ func (h *Handler) initSNPRoutes(api *gin.RouterGroup) {
 	snp := api.Group("/snp-new")
 	{
 		snp.GET("", handler.get)
-		snp.GET("/data", handler.getData)
+		snp.GET("/data", handler.getDataNew)
 		// snp.GET("/default", h.getDefault)
 		// snp.GET("/", h.getSNP)
 		// snp = snp.Group("/", h.middleware.AccessForProAdmin)
@@ -85,7 +85,28 @@ func (h *SnpHandler) get(c *gin.Context) {
 	c.JSON(http.StatusOK, models.DataResponse{Data: snp})
 }
 
-func (h *SnpHandler) getData(c *gin.Context) {
+//* old
+// func (h *SnpHandler) getData(c *gin.Context) {
+// 	standardId := c.Query("standardId")
+// 	// if standardId == "" {
+// 	// 	models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty standard id param")
+// 	// 	return
+// 	// }
+// 	snpStandardId := c.Query("snpStandardId")
+
+// 	snp, err := h.snpApi.GetData(c, &snp_api.GetSnpData{
+// 		StandardId:    standardId,
+// 		SnpStandardId: snpStandardId,
+// 	})
+// 	if err != nil {
+// 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, models.DataResponse{Data: snp.SnpData})
+// }
+
+func (h *SnpHandler) getDataNew(c *gin.Context) {
 	standardId := c.Query("standardId")
 	// if standardId == "" {
 	// 	models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty standard id param")
@@ -93,7 +114,7 @@ func (h *SnpHandler) getData(c *gin.Context) {
 	// }
 	snpStandardId := c.Query("snpStandardId")
 
-	snp, err := h.snpApi.GetData(c, &snp_api.GetSnpData{
+	snp, err := h.snpApi.GetDataNew(c, &snp_api.GetSnpData{
 		StandardId:    standardId,
 		SnpStandardId: snpStandardId,
 	})

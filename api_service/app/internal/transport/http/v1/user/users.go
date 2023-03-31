@@ -39,8 +39,20 @@ func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
 
 	users := api.Group("/users")
 	{
+		users.GET("/managers", handler.getManagers)
 		users.POST("/confirm/:code", handler.confirm)
+		users.POST("/manager", handler.setManager)
 	}
+}
+
+func (h *UserHandler) getManagers(c *gin.Context) {
+	users, err := h.userApi.GetManagers(c, &user_api.GetNewUser{})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: users})
 }
 
 func (h *UserHandler) confirm(c *gin.Context) {
@@ -71,6 +83,21 @@ func (h *UserHandler) confirm(c *gin.Context) {
 
 	c.SetCookie(h.cookieName, token, int(h.auth.RefreshTokenTTL.Seconds()), "/", c.Request.Host, h.auth.Secure, true)
 	c.JSON(http.StatusOK, models.DataResponse{Data: user})
+}
+
+func (h *UserHandler) setManager(c *gin.Context) {
+	var dto *user_api.UserManager
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	_, err := h.userApi.SetManager(c, dto)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated manager successfully"})
 }
 
 // // @Summary Get All Users

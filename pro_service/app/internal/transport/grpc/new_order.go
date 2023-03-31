@@ -131,3 +131,10 @@ func (h *OrderHandlers) SetStatus(ctx context.Context, status *order_api.Status)
 	}
 	return &response_model.Response{}, nil
 }
+
+func (h *OrderHandlers) SetManager(ctx context.Context, manager *order_api.Manager) (*response_model.Response, error) {
+	if err := h.service.SetManager(ctx, manager); err != nil {
+		return nil, err
+	}
+	return &response_model.Response{}, nil
+}

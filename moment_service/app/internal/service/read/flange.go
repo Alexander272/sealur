@@ -10,6 +10,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/Alexander272/sealur_proto/api/moment/material_api"
 	"github.com/Alexander272/sealur_proto/api/moment/models/flange_model"
+	"github.com/Alexander272/sealur_proto/api/moment/models/material_model"
 	"github.com/Alexander272/sealur_proto/api/moment/read_api"
 )
 
@@ -74,17 +75,23 @@ func (s *FlangeService) GetFlange(ctx context.Context, req *read_api.GetFlangeRe
 		return nil, err
 	}
 
-	materials, err := s.materials.GetMaterials(ctx, &material_api.GetMaterialsRequest{})
+	boltMaterials, err := s.materials.GetMaterials(ctx, &material_api.GetMaterialsRequest{Type: material_model.MaterialType_bolt})
+	if err != nil {
+		return nil, err
+	}
+
+	flangeMaterials, err := s.materials.GetMaterials(ctx, &material_api.GetMaterialsRequest{Type: material_model.MaterialType_flange})
 	if err != nil {
 		return nil, err
 	}
 
 	res := &read_api.GetFlangeResponse{
-		TypeFlange: typeFlange,
-		Standarts:  standarts,
-		Gaskets:    gasket,
-		Env:        env,
-		Materials:  materials,
+		TypeFlange:      typeFlange,
+		Standarts:       standarts,
+		Gaskets:         gasket,
+		Env:             env,
+		BoltMaterials:   boltMaterials,
+		FlangeMaterials: flangeMaterials,
 	}
 
 	return res, nil

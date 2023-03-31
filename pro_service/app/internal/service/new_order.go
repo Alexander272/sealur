@@ -61,7 +61,7 @@ func (s *OrderServiceNew) GetCurrent(ctx context.Context, req *order_api.GetCurr
 		}
 	}
 	if empty {
-		id, err := s.Create(ctx, &order_api.CreateOrder{UserId: req.UserId})
+		id, err := s.Create(ctx, &order_api.CreateOrder{UserId: req.UserId, ManagerId: req.ManagerId})
 		if err != nil {
 			return nil, err
 		}
@@ -319,6 +319,13 @@ func (s *OrderServiceNew) SetStatus(ctx context.Context, status *order_api.Statu
 
 	if err := s.repo.SetStatus(ctx, status); err != nil {
 		return fmt.Errorf("failed to set status order. error: %w", err)
+	}
+	return nil
+}
+
+func (s *OrderServiceNew) SetManager(ctx context.Context, manager *order_api.Manager) error {
+	if err := s.repo.SetManager(ctx, manager); err != nil {
+		return fmt.Errorf("failed to set manager. error: %w", err)
 	}
 	return nil
 }

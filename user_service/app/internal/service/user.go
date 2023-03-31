@@ -86,6 +86,14 @@ func (s *UserService) GetManager(ctx context.Context, req *user_api.GetUser) (ma
 	return manager, nil
 }
 
+func (s *UserService) GetManagers(ctx context.Context, req *user_api.GetNewUser) ([]*user_model.User, error) {
+	users, err := s.repo.GetManagers(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get managers. error: %w", err)
+	}
+	return users, nil
+}
+
 func (s *UserService) Create(ctx context.Context, user *user_api.CreateUser) (string, error) {
 	candidate, _, err := s.repo.GetByEmail(ctx, &user_api.GetUserByEmail{Email: user.Email})
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
@@ -128,6 +136,13 @@ func (s *UserService) Confirm(ctx context.Context, user *user_api.ConfirmUser) (
 		return nil, err
 	}
 	return u, nil
+}
+
+func (s *UserService) SetManager(ctx context.Context, manager *user_api.UserManager) error {
+	if err := s.repo.SetManager(ctx, manager); err != nil {
+		return fmt.Errorf("failed to set manager. error: %w", err)
+	}
+	return nil
 }
 
 // type UserService struct {

@@ -12,6 +12,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_size_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_standard_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_type_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/google/uuid"
@@ -83,7 +84,7 @@ func (r *PositionSnpRepo) Get(ctx context.Context, orderId string) (positions []
 func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]*position_model.OrderPositionSnp, error) {
 	var materialData []models.SnpMaterialBlock
 	materialQuery := fmt.Sprintf(`SELECT %s.id, position_id, 
-		filler_id, %s.code, %s.title, %s.another_title, %s.description, %s.designation,
+		filler_id, %s.code, %s.title, %s.base_code, %s.description, %s.designation,
 		frame_id as m1_id, m1.code as m1_code, m1.title as m1_title, m1.short_en as m1_short_en, m1.short_rus as m1_short_rus,
 		inner_ring_id as m2_id, m2.code as m2_code, m2.title as m2_title, m2.short_en as m2_short_en, m2.short_rus as m2_short_rus,
 		outer_ring_id as m3_id, m3.code as m3_code, m3.title as m3_title, m3.short_en as m3_short_en, m3.short_rus as m3_short_rus
@@ -94,8 +95,8 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 		LEFT JOIN %s as m3 ON m3.id=outer_ring_id
 		WHERE array[position_id] <@ $1 ORDER BY position_id`,
 		PositionMaterialSnpTable,
-		SnpFillerTable, SnpFillerTable, SnpFillerTable, SnpFillerTable, SnpFillerTable,
-		PositionMaterialSnpTable, SnpFillerTable, SnpFillerTable, MaterialTable, MaterialTable, MaterialTable,
+		SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable,
+		PositionMaterialSnpTable, SnpFillerNewTable, SnpFillerNewTable, MaterialTable, MaterialTable, MaterialTable,
 	)
 	if err := r.db.Select(&materialData, materialQuery, pq.Array(positionsId)); err != nil {
 		return nil, fmt.Errorf("failed to complete query material. error: %w", err)
@@ -103,8 +104,8 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 
 	var mainData []models.SnpMainBlock
 	mainQuery := fmt.Sprintf(`SELECT %s.id, position_id, flange_type_code, flange_type_title, 
-		snp_type_id, st.code, st.title,  
-		ss.id as snp_standard_id, ss.dn_title, ss.pn_title, ss.has_d2,
+		snp_type_id, st.code, st.title, st.has_d4, st.has_d3, st.has_d2, st.has_d1,
+		ss.id as snp_standard_id, ss.dn_title, ss.pn_title, ss.has_d2 as st_has_d2,
 		standard_id, s.title as standard_title, s.format as standard_format, 
 		flange_standard_id, fs.title as flange_title, fs.code as flange_code
 		FROM %s LEFT JOIN %s as st ON st.id=snp_type_id
@@ -161,12 +162,21 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 
 		positions = append(positions, &position_model.OrderPositionSnp{
 			Main: &position_model.OrderPositionSnp_Main{
-				Id:              m.Id,
-				PositionId:      m.PositionId,
-				SnpStandardId:   m.SnpStandardId,
-				SnpTypeId:       m.SnpTypeId,
-				SnpTypeCode:     m.SnpTypeCode,
-				SnpTypeTitle:    m.SnpTypeTitle,
+				Id:            m.Id,
+				PositionId:    m.PositionId,
+				SnpStandardId: m.SnpStandardId,
+				SnpTypeId:     m.SnpTypeId,
+				SnpType: &snp_type_model.SnpType{
+					Id:    m.SnpTypeId,
+					Title: m.SnpTypeTitle,
+					Code:  m.SnpTypeCode,
+					HasD4: m.SnpTypeHasD4,
+					HasD3: m.SnpTypeHasD3,
+					HasD2: m.SnpTypeHasD2,
+					HasD1: m.SnpTypeHasD1,
+				},
+				// SnpTypeCode:     m.SnpTypeCode,
+				// SnpTypeTitle:    m.SnpTypeTitle,
 				FlangeTypeCode:  m.FlangeTypeCode,
 				FlangeTypeTitle: m.FlangeTypeTitle,
 				SnpStandard: &snp_standard_model.SnpStandard{
@@ -189,13 +199,13 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 			Material: &position_model.OrderPositionSnp_Material{
 				Id:         material.Id,
 				PositionId: material.PositionId,
-				Filler: &snp_filler_model.SnpFiller{
-					Id:           material.FillerId,
-					Title:        material.FillerTitle,
-					AnotherTitle: material.FillerAnotherTitle,
-					Code:         material.FillerCode,
-					Description:  material.FillerDescription,
-					Designation:  material.FillerDesignation,
+				Filler: &snp_filler_model.SnpFillerNew{
+					Id:          material.FillerId,
+					BaseCode:    material.FillerBaseCode,
+					Code:        material.FillerCode,
+					Title:       material.FillerTitle,
+					Description: material.FillerDescription,
+					Designation: material.FillerDesignation,
 				},
 				Fr: frame,
 				Ir: innerRing,
@@ -472,7 +482,7 @@ func (r *PositionSnpRepo) Copy(ctx context.Context, targetPositionId string, pos
 		SELECT $1, $2, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another FROM %s WHERE position_id=$3`,
 		PositionSizeSnpTable, PositionSizeSnpTable,
 	)
-	//TODO надо что-то думать с чертежом (ели он есть)
+	// надо что-то думать с чертежом (ели он есть)
 	designQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, has_jumper, jumper_code, jumper_width, has_hole, has_mounting, mounting_code, drawing)
 		SELECT $1, $2, has_jumper, jumper_code, jumper_width, has_hole, has_mounting, mounting_code, replace(drawing, $3, $4) 
 		FROM %s WHERE position_id=$5 RETURNING drawing`,

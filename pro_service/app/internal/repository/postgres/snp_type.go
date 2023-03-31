@@ -43,9 +43,10 @@ func (r *SNPTypeRepo) Get(ctx context.Context, req *snp_type_api.GetSnpTypes) (s
 
 func (r *SNPTypeRepo) GetWithFlange(ctx context.Context, req *snp_api.GetSnpData) (types []*snp_model.FlangeType, err error) {
 	var data []models.SNPTypeWithFlange
-	query := fmt.Sprintf(`SELECT %s.id as type_id, %s.title as type_title, %s.code as type_code, %s.id, %s.title, %s.code
-		FROM %s INNER JOIN %s ON %s.id=flange_type_id WHERE %s.snp_standard_id=$1 ORDER BY flange_type_id, %s.code`,
-		SnpTypeTable, SnpTypeTable, SnpTypeTable, FlangeTypeTable, FlangeTypeTable, FlangeTypeTable,
+	query := fmt.Sprintf(`SELECT %s.id as type_id, %s.title as type_title, %s.code as type_code, %s.id, %s.title, %s.code,
+		%s.description, has_d4, has_d3, has_d2, has_d1
+		FROM %s INNER JOIN %s ON %s.id=flange_type_id WHERE %s.snp_standard_id=$1 ORDER BY flange_type_id, %s.title`,
+		SnpTypeTable, SnpTypeTable, SnpTypeTable, FlangeTypeTable, FlangeTypeTable, FlangeTypeTable, SnpTypeTable,
 		SnpTypeTable, FlangeTypeTable, FlangeTypeTable, SnpTypeTable, SnpTypeTable,
 	)
 
@@ -59,16 +60,26 @@ func (r *SNPTypeRepo) GetWithFlange(ctx context.Context, req *snp_api.GetSnpData
 				Id:    s.TypeId,
 				Code:  s.TypeCode,
 				Title: s.TypeTitle,
+				HasD4: s.HasD4,
+				HasD3: s.HasD3,
+				HasD2: s.HasD2,
+				HasD1: s.HasD1,
+				// Description: s.Description,
 			})
 		} else {
 			types = append(types, &snp_model.FlangeType{
-				Id:    s.Id,
-				Title: s.Title,
-				Code:  s.Code,
+				Id:          s.Id,
+				Title:       s.Title,
+				Code:        s.Code,
+				Description: s.Description,
 				Types: []*snp_type_model.SnpType{{
 					Id:    s.TypeId,
 					Code:  s.TypeCode,
 					Title: s.TypeTitle,
+					HasD4: s.HasD4,
+					HasD3: s.HasD3,
+					HasD2: s.HasD2,
+					HasD1: s.HasD1,
 				}},
 			})
 		}
@@ -77,6 +88,7 @@ func (r *SNPTypeRepo) GetWithFlange(ctx context.Context, req *snp_api.GetSnpData
 	return types, nil
 }
 
+// TODO исправить запрос
 func (r *SNPTypeRepo) Create(ctx context.Context, snp *snp_type_api.CreateSnpType) error {
 	query := fmt.Sprintf("INSERT INTO %s (id, title, flange_type_id, code, snp_standard_id) VALUES ($1, $2, $3, $4, $5)", SnpTypeTable)
 	id := uuid.New()

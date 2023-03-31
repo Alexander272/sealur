@@ -12,13 +12,15 @@ import (
 )
 
 type Users interface {
-	Get(ctx context.Context, req *user_api.GetUser) (*user_model.User, error)
-	GetByEmail(ctx context.Context, req *user_api.GetUserByEmail) (*user_model.User, string, error)
+	Get(context.Context, *user_api.GetUser) (*user_model.User, error)
+	GetByEmail(context.Context, *user_api.GetUserByEmail) (*user_model.User, string, error)
+	GetManagers(context.Context, *user_api.GetNewUser) ([]*user_model.User, error)
 	// Get(context.Context, *user_api.GetUser) (models.User, error)
 	// GetAll(context.Context, *user_api.GetAllUser) ([]models.User, error)
 	// GetNew(context.Context, *user_api.GetNewUser) ([]models.User, error)
 	Create(context.Context, *user_api.CreateUser, string) (string, error)
 	Confirm(context.Context, *user_api.ConfirmUser) error
+	SetManager(context.Context, *user_api.UserManager) error
 	// Update(context.Context, *user_api.UpdateUser) error
 	// Delete(context.Context, *user_api.DeleteUser) error
 }

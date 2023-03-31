@@ -18,13 +18,13 @@ func NewMaterialsRepo(db *sqlx.DB) *MaterialsRepo {
 }
 
 func (r *MaterialsRepo) GetMaterials(ctx context.Context, req *material_api.GetMaterialsRequest) (materials []models.MaterialsDTO, err error) {
-	query := fmt.Sprintf(`SELECT id, title FROM %s WHERE 
+	query := fmt.Sprintf(`SELECT id, title FROM %s WHERE type=$1 AND
 			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) > 0 AND
 			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) > 0 AND
 			(SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) > 0
 		ORDER BY id`, MaterialsTable, ElasticityTable, MaterialsTable, VoltageTable, MaterialsTable, AlphaTable, MaterialsTable)
 
-	if err := r.db.Select(&materials, query); err != nil {
+	if err := r.db.Select(&materials, query, req.Type.String()); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return materials, nil
@@ -32,7 +32,7 @@ func (r *MaterialsRepo) GetMaterials(ctx context.Context, req *material_api.GetM
 
 func (r *MaterialsRepo) GetMaterialsWithIsEmpty(ctx context.Context, req *material_api.GetMaterialsRequest,
 ) (materials []models.MaterialsWithIsEmpty, err error) {
-	query := fmt.Sprintf(`SELECT id, title, 
+	query := fmt.Sprintf(`SELECT id, title, type,
 			COALESCE((SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0, true) as is_empty_elasticity, 
 			COALESCE((SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0, true) as is_empty_voltage, 
 			COALESCE((SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0, true) as is_empty_alpha

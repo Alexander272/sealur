@@ -22,7 +22,7 @@ func NewSnpSizeRepo(db *sqlx.DB) *SnpSizeRepo {
 
 func (r *SnpSizeRepo) Get(ctx context.Context, req *snp_size_api.GetSnpSize) (sizes []*snp_size_model.SnpSize, err error) {
 	var data []models.SnpSize
-	query := fmt.Sprintf(`SELECT id, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3
+	query := fmt.Sprintf(`SELECT id, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3
 		FROM %s WHERE snp_type_id=$1 ORDER BY count`, SnpSizeTable)
 
 	if err := r.db.Select(&data, query, req.TypeId); err != nil {
@@ -53,8 +53,9 @@ func (r *SnpSizeRepo) Get(ctx context.Context, req *snp_size_api.GetSnpSize) (si
 			})
 		} else {
 			sizes = append(sizes, &snp_size_model.SnpSize{
-				Id: ss.Id,
-				Dn: ss.Dn,
+				Id:   ss.Id,
+				Dn:   ss.Dn,
+				DnMm: ss.DnMm,
 				Sizes: []*snp_size_model.Size{{
 					Pn: Pn,
 					D4: ss.D4,
@@ -76,6 +77,7 @@ func (r *SnpSizeRepo) Get(ctx context.Context, req *snp_size_api.GetSnpSize) (si
 	return sizes, nil
 }
 
+// TODO исправить создание размера
 func (r *SnpSizeRepo) Create(ctx context.Context, size *snp_size_api.CreateSnpSize) error {
 	query := fmt.Sprintf(`INSERT INTO %s(id, standard_id, flange_standard_id, snp_type_id, count, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`, SnpSizeTable)

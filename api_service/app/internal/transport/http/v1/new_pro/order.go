@@ -50,6 +50,7 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 		order.POST("/copy", handler.copy)
 		order.POST("/save", handler.save)
 		order.POST("/finish", handler.finish)
+		order.POST("/manager", handler.setManager)
 	}
 }
 
@@ -83,7 +84,13 @@ func (h *OrderHandler) getCurrent(c *gin.Context) {
 		return
 	}
 
-	order, err := h.orderApi.GetCurrent(c, &order_api.GetCurrentOrder{UserId: userId.(string)})
+	user, err := h.userApi.Get(c, &user_api.GetUser{Id: userId.(string)})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	order, err := h.orderApi.GetCurrent(c, &order_api.GetCurrentOrder{UserId: user.Id, ManagerId: user.ManagerId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -295,4 +302,19 @@ func (h *OrderHandler) finish(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated status successfully"})
+}
+
+func (h *OrderHandler) setManager(c *gin.Context) {
+	var dto *order_api.Manager
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		return
+	}
+
+	_, err := h.orderApi.SetManager(c, dto)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated manager successfully"})
 }

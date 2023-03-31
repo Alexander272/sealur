@@ -51,6 +51,14 @@ func (h *UserHandler) GetManagerEmail(ctx context.Context, req *user_api.GetUser
 	return user, nil
 }
 
+func (h *UserHandler) GetManagers(ctx context.Context, req *user_api.GetNewUser) (*user_api.Users, error) {
+	users, err := h.service.GetManagers(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &user_api.Users{Users: users}, nil
+}
+
 func (h *UserHandler) Create(ctx context.Context, user *user_api.CreateUser) (*response_model.IdResponse, error) {
 	logger.Info("create")
 	id, err := h.service.Create(ctx, user)
@@ -66,6 +74,13 @@ func (h *UserHandler) Confirm(ctx context.Context, user *user_api.ConfirmUser) (
 		return nil, err
 	}
 	return u, nil
+}
+
+func (h *UserHandler) SetManager(ctx context.Context, manager *user_api.UserManager) (*response_model.Response, error) {
+	if err := h.service.SetManager(ctx, manager); err != nil {
+		return nil, err
+	}
+	return &response_model.Response{}, nil
 }
 
 // func (h *Handler) GetUser(ctx context.Context, req *user_api.GetUserRequest) (*user_api.UserResponse, error) {

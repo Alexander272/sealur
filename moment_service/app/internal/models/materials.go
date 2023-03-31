@@ -28,6 +28,7 @@ type MaterialsAll struct {
 type MaterialsWithIsEmpty struct {
 	Id                string `db:"id"`
 	Title             string `db:"title"`
+	Type              string `db:"type"`
 	IsEmptyAlpha      bool   `db:"is_empty_alpha"`
 	IsEmptyElasticity bool   `db:"is_empty_elasticity"`
 	IsEmptyVoltage    bool   `db:"is_empty_voltage"`

@@ -5,6 +5,7 @@ import "github.com/lib/pq"
 type SnpSize struct {
 	Id    string         `db:"id"`
 	Dn    string         `db:"dn"`
+	DnMm  string         `db:"dn_mm"`
 	PnMpa pq.StringArray `db:"pn_mpa"`
 	PnKg  pq.StringArray `db:"pn_kg"`
 	D4    string         `db:"d4"`

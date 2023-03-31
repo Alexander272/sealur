@@ -260,6 +260,7 @@ type FlangeTypeSnp interface {
 
 type SnpFiller interface {
 	GetAll(context.Context, *snp_filler_api.GetSnpFillers) ([]*snp_filler_model.SnpFiller, error)
+	GetAllNew(context.Context, *snp_filler_api.GetSnpFillers) ([]*snp_filler_model.SnpFillerNew, error)
 	Create(context.Context, *snp_filler_api.CreateSnpFiller) error
 	CreateSeveral(context.Context, *snp_filler_api.CreateSeveralSnpFiller) error
 	Update(context.Context, *snp_filler_api.UpdateSnpFiller) error
@@ -306,6 +307,7 @@ type SnpSize interface {
 type Snp interface {
 	Get(context.Context, *snp_api.GetSnp) (*snp_api.Snp, error)
 	GetData(context.Context, *snp_api.GetSnpData) (*snp_model.SnpData, error)
+	GetDataNew(context.Context, *snp_api.GetSnpData) (*snp_model.SnpDataNew, error)
 }
 
 type OrderNew interface {
@@ -318,6 +320,7 @@ type OrderNew interface {
 	Copy(context.Context, *order_api.CopyOrder) error
 	Create(context.Context, *order_api.CreateOrder) (string, error)
 	SetStatus(ctx context.Context, status *order_api.Status) error
+	SetManager(ctx context.Context, manager *order_api.Manager) error
 }
 
 type Position interface {

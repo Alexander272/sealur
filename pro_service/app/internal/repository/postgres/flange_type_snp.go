@@ -20,6 +20,7 @@ func NewFlangeTypeRepo(db *sqlx.DB) *FlangeTypeRepo {
 	return &FlangeTypeRepo{db: db}
 }
 
+// добавить описание для фланцев
 func (r *FlangeTypeRepo) Get(ctx context.Context, flange *flange_type_snp_api.GetFlangeTypeSnp) (flanges []*flange_type_snp_model.FlangeTypeSnp, err error) {
 	var data []models.FlangeTypeSnp
 	query := fmt.Sprintf("SELECT id, title, code FROM %s WHERE standard_id=$1", FlangeTypeSNPTable)

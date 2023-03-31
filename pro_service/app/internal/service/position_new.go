@@ -129,7 +129,7 @@ func (s *PositionServiceNew) Copy(ctx context.Context, position *position_api.Co
 		return "", fmt.Errorf("failed to copy position. error: %w", err)
 	}
 
-	//TODO По сути я могу возвращать drawing и из него вырезать id файла, а id заявки (старой и новой) буду принимать с клиента
+	// По сути я могу возвращать drawing и из него вырезать id файла, а id заявки (старой и новой) буду принимать с клиента
 	drawing, err := s.snp.Copy(ctx, id, position)
 	if err != nil {
 		return "", err

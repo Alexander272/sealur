@@ -7,6 +7,7 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
 	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/models/material_model"
 	"github.com/Alexander272/sealur_proto/api/moment/read_api"
 )
 
@@ -33,15 +34,21 @@ func (s *DevCoolingService) GetDevCooling(ctx context.Context, req *read_api.Get
 		return nil, err
 	}
 
-	materials, err := s.materials.GetMaterials(ctx, &material_api.GetMaterialsRequest{})
+	boltMaterials, err := s.materials.GetMaterials(ctx, &material_api.GetMaterialsRequest{Type: material_model.MaterialType_bolt})
+	if err != nil {
+		return nil, err
+	}
+
+	flangeMaterials, err := s.materials.GetMaterials(ctx, &material_api.GetMaterialsRequest{Type: material_model.MaterialType_flange})
 	if err != nil {
 		return nil, err
 	}
 
 	res := &read_api.GetDevCoolingResponse{
-		Gaskets:   gasket,
-		Materials: materials,
-		Env:       env,
+		Gaskets:         gasket,
+		BoltMaterials:   boltMaterials,
+		FlangeMaterials: flangeMaterials,
+		Env:             env,
 	}
 
 	return res, nil

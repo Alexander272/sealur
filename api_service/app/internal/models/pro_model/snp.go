@@ -107,7 +107,7 @@ type MaterialSnp struct {
 func (s *MaterialSnp) Parse() *position_model.PositionSnp_Material {
 	return &position_model.PositionSnp_Material{
 		FillerId:      s.Filler.Id,
-		FillerCode:    s.Filler.Code,
+		FillerCode:    s.Filler.BaseCode,
 		FrameId:       s.Fr.Id,
 		FrameCode:     s.Fr.Code,
 		InnerRingId:   s.Ir.Id,

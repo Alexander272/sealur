@@ -21,7 +21,7 @@ func NewFlangeRepo(db *sqlx.DB) *FlangeRepo {
 
 func (r *FlangeRepo) GetFlangeSize(ctx context.Context, req *flange_api.GetFlangeSizeRequest) (size models.FlangeSize, err error) {
 	query := fmt.Sprintf(`SELECT %s.id, pn, d, d6, d_out, x, a, h, s0, s1, length, count, diameter, area FROM %s
-		INNER JOIN %s on bolt_id=%s.id WHERE stand_id=$1 AND dn=$2 AND pn=$3 AND row=$4`,
+		INNER JOIN %s on bolt_id=%s.id WHERE stand_id=$1 AND dn=$2 AND pn=$3 AND row=$4 ORDER BY dn, pn`,
 		FlangeSizeTable, FlangeSizeTable, BoltsTable, BoltsTable)
 
 	if err := r.db.Get(&size, query, req.StandId, req.Dn, req.Pn, req.Row); err != nil {
@@ -57,7 +57,7 @@ func (r *FlangeRepo) GetBasisFlangeSizes(ctx context.Context, req models.GetBasi
 
 func (r *FlangeRepo) GetFullFlangeSize(ctx context.Context, req *flange_api.GetFullFlangeSizeRequest, row int32) (size []models.FlangeSizeDTO, err error) {
 	query := fmt.Sprintf(`SELECT id, stand_id, pn, dn, dmm, d, d6, d_out, x, a, h, s0, s1, length, count, bolt_id 
-		FROM %s WHERE stand_id=$1 AND row=$2`, FlangeSizeTable)
+		FROM %s WHERE stand_id=$1 AND row=$2 ORDER BY dn, pn`, FlangeSizeTable)
 
 	if err := r.db.Select(&size, query, req.StandId, row); err != nil {
 		return size, fmt.Errorf("failed to execute query. error: %w", err)

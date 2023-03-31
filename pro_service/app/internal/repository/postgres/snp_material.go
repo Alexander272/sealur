@@ -24,7 +24,7 @@ func NewSnpMaterialRepo(db *sqlx.DB) *SnpMaterialRepo {
 func (r *SnpMaterialRepo) Get(ctx context.Context, req *snp_material_api.GetSnpMaterial) (materials []*snp_material_model.SnpMaterial, err error) {
 	var data []models.SNPMaterial
 	query := fmt.Sprintf(`SELECT %s.id, title, code, short_en, short_rus, %s.id as material_id, default_id, type
-		FROM %s INNER JOIN %s ON array[%s.id]<@material_id WHERE standard_id=$1 ORDER BY type, code`,
+		FROM %s INNER JOIN %s ON array[%s.id]<@material_id WHERE standard_id=$1 ORDER BY type, count`,
 		SnpMaterialTable, MaterialTable, SnpMaterialTable, MaterialTable, MaterialTable,
 	)
 

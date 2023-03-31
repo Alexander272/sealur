@@ -81,6 +81,32 @@ func (r *UserRepo) GetByEmail(ctx context.Context, req *user_api.GetUserByEmail)
 	return user, data.Password, nil
 }
 
+func (r *UserRepo) GetManagers(ctx context.Context, req *user_api.GetNewUser) (users []*user_model.User, err error) {
+	var data []models.User
+	query := fmt.Sprintf(`SELECT "%s".id, region, city, "position", phone, email, %s.code as role_code, name
+		FROM "%s" INNER JOIN %s on %s.id=role_id WHERE role_code=manager`,
+		UserTable, RoleTable, UserTable, RoleTable, RoleTable,
+	)
+
+	if err := r.db.Select(&data, query); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for _, u := range data {
+		users = append(users, &user_model.User{
+			Id:       u.Id,
+			Region:   u.Region,
+			City:     u.City,
+			Position: u.Position,
+			Phone:    u.Phone,
+			Email:    u.Email,
+			Name:     u.Name,
+			RoleCode: u.RoleCode,
+		})
+	}
+	return users, nil
+}
+
 func (r *UserRepo) Create(ctx context.Context, user *user_api.CreateUser, roleId string) (string, error) {
 	query := fmt.Sprintf(`INSERT INTO "%s"(id, company, inn, kpp, region, city, "position", phone, password, email, role_id, name, address, manager_id)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`, UserTable)
@@ -113,5 +139,15 @@ func (r *UserRepo) Confirm(ctx context.Context, user *user_api.ConfirmUser) erro
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
+	return nil
+}
+
+func (r *UserRepo) SetManager(ctx context.Context, manager *user_api.UserManager) error {
+	query := fmt.Sprintf(`UPDATE "%s" SET manager_id=$1 WHERE id=$2`, UserTable)
+
+	_, err := r.db.Exec(query, manager.ManagerId, manager.Id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
 	return nil
 }

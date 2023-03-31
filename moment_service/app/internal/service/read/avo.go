@@ -9,6 +9,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/device_api"
 	"github.com/Alexander272/sealur_proto/api/moment/gasket_api"
 	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/models/material_model"
 	"github.com/Alexander272/sealur_proto/api/moment/read_api"
 )
 
@@ -37,7 +38,12 @@ func (s *GasCoolingService) GetAVO(ctx context.Context, req *read_api.GetAVORequ
 		return nil, err
 	}
 
-	materials, err := s.materials.GetMaterials(ctx, &material_api.GetMaterialsRequest{})
+	boltMaterials, err := s.materials.GetMaterials(ctx, &material_api.GetMaterialsRequest{Type: material_model.MaterialType_bolt})
+	if err != nil {
+		return nil, err
+	}
+
+	flangeMaterials, err := s.materials.GetMaterials(ctx, &material_api.GetMaterialsRequest{Type: material_model.MaterialType_flange})
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +85,8 @@ func (s *GasCoolingService) GetAVO(ctx context.Context, req *read_api.GetAVORequ
 
 	res := &read_api.GetAVOResponse{
 		Gaskets:          gasket,
-		Materials:        materials,
+		BoltMaterials:    boltMaterials,
+		FlangeMaterials:  flangeMaterials,
 		Env:              env,
 		Devices:          devices,
 		Pressure:         pressure,
