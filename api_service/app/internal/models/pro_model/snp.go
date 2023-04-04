@@ -98,22 +98,25 @@ func (s *SizeSnp) Parse() *position_model.PositionSnp_Size {
 }
 
 type MaterialSnp struct {
-	Ir     Material  `json:"ir"`
-	Or     Material  `json:"or"`
-	Fr     Material  `json:"fr"`
-	Filler SnpFiller `json:"filler"`
+	// Ir        Material    `json:"ir"`
+	// Or        Material    `json:"or"`
+	// Fr        Material    `json:"fr"`
+	InnerRing SnpMaterial `json:"innerRing"`
+	OuterRing SnpMaterial `json:"outerRing"`
+	Frame     SnpMaterial `json:"frame"`
+	Filler    SnpFiller   `json:"filler"`
 }
 
 func (s *MaterialSnp) Parse() *position_model.PositionSnp_Material {
 	return &position_model.PositionSnp_Material{
 		FillerId:      s.Filler.Id,
 		FillerCode:    s.Filler.BaseCode,
-		FrameId:       s.Fr.Id,
-		FrameCode:     s.Fr.Code,
-		InnerRingId:   s.Ir.Id,
-		InnerRingCode: s.Ir.Code,
-		OuterRingId:   s.Or.Id,
-		OuterRingCode: s.Or.Code,
+		FrameId:       s.Frame.Id,
+		FrameCode:     s.Frame.BaseCode,
+		InnerRingId:   s.InnerRing.Id,
+		InnerRingCode: s.InnerRing.BaseCode,
+		OuterRingId:   s.OuterRing.Id,
+		OuterRingCode: s.OuterRing.BaseCode,
 	}
 }
 

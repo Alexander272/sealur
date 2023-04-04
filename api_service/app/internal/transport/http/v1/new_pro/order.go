@@ -291,14 +291,14 @@ func (h *OrderHandler) save(c *gin.Context) {
 func (h *OrderHandler) finish(c *gin.Context) {
 	var dto *order_api.Status
 	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "отправлены некорректные данные")
 		return
 	}
 	dto.Status = order_model.OrderStatus_finish
 
 	_, err := h.orderApi.SetStatus(c, dto)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 		return
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated status successfully"})
@@ -307,13 +307,14 @@ func (h *OrderHandler) finish(c *gin.Context) {
 func (h *OrderHandler) setManager(c *gin.Context) {
 	var dto *order_api.Manager
 	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "отправлены некорректные данные")
 		return
 	}
 
+	//TODO отправлять email при изменении (? а надо ли это вообще)
 	_, err := h.orderApi.SetManager(c, dto)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 		return
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated manager successfully"})

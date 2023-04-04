@@ -62,7 +62,6 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 		Bolts:     d.Bolt,
 		Gasket:    d.Gasket,
 		Calc:      &dev_cooling_model.Calculated{},
-		Formulas:  &dev_cooling_model.Formulas{},
 	}
 
 	Auxiliary := &dev_cooling_model.CalcAuxiliary{}

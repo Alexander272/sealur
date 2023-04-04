@@ -65,11 +65,10 @@ func (s *ExRectService) CalculateExRect(ctx context.Context, data *calc_api.Expr
 	}
 
 	result := calc_api.ExpressRectangleResponse{
-		Data:     s.data.FormatInitData(data),
-		Bolts:    d.Bolt,
-		Gasket:   d.Gasket,
-		Calc:     &express_rectangle_model.Calculated{},
-		Formulas: &express_rectangle_model.Formulas{},
+		Data:   s.data.FormatInitData(data),
+		Bolts:  d.Bolt,
+		Gasket: d.Gasket,
+		Calc:   &express_rectangle_model.Calculated{},
 	}
 
 	Auxiliary := &express_rectangle_model.CalcAuxiliary{}

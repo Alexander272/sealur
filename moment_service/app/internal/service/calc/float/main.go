@@ -64,13 +64,12 @@ func (s *FloatService) CalculationFloat(ctx context.Context, data *calc_api.Floa
 	}
 
 	result := calc_api.FloatResponse{
-		Data:     s.data.FormatInitData(data),
-		Flange:   d.Flange,
-		Cap:      d.Cap,
-		Bolt:     d.Bolt,
-		Gasket:   d.Gasket,
-		Calc:     &float_model.Calculated{},
-		Formulas: &float_model.Formulas{},
+		Data:   s.data.FormatInitData(data),
+		Flange: d.Flange,
+		Cap:    d.Cap,
+		Bolt:   d.Bolt,
+		Gasket: d.Gasket,
+		Calc:   &float_model.Calculated{},
 	}
 
 	// Эффективная ширина прокладки

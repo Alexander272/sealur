@@ -10,6 +10,7 @@ const (
 	SnpFillerTable           = "snp_filler"
 	SnpFillerNewTable        = "snp_filler_new"
 	SnpMaterialTable         = "snp_material"
+	SnpMaterialTableNew      = "snp_material_new"
 	SnpStandardTable         = "snp_standard"
 	SnpTypeTable             = "snp_type"
 	TemperatureTable         = "temperature"

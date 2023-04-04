@@ -6,10 +6,11 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
+	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_standard_model"
-	"github.com/Alexander272/sealur_proto/api/pro/models/material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_size_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_type_model"
@@ -82,21 +83,22 @@ func (r *PositionSnpRepo) Get(ctx context.Context, orderId string) (positions []
 
 // ? возможно стоит попробовать написать запросы получше
 func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]*position_model.OrderPositionSnp, error) {
-	var materialData []models.SnpMaterialBlock
-	materialQuery := fmt.Sprintf(`SELECT %s.id, position_id, 
-		filler_id, %s.code, %s.title, %s.base_code, %s.description, %s.designation,
-		frame_id as m1_id, m1.code as m1_code, m1.title as m1_title, m1.short_en as m1_short_en, m1.short_rus as m1_short_rus,
-		inner_ring_id as m2_id, m2.code as m2_code, m2.title as m2_title, m2.short_en as m2_short_en, m2.short_rus as m2_short_rus,
-		outer_ring_id as m3_id, m3.code as m3_code, m3.title as m3_title, m3.short_en as m3_short_en, m3.short_rus as m3_short_rus
-		FROM %s
-		LEFT JOIN %s ON %s.id=filler_id
-		LEFT JOIN %s as m1 ON m1.id=frame_id
-		LEFT JOIN %s as m2 ON m2.id=inner_ring_id
-		LEFT JOIN %s as m3 ON m3.id=outer_ring_id
-		WHERE array[position_id] <@ $1 ORDER BY position_id`,
+
+	var materialData []models.SnpMaterialBlockNew
+	materialQuery := fmt.Sprintf(`SELECT %s.id, position_id,
+			filler_id, %s.code, %s.title, %s.base_code, %s.description, %s.designation,
+			frame_code, frame_id, m1.code as m1_code, m1.material_id as m1_material_id, m1.type as m1_type, m1.is_default as m1_is_default, m1.is_standard as m1_is_standard,
+			inner_ring_code, inner_ring_id, m2.code as m2_code, m2.material_id as m2_material_id, m2.type as m2_type, m2.is_default as m2_is_default, m2.is_standard as m2_is_standard,
+			outer_ring_code, outer_ring_id, m3.code as m3_code, m3.material_id as m3_material_id, m3.type as m3_type, m3.is_default as m3_is_default, m3.is_standard as m3_is_standard
+			FROM %s
+			LEFT JOIN %s ON %s.id=filler_id
+			LEFT JOIN %s as m1 ON m1.id=frame_id
+			LEFT JOIN %s as m2 ON m2.id=inner_ring_id
+			LEFT JOIN %s as m3 ON m3.id=outer_ring_id
+			WHERE array[position_id] <@ $1 ORDER BY position_id`,
 		PositionMaterialSnpTable,
 		SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable,
-		PositionMaterialSnpTable, SnpFillerNewTable, SnpFillerNewTable, MaterialTable, MaterialTable, MaterialTable,
+		PositionMaterialSnpTable, SnpFillerNewTable, SnpFillerNewTable, SnpMaterialTableNew, SnpMaterialTableNew, SnpMaterialTableNew,
 	)
 	if err := r.db.Select(&materialData, materialQuery, pq.Array(positionsId)); err != nil {
 		return nil, fmt.Errorf("failed to complete query material. error: %w", err)
@@ -138,26 +140,31 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 		size := sizeData[i]
 		design := designData[i]
 
-		frame := &material_model.Material{Id: material.FrameId}
+		logger.Debug(material)
+
+		frame := &snp_material_model.Material{Id: material.FrameId, BaseCode: material.FrameBaseCode}
 		if material.FrameId != uuid.Nil.String() {
 			frame.Code = *material.FrameCode
-			frame.Title = *material.FrameTitle
-			frame.ShortEn = *material.FrameShortEn
-			frame.ShortRus = *material.FrameShortRus
+			frame.MaterialId = *material.FrameMaterialId
+			frame.Type = *material.FrameType
+			frame.IsDefault = *material.FrameIsDefault
+			frame.IsStandard = *material.FrameIsStandard
 		}
-		innerRing := &material_model.Material{Id: material.InnerRingId}
+		innerRing := &snp_material_model.Material{Id: material.InnerRingId, BaseCode: material.InnerRingBaseCode}
 		if material.InnerRingId != uuid.Nil.String() {
 			innerRing.Code = *material.InnerRingCode
-			innerRing.Title = *material.InnerRingTitle
-			innerRing.ShortEn = *material.InnerRingShortEn
-			innerRing.ShortRus = *material.InnerRingShortRus
+			innerRing.MaterialId = *material.InnerRingMaterialId
+			innerRing.Type = *material.InnerRingType
+			innerRing.IsDefault = *material.InnerRingIsDefault
+			innerRing.IsStandard = *material.InnerRingIsStandard
 		}
-		outerRing := &material_model.Material{Id: material.OuterRingId}
+		outerRing := &snp_material_model.Material{Id: material.OuterRingId, BaseCode: material.OuterRingBaseCode}
 		if material.OuterRingId != uuid.Nil.String() {
 			outerRing.Code = *material.OuterRingCode
-			outerRing.Title = *material.OuterRingTitle
-			outerRing.ShortEn = *material.OuterRingShortEn
-			outerRing.ShortRus = *material.OuterRingShortRus
+			outerRing.MaterialId = *material.OuterRingMaterialId
+			outerRing.Type = *material.OuterRingType
+			outerRing.IsDefault = *material.OuterRingIsDefault
+			outerRing.IsStandard = *material.OuterRingIsStandard
 		}
 
 		positions = append(positions, &position_model.OrderPositionSnp{
@@ -175,8 +182,6 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 					HasD2: m.SnpTypeHasD2,
 					HasD1: m.SnpTypeHasD1,
 				},
-				// SnpTypeCode:     m.SnpTypeCode,
-				// SnpTypeTitle:    m.SnpTypeTitle,
 				FlangeTypeCode:  m.FlangeTypeCode,
 				FlangeTypeTitle: m.FlangeTypeTitle,
 				SnpStandard: &snp_standard_model.SnpStandard{
@@ -207,9 +212,9 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 					Description: material.FillerDescription,
 					Designation: material.FillerDesignation,
 				},
-				Fr: frame,
-				Ir: innerRing,
-				Or: outerRing,
+				Frame:     frame,
+				InnerRing: innerRing,
+				OuterRing: outerRing,
 			},
 			Size: &position_model.OrderPositionSnp_Size{
 				Id:         size.Id,

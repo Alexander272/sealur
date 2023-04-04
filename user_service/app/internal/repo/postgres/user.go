@@ -84,8 +84,8 @@ func (r *UserRepo) GetByEmail(ctx context.Context, req *user_api.GetUserByEmail)
 func (r *UserRepo) GetManagers(ctx context.Context, req *user_api.GetNewUser) (users []*user_model.User, err error) {
 	var data []models.User
 	query := fmt.Sprintf(`SELECT "%s".id, region, city, "position", phone, email, %s.code as role_code, name
-		FROM "%s" INNER JOIN %s on %s.id=role_id WHERE role_code=manager`,
-		UserTable, RoleTable, UserTable, RoleTable, RoleTable,
+		FROM "%s" INNER JOIN %s on %s.id=role_id WHERE %s.code='manager'`,
+		UserTable, RoleTable, UserTable, RoleTable, RoleTable, RoleTable,
 	)
 
 	if err := r.db.Select(&data, query); err != nil {

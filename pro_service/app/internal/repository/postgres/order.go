@@ -158,7 +158,7 @@ func (r *OrderRepo) Create(ctx context.Context, order *order_api.CreateOrder, da
 }
 
 func (r *OrderRepo) SetStatus(ctx context.Context, status *order_api.Status) error {
-	query := fmt.Sprintf(`UPDATE "%s" SET status=$1, %s_date=$2 WHERE id=$3`, OrderTable, status.Status.String())
+	query := fmt.Sprintf(`UPDATE "%s" SET status=$1, %s_date=$2 WHERE id=$3 AND status!=$1`, OrderTable, status.Status.String())
 
 	_, err := r.db.Exec(query, status.Status.String(), status.Date, status.OrderId)
 	if err != nil {

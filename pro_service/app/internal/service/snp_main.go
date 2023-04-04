@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
-	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_model"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
@@ -59,50 +58,7 @@ func (s *SnpService) Get(ctx context.Context, req *snp_api.GetSnp) (snp *snp_api
 	return snp, nil
 }
 
-func (s *SnpService) GetData(ctx context.Context, req *snp_api.GetSnpData) (snpData *snp_model.SnpData, err error) {
-	var mounting []*mounting_model.Mounting
-	var fillers []*snp_filler_model.SnpFiller
-	snpData = &snp_model.SnpData{}
-
-	if req.StandardId == "" {
-		standard, err := s.snpStandard.GetDefault(ctx)
-		if err != nil {
-			return nil, err
-		}
-		req.StandardId = standard.Standard.Id
-		req.SnpStandardId = standard.Id
-
-		mounting, err = s.mounting.GetAll(ctx, &mounting_api.GetAllMountings{})
-		if err != nil {
-			return nil, err
-		}
-
-		fillers, err = s.filler.GetAll(ctx, &snp_filler_api.GetSnpFillers{})
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	snpData.Mounting = mounting
-	snpData.Fillers = fillers
-
-	materials, err := s.material.Get(ctx, &snp_material_api.GetSnpMaterial{StandardId: req.StandardId})
-	if err != nil {
-		return nil, err
-	}
-
-	snpTypes, err := s.snpType.GetWithFlange(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-
-	snpData.Materials = materials
-	snpData.FlangeTypes = snpTypes
-
-	return snpData, nil
-}
-
-func (s *SnpService) GetDataNew(ctx context.Context, req *snp_api.GetSnpData) (snpData *snp_model.SnpDataNew, err error) {
+func (s *SnpService) GetData(ctx context.Context, req *snp_api.GetSnpData) (snpData *snp_model.SnpDataNew, err error) {
 	var mounting []*mounting_model.Mounting
 	// var fillers []*snp_filler_model.SnpFiller
 	snpData = &snp_model.SnpDataNew{}
@@ -124,24 +80,31 @@ func (s *SnpService) GetDataNew(ctx context.Context, req *snp_api.GetSnpData) (s
 
 	snpData.Mounting = mounting
 
-	materials, err := s.material.Get(ctx, &snp_material_api.GetSnpMaterial{StandardId: req.StandardId})
-	if err != nil {
-		return nil, err
-	}
+	// materials, err := s.material.Get(ctx, &snp_material_api.GetSnpMaterial{StandardId: req.StandardId})
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	snpTypes, err := s.snpType.GetWithFlange(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 
-	fillers, err := s.filler.GetAllNew(ctx, &snp_filler_api.GetSnpFillers{StandardId: req.StandardId})
+	fillers, err := s.filler.GetAll(ctx, &snp_filler_api.GetSnpFillers{StandardId: req.StandardId})
 	if err != nil {
 		return nil, err
 	}
 
-	snpData.Materials = materials
+	//TODO
+	snpMaterials, err := s.material.GetNew(ctx, &snp_material_api.GetSnpMaterial{StandardId: req.StandardId})
+	if err != nil {
+		return nil, err
+	}
+
+	// snpData.Materials = materials
 	snpData.FlangeTypes = snpTypes
 	snpData.Fillers = fillers
+	snpData.SnpMaterials = snpMaterials
 
 	return snpData, nil
 }

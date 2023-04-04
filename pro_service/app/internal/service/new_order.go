@@ -103,12 +103,18 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		return nil, "", err
 	}
 
+	//TODO добавить чертеж (возможно просто отметку)
 	mainColumn := []interface{}{"№", "Наименование", "Количество"}
 	snpColumn := []interface{}{"№", "Наименование", "Д4", "Д3", "Д2", "Д1", "h", "материал внутр. кольца", "материал каркаса", "материал наполнителя", "материал нар. кольца", "Перемычка", "Отверстие", "Крепление"}
 
 	file := excelize.NewFile()
 	sheetName := file.GetSheetName(file.GetActiveSheetIndex())
 
+	//TODO надо получать ячейку
+	// cell, err := excelize.CoordinatesToCellName(1, int(1+p.Count))
+	// 	if err != nil {
+	// 		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+	// 	}
 	if err = file.SetSheetRow(sheetName, "A1", &mainColumn); err != nil {
 		return nil, "", fmt.Errorf("failed to create header table. error: %w", err)
 	}
@@ -162,6 +168,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 	}
 	buffer := new(bytes.Buffer)
 
+	//TODO добавлять к названию номер позиции
 	// stream, err := s.file.GroupDownload(ctx, &file_api.GroupDownloadRequest{
 	// 	Bucket: "pro",
 	// 	Group:  order.OrderId,

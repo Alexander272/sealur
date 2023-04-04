@@ -73,14 +73,13 @@ func (s *CapService) CalculationCap(ctx context.Context, data *calc_api.CapReque
 	}
 
 	result := calc_api.CapResponse{
-		Data:     s.data.FormatInitData(data.Data),
-		Bolt:     d.Bolt,
-		Flange:   d.Flange,
-		Cap:      d.Cap,
-		Embed:    d.Embed,
-		Gasket:   d.Gasket,
-		Calc:     &cap_model.Calculated{},
-		Formulas: &cap_model.Formulas{},
+		Data:   s.data.FormatInitData(data.Data),
+		Bolt:   d.Bolt,
+		Flange: d.Flange,
+		Cap:    d.Cap,
+		Embed:  d.Embed,
+		Gasket: d.Gasket,
+		Calc:   &cap_model.Calculated{},
 	}
 
 	if data.IsUseWasher {

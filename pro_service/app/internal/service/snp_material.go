@@ -25,6 +25,14 @@ func (s *SnpMaterialService) Get(ctx context.Context, material *snp_material_api
 	return materials, err
 }
 
+func (s *SnpMaterialService) GetNew(ctx context.Context, material *snp_material_api.GetSnpMaterial) (*snp_material_model.SnpMaterials, error) {
+	materials, err := s.repo.GetNew(ctx, material)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get snp material. error: %w", err)
+	}
+	return materials, err
+}
+
 func (s *SnpMaterialService) Create(ctx context.Context, material *snp_material_api.CreateSnpMaterial) error {
 	if err := s.repo.Create(ctx, material); err != nil {
 		return fmt.Errorf("failed to create snp material. error: %w", err)

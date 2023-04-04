@@ -65,11 +65,10 @@ func (s *ExCircleService) CalculateExCircle(ctx context.Context, data *calc_api.
 	}
 
 	result := calc_api.ExpressCircleResponse{
-		Data:     s.data.FormatInitData(data),
-		Bolts:    d.Bolt,
-		Gasket:   d.Gasket,
-		Calc:     &express_circle_model.Calculated{},
-		Formulas: &express_circle_model.Formulas{},
+		Data:   s.data.FormatInitData(data),
+		Bolts:  d.Bolt,
+		Gasket: d.Gasket,
+		Calc:   &express_circle_model.Calculated{},
 	}
 
 	Deformation := &express_circle_model.CalcDeformation{}

@@ -68,6 +68,53 @@ func (r *SnpMaterialRepo) Get(ctx context.Context, req *snp_material_api.GetSnpM
 	return materials, nil
 }
 
+func (r *SnpMaterialRepo) GetNew(ctx context.Context, req *snp_material_api.GetSnpMaterial) (*snp_material_model.SnpMaterials, error) {
+	var data []models.SnpMaterial
+	query := fmt.Sprintf(`SELECT %s.id, material_id, type, is_default, %s.code, is_standard, %s.code as base_code, title
+		FROM %s INNER JOIN %s ON material_id=%s.id WHERE standard_id=$1 ORDER BY type, count`,
+		SnpMaterialTableNew, SnpMaterialTableNew, MaterialTable, SnpMaterialTableNew, MaterialTable, MaterialTable,
+	)
+
+	if err := r.db.Select(&data, query, req.StandardId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	var frame []*snp_material_model.Material
+	var innerRing []*snp_material_model.Material
+	var outerRing []*snp_material_model.Material
+
+	for _, m := range data {
+		currentMaterial := &snp_material_model.Material{
+			Id:         m.Id,
+			MaterialId: m.MaterialId,
+			Type:       m.Type,
+			IsDefault:  m.IsDefault,
+			Code:       m.Code,
+			IsStandard: m.IsStandard,
+			BaseCode:   m.BaseCode,
+			Title:      m.Title,
+		}
+
+		if m.Type == "fr" {
+			frame = append(frame, currentMaterial)
+		}
+		if m.Type == "ir" {
+			innerRing = append(innerRing, currentMaterial)
+		}
+		if m.Type == "or" {
+			outerRing = append(outerRing, currentMaterial)
+		}
+	}
+
+	material := &snp_material_model.SnpMaterials{
+		Frame:     frame,
+		InnerRing: innerRing,
+		OuterRing: outerRing,
+	}
+
+	return material, nil
+}
+
 func (r *SnpMaterialRepo) Create(ctx context.Context, material *snp_material_api.CreateSnpMaterial) error {
 	query := fmt.Sprintf("INSERT INTO %s (id, material_id, default_id, type, standard_id) VALUES ($1, $2, $3, $4, $5)", SnpMaterialTable)
 	id := uuid.New()

@@ -17,3 +17,14 @@ type Material struct {
 	ShortEn  string `json:"shortEn"`
 	ShortRus string `json:"shortRus"`
 }
+
+type SnpMaterial struct {
+	Id         string `json:"id"`
+	MaterialId string `json:"materialId"`
+	Type       string `json:"type"`
+	Code       string `json:"code"`
+	IsDefault  bool   `json:"isDefault"`
+	IsStandard bool   `json:"isStandard"`
+	BaseCode   string `json:"baseCode"`
+	Title      string `json:"title"`
+}

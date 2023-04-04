@@ -17,16 +17,8 @@ func NewSnpFillerService(repo repository.SnpFiller) *SnpFillerService {
 	return &SnpFillerService{repo: repo}
 }
 
-func (s *SnpFillerService) GetAll(ctx context.Context, req *snp_filler_api.GetSnpFillers) ([]*snp_filler_model.SnpFiller, error) {
+func (s *SnpFillerService) GetAll(ctx context.Context, req *snp_filler_api.GetSnpFillers) ([]*snp_filler_model.SnpFillerNew, error) {
 	fillers, err := s.repo.GetAll(ctx, req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get snp filler. error: %w", err)
-	}
-	return fillers, err
-}
-
-func (s *SnpFillerService) GetAllNew(ctx context.Context, req *snp_filler_api.GetSnpFillers) ([]*snp_filler_model.SnpFillerNew, error) {
-	fillers, err := s.repo.GetAllNew(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get snp filler new. error: %w", err)
 	}

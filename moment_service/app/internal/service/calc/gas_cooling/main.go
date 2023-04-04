@@ -66,11 +66,10 @@ func (s *CoolingService) CalculateGasCooling(ctx context.Context, data *calc_api
 	}
 
 	result := &calc_api.GasCoolingResponse{
-		Data:     s.data.FormatInitData(data.Data),
-		Bolts:    d.Bolt,
-		Gasket:   d.Gasket,
-		Calc:     &gas_cooling_model.Calculated{},
-		Formulas: &gas_cooling_model.Formulas{},
+		Data:   s.data.FormatInitData(data.Data),
+		Bolts:  d.Bolt,
+		Gasket: d.Gasket,
+		Calc:   &gas_cooling_model.Calculated{},
 	}
 
 	result.Calc.Auxiliary = s.CalcAuxiliary(ctx, d)
