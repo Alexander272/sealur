@@ -1,15 +1,18 @@
 package service
 
 import (
-	"archive/zip"
 	"bytes"
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
+	"io"
+	"strings"
 	"time"
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
+	"github.com/Alexander272/sealur/pro_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/Alexander272/sealur_proto/api/pro/models/order_model"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
@@ -20,12 +23,16 @@ import (
 type OrderServiceNew struct {
 	repo     repository.OrderNew
 	position Position
+	zip      Zip
+	fileApi  file_api.FileServiceClient
 }
 
-func NewOrderService_New(repo repository.OrderNew, position Position) *OrderServiceNew {
+func NewOrderService_New(repo repository.OrderNew, position Position, zip Zip, fileApi file_api.FileServiceClient) *OrderServiceNew {
 	return &OrderServiceNew{
 		repo:     repo,
 		position: position,
+		zip:      zip,
+		fileApi:  fileApi,
 	}
 }
 
@@ -103,24 +110,29 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		return nil, "", err
 	}
 
-	//TODO добавить чертеж (возможно просто отметку)
 	mainColumn := []interface{}{"№", "Наименование", "Количество"}
-	snpColumn := []interface{}{"№", "Наименование", "Д4", "Д3", "Д2", "Д1", "h", "материал внутр. кольца", "материал каркаса", "материал наполнителя", "материал нар. кольца", "Перемычка", "Отверстие", "Крепление"}
+	snpColumn := []interface{}{"№", "Наименование", "Д4", "Д3", "Д2", "Д1", "h", "материал внутр. кольца", "материал каркаса", "материал наполнителя", "материал нар. кольца", "Перемычка", "Отверстие", "Крепление", "Чертеж"}
 
 	file := excelize.NewFile()
 	sheetName := file.GetSheetName(file.GetActiveSheetIndex())
 
-	//TODO надо получать ячейку
-	// cell, err := excelize.CoordinatesToCellName(1, int(1+p.Count))
-	// 	if err != nil {
-	// 		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
-	// 	}
-	if err = file.SetSheetRow(sheetName, "A1", &mainColumn); err != nil {
+	cell, err := excelize.CoordinatesToCellName(1, 1)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+	}
+	if err = file.SetSheetRow(sheetName, cell, &mainColumn); err != nil {
 		return nil, "", fmt.Errorf("failed to create header table. error: %w", err)
 	}
-	if err = file.SetSheetRow(sheetName, "F1", &snpColumn); err != nil {
+
+	cell, err = excelize.CoordinatesToCellName(6, 1)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+	}
+	if err = file.SetSheetRow(sheetName, cell, &snpColumn); err != nil {
 		return nil, "", fmt.Errorf("failed to create snp header table. error: %w", err)
 	}
+
+	drawings := []string{}
 
 	for _, p := range order.Positions {
 		mainLine := []interface{}{p.Count, p.Title, p.Amount}
@@ -150,12 +162,18 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		if snpData.Design.HasMounting {
 			mounting = snpData.Design.MountingCode
 		}
+		drawing := ""
+		if snpData.Design.Drawing != "" {
+			drawing = "есть"
+			parts := strings.Split(snpData.Design.Drawing, "/")
+			drawings = append(drawings, fmt.Sprintf("%d_%s", p.Count, parts[len(parts)-1]))
+		}
 
 		snpLine := []interface{}{
 			p.Count, p.Title,
 			snpData.Size.D4, snpData.Size.D3, snpData.Size.D2, snpData.Size.D1, snpThickness,
 			snpData.Material.InnerRingCode, snpData.Material.FrameCode, snpData.Material.FillerCode, snpData.Material.OuterRingCode,
-			jumper, hole, mounting,
+			jumper, hole, mounting, drawing,
 		}
 
 		cell, err = excelize.CoordinatesToCellName(6, int(1+p.Count))
@@ -166,77 +184,56 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 			return nil, "", fmt.Errorf("failed to create snp line. error: %w", err)
 		}
 	}
-	buffer := new(bytes.Buffer)
-
-	//TODO добавлять к названию номер позиции
-	// stream, err := s.file.GroupDownload(ctx, &file_api.GroupDownloadRequest{
-	// 	Bucket: "pro",
-	// 	Group:  order.OrderId,
-	// })
-	// if err != nil {
-	// 	logger.Errorf("failed to download drawing. err :%w", err)
-	// 	return nil, nil, fmt.Errorf("failed to download drawing. err :%w", err)
-	// }
-
-	// req, err := stream.Recv()
-	// if err != nil && !strings.Contains(err.Error(), "file not found") {
-	// 	return nil, nil, fmt.Errorf("failed to get data. err: %w", err)
-	// }
-	// meta := req.GetMetadata()
-	// fileData := bytes.Buffer{}
-
-	// if meta != nil {
-	// 	for {
-	// 		logger.Debug("waiting to receive more data")
-
-	// 		req, err := stream.Recv()
-	// 		if err == io.EOF {
-	// 			logger.Debug("no more data")
-	// 			break
-	// 		}
-
-	// 		if err != nil {
-	// 			return nil, nil, fmt.Errorf("failed to get chunk. err %w", err)
-	// 		}
-
-	// 		chunk := req.GetFile().Content
-
-	// 		_, err = fileData.Write(chunk)
-	// 		if err != nil {
-	// 			return nil, nil, fmt.Errorf("failed to write chunk. err %w", err)
-	// 		}
-	// 	}
-	// }
-
-	writer := zip.NewWriter(buffer)
 
 	fileName := fmt.Sprintf("Заявка %d", order.Number)
+	var buffer *bytes.Buffer
 
-	fw, err := writer.Create(fileName + ".xlsx")
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to create xlsx in zip. err %w", err)
-	}
-	_, err = file.WriteTo(fw)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to write xlsx in zip. err %w", err)
-	}
+	if len(drawings) > 0 {
+		stream, err := s.fileApi.GroupDownload(ctx, &file_api.GroupDownloadRequest{
+			Bucket: "pro",
+			Group:  order.Id,
+		})
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to download drawing. err :%w", err)
+		}
 
-	// names = append(names, "Заказ.xlsx")
+		res, err := stream.Recv()
+		if err != nil && !strings.Contains(err.Error(), "file not found") {
+			return nil, "", fmt.Errorf("failed to get data. err: %w", err)
+		}
+		meta := res.GetMetadata()
+		fileData := bytes.Buffer{}
 
-	// if meta != nil {
-	// 	fw, err := writer.Create(meta.Name)
-	// 	if err != nil {
-	// 		return nil, nil, fmt.Errorf("failed to create zip in zip. err %w", err)
-	// 	}
-	// 	_, err = fw.Write(fileData.Bytes())
-	// 	if err != nil {
-	// 		return nil, nil, fmt.Errorf("failed to write zip in zip. err %w", err)
-	// 	}
-	// 	names = append(names, meta.Name)
-	// }
+		if meta != nil {
+			for {
+				logger.Debug("waiting to receive more data")
 
-	if err := writer.Close(); err != nil {
-		return nil, "", fmt.Errorf("failed to close writer. err %w", err)
+				req, err := stream.Recv()
+				if err == io.EOF {
+					logger.Debug("no more data")
+					break
+				}
+				if err != nil {
+					return nil, "", fmt.Errorf("failed to get chunk. err %w", err)
+				}
+
+				chunk := req.GetFile().Content
+				_, err = fileData.Write(chunk)
+				if err != nil {
+					return nil, "", fmt.Errorf("failed to write chunk. err %w", err)
+				}
+			}
+		}
+
+		buffer, err = s.zip.CreateWithDrawings(fileName+".xlsx", file, fileData, drawings)
+		if err != nil {
+			return nil, "", err
+		}
+	} else {
+		buffer, err = s.zip.Create(fileName+".xlsx", file)
+		if err != nil {
+			return nil, "", err
+		}
 	}
 
 	return buffer, fileName, nil
@@ -291,6 +288,15 @@ func (s *OrderServiceNew) Copy(ctx context.Context, order *order_api.CopyOrder) 
 		return fmt.Errorf("failed to get positions. error: %w", err)
 	}
 
+	// _, err = s.fileApi.CopyGroup(context.Background(), &file_api.CopyGroupRequest{
+	// 	Bucket:   "pro",
+	// 	Group:    order.FromId,
+	// 	NewGroup: order.TargetId,
+	// })
+	// if err != nil {
+	// 	return fmt.Errorf("failed to copy group files. error: %w", err)
+	// }
+
 	for i, fp := range positions {
 		_, err := s.position.Copy(ctx, &position_api.CopyPosition{Id: fp.Id, Count: order.Count + int64(i), OrderId: order.TargetId, FromOrderId: order.FromId})
 		if err != nil {
@@ -300,7 +306,7 @@ func (s *OrderServiceNew) Copy(ctx context.Context, order *order_api.CopyOrder) 
 	return nil
 }
 
-// TODO можно для заказа запоминать id менеджера, для более точной статистики и для того, чтобы можно было передать только один заказ, а не все заказы от данного клиента
+// можно для заказа запоминать id менеджера, для более точной статистики и для того, чтобы можно было передать только один заказ, а не все заказы от данного клиента
 func (s *OrderServiceNew) Create(ctx context.Context, order *order_api.CreateOrder) (string, error) {
 	var orderId = order.Id
 	if orderId == "" {

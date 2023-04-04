@@ -39,6 +39,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/temperature_api"
 	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
+	"github.com/xuri/excelize/v2"
 )
 
 type Stand interface {
@@ -343,6 +344,12 @@ type PositionSnp interface {
 	Delete(ctx context.Context, positionId string) error
 }
 
+type Zip interface {
+	Create(fileName string, excel *excelize.File) (*bytes.Buffer, error)
+	InsertDrawings(file bytes.Buffer, drawings []string, buffer *bytes.Buffer) (*bytes.Buffer, error)
+	CreateWithDrawings(excelName string, excel *excelize.File, file bytes.Buffer, drawings []string) (*bytes.Buffer, error)
+}
+
 type Services struct {
 	Stand
 	Flange
@@ -379,6 +386,7 @@ type Services struct {
 	OrderNew
 	Position
 	PositionSnp
+	Zip
 }
 
 func NewServices(repos *repository.Repositories, email email_api.EmailServiceClient,
@@ -393,9 +401,11 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 	snpData := NewSnpDataService(repos.SnpData)
 	snpSize := NewSnpSizeService(repos.SnpSize)
 
+	zip := NewZipService()
+
 	positionSnp := NewPositionSnpService(repos.PositionSnp)
-	position := NewPositionService_New(repos.Position, positionSnp)
-	order := NewOrderService_New(repos.OrderNew, position)
+	position := NewPositionService_New(repos.Position, positionSnp, file)
+	order := NewOrderService_New(repos.OrderNew, position, zip, file)
 
 	return &Services{
 		Stand:         NewStandService(repos.Stand),

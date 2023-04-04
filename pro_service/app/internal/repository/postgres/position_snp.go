@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
@@ -83,7 +82,7 @@ func (r *PositionSnpRepo) Get(ctx context.Context, orderId string) (positions []
 
 // ? возможно стоит попробовать написать запросы получше
 func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]*position_model.OrderPositionSnp, error) {
-
+	//TODO мне нужно название материалов
 	var materialData []models.SnpMaterialBlockNew
 	materialQuery := fmt.Sprintf(`SELECT %s.id, position_id,
 			filler_id, %s.code, %s.title, %s.base_code, %s.description, %s.designation,
@@ -139,8 +138,6 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 		material := materialData[i]
 		size := sizeData[i]
 		design := designData[i]
-
-		logger.Debug(material)
 
 		frame := &snp_material_model.Material{Id: material.FrameId, BaseCode: material.FrameBaseCode}
 		if material.FrameId != uuid.Nil.String() {

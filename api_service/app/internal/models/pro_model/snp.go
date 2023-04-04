@@ -124,6 +124,7 @@ type DesignSnp struct {
 	HasHole  bool     `json:"hasHole"`
 	Jumper   Jumper   `json:"jumper"`
 	Mounting Mounting `json:"mounting"`
+	Drawing  string   `json:"drawing"`
 }
 
 func (s *DesignSnp) Parse() *position_model.PositionSnp_Design {
@@ -134,5 +135,6 @@ func (s *DesignSnp) Parse() *position_model.PositionSnp_Design {
 		HasHole:      s.HasHole,
 		HasMounting:  s.Mounting.HasMounting,
 		MountingCode: s.Mounting.Code,
+		Drawing:      s.Drawing,
 	}
 }

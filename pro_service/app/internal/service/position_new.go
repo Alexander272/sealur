@@ -3,22 +3,27 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
+	"github.com/Alexander272/sealur/pro_service/pkg/logger"
+	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/google/uuid"
 )
 
 type PositionServiceNew struct {
-	repo repository.Position
-	snp  PositionSnp
+	repo    repository.Position
+	snp     PositionSnp
+	fileApi file_api.FileServiceClient
 }
 
-func NewPositionService_New(repo repository.Position, snp PositionSnp) *PositionServiceNew {
+func NewPositionService_New(repo repository.Position, snp PositionSnp, fileApi file_api.FileServiceClient) *PositionServiceNew {
 	return &PositionServiceNew{
-		repo: repo,
-		snp:  snp,
+		repo:    repo,
+		snp:     snp,
+		fileApi: fileApi,
 	}
 }
 
@@ -71,6 +76,7 @@ func (s *PositionServiceNew) GetFull(ctx context.Context, orderId string) ([]*po
 }
 
 func (s *PositionServiceNew) Create(ctx context.Context, position *position_model.FullPosition) (string, error) {
+	//TODO запретить создавать одинаковые позиции
 	id, err := s.repo.Create(ctx, position)
 	if err != nil {
 		return "", fmt.Errorf("failed to create position. error: %w", err)
@@ -124,6 +130,7 @@ func (s *PositionServiceNew) Update(ctx context.Context, position *position_mode
 }
 
 func (s *PositionServiceNew) Copy(ctx context.Context, position *position_api.CopyPosition) (string, error) {
+	//TODO запретить копировать одинаковые позиции
 	id, err := s.repo.Copy(ctx, position)
 	if err != nil {
 		return "", fmt.Errorf("failed to copy position. error: %w", err)
@@ -133,6 +140,22 @@ func (s *PositionServiceNew) Copy(ctx context.Context, position *position_api.Co
 	drawing, err := s.snp.Copy(ctx, id, position)
 	if err != nil {
 		return "", err
+	}
+
+	if drawing != "" {
+		parts := strings.Split(drawing, "/")
+
+		logger.Debug(position.FromOrderId, ", ", position.OrderId)
+
+		_, err := s.fileApi.Copy(context.Background(), &file_api.CopyFileRequest{
+			Id:       fmt.Sprintf("%s_%s", parts[len(parts)-2], parts[len(parts)-1]),
+			Bucket:   "pro",
+			Group:    position.FromOrderId,
+			NewGroup: position.OrderId,
+		})
+		if err != nil {
+			return "", fmt.Errorf("failed to copy drawing. error: %w", err)
+		}
 	}
 
 	return drawing, nil
@@ -146,6 +169,8 @@ func (s *PositionServiceNew) Delete(ctx context.Context, positionId string) erro
 	if err := s.snp.Delete(ctx, positionId); err != nil {
 		return err
 	}
+
+	//TODO удалять чертеж
 
 	return nil
 }
