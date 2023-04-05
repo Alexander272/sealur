@@ -20,7 +20,7 @@ func NewSNPFillerRepo(db *sqlx.DB) *SNPFillerRepo {
 	return &SNPFillerRepo{db: db}
 }
 
-func (r *SNPFillerRepo) GetAll(ctx context.Context, req *snp_filler_api.GetSnpFillers) (fillers []*snp_filler_model.SnpFillerNew, err error) {
+func (r *SNPFillerRepo) GetAll(ctx context.Context, req *snp_filler_api.GetSnpFillers) (fillers []*snp_filler_model.SnpFiller, err error) {
 	var data []models.SnpFillerNew
 	query := fmt.Sprintf(`SELECT %s.id, %s.title, base_code, code, description, designation, disabled_types, %s.title as temperature
 		FROM %s INNER JOIN %s on %s.id=temperature_id WHERE standard_id=$1 ORDER BY base_code`,
@@ -32,7 +32,7 @@ func (r *SNPFillerRepo) GetAll(ctx context.Context, req *snp_filler_api.GetSnpFi
 	}
 
 	for _, s := range data {
-		fillers = append(fillers, &snp_filler_model.SnpFillerNew{
+		fillers = append(fillers, &snp_filler_model.SnpFiller{
 			Id:            s.Id,
 			Temperature:   s.Temperature,
 			BaseCode:      s.BaseCode,

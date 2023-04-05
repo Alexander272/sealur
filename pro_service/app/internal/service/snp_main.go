@@ -58,10 +58,9 @@ func (s *SnpService) Get(ctx context.Context, req *snp_api.GetSnp) (snp *snp_api
 	return snp, nil
 }
 
-func (s *SnpService) GetData(ctx context.Context, req *snp_api.GetSnpData) (snpData *snp_model.SnpDataNew, err error) {
+func (s *SnpService) GetData(ctx context.Context, req *snp_api.GetSnpData) (snpData *snp_model.SnpData, err error) {
 	var mounting []*mounting_model.Mounting
-	// var fillers []*snp_filler_model.SnpFiller
-	snpData = &snp_model.SnpDataNew{}
+	snpData = &snp_model.SnpData{}
 
 	if req.StandardId == "" {
 		standard, err := s.snpStandard.GetDefault(ctx)
@@ -80,11 +79,6 @@ func (s *SnpService) GetData(ctx context.Context, req *snp_api.GetSnpData) (snpD
 
 	snpData.Mounting = mounting
 
-	// materials, err := s.material.Get(ctx, &snp_material_api.GetSnpMaterial{StandardId: req.StandardId})
-	// if err != nil {
-	// 	return nil, err
-	// }
-
 	snpTypes, err := s.snpType.GetWithFlange(ctx, req)
 	if err != nil {
 		return nil, err
@@ -95,16 +89,14 @@ func (s *SnpService) GetData(ctx context.Context, req *snp_api.GetSnpData) (snpD
 		return nil, err
 	}
 
-	//TODO
-	snpMaterials, err := s.material.GetNew(ctx, &snp_material_api.GetSnpMaterial{StandardId: req.StandardId})
+	materials, err := s.material.Get(ctx, &snp_material_api.GetSnpMaterial{StandardId: req.StandardId})
 	if err != nil {
 		return nil, err
 	}
 
-	// snpData.Materials = materials
 	snpData.FlangeTypes = snpTypes
 	snpData.Fillers = fillers
-	snpData.SnpMaterials = snpMaterials
+	snpData.Materials = materials
 
 	return snpData, nil
 }

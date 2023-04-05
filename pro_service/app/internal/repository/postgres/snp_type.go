@@ -45,7 +45,7 @@ func (r *SNPTypeRepo) GetWithFlange(ctx context.Context, req *snp_api.GetSnpData
 	var data []models.SNPTypeWithFlange
 	query := fmt.Sprintf(`SELECT %s.id as type_id, %s.title as type_title, %s.code as type_code, %s.id, %s.title, %s.code,
 		%s.description, has_d4, has_d3, has_d2, has_d1
-		FROM %s INNER JOIN %s ON %s.id=flange_type_id WHERE %s.snp_standard_id=$1 ORDER BY flange_type_id, %s.title`,
+		FROM %s INNER JOIN %s ON %s.id=flange_type_id WHERE %s.snp_standard_id=$1 ORDER BY code desc, flange_type_id, %s.title`,
 		SnpTypeTable, SnpTypeTable, SnpTypeTable, FlangeTypeTable, FlangeTypeTable, FlangeTypeTable, SnpTypeTable,
 		SnpTypeTable, FlangeTypeTable, FlangeTypeTable, SnpTypeTable, SnpTypeTable,
 	)

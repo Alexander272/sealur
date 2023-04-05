@@ -19,14 +19,14 @@ func NewSnpMaterialHandlers(service service.SnpMaterial) *SnpMaterialHandlers {
 	}
 }
 
-func (h *SnpMaterialHandlers) Get(ctx context.Context, req *snp_material_api.GetSnpMaterial) (*snp_material_api.SnpMaterials, error) {
-	materials, err := h.service.Get(ctx, req)
-	if err != nil {
-		return nil, err
-	}
+// func (h *SnpMaterialHandlers) Get(ctx context.Context, req *snp_material_api.GetSnpMaterial) (*snp_material_api.SnpMaterials, error) {
+// 	materials, err := h.service.Get(ctx, req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &snp_material_api.SnpMaterials{Materials: materials}, nil
-}
+// 	return &snp_material_api.SnpMaterials{Materials: materials}, nil
+// }
 
 func (h *SnpMaterialHandlers) Create(ctx context.Context, material *snp_material_api.CreateSnpMaterial) (*response_model.Response, error) {
 	if err := h.service.Create(ctx, material); err != nil {

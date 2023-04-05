@@ -260,7 +260,7 @@ type FlangeTypeSnp interface {
 }
 
 type SnpFiller interface {
-	GetAll(context.Context, *snp_filler_api.GetSnpFillers) ([]*snp_filler_model.SnpFillerNew, error)
+	GetAll(context.Context, *snp_filler_api.GetSnpFillers) ([]*snp_filler_model.SnpFiller, error)
 	Create(context.Context, *snp_filler_api.CreateSnpFiller) error
 	CreateSeveral(context.Context, *snp_filler_api.CreateSeveralSnpFiller) error
 	Update(context.Context, *snp_filler_api.UpdateSnpFiller) error
@@ -286,8 +286,7 @@ type SnpType interface {
 }
 
 type SnpMaterial interface {
-	Get(context.Context, *snp_material_api.GetSnpMaterial) ([]*snp_material_model.SnpMaterial, error)
-	GetNew(context.Context, *snp_material_api.GetSnpMaterial) (*snp_material_model.SnpMaterials, error)
+	Get(context.Context, *snp_material_api.GetSnpMaterial) (*snp_material_model.SnpMaterials, error)
 	Create(context.Context, *snp_material_api.CreateSnpMaterial) error
 	Update(context.Context, *snp_material_api.UpdateSnpMaterial) error
 	Delete(context.Context, *snp_material_api.DeleteSnpMaterial) error
@@ -307,7 +306,7 @@ type SnpSize interface {
 
 type Snp interface {
 	Get(context.Context, *snp_api.GetSnp) (*snp_api.Snp, error)
-	GetData(context.Context, *snp_api.GetSnpData) (*snp_model.SnpDataNew, error)
+	GetData(context.Context, *snp_api.GetSnpData) (*snp_model.SnpData, error)
 }
 
 type OrderNew interface {

@@ -109,14 +109,17 @@ type MaterialSnp struct {
 
 func (s *MaterialSnp) Parse() *position_model.PositionSnp_Material {
 	return &position_model.PositionSnp_Material{
-		FillerId:      s.Filler.Id,
-		FillerCode:    s.Filler.BaseCode,
-		FrameId:       s.Frame.Id,
-		FrameCode:     s.Frame.BaseCode,
-		InnerRingId:   s.InnerRing.Id,
-		InnerRingCode: s.InnerRing.BaseCode,
-		OuterRingId:   s.OuterRing.Id,
-		OuterRingCode: s.OuterRing.BaseCode,
+		FillerId:       s.Filler.Id,
+		FillerCode:     s.Filler.BaseCode,
+		FrameId:        s.Frame.Id,
+		FrameCode:      s.Frame.BaseCode,
+		FrameTitle:     s.Frame.Title,
+		InnerRingId:    s.InnerRing.Id,
+		InnerRingCode:  s.InnerRing.BaseCode,
+		InnerRingTitle: s.InnerRing.Title,
+		OuterRingId:    s.OuterRing.Id,
+		OuterRingCode:  s.OuterRing.BaseCode,
+		OuterRingTitle: s.OuterRing.Title,
 	}
 }
 

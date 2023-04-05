@@ -27,20 +27,10 @@ func (h *SnpHandlers) Get(ctx context.Context, req *snp_api.GetSnp) (*snp_api.Sn
 	return snp, nil
 }
 
-// func (h *SnpHandlers) GetData(ctx context.Context, req *snp_api.GetSnpData) (*snp_api.SnpData, error) {
-// 	snpData, err := h.service.GetData(ctx, req)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &snp_api.SnpData{SnpData: snpData}, nil
-// }
-
-// TODO убрать new
-func (h *SnpHandlers) GetDataNew(ctx context.Context, req *snp_api.GetSnpData) (*snp_api.SnpDataNew, error) {
+func (h *SnpHandlers) GetData(ctx context.Context, req *snp_api.GetSnpData) (*snp_api.SnpData, error) {
 	snpData, err := h.service.GetData(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	return &snp_api.SnpDataNew{SnpData: snpData}, nil
+	return &snp_api.SnpData{SnpData: snpData}, nil
 }

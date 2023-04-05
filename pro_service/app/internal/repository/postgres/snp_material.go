@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
-	"github.com/Alexander272/sealur_proto/api/pro/models/material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
 	"github.com/google/uuid"
@@ -21,54 +20,7 @@ func NewSnpMaterialRepo(db *sqlx.DB) *SnpMaterialRepo {
 	return &SnpMaterialRepo{db: db}
 }
 
-func (r *SnpMaterialRepo) Get(ctx context.Context, req *snp_material_api.GetSnpMaterial) (materials []*snp_material_model.SnpMaterial, err error) {
-	var data []models.SNPMaterial
-	query := fmt.Sprintf(`SELECT %s.id, title, code, short_en, short_rus, %s.id as material_id, default_id, type
-		FROM %s INNER JOIN %s ON array[%s.id]<@material_id WHERE standard_id=$1 ORDER BY type, count`,
-		SnpMaterialTable, MaterialTable, SnpMaterialTable, MaterialTable, MaterialTable,
-	)
-
-	if err := r.db.Select(&data, query, req.StandardId); err != nil {
-		return nil, fmt.Errorf("failed to execute query. error: %w", err)
-	}
-
-	for i, s := range data {
-		if i > 0 && s.Id == materials[len(materials)-1].Id {
-			materials[len(materials)-1].Materials = append(materials[len(materials)-1].Materials, &material_model.Material{
-				Id:       s.MaterialId,
-				Title:    s.Title,
-				Code:     s.Code,
-				ShortEn:  s.ShortEn,
-				ShortRus: s.ShortRus,
-			})
-		} else {
-			materials = append(materials, &snp_material_model.SnpMaterial{
-				Id:   s.Id,
-				Type: s.Type,
-				Materials: []*material_model.Material{{
-					Id:       s.MaterialId,
-					Title:    s.Title,
-					Code:     s.Code,
-					ShortEn:  s.ShortEn,
-					ShortRus: s.ShortRus,
-				}},
-			})
-		}
-		if s.Default == s.MaterialId {
-			materials[len(materials)-1].Default = &material_model.Material{
-				Id:       s.MaterialId,
-				Title:    s.Title,
-				Code:     s.Code,
-				ShortEn:  s.ShortEn,
-				ShortRus: s.ShortRus,
-			}
-		}
-	}
-
-	return materials, nil
-}
-
-func (r *SnpMaterialRepo) GetNew(ctx context.Context, req *snp_material_api.GetSnpMaterial) (*snp_material_model.SnpMaterials, error) {
+func (r *SnpMaterialRepo) Get(ctx context.Context, req *snp_material_api.GetSnpMaterial) (*snp_material_model.SnpMaterials, error) {
 	var data []models.SnpMaterial
 	query := fmt.Sprintf(`SELECT %s.id, material_id, type, is_default, %s.code, is_standard, %s.code as base_code, title
 		FROM %s INNER JOIN %s ON material_id=%s.id WHERE standard_id=$1 ORDER BY type, count`,
@@ -82,6 +34,7 @@ func (r *SnpMaterialRepo) GetNew(ctx context.Context, req *snp_material_api.GetS
 	var frame []*snp_material_model.Material
 	var innerRing []*snp_material_model.Material
 	var outerRing []*snp_material_model.Material
+	var frameDefIndex, innerDefIndex, outerDefIndex int64
 
 	for _, m := range data {
 		currentMaterial := &snp_material_model.Material{
@@ -106,10 +59,32 @@ func (r *SnpMaterialRepo) GetNew(ctx context.Context, req *snp_material_api.GetS
 		}
 	}
 
+	for i, m := range frame {
+		if m.IsDefault {
+			frameDefIndex = int64(i)
+			break
+		}
+	}
+	for i, m := range innerRing {
+		if m.IsDefault {
+			innerDefIndex = int64(i)
+			break
+		}
+	}
+	for i, m := range outerRing {
+		if m.IsDefault {
+			outerDefIndex = int64(i)
+			break
+		}
+	}
+
 	material := &snp_material_model.SnpMaterials{
-		Frame:     frame,
-		InnerRing: innerRing,
-		OuterRing: outerRing,
+		Frame:                 frame,
+		InnerRing:             innerRing,
+		OuterRing:             outerRing,
+		FrameDefaultIndex:     frameDefIndex,
+		InnerRingDefaultIndex: innerDefIndex,
+		OuterRingDefaultIndex: outerDefIndex,
 	}
 
 	return material, nil

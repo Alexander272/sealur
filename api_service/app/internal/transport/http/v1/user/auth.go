@@ -19,13 +19,14 @@ type AuthHandler struct {
 	userApi    user_api.UserServiceClient
 	emailApi   email_api.EmailServiceClient
 	auth       config.AuthConfig
+	http       config.HttpConfig
 	services   *service.Services
 	cookieName string
 }
 
 func NewAuthHandler(
 	userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient,
-	auth config.AuthConfig,
+	auth config.AuthConfig, http config.HttpConfig,
 	services *service.Services,
 	cookieName string,
 ) *AuthHandler {
@@ -33,13 +34,14 @@ func NewAuthHandler(
 		userApi:    userApi,
 		emailApi:   emailApi,
 		auth:       auth,
+		http:       http,
 		services:   services,
 		cookieName: cookieName,
 	}
 }
 
 func (h *Handler) initAuthRoutes(api *gin.RouterGroup) {
-	handler := NewAuthHandler(h.userApi, h.emailApi, h.auth, h.services, h.cookieName)
+	handler := NewAuthHandler(h.userApi, h.emailApi, h.auth, h.http, h.services, h.cookieName)
 
 	auth := api.Group("/auth")
 	{
@@ -143,9 +145,7 @@ func (h *AuthHandler) singUp(c *gin.Context) {
 	data := &email_api.ConfirmUserRequest{
 		Name:  dto.Name,
 		Email: dto.Email,
-		//TODO
-		// Link:  fmt.Sprintf("%s/auth/confirm?code=%s", c.Request.Host, code),
-		Link: fmt.Sprintf("%s/auth/confirm?code=%s", "http://pro.sealur.ru", code),
+		Link:  fmt.Sprintf("%s/auth/confirm?code=%s", h.http.Host, code),
 	}
 	_, err = h.emailApi.ConfirmUser(c, data)
 	if err != nil {

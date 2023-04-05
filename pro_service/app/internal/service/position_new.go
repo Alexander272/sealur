@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -76,7 +78,15 @@ func (s *PositionServiceNew) GetFull(ctx context.Context, orderId string) ([]*po
 }
 
 func (s *PositionServiceNew) Create(ctx context.Context, position *position_model.FullPosition) (string, error) {
-	//TODO запретить создавать одинаковые позиции
+	candidate, err := s.repo.GetByTitle(ctx, position.Title, position.OrderId)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return "", fmt.Errorf("failed to get position by title. error: %w", err)
+	}
+
+	if candidate != "" {
+		return "", fmt.Errorf("position exists")
+	}
+
 	id, err := s.repo.Create(ctx, position)
 	if err != nil {
 		return "", fmt.Errorf("failed to create position. error: %w", err)
@@ -130,11 +140,33 @@ func (s *PositionServiceNew) Update(ctx context.Context, position *position_mode
 }
 
 func (s *PositionServiceNew) Copy(ctx context.Context, position *position_api.CopyPosition) (string, error) {
-	//TODO запретить копировать одинаковые позиции
-	id, err := s.repo.Copy(ctx, position)
+	curPosition, err := s.repo.GetById(ctx, position.Id)
 	if err != nil {
-		return "", fmt.Errorf("failed to copy position. error: %w", err)
+		return "", fmt.Errorf("failed to get position. error: %w", err)
 	}
+
+	candidate, err := s.repo.GetByTitle(ctx, curPosition.Title, position.OrderId)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return "", fmt.Errorf("failed to get position by title. error: %w", err)
+	}
+
+	if candidate != "" {
+		return "", fmt.Errorf("position exists")
+	}
+
+	curPosition.Count = position.Count
+	curPosition.OrderId = position.OrderId
+	if position.Amount != "" {
+		curPosition.Amount = position.Amount
+	}
+	id, err := s.repo.Create(ctx, curPosition)
+	if err != nil {
+		return "", fmt.Errorf("failed to create position. error: %w", err)
+	}
+	// id, err := s.repo.Copy(ctx, position)
+	// if err != nil {
+	// 	return "", fmt.Errorf("failed to copy position. error: %w", err)
+	// }
 
 	// По сути я могу возвращать drawing и из него вырезать id файла, а id заявки (старой и новой) буду принимать с клиента
 	drawing, err := s.snp.Copy(ctx, id, position)

@@ -14,6 +14,7 @@ import (
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/Alexander272/sealur_proto/api/pro/models/order_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/google/uuid"
@@ -134,10 +135,12 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 
 	drawings := []string{}
 
-	for _, p := range order.Positions {
-		mainLine := []interface{}{p.Count, p.Title, p.Amount}
+	snpCount := 1
 
-		cell, err := excelize.CoordinatesToCellName(1, int(1+p.Count))
+	for i, p := range order.Positions {
+		mainLine := []interface{}{1 + i, p.Title, p.Amount}
+
+		cell, err := excelize.CoordinatesToCellName(1, 2+i)
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 		}
@@ -145,44 +148,48 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 			return nil, "", fmt.Errorf("failed to create main line. error: %w", err)
 		}
 
-		snpData := p.SnpData
-		snpThickness := snpData.Size.H
-		if snpThickness == "" {
-			snpThickness = snpData.Size.Another
-		}
-		jumper := ""
-		if snpData.Design.HasJumper {
-			jumper = fmt.Sprintf("%s/%s", snpData.Design.JumperCode, snpData.Design.JumperWidth)
-		}
-		hole := ""
-		if snpData.Design.HasHole {
-			hole = "есть"
-		}
-		mounting := ""
-		if snpData.Design.HasMounting {
-			mounting = snpData.Design.MountingCode
-		}
-		drawing := ""
-		if snpData.Design.Drawing != "" {
-			drawing = "есть"
-			parts := strings.Split(snpData.Design.Drawing, "/")
-			drawings = append(drawings, fmt.Sprintf("%d_%s", p.Count, parts[len(parts)-1]))
+		if p.Type == position_model.PositionType_Snp {
+			snpData := p.SnpData
+			snpThickness := snpData.Size.H
+			if snpThickness == "" {
+				snpThickness = snpData.Size.Another
+			}
+			jumper := ""
+			if snpData.Design.HasJumper {
+				jumper = fmt.Sprintf("%s/%s", snpData.Design.JumperCode, snpData.Design.JumperWidth)
+			}
+			hole := ""
+			if snpData.Design.HasHole {
+				hole = "есть"
+			}
+			mounting := ""
+			if snpData.Design.HasMounting {
+				mounting = snpData.Design.MountingCode
+			}
+			drawing := ""
+			if snpData.Design.Drawing != "" {
+				drawing = "есть"
+				parts := strings.Split(snpData.Design.Drawing, "/")
+				drawings = append(drawings, fmt.Sprintf("%d_%s", snpCount, parts[len(parts)-1]))
+			}
+
+			snpLine := []interface{}{
+				snpCount, p.Title,
+				snpData.Size.D4, snpData.Size.D3, snpData.Size.D2, snpData.Size.D1, snpThickness,
+				snpData.Material.InnerRingCode, snpData.Material.FrameCode, snpData.Material.FillerCode, snpData.Material.OuterRingCode,
+				jumper, hole, mounting, drawing,
+			}
+
+			cell, err = excelize.CoordinatesToCellName(6, int(1+snpCount))
+			if err != nil {
+				return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+			}
+			if err = file.SetSheetRow(sheetName, cell, &snpLine); err != nil {
+				return nil, "", fmt.Errorf("failed to create snp line. error: %w", err)
+			}
+			snpCount++
 		}
 
-		snpLine := []interface{}{
-			p.Count, p.Title,
-			snpData.Size.D4, snpData.Size.D3, snpData.Size.D2, snpData.Size.D1, snpThickness,
-			snpData.Material.InnerRingCode, snpData.Material.FrameCode, snpData.Material.FillerCode, snpData.Material.OuterRingCode,
-			jumper, hole, mounting, drawing,
-		}
-
-		cell, err = excelize.CoordinatesToCellName(6, int(1+p.Count))
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
-		}
-		if err = file.SetSheetRow(sheetName, cell, &snpLine); err != nil {
-			return nil, "", fmt.Errorf("failed to create snp line. error: %w", err)
-		}
 	}
 
 	fileName := fmt.Sprintf("Заявка %d", order.Number)

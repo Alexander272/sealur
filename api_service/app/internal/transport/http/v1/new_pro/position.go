@@ -39,7 +39,7 @@ func (h *Handler) initPositionRoutes(api *gin.RouterGroup) {
 func (h *PositionHandler) create(c *gin.Context) {
 	var dto pro_model.Position
 	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Некорректные данные отправлены")
 		return
 	}
 
@@ -47,7 +47,11 @@ func (h *PositionHandler) create(c *gin.Context) {
 
 	res, err := h.positionApi.Create(c, &position_api.CreatePosition{Position: position})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		if strings.Contains(err.Error(), "position exists") {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Такая позиция уже добавлена в заявку")
+			return
+		}
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка")
 		return
 	}
 
@@ -64,13 +68,17 @@ func (h *PositionHandler) copy(c *gin.Context) {
 
 	var dto *position_api.CopyPosition
 	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Некорректные данные отправлены")
 		return
 	}
 	dto.Id = id
 
 	drawing, err := h.positionApi.Copy(c, dto)
 	if err != nil {
+		if strings.Contains(err.Error(), "position exists") {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Такая позиция уже добавлена в заявку")
+			return
+		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 		return
 	}

@@ -27,11 +27,11 @@ func NewHandler(services *service.Services, middleware *middleware.Middleware) *
 	}
 }
 
-func (h *Handler) Init(conf config.ServicesConfig, auth config.AuthConfig, api *gin.RouterGroup) {
+func (h *Handler) Init(conf config.ServicesConfig, auth config.AuthConfig, http config.HttpConfig, api *gin.RouterGroup) {
 	// proHandler := pro.NewHandler(h.middleware)
 	momentHandler := moment.NewHandler(h.middleware)
 	fileHandler := file.NewHandler(h.middleware)
-	userHandler := user.NewHandler(auth, h.services, h.middleware, CookieName)
+	userHandler := user.NewHandler(auth, http, h.services, h.middleware, CookieName)
 
 	v1 := api.Group("/v1")
 	{

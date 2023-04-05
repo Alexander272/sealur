@@ -82,13 +82,12 @@ func (r *PositionSnpRepo) Get(ctx context.Context, orderId string) (positions []
 
 // ? возможно стоит попробовать написать запросы получше
 func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]*position_model.OrderPositionSnp, error) {
-	//TODO мне нужно название материалов
 	var materialData []models.SnpMaterialBlockNew
 	materialQuery := fmt.Sprintf(`SELECT %s.id, position_id,
 			filler_id, %s.code, %s.title, %s.base_code, %s.description, %s.designation,
-			frame_code, frame_id, m1.code as m1_code, m1.material_id as m1_material_id, m1.type as m1_type, m1.is_default as m1_is_default, m1.is_standard as m1_is_standard,
-			inner_ring_code, inner_ring_id, m2.code as m2_code, m2.material_id as m2_material_id, m2.type as m2_type, m2.is_default as m2_is_default, m2.is_standard as m2_is_standard,
-			outer_ring_code, outer_ring_id, m3.code as m3_code, m3.material_id as m3_material_id, m3.type as m3_type, m3.is_default as m3_is_default, m3.is_standard as m3_is_standard
+			frame_code, frame_id, frame_title, m1.code as m1_code, m1.material_id as m1_material_id, m1.type as m1_type, m1.is_default as m1_is_default, m1.is_standard as m1_is_standard,
+			inner_ring_code, inner_ring_id, inner_ring_title, m2.code as m2_code, m2.material_id as m2_material_id, m2.type as m2_type, m2.is_default as m2_is_default, m2.is_standard as m2_is_standard,
+			outer_ring_code, outer_ring_id, outer_ring_title, m3.code as m3_code, m3.material_id as m3_material_id, m3.type as m3_type, m3.is_default as m3_is_default, m3.is_standard as m3_is_standard
 			FROM %s
 			LEFT JOIN %s ON %s.id=filler_id
 			LEFT JOIN %s as m1 ON m1.id=frame_id
@@ -139,7 +138,7 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 		size := sizeData[i]
 		design := designData[i]
 
-		frame := &snp_material_model.Material{Id: material.FrameId, BaseCode: material.FrameBaseCode}
+		frame := &snp_material_model.Material{Id: material.FrameId, BaseCode: material.FrameBaseCode, Title: material.FrameTitle}
 		if material.FrameId != uuid.Nil.String() {
 			frame.Code = *material.FrameCode
 			frame.MaterialId = *material.FrameMaterialId
@@ -147,7 +146,7 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 			frame.IsDefault = *material.FrameIsDefault
 			frame.IsStandard = *material.FrameIsStandard
 		}
-		innerRing := &snp_material_model.Material{Id: material.InnerRingId, BaseCode: material.InnerRingBaseCode}
+		innerRing := &snp_material_model.Material{Id: material.InnerRingId, BaseCode: material.InnerRingBaseCode, Title: material.InnerRingTitle}
 		if material.InnerRingId != uuid.Nil.String() {
 			innerRing.Code = *material.InnerRingCode
 			innerRing.MaterialId = *material.InnerRingMaterialId
@@ -155,7 +154,7 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 			innerRing.IsDefault = *material.InnerRingIsDefault
 			innerRing.IsStandard = *material.InnerRingIsStandard
 		}
-		outerRing := &snp_material_model.Material{Id: material.OuterRingId, BaseCode: material.OuterRingBaseCode}
+		outerRing := &snp_material_model.Material{Id: material.OuterRingId, BaseCode: material.OuterRingBaseCode, Title: material.OuterRingTitle}
 		if material.OuterRingId != uuid.Nil.String() {
 			outerRing.Code = *material.OuterRingCode
 			outerRing.MaterialId = *material.OuterRingMaterialId
@@ -201,7 +200,7 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 			Material: &position_model.OrderPositionSnp_Material{
 				Id:         material.Id,
 				PositionId: material.PositionId,
-				Filler: &snp_filler_model.SnpFillerNew{
+				Filler: &snp_filler_model.SnpFiller{
 					Id:          material.FillerId,
 					BaseCode:    material.FillerBaseCode,
 					Code:        material.FillerCode,
@@ -257,7 +256,8 @@ func (r *PositionSnpRepo) Create(ctx context.Context, position *position_model.F
 	sizeQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`, PositionSizeSnpTable)
 	materialQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, filler_id, frame_id, inner_ring_id, outer_ring_id, filler_code, frame_code, 
-		inner_ring_code, outer_ring_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, PositionMaterialSnpTable)
+		inner_ring_code, outer_ring_code, frame_title, inner_ring_title, outer_ring_title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+		PositionMaterialSnpTable)
 	designQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, has_jumper, jumper_code, jumper_width, has_hole, has_mounting, mounting_code, drawing) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, PositionDesignSnpTable)
 
@@ -290,8 +290,8 @@ func (r *PositionSnpRepo) Create(ctx context.Context, position *position_model.F
 		tx.Rollback()
 		return fmt.Errorf("failed to complete query size. error: %w", err)
 	}
-	_, err = tx.Exec(materialQuery, id, position.Id, material.FillerId, material.FrameId, material.InnerRingId, material.OuterRingId,
-		material.FillerCode, material.FrameCode, material.InnerRingCode, material.OuterRingCode)
+	_, err = tx.Exec(materialQuery, id, position.Id, material.FillerId, material.FrameId, material.InnerRingId, material.OuterRingId, material.FillerCode,
+		material.FrameCode, material.InnerRingCode, material.OuterRingCode, material.FrameTitle, material.InnerRingTitle, material.OuterRingTitle)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("failed to complete query material. error: %w", err)
@@ -313,7 +313,7 @@ func (r *PositionSnpRepo) Create(ctx context.Context, position *position_model.F
 func (r *PositionSnpRepo) CreateSeveral(ctx context.Context, positions []*position_model.FullPosition) error {
 	mainQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, snp_standard_id, snp_type_id, flange_type_code, flange_type_title) VALUES `, PositionMainSnpTable)
 	sizeQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another) VALUES `, PositionSizeSnpTable)
-	materialQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, filler_id, frame_id, inner_ring_id, outer_ring_id, filler_code, frame_code, inner_ring_code, outer_ring_code) VALUES `, PositionMaterialSnpTable)
+	materialQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, filler_id, frame_id, inner_ring_id, outer_ring_id, filler_code, frame_code, inner_ring_code, outer_ring_code, frame_title, inner_ring_title, outer_ring_title) VALUES `, PositionMaterialSnpTable)
 	designQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, has_jumper, jumper_code, jumper_width, has_hole, has_mounting, mounting_code, drawing) VALUES `, PositionDesignSnpTable)
 
 	tx, err := r.db.Begin()
@@ -337,7 +337,7 @@ func (r *PositionSnpRepo) CreateSeveral(ctx context.Context, positions []*positi
 
 	mainCount := 6
 	sizeCount := 13
-	materialCount := 10
+	materialCount := 13
 	designCount := 9
 
 	nilId := uuid.Nil.String()
@@ -358,9 +358,9 @@ func (r *PositionSnpRepo) CreateSeveral(ctx context.Context, positions []*positi
 		size = p.SnpData.Size
 		sizeArgs = append(sizeArgs, id, p.Id, size.Dn, size.Pn.Mpa, size.Pn.Kg, size.D4, size.D3, size.D2, size.D1, size.H, size.S2, size.S3, size.Another)
 
-		materialValues = append(materialValues, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+		materialValues = append(materialValues, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
 			i*materialCount+1, i*materialCount+2, i*materialCount+3, i*materialCount+4, i*materialCount+5, i*materialCount+6, i*materialCount+7,
-			i*materialCount+8, i*materialCount+9, i*materialCount+10,
+			i*materialCount+8, i*materialCount+9, i*materialCount+10, i*materialCount+11, i*materialCount+12, i*materialCount+13,
 		))
 		material = p.SnpData.Material
 		if material.InnerRingId == "" {
@@ -371,6 +371,7 @@ func (r *PositionSnpRepo) CreateSeveral(ctx context.Context, positions []*positi
 		}
 		materialArgs = append(materialArgs, id, p.Id, material.FillerId, material.FrameId, material.InnerRingId, material.OuterRingId,
 			material.FillerCode, material.FrameCode, material.InnerRingCode, material.OuterRingCode,
+			material.FrameTitle, material.InnerRingTitle, material.OuterRingTitle,
 		)
 
 		designValues = append(designValues, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",

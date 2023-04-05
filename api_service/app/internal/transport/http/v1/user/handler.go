@@ -16,14 +16,16 @@ type Handler struct {
 	userApi    user_api.UserServiceClient
 	emailApi   email_api.EmailServiceClient
 	auth       config.AuthConfig
+	http       config.HttpConfig
 	services   *service.Services
 	middleware *middleware.Middleware
 	cookieName string
 }
 
-func NewHandler(auth config.AuthConfig, services *service.Services, middleware *middleware.Middleware, cookieName string) *Handler {
+func NewHandler(auth config.AuthConfig, http config.HttpConfig, services *service.Services, middleware *middleware.Middleware, cookieName string) *Handler {
 	return &Handler{
 		auth:       auth,
+		http:       http,
 		services:   services,
 		middleware: middleware,
 		cookieName: cookieName,

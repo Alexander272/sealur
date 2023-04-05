@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
@@ -234,6 +235,10 @@ func (h *OrderHandler) copy(c *gin.Context) {
 
 	_, err := h.orderApi.Copy(c, dto)
 	if err != nil {
+		if strings.Contains(err.Error(), "position exists") {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Одна или несколько позиций дублируются")
+			return
+		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка во время копирования")
 		return
 	}

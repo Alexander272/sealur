@@ -87,6 +87,7 @@ type SnpMaterialBlockNew struct {
 	FillerDescription   string  `db:"description"`
 	FillerDesignation   string  `db:"designation"`
 	FrameId             string  `db:"frame_id"`
+	FrameTitle          string  `db:"frame_title"`
 	FrameBaseCode       string  `db:"frame_code"`
 	FrameCode           *string `db:"m1_code"`
 	FrameMaterialId     *string `db:"m1_material_id"`
@@ -94,6 +95,7 @@ type SnpMaterialBlockNew struct {
 	FrameIsDefault      *bool   `db:"m1_is_default"`
 	FrameIsStandard     *bool   `db:"m1_is_standard"`
 	InnerRingId         string  `db:"inner_ring_id"`
+	InnerRingTitle      string  `db:"inner_ring_title"`
 	InnerRingBaseCode   string  `db:"inner_ring_code"`
 	InnerRingCode       *string `db:"m2_code"`
 	InnerRingMaterialId *string `db:"m2_material_id"`
@@ -101,6 +103,7 @@ type SnpMaterialBlockNew struct {
 	InnerRingIsDefault  *bool   `db:"m2_is_default"`
 	InnerRingIsStandard *bool   `db:"m2_is_standard"`
 	OuterRingId         string  `db:"outer_ring_id"`
+	OuterRingTitle      string  `db:"outer_ring_title"`
 	OuterRingBaseCode   string  `db:"outer_ring_code"`
 	OuterRingCode       *string `db:"m3_code"`
 	OuterRingMaterialId *string `db:"m3_material_id"`

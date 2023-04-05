@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -60,6 +62,19 @@ func (r *PositionRepo) Get(ctx context.Context, orderId string) (positions []*po
 	}
 
 	return positions, nil
+}
+
+func (r *PositionRepo) GetByTitle(ctx context.Context, title, orderId string) (string, error) {
+	var data models.PositionNew
+	query := fmt.Sprintf(`SELECT id FROM %s WHERE order_id=$1 AND title=$2`, PositionTable)
+
+	if err := r.db.Get(&data, query, orderId, title); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", err
+		}
+		return "", fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return data.Id, nil
 }
 
 func (r *PositionRepo) Copy(ctx context.Context, position *position_api.CopyPosition) (string, error) {
