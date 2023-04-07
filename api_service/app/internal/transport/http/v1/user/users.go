@@ -40,8 +40,11 @@ func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
 	users := api.Group("/users")
 	{
 		users.GET("/managers", handler.getManagers)
+		users.GET("/:id", handler.getUser)
 		users.POST("/confirm/:code", handler.confirm)
 		users.POST("/manager", handler.setManager)
+		users.POST("/reset", handler.resetPassword)
+		users.POST("/reset/:token", handler.setPassword)
 	}
 }
 
@@ -53,6 +56,22 @@ func (h *UserHandler) getManagers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, models.DataResponse{Data: users})
+}
+
+func (h *UserHandler) getUser(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty id", "empty id param")
+		return
+	}
+
+	user, err := h.userApi.Get(c, &user_api.GetUser{Id: id})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: user})
 }
 
 func (h *UserHandler) confirm(c *gin.Context) {
@@ -99,6 +118,32 @@ func (h *UserHandler) setManager(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated manager successfully"})
 }
+
+func (h *UserHandler) resetPassword(c *gin.Context) {
+	var dto *user_api.GetUserByEmail
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Введены некорректные данные")
+		return
+	}
+	// dto.Code = "i_reset_pass"
+
+	// user, err := h.userApi.GetByEmail(c, dto)
+	// if err != nil {
+	// 	models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+	// 	return
+	// }
+
+	// // генерировать код для подтверждения и записывать его в редис (с id пользователя)
+	// code, err := h.services.Confirm.Create(c, user.Id)
+	// if err != nil {
+	// 	models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+	// 	return
+	// }
+
+	// TODO отправлять email с кодом
+}
+
+func (h *UserHandler) setPassword(c *gin.Context) {}
 
 // // @Summary Get All Users
 // // @Tags Users

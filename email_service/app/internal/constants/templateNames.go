@@ -9,4 +9,5 @@ const (
 	OrderNewTemplate   = "order_new.html"
 	InterviewTemplate  = "interview.html"
 	BlockedTemplate    = "blocked.html"
+	FeedbackTemplate   = "connect.html"
 )

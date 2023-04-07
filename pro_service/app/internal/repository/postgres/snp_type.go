@@ -88,12 +88,12 @@ func (r *SNPTypeRepo) GetWithFlange(ctx context.Context, req *snp_api.GetSnpData
 	return types, nil
 }
 
-// TODO исправить запрос
 func (r *SNPTypeRepo) Create(ctx context.Context, snp *snp_type_api.CreateSnpType) error {
-	query := fmt.Sprintf("INSERT INTO %s (id, title, flange_type_id, code, snp_standard_id) VALUES ($1, $2, $3, $4, $5)", SnpTypeTable)
+	query := fmt.Sprintf(`INSERT INTO %s (id, title, flange_type_id, code, snp_standard_id, description, has_d4, has_d3, has_d2, has_d1) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, SnpTypeTable)
 	id := uuid.New()
 
-	_, err := r.db.Exec(query, id, snp.Title, snp.FlangeTypeId, snp.Code, snp.StandardId)
+	_, err := r.db.Exec(query, id, snp.Title, snp.FlangeTypeId, snp.Code, snp.StandardId, snp.Description, snp.HasD4, snp.HasD3, snp.HasD2, snp.HasD1)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -101,15 +101,17 @@ func (r *SNPTypeRepo) Create(ctx context.Context, snp *snp_type_api.CreateSnpTyp
 }
 
 func (r *SNPTypeRepo) CreateSeveral(ctx context.Context, snp *snp_type_api.CreateSeveralSnpType) error {
-	query := fmt.Sprintf("INSERT INTO %s (id, title, code, flange_type_id, code, snp_standard_id) VALUES ", SnpTypeTable)
+	query := fmt.Sprintf("INSERT INTO %s (id, title, code, flange_type_id, code, snp_standard_id, description, has_d4, has_d3, has_d2, has_d1) VALUES ", SnpTypeTable)
 
 	args := make([]interface{}, 0)
 	values := make([]string, 0, len(snp.SnpTypes))
 
-	c := 5
+	c := 10
 	for i, s := range snp.SnpTypes {
 		id := uuid.New()
-		values = append(values, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d)", i*c+1, i*c+2, i*c+3, i*c+4, i*c+5))
+		values = append(values, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+			i*c+1, i*c+2, i*c+3, i*c+4, i*c+5, i*c+6, i*c+7, i*c+8, i*c+9, i*c+10,
+		))
 		args = append(args, id, s.Title, s.FlangeTypeId, s.Code, s.StandardId)
 	}
 	query += strings.Join(values, ", ")
@@ -122,9 +124,10 @@ func (r *SNPTypeRepo) CreateSeveral(ctx context.Context, snp *snp_type_api.Creat
 }
 
 func (r *SNPTypeRepo) Update(ctx context.Context, snp *snp_type_api.UpdateSnpType) error {
-	query := fmt.Sprintf("UPDATE %s	SET title=$1, flange_type_id=$2, code=$3, snp_standard_id=$4 WHERE id=$5", SnpTypeTable)
+	query := fmt.Sprintf(`UPDATE %s	SET title=$1, flange_type_id=$2, code=$3, snp_standard_id=$4, description=$5,
+		has_d4=$6, has_d3=$7, has_d2=$8, has_d1=$9 WHERE id=$10`, SnpTypeTable)
 
-	_, err := r.db.Exec(query, snp.Title, snp.FlangeTypeId, snp.Code, snp.StandardId, snp.Id)
+	_, err := r.db.Exec(query, snp.Title, snp.FlangeTypeId, snp.Code, snp.StandardId, snp.Description, snp.HasD4, snp.HasD3, snp.HasD2, snp.HasD1, snp.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

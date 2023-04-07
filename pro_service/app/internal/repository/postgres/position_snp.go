@@ -420,7 +420,7 @@ func (r *PositionSnpRepo) Update(ctx context.Context, position *position_model.F
 	sizeQuery := fmt.Sprintf(`UPDATE %s	SET dn=$1, pn_mpa=$2, pn_kg=$3, d4=$4, d3=$5, d2=$6, d1=$7, h=$8, s2=$9, s3=$10, another=$11
 		WHERE position_id=$12`, PositionSizeSnpTable)
 	materialQuery := fmt.Sprintf(`UPDATE %s SET filler_id=$1, frame_id=$2, inner_ring_id=$3, outer_ring_id=$4, filler_code=$5, 
-		frame_code=$6, inner_ring_code=$7, outer_ring_code=$8 WHERE position_id=$9`, PositionMaterialSnpTable)
+		frame_code=$6, inner_ring_code=$7, outer_ring_code=$8, frame_title=$9, inner_ring_title=$10, outer_ring_title=$11 WHERE position_id=$12`, PositionMaterialSnpTable)
 	designQuery := fmt.Sprintf(`UPDATE %s SET has_jumper=$1, jumper_code=$2, jumper_width=$3, has_hole=$4, has_mounting=$5, mounting_code=$6, drawing=$7
 		WHERE position_id=$8`, PositionDesignSnpTable)
 
@@ -452,8 +452,8 @@ func (r *PositionSnpRepo) Update(ctx context.Context, position *position_model.F
 		tx.Rollback()
 		return fmt.Errorf("failed to complete query size. error: %w", err)
 	}
-	_, err = tx.Exec(materialQuery, material.FillerId, material.FrameId, material.InnerRingId, material.OuterRingId,
-		material.FillerCode, material.FrameCode, material.InnerRingCode, material.OuterRingCode, position.Id)
+	_, err = tx.Exec(materialQuery, material.FillerId, material.FrameId, material.InnerRingId, material.OuterRingId, material.FillerCode, material.FrameCode,
+		material.InnerRingCode, material.OuterRingCode, material.FrameTitle, material.InnerRingTitle, material.OuterRingTitle, position.Id)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("failed to complete query material. error: %w", err)

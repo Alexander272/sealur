@@ -198,6 +198,8 @@ func (s *PositionServiceNew) Delete(ctx context.Context, positionId string) erro
 		return fmt.Errorf("failed to delete position. error: %w", err)
 	}
 
+	//? оно удаляется само (каскадом)
+	// можно было бы тут получать чертеж, но оно ничего не удалит
 	if err := s.snp.Delete(ctx, positionId); err != nil {
 		return err
 	}

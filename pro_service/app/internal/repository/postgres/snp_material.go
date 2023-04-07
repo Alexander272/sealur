@@ -9,7 +9,6 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"github.com/lib/pq"
 )
 
 type SnpMaterialRepo struct {
@@ -91,10 +90,10 @@ func (r *SnpMaterialRepo) Get(ctx context.Context, req *snp_material_api.GetSnpM
 }
 
 func (r *SnpMaterialRepo) Create(ctx context.Context, material *snp_material_api.CreateSnpMaterial) error {
-	query := fmt.Sprintf("INSERT INTO %s (id, material_id, default_id, type, standard_id) VALUES ($1, $2, $3, $4, $5)", SnpMaterialTable)
+	query := fmt.Sprintf("INSERT INTO %s (id, standard_id, material_id, type, is_default, code, is_standard) VALUES ($1, $2, $3, $4, $5, $6, $7)", SnpMaterialTable)
 	id := uuid.New()
 
-	_, err := r.db.Exec(query, id, pq.Array(material.MaterialId), material.Default, material.Type, material.StandardId)
+	_, err := r.db.Exec(query, id, material.StandardId, material.MaterialId, material.Type, material.IsDefault, material.Code, material.IsStandard)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -102,9 +101,9 @@ func (r *SnpMaterialRepo) Create(ctx context.Context, material *snp_material_api
 }
 
 func (r *SnpMaterialRepo) Update(ctx context.Context, material *snp_material_api.UpdateSnpMaterial) error {
-	query := fmt.Sprintf("UPDATE %s	SET material_id=$1, default_id=$2, type=$3, standard_id=$4 WHERE id=$5", SnpMaterialTable)
+	query := fmt.Sprintf("UPDATE %s	SET standard_id=$1, material_id=$2, type=$3, is_default=$4, code=$5, is_standard=$6 WHERE id=$7", SnpMaterialTable)
 
-	_, err := r.db.Exec(query, pq.Array(material.MaterialId), material.Default, material.Type, material.StandardId, material.Id)
+	_, err := r.db.Exec(query, material.StandardId, material.MaterialId, material.Type, material.IsDefault, material.Code, material.IsStandard, material.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

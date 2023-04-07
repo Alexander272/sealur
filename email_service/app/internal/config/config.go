@@ -49,6 +49,7 @@ type (
 		Confirm           string
 		ConfirmSubject    string
 		ConfirmSubjectNew string
+		Connect           string
 		JoinSubject       string // Заголовок письма отправляемого пользователю после подтверждения
 		RejectSubject     string // Заголовок письма - если регистрацию отклонили
 		Support           string

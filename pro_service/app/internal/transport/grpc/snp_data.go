@@ -5,7 +5,6 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/service"
 	"github.com/Alexander272/sealur_proto/api/pro/models/response_model"
-	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 )
 
@@ -26,8 +25,7 @@ func (h *SnpDataHandlers) Get(ctx context.Context, req *snp_data_api.GetSnpData)
 		return nil, err
 	}
 
-	// TODO переделать proto, должен возвращаться объект, а не массив
-	return &snp_data_api.SnpData{Snp: []*snp_data_model.SnpData{snp}}, nil
+	return &snp_data_api.SnpData{Snp: snp}, nil
 }
 
 func (h *SnpDataHandlers) Create(ctx context.Context, snp *snp_data_api.CreateSnpData) (*response_model.Response, error) {

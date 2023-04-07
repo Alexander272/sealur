@@ -29,6 +29,10 @@ type Blocked interface {
 	SendBlocked(ctx context.Context, req *email_api.BlockedUserRequest) error
 }
 
+type Connect interface {
+	SendFeedback(ctx context.Context, feedback *email_api.Feedback) error
+}
+
 type Test interface {
 	SendEmail(*email_api.SendTestRequest) error
 }
@@ -37,8 +41,9 @@ type Services struct {
 	Interview
 	Order
 	User
-	Test
+	Connect
 	Blocked
+	Test
 }
 
 func NewServices(EmailSender email.Sender, conf config.RecipientsConfig) *Services {
@@ -46,6 +51,7 @@ func NewServices(EmailSender email.Sender, conf config.RecipientsConfig) *Servic
 		Interview: NewInterviewService(EmailSender, conf),
 		Order:     NewOrderService(EmailSender, conf),
 		User:      NewUserService(EmailSender, conf),
+		Connect:   NewConnectService(EmailSender, conf),
 		Blocked:   NewBlockedService(EmailSender, conf),
 		Test:      NewTestService(EmailSender, conf),
 	}

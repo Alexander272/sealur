@@ -99,6 +99,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.initSnpStandardRoutes(pro)
 	h.initOrderRoutes(pro)
 	h.initPositionRoutes(pro)
+	h.initConnectRoutes(pro)
 }
 
 // func (h *Handler) ping(c *gin.Context) {

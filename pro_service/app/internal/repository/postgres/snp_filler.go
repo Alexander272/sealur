@@ -10,6 +10,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type SNPFillerRepo struct {
@@ -47,12 +48,14 @@ func (r *SNPFillerRepo) GetAll(ctx context.Context, req *snp_filler_api.GetSnpFi
 	return fillers, nil
 }
 
-// TODO обновить создание, обновление в соответствии с новой структурой
 func (r *SNPFillerRepo) Create(ctx context.Context, filler *snp_filler_api.CreateSnpFiller) error {
-	query := fmt.Sprintf("INSERT INTO %s (id, title, code, description) VALUES ($1, $2, $3, $4)", SnpFillerTable)
+	query := fmt.Sprintf(`INSERT INTO %s (id, standard_id, temperature_id, base_code, code, title, description, designation, disabled_types) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, SnpFillerTable)
 	id := uuid.New()
 
-	_, err := r.db.Exec(query, id, filler.Title, filler.Code, filler.Description)
+	_, err := r.db.Exec(query, id, filler.StandardId, filler.TemperatureId, filler.BaseCode, filler.Code, filler.Title, filler.Description,
+		filler.Designation, pq.Array(filler.DisabledTypes),
+	)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -60,16 +63,16 @@ func (r *SNPFillerRepo) Create(ctx context.Context, filler *snp_filler_api.Creat
 }
 
 func (r *SNPFillerRepo) CreateSeveral(ctx context.Context, fillers *snp_filler_api.CreateSeveralSnpFiller) error {
-	query := fmt.Sprintf("INSERT INTO %s (id, title, code, description) VALUES ", SnpFillerTable)
+	query := fmt.Sprintf("INSERT INTO %s (id, standard_id, temperature_id, base_code, code, title, description, designation, disabled_types) VALUES ", SnpFillerTable)
 
 	args := make([]interface{}, 0)
 	values := make([]string, 0, len(fillers.SnpFillers))
 
-	c := 4
+	c := 9
 	for i, f := range fillers.SnpFillers {
 		id := uuid.New()
-		values = append(values, fmt.Sprintf("($%d, $%d, $%d, $%d)", i*c+1, i*c+2, i*c+3, i*c+4))
-		args = append(args, id, f.Title, f.Code, f.Description)
+		values = append(values, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)", i*c+1, i*c+2, i*c+3, i*c+4, i*c+5, i*c+6, i*c+7, i*c+8, i*c+9))
+		args = append(args, id, f.StandardId, f.TemperatureId, f.BaseCode, f.Code, f.Title, f.Description, f.Designation, pq.Array(f.DisabledTypes))
 	}
 	query += strings.Join(values, ", ")
 
@@ -81,9 +84,12 @@ func (r *SNPFillerRepo) CreateSeveral(ctx context.Context, fillers *snp_filler_a
 }
 
 func (r *SNPFillerRepo) Update(ctx context.Context, filler *snp_filler_api.UpdateSnpFiller) error {
-	query := fmt.Sprintf("UPDATE %s	SET title=$1, code=$2, description=$3 WHERE id=$4", SnpFillerTable)
+	query := fmt.Sprintf(`UPDATE %s	SET standard_id=$1, temperature_id=$2, base_code=$3, code=$4, title=$5, description=$6, designation=$7,
+		disabled_types=$8 WHERE id=$9`, SnpFillerTable)
 
-	_, err := r.db.Exec(query, filler.Title, filler.Code, filler.Description, filler.Id)
+	_, err := r.db.Exec(query, filler.StandardId, filler.TemperatureId, filler.BaseCode, filler.Code, filler.Title, filler.Description,
+		filler.Designation, pq.Array(filler.DisabledTypes), filler.Id,
+	)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

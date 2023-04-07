@@ -3,7 +3,7 @@ module github.com/Alexander272/sealur/email_service
 go 1.19
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230403083248-aef6a3b134a0
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230407055949-6bd1b69dafed
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.15.0

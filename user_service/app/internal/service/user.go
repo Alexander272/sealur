@@ -48,6 +48,11 @@ func (s *UserService) GetByEmail(ctx context.Context, req *user_api.GetUserByEma
 		return nil, fmt.Errorf("failed to get user. error: %w", err)
 	}
 
+	//TODO а надо ли мне этот код вообще
+	if req.Password == "" && req.Code == "i_reset_pass" {
+		return user, nil
+	}
+
 	salt := strings.Split(password, ".")[1]
 	pass, err := s.hasher.Hash(req.Password, salt)
 	if err != nil {
@@ -142,6 +147,26 @@ func (s *UserService) SetManager(ctx context.Context, manager *user_api.UserMana
 	if err := s.repo.SetManager(ctx, manager); err != nil {
 		return fmt.Errorf("failed to set manager. error: %w", err)
 	}
+	return nil
+}
+
+func (s *UserService) Update(ctx context.Context, user *user_api.UpdateUser) error {
+	if user.Password != "" {
+		salt, err := s.hasher.GenerateSalt()
+		if err != nil {
+			return fmt.Errorf("failed to create salt. error: %w", err)
+		}
+		pass, err := s.hasher.Hash(user.Password, salt)
+		if err != nil {
+			return fmt.Errorf("failed to hash password. error: %w", err)
+		}
+		user.Password = fmt.Sprintf("%s.%s", pass, salt)
+	}
+
+	if err := s.repo.Update(ctx, user); err != nil {
+		return fmt.Errorf("failed to update user. error: %w", err)
+	}
+
 	return nil
 }
 

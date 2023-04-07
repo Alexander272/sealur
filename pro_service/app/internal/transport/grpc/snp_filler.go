@@ -19,15 +19,14 @@ func NewSnpFillerHandlers(service service.SnpFiller) *SnpFillerHandlers {
 	}
 }
 
-//TODO надо возвращать новые данные
-// func (h *SnpFillerHandlers) Get(ctx context.Context, req *snp_filler_api.GetSnpFillers) (*snp_filler_api.SnpFillers, error) {
-// 	fillers, err := h.service.GetAll(ctx, req)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (h *SnpFillerHandlers) Get(ctx context.Context, req *snp_filler_api.GetSnpFillers) (*snp_filler_api.SnpFillers, error) {
+	fillers, err := h.service.GetAll(ctx, req)
+	if err != nil {
+		return nil, err
+	}
 
-// 	return &snp_filler_api.SnpFillers{SnpFillers: fillers}, nil
-// }
+	return &snp_filler_api.SnpFillers{SnpFillers: fillers}, nil
+}
 
 func (h *SnpFillerHandlers) Create(ctx context.Context, filler *snp_filler_api.CreateSnpFiller) (*response_model.Response, error) {
 	if err := h.service.Create(ctx, filler); err != nil {

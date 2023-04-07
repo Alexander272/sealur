@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Alexander272/sealur/user_service/internal/models"
@@ -149,5 +150,78 @@ func (r *UserRepo) SetManager(ctx context.Context, manager *user_api.UserManager
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
+	return nil
+}
+
+func (r *UserRepo) Update(ctx context.Context, user *user_api.UpdateUser) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
+
+	if user.Company != "" {
+		setValues = append(setValues, fmt.Sprintf("company=$%d", argId))
+		args = append(args, user.Company)
+		argId++
+	}
+	if user.Address != "" {
+		setValues = append(setValues, fmt.Sprintf("address=$%d", argId))
+		args = append(args, user.Address)
+		argId++
+	}
+	if user.Inn != "" {
+		setValues = append(setValues, fmt.Sprintf("inn=$%d", argId))
+		args = append(args, user.Inn)
+		argId++
+	}
+	if user.Kpp != "" {
+		setValues = append(setValues, fmt.Sprintf("kpp=$%d", argId))
+		args = append(args, user.Kpp)
+		argId++
+	}
+	if user.Region != "" {
+		setValues = append(setValues, fmt.Sprintf("region=$%d", argId))
+		args = append(args, user.Region)
+		argId++
+	}
+	if user.City != "" {
+		setValues = append(setValues, fmt.Sprintf("city=$%d", argId))
+		args = append(args, user.City)
+		argId++
+	}
+	if user.Name != "" {
+		setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
+		args = append(args, user.Name)
+		argId++
+	}
+	if user.Email != "" {
+		setValues = append(setValues, fmt.Sprintf("email=$%d", argId))
+		args = append(args, user.Email)
+		argId++
+	}
+	if user.Position != "" {
+		setValues = append(setValues, fmt.Sprintf("position=$%d", argId))
+		args = append(args, user.Position)
+		argId++
+	}
+	if user.Phone != "" {
+		setValues = append(setValues, fmt.Sprintf("phone=$%d", argId))
+		args = append(args, user.Phone)
+		argId++
+	}
+	if user.Password != "" {
+		setValues = append(setValues, fmt.Sprintf("password=$%d", argId))
+		args = append(args, user.Password)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", UserTable, setQuery, argId)
+
+	args = append(args, user.Id)
+	_, err := r.db.Exec(query, args...)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
 	return nil
 }
