@@ -215,7 +215,7 @@ func (r *UserRepo) Update(ctx context.Context, user *user_api.UpdateUser) error 
 	}
 
 	setQuery := strings.Join(setValues, ", ")
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", UserTable, setQuery, argId)
+	query := fmt.Sprintf(`UPDATE "%s" SET %s WHERE id=$%d`, UserTable, setQuery, argId)
 
 	args = append(args, user.Id)
 	_, err := r.db.Exec(query, args...)

@@ -15,22 +15,23 @@ type Interview interface {
 
 type Order interface {
 	SendOrder(*email_api.OrderData, *bytes.Buffer) error
-	SendNotification(ctx context.Context, data *email_api.NotificationData) error
+	SendNotification(context.Context, *email_api.NotificationData) error
 }
 
 type User interface {
-	SendConfirm(ctx context.Context, req *email_api.ConfirmUserRequestOld) error
-	SendConfirmNew(ctx context.Context, req *email_api.ConfirmUserRequest) error
-	SendReject(ctx context.Context, req *email_api.RejectUserRequest) error
-	SendJoin(ctx context.Context, user *email_api.JoinUserRequest) error
+	SendConfirm(context.Context, *email_api.ConfirmUserRequestOld) error
+	SendConfirmNew(context.Context, *email_api.ConfirmUserRequest) error
+	SendReject(context.Context, *email_api.RejectUserRequest) error
+	SendJoin(context.Context, *email_api.JoinUserRequest) error
+	SendRecovery(context.Context, *email_api.RecoveryPassword) error
 }
 
 type Blocked interface {
-	SendBlocked(ctx context.Context, req *email_api.BlockedUserRequest) error
+	SendBlocked(context.Context, *email_api.BlockedUserRequest) error
 }
 
 type Connect interface {
-	SendFeedback(ctx context.Context, feedback *email_api.Feedback) error
+	SendFeedback(context.Context, *email_api.Feedback) error
 }
 
 type Test interface {

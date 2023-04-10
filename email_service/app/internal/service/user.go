@@ -9,6 +9,7 @@ import (
 	"github.com/Alexander272/sealur/email_service/internal/constants"
 	"github.com/Alexander272/sealur/email_service/internal/models"
 	"github.com/Alexander272/sealur/email_service/pkg/email"
+	"github.com/Alexander272/sealur/email_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 )
 
@@ -61,6 +62,28 @@ func (s *UserService) SendConfirmNew(ctx context.Context, req *email_api.Confirm
 	}
 
 	if err := input.GenerateBodyFromHTML(constants.NewConfirmTemplate, data); err != nil {
+		return err
+	}
+
+	return s.sender.Send(input)
+}
+
+func (s *UserService) SendRecovery(ctx context.Context, req *email_api.RecoveryPassword) error {
+	input := email.SendEmailInput{
+		Subject: s.conf.RecoverySubject,
+		To:      []string{req.Email},
+	}
+
+	logger.Debug(req)
+
+	data := models.RecoveryTemplate{
+		Link:    req.Link,
+		Support: s.conf.Support,
+	}
+
+	logger.Debug(data.Link)
+
+	if err := input.GenerateBodyFromHTML(constants.RecoveryTemplate, data); err != nil {
 		return err
 	}
 

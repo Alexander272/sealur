@@ -10,4 +10,5 @@ const (
 	InterviewTemplate  = "interview.html"
 	BlockedTemplate    = "blocked.html"
 	FeedbackTemplate   = "connect.html"
+	RecoveryTemplate   = "recovery.html"
 )

@@ -83,8 +83,8 @@ func (h *UserHandler) SetManager(ctx context.Context, manager *user_api.UserMana
 	return &response_model.Response{}, nil
 }
 
-func (h *Handler) UpdateUser(ctx context.Context, user *user_api.UpdateUser) (*response_model.Response, error) {
-	if err := h.service.User.Update(ctx, user); err != nil {
+func (h *UserHandler) Update(ctx context.Context, user *user_api.UpdateUser) (*response_model.Response, error) {
+	if err := h.service.Update(ctx, user); err != nil {
 		return nil, err
 	}
 	return &response_model.Response{}, nil

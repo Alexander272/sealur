@@ -34,3 +34,10 @@ func (h *Handler) SendJoin(ctx context.Context, user *email_api.JoinUserRequest)
 	}
 	return &email_api.SuccessResponse{Success: true}, nil
 }
+
+func (h *Handler) Recovery(ctx context.Context, req *email_api.RecoveryPassword) (*email_api.SuccessResponse, error) {
+	if err := h.service.User.SendRecovery(ctx, req); err != nil {
+		return nil, fmt.Errorf("failed to send recovery email. error: %w", err)
+	}
+	return &email_api.SuccessResponse{Success: true}, nil
+}

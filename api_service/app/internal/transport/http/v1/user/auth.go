@@ -8,6 +8,7 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
+	"github.com/Alexander272/sealur/api_service/internal/models/user_model"
 	"github.com/Alexander272/sealur/api_service/internal/service"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
@@ -53,10 +54,15 @@ func (h *Handler) initAuthRoutes(api *gin.RouterGroup) {
 }
 
 func (h *AuthHandler) signIn(c *gin.Context) {
-	var dto *user_api.GetUserByEmail
-	if err := c.BindJSON(&dto); err != nil {
+	var req user_model.SignIn
+	if err := c.BindJSON(&req); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Введены некорректные данные")
 		return
+	}
+
+	dto := &user_api.GetUserByEmail{
+		Email:    req.Email,
+		Password: req.Password,
 	}
 
 	limit, err := h.services.Limit.Get(c, c.ClientIP())
@@ -145,7 +151,8 @@ func (h *AuthHandler) singUp(c *gin.Context) {
 	data := &email_api.ConfirmUserRequest{
 		Name:  dto.Name,
 		Email: dto.Email,
-		Link:  fmt.Sprintf("%s/auth/confirm?code=%s", h.http.Host, code),
+		//TODO
+		Link: fmt.Sprintf("%s/auth/confirm?code=%s", h.http.Host, code),
 	}
 	_, err = h.emailApi.ConfirmUser(c, data)
 	if err != nil {

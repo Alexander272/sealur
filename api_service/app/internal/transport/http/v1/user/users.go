@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/config"
@@ -15,13 +16,14 @@ type UserHandler struct {
 	userApi    user_api.UserServiceClient
 	emailApi   email_api.EmailServiceClient
 	auth       config.AuthConfig
+	http       config.HttpConfig
 	services   *service.Services
 	cookieName string
 }
 
 func NewUserHandler(
 	userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient,
-	auth config.AuthConfig,
+	auth config.AuthConfig, http config.HttpConfig,
 	services *service.Services,
 	cookieName string,
 ) *UserHandler {
@@ -35,7 +37,7 @@ func NewUserHandler(
 }
 
 func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
-	handler := NewUserHandler(h.userApi, h.emailApi, h.auth, h.services, h.cookieName)
+	handler := NewUserHandler(h.userApi, h.emailApi, h.auth, h.http, h.services, h.cookieName)
 
 	users := api.Group("/users")
 	{
@@ -43,8 +45,8 @@ func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
 		users.GET("/:id", handler.getUser)
 		users.POST("/confirm/:code", handler.confirm)
 		users.POST("/manager", handler.setManager)
-		users.POST("/reset", handler.resetPassword)
-		users.POST("/reset/:token", handler.setPassword)
+		users.POST("/recovery", handler.recoveryPassword)
+		users.POST("/recovery/:code", handler.recoveryPasswordCode)
 	}
 }
 
@@ -119,31 +121,73 @@ func (h *UserHandler) setManager(c *gin.Context) {
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated manager successfully"})
 }
 
-func (h *UserHandler) resetPassword(c *gin.Context) {
+func (h *UserHandler) recoveryPassword(c *gin.Context) {
 	var dto *user_api.GetUserByEmail
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Введены некорректные данные")
 		return
 	}
-	// dto.Code = "i_reset_pass"
 
-	// user, err := h.userApi.GetByEmail(c, dto)
-	// if err != nil {
-	// 	models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
-	// 	return
-	// }
+	user, err := h.userApi.GetByEmail(c, dto)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		return
+	}
 
-	// // генерировать код для подтверждения и записывать его в редис (с id пользователя)
-	// code, err := h.services.Confirm.Create(c, user.Id)
-	// if err != nil {
-	// 	models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
-	// 	return
-	// }
+	// генерировать код для подтверждения и записывать его в редис (с id пользователя)
+	code, err := h.services.Confirm.Create(c, user.Id)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		return
+	}
 
-	// TODO отправлять email с кодом
+	data := &email_api.RecoveryPassword{
+		Email: user.Email,
+		//TODO использовать тут хост как-то не особо правильно выглядит
+		// Link: fmt.Sprintf("%s/auth/recovery/%s", h.http.Host, code),
+		Link: fmt.Sprintf("%s/auth/recovery/%s", "http://pro.sealur.ru", code),
+	}
+
+	_, err = h.emailApi.Recovery(c, data)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка при отправлении письма")
+		return
+	}
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Reset completed successfully"})
 }
 
-func (h *UserHandler) setPassword(c *gin.Context) {}
+func (h *UserHandler) recoveryPasswordCode(c *gin.Context) {
+	code := c.Param("code")
+	if code == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty code", "Некорректный код восстановления")
+		return
+	}
+
+	var dto *user_api.GetUserByEmail
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Введены некорректные данные")
+		return
+	}
+
+	data, err := h.services.Confirm.Get(c, code)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		return
+	}
+
+	user, err := h.userApi.Get(c, &user_api.GetUser{Id: data.UserId})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		return
+	}
+
+	_, err = h.userApi.Update(c, &user_api.UpdateUser{Id: user.Id, Password: dto.Password})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		return
+	}
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated password successfully"})
+}
 
 // // @Summary Get All Users
 // // @Tags Users
@@ -154,7 +198,7 @@ func (h *UserHandler) setPassword(c *gin.Context) {}
 // // @Produce json
 // // @Param page path string true "page number"
 // // @Param search query string false "search value"
-// // @Param search_field query false "searxh field"
+// // @Param search_field query false "search field"
 // // @Success 200 {object} models.DataResponse{data=[]user_api.User}
 // // @Failure 400,404 {object} models.ErrorResponse
 // // @Failure 500 {object} models.ErrorResponse
@@ -269,7 +313,7 @@ func (h *UserHandler) setPassword(c *gin.Context) {}
 // // @Summary Confirm User
 // // @Tags Users
 // // @Security ApiKeyAuth
-// // @Description потверждение пользователя
+// // @Description подтверждение пользователя
 // // @ModuleID confirmUser
 // // @Accept json
 // // @Produce json
@@ -323,7 +367,7 @@ func (h *UserHandler) setPassword(c *gin.Context) {}
 // // @Summary Reject User
 // // @Tags Users
 // // @Security ApiKeyAuth
-// // @Description оклонение пользователя
+// // @Description отклонение пользователя
 // // @ModuleID rejectUser
 // // @Accept json
 // // @Produce json

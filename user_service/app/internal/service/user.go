@@ -48,8 +48,7 @@ func (s *UserService) GetByEmail(ctx context.Context, req *user_api.GetUserByEma
 		return nil, fmt.Errorf("failed to get user. error: %w", err)
 	}
 
-	//TODO а надо ли мне этот код вообще
-	if req.Password == "" && req.Code == "i_reset_pass" {
+	if req.Password == "" {
 		return user, nil
 	}
 

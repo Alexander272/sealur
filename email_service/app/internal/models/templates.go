@@ -32,6 +32,11 @@ type ConfirmTemplateNew struct {
 	Email string
 }
 
+type RecoveryTemplate struct {
+	Link    string
+	Support string
+}
+
 type RejectTemplate struct {
 	Name  string
 	Email string
