@@ -9,6 +9,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_standard_api"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	"github.com/gin-gonic/gin"
@@ -17,14 +18,17 @@ import (
 )
 
 type Handler struct {
-	middleware     *middleware.Middleware
+	middleware *middleware.Middleware
+
 	snpApi         snp_api.SnpDataServiceClient
 	snpStandardApi snp_standard_api.SnpStandardServiceClient
 	orderApi       order_api.OrderServiceClient
 	positionApi    position_api.PositionServiceClient
-	userApi        user_api.UserServiceClient
-	emailApi       email_api.EmailServiceClient
-	fileApi        file_api.FileServiceClient
+	materialApi    snp_material_api.SnpMaterialServiceClient
+
+	userApi  user_api.UserServiceClient
+	emailApi email_api.EmailServiceClient
+	fileApi  file_api.FileServiceClient
 	// pingClient      moment.PingServiceClient
 	// gasketClient    gasket_api.GasketServiceClient
 	// materialsClient material_api.MaterialsServiceClient
@@ -90,6 +94,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.snpStandardApi = snp_standard_api.NewSnpStandardServiceClient(connect)
 	h.orderApi = order_api.NewOrderServiceClient(connect)
 	h.positionApi = position_api.NewPositionServiceClient(connect)
+	h.materialApi = snp_material_api.NewSnpMaterialServiceClient(connect)
 
 	pro := api.Group("/sealur-pro")
 	{
@@ -100,6 +105,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.initOrderRoutes(pro)
 	h.initPositionRoutes(pro)
 	h.initConnectRoutes(pro)
+	h.initMaterialRoutes(pro)
 }
 
 // func (h *Handler) ping(c *gin.Context) {

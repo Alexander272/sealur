@@ -139,6 +139,8 @@ func (h *Handler) createDrawing(c *gin.Context) {
 		return
 	}
 
+	fileType := file.Header.Get("Content-Type")
+
 	f, err := file.Open()
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "file read error")
@@ -155,8 +157,6 @@ func (h *Handler) createDrawing(c *gin.Context) {
 		}
 		group = gUuid.String()
 	}
-
-	fileType := file.Header.Get("Content-Type")
 
 	reqMeta := &file_api.FileUploadRequest{
 		Request: &file_api.FileUploadRequest_Metadata{

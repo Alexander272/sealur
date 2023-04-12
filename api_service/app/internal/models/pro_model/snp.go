@@ -71,6 +71,7 @@ func (pn *Pn) Parse() *snp_size_model.Pn {
 
 type SizeSnp struct {
 	Dn      string `json:"dn"`
+	DnMm    string `json:"dnMm"`
 	Pn      Pn     `json:"pn"`
 	D4      string `json:"d4"`
 	D3      string `json:"d3"`
@@ -85,6 +86,7 @@ type SizeSnp struct {
 func (s *SizeSnp) Parse() *position_model.PositionSnp_Size {
 	return &position_model.PositionSnp_Size{
 		Dn:      s.Dn,
+		DnMm:    s.DnMm,
 		Pn:      s.Pn.Parse(),
 		D4:      s.D4,
 		D3:      s.D3,

@@ -28,6 +28,7 @@ func (h *Handler) UnaryInterceptor(ctx context.Context, req interface{}, info *g
 	return handler(ctx, req)
 }
 
+// TODO
 func (h *Handler) authenticateClient(ctx context.Context) (string, error) {
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
 		clientLogin := strings.Join(md["service-name"], "")

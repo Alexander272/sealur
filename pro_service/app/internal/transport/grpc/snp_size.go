@@ -34,3 +34,24 @@ func (h *SnpSizeHandlers) Create(ctx context.Context, size *snp_size_api.CreateS
 	}
 	return &response_model.Response{}, nil
 }
+
+func (h *SnpSizeHandlers) CreateSeveral(ctx context.Context, sizes *snp_size_api.CreateSeveralSnpSize) (*response_model.Response, error) {
+	if err := h.service.CreateSeveral(ctx, sizes); err != nil {
+		return nil, err
+	}
+	return &response_model.Response{}, nil
+}
+
+func (h *SnpSizeHandlers) Update(ctx context.Context, size *snp_size_api.UpdateSnpSize) (*response_model.Response, error) {
+	if err := h.service.Update(ctx, size); err != nil {
+		return nil, err
+	}
+	return &response_model.Response{}, nil
+}
+
+func (h *SnpSizeHandlers) Delete(ctx context.Context, size *snp_size_api.DeleteSnpSize) (*response_model.Response, error) {
+	if err := h.service.Delete(ctx, size); err != nil {
+		return nil, err
+	}
+	return &response_model.Response{}, nil
+}

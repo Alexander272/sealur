@@ -50,6 +50,21 @@ func (m *Middleware) UserIdentity(c *gin.Context) {
 	c.Set(UserRolesCtx, user.RoleCode)
 }
 
+func (m *Middleware) AccessForManager(c *gin.Context) {
+	userId, _ := c.Get(UserIdCtx)
+	role, exists := c.Get(UserRolesCtx)
+	if !exists {
+		models.NewErrorResponse(c, http.StatusUnauthorized, "roles empty", "failed to get role")
+		return
+	}
+
+	if role != "manager" {
+		models.NewErrorResponse(c, http.StatusForbidden, role.(string), "access not allowed")
+		logger.Error(userId)
+		return
+	}
+}
+
 // TODO переписать Middleware
 func (m *Middleware) AccessForProAdmin(c *gin.Context) {
 	userId, _ := c.Get(UserIdCtx)

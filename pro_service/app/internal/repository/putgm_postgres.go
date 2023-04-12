@@ -95,19 +95,19 @@ func (r *PutgmRepo) GetByCondition(cond string) (putgm []models.Putgm, err error
 	return putgm, nil
 }
 
-func (r *PutgmRepo) UpdateAddit(putgm models.UpdateAdditDTO) error {
-	query := fmt.Sprintf(`UPDATE %s SET construction=$1, temperatures=$2, basis=$3, obturator=$4, 
-		coating=$5, mounting=$6, graphite=$7 WHERE id=$8`, PutgmTable)
+// func (r *PutgmRepo) UpdateAddit(putgm models.UpdateAdditDTO) error {
+// 	query := fmt.Sprintf(`UPDATE %s SET construction=$1, temperatures=$2, basis=$3, obturator=$4,
+// 		coating=$5, mounting=$6, graphite=$7 WHERE id=$8`, PutgmTable)
 
-	id, err := strconv.Atoi(putgm.Id)
-	if err != nil {
-		return fmt.Errorf("failed to convert string to int. error: %w", err)
-	}
+// 	id, err := strconv.Atoi(putgm.Id)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to convert string to int. error: %w", err)
+// 	}
 
-	_, err = r.db.Exec(query, putgm.Construction, putgm.Temperature, putgm.Basis, putgm.PObturator,
-		putgm.Coating, putgm.Mounting, putgm.Graphite, id)
-	if err != nil {
-		return fmt.Errorf("failed to execute query. error: %w", err)
-	}
-	return nil
-}
+// 	_, err = r.db.Exec(query, putgm.Construction, putgm.Temperature, putgm.Basis, putgm.PObturator,
+// 		putgm.Coating, putgm.Mounting, putgm.Graphite, id)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to execute query. error: %w", err)
+// 	}
+// 	return nil
+// }

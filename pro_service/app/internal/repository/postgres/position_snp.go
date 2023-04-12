@@ -81,10 +81,11 @@ func (r *PositionSnpRepo) Get(ctx context.Context, orderId string) (positions []
 }
 
 // ? возможно стоит попробовать написать запросы получше
+// получение всех данных о позициях снп
 func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]*position_model.OrderPositionSnp, error) {
 	var materialData []models.SnpMaterialBlockNew
 	materialQuery := fmt.Sprintf(`SELECT %s.id, position_id,
-			filler_id, %s.code, %s.title, %s.base_code, %s.description, %s.designation,
+			filler_id, %s.code, %s.title, %s.base_code, %s.description, %s.designation, %s.disabled_types,
 			frame_code, frame_id, frame_title, m1.code as m1_code, m1.material_id as m1_material_id, m1.type as m1_type, m1.is_default as m1_is_default, m1.is_standard as m1_is_standard,
 			inner_ring_code, inner_ring_id, inner_ring_title, m2.code as m2_code, m2.material_id as m2_material_id, m2.type as m2_type, m2.is_default as m2_is_default, m2.is_standard as m2_is_standard,
 			outer_ring_code, outer_ring_id, outer_ring_title, m3.code as m3_code, m3.material_id as m3_material_id, m3.type as m3_type, m3.is_default as m3_is_default, m3.is_standard as m3_is_standard
@@ -95,7 +96,7 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 			LEFT JOIN %s as m3 ON m3.id=outer_ring_id
 			WHERE array[position_id] <@ $1 ORDER BY position_id`,
 		PositionMaterialSnpTable,
-		SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable,
+		SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable, SnpFillerNewTable,
 		PositionMaterialSnpTable, SnpFillerNewTable, SnpFillerNewTable, SnpMaterialTableNew, SnpMaterialTableNew, SnpMaterialTableNew,
 	)
 	if err := r.db.Select(&materialData, materialQuery, pq.Array(positionsId)); err != nil {
@@ -119,7 +120,7 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 	}
 
 	var sizeData []models.SnpSizeBlock
-	sizeQuery := fmt.Sprintf(`SELECT id, position_id, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another
+	sizeQuery := fmt.Sprintf(`SELECT id, position_id, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another
 		FROM %s WHERE array[position_id] <@ $1 ORDER BY position_id`, PositionSizeSnpTable)
 	if err := r.db.Select(&sizeData, sizeQuery, pq.Array(positionsId)); err != nil {
 		return nil, fmt.Errorf("failed to complete query size. error: %w", err)
@@ -145,6 +146,8 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 			frame.Type = *material.FrameType
 			frame.IsDefault = *material.FrameIsDefault
 			frame.IsStandard = *material.FrameIsStandard
+		} else {
+			frame = nil
 		}
 		innerRing := &snp_material_model.Material{Id: material.InnerRingId, BaseCode: material.InnerRingBaseCode, Title: material.InnerRingTitle}
 		if material.InnerRingId != uuid.Nil.String() {
@@ -153,6 +156,8 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 			innerRing.Type = *material.InnerRingType
 			innerRing.IsDefault = *material.InnerRingIsDefault
 			innerRing.IsStandard = *material.InnerRingIsStandard
+		} else {
+			innerRing = nil
 		}
 		outerRing := &snp_material_model.Material{Id: material.OuterRingId, BaseCode: material.OuterRingBaseCode, Title: material.OuterRingTitle}
 		if material.OuterRingId != uuid.Nil.String() {
@@ -161,6 +166,8 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 			outerRing.Type = *material.OuterRingType
 			outerRing.IsDefault = *material.OuterRingIsDefault
 			outerRing.IsStandard = *material.OuterRingIsStandard
+		} else {
+			outerRing = nil
 		}
 
 		positions = append(positions, &position_model.OrderPositionSnp{
@@ -201,12 +208,13 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 				Id:         material.Id,
 				PositionId: material.PositionId,
 				Filler: &snp_filler_model.SnpFiller{
-					Id:          material.FillerId,
-					BaseCode:    material.FillerBaseCode,
-					Code:        material.FillerCode,
-					Title:       material.FillerTitle,
-					Description: material.FillerDescription,
-					Designation: material.FillerDesignation,
+					Id:            material.FillerId,
+					BaseCode:      material.FillerBaseCode,
+					Code:          material.FillerCode,
+					Title:         material.FillerTitle,
+					Description:   material.FillerDescription,
+					Designation:   material.FillerDesignation,
+					DisabledTypes: material.FillerDisabledTypes,
 				},
 				Frame:     frame,
 				InnerRing: innerRing,
@@ -216,6 +224,7 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 				Id:         size.Id,
 				PositionId: size.PositionId,
 				Dn:         size.Dn,
+				DnMm:       size.DnMm,
 				Pn: &snp_size_model.Pn{
 					Mpa: size.PnMpa,
 					Kg:  size.PnKg,
@@ -253,8 +262,8 @@ func (r *PositionSnpRepo) GetFull(ctx context.Context, positionsId []string) ([]
 func (r *PositionSnpRepo) Create(ctx context.Context, position *position_model.FullPosition) error {
 	mainQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, snp_standard_id, snp_type_id, flange_type_code, flange_type_title) 
 		VALUES ($1, $2, $3, $4, $5, $6)`, PositionMainSnpTable)
-	sizeQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`, PositionSizeSnpTable)
+	sizeQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`, PositionSizeSnpTable)
 	materialQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, filler_id, frame_id, inner_ring_id, outer_ring_id, filler_code, frame_code, 
 		inner_ring_code, outer_ring_code, frame_title, inner_ring_title, outer_ring_title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
 		PositionMaterialSnpTable)
@@ -285,7 +294,7 @@ func (r *PositionSnpRepo) Create(ctx context.Context, position *position_model.F
 		tx.Rollback()
 		return fmt.Errorf("failed to complete query main. error: %w", err)
 	}
-	_, err = tx.Exec(sizeQuery, id, position.Id, size.Dn, size.Pn.Mpa, size.Pn.Kg, size.D4, size.D3, size.D2, size.D1, size.H, size.S2, size.S3, size.Another)
+	_, err = tx.Exec(sizeQuery, id, position.Id, size.Dn, size.DnMm, size.Pn.Mpa, size.Pn.Kg, size.D4, size.D3, size.D2, size.D1, size.H, size.S2, size.S3, size.Another)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("failed to complete query size. error: %w", err)
@@ -312,7 +321,7 @@ func (r *PositionSnpRepo) Create(ctx context.Context, position *position_model.F
 
 func (r *PositionSnpRepo) CreateSeveral(ctx context.Context, positions []*position_model.FullPosition) error {
 	mainQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, snp_standard_id, snp_type_id, flange_type_code, flange_type_title) VALUES `, PositionMainSnpTable)
-	sizeQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another) VALUES `, PositionSizeSnpTable)
+	sizeQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another) VALUES `, PositionSizeSnpTable)
 	materialQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, filler_id, frame_id, inner_ring_id, outer_ring_id, filler_code, frame_code, inner_ring_code, outer_ring_code, frame_title, inner_ring_title, outer_ring_title) VALUES `, PositionMaterialSnpTable)
 	designQuery := fmt.Sprintf(`INSERT INTO %s(id, position_id, has_jumper, jumper_code, jumper_width, has_hole, has_mounting, mounting_code, drawing) VALUES `, PositionDesignSnpTable)
 
@@ -336,7 +345,7 @@ func (r *PositionSnpRepo) CreateSeveral(ctx context.Context, positions []*positi
 	var design *position_model.PositionSnp_Design
 
 	mainCount := 6
-	sizeCount := 13
+	sizeCount := 14
 	materialCount := 13
 	designCount := 9
 
@@ -351,12 +360,12 @@ func (r *PositionSnpRepo) CreateSeveral(ctx context.Context, positions []*positi
 		main = p.SnpData.Main
 		mainArgs = append(mainArgs, id, p.Id, main.SnpStandardId, main.SnpTypeId, main.FlangeTypeCode, main.FlangeTypeTitle)
 
-		sizeValues = append(sizeValues, fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)`,
+		sizeValues = append(sizeValues, fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)`,
 			i*sizeCount+1, i*sizeCount+2, i*sizeCount+3, i*sizeCount+4, i*sizeCount+5, i*sizeCount+6, i*sizeCount+7, i*sizeCount+8,
-			i*sizeCount+9, i*sizeCount+10, i*sizeCount+11, i*sizeCount+12, i*sizeCount+13,
+			i*sizeCount+9, i*sizeCount+10, i*sizeCount+11, i*sizeCount+12, i*sizeCount+13, i*sizeCount+14,
 		))
 		size = p.SnpData.Size
-		sizeArgs = append(sizeArgs, id, p.Id, size.Dn, size.Pn.Mpa, size.Pn.Kg, size.D4, size.D3, size.D2, size.D1, size.H, size.S2, size.S3, size.Another)
+		sizeArgs = append(sizeArgs, id, p.Id, size.Dn, size.DnMm, size.Pn.Mpa, size.Pn.Kg, size.D4, size.D3, size.D2, size.D1, size.H, size.S2, size.S3, size.Another)
 
 		materialValues = append(materialValues, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
 			i*materialCount+1, i*materialCount+2, i*materialCount+3, i*materialCount+4, i*materialCount+5, i*materialCount+6, i*materialCount+7,
@@ -417,8 +426,8 @@ func (r *PositionSnpRepo) CreateSeveral(ctx context.Context, positions []*positi
 func (r *PositionSnpRepo) Update(ctx context.Context, position *position_model.FullPosition) error {
 	mainQuery := fmt.Sprintf(`UPDATE %s SET snp_standard_id=$1, snp_type_id=$2, flange_type_code=$3, flange_type_title=$4 WHERE position_id=$5`,
 		PositionMainSnpTable)
-	sizeQuery := fmt.Sprintf(`UPDATE %s	SET dn=$1, pn_mpa=$2, pn_kg=$3, d4=$4, d3=$5, d2=$6, d1=$7, h=$8, s2=$9, s3=$10, another=$11
-		WHERE position_id=$12`, PositionSizeSnpTable)
+	sizeQuery := fmt.Sprintf(`UPDATE %s	SET dn=$1, dn_mm=$2, pn_mpa=$3, pn_kg=$4, d4=$5, d3=$6, d2=$7, d1=$8, h=$9, s2=$10, s3=$11, another=$12
+		WHERE position_id=$13`, PositionSizeSnpTable)
 	materialQuery := fmt.Sprintf(`UPDATE %s SET filler_id=$1, frame_id=$2, inner_ring_id=$3, outer_ring_id=$4, filler_code=$5, 
 		frame_code=$6, inner_ring_code=$7, outer_ring_code=$8, frame_title=$9, inner_ring_title=$10, outer_ring_title=$11 WHERE position_id=$12`, PositionMaterialSnpTable)
 	designQuery := fmt.Sprintf(`UPDATE %s SET has_jumper=$1, jumper_code=$2, jumper_width=$3, has_hole=$4, has_mounting=$5, mounting_code=$6, drawing=$7
@@ -447,7 +456,7 @@ func (r *PositionSnpRepo) Update(ctx context.Context, position *position_model.F
 		tx.Rollback()
 		return fmt.Errorf("failed to complete query main. error: %w", err)
 	}
-	_, err = tx.Exec(sizeQuery, size.Dn, size.Pn.Mpa, size.Pn.Kg, size.D4, size.D3, size.D2, size.D1, size.H, size.S2, size.S3, size.Another, position.Id)
+	_, err = tx.Exec(sizeQuery, size.Dn, size.DnMm, size.Pn.Mpa, size.Pn.Kg, size.D4, size.D3, size.D2, size.D1, size.H, size.S2, size.S3, size.Another, position.Id)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("failed to complete query size. error: %w", err)
@@ -481,8 +490,8 @@ func (r *PositionSnpRepo) Copy(ctx context.Context, targetPositionId string, pos
 		filler_code, frame_code, inner_ring_code, outer_ring_code FROM %s WHERE position_id=$3`,
 		PositionMaterialSnpTable, PositionMaterialSnpTable,
 	)
-	sizeQuery := fmt.Sprintf(`INSERT INTO %s (id, position_id, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another)
-		SELECT $1, $2, dn, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another FROM %s WHERE position_id=$3`,
+	sizeQuery := fmt.Sprintf(`INSERT INTO %s (id, position_id, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another)
+		SELECT $1, $2, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another FROM %s WHERE position_id=$3`,
 		PositionSizeSnpTable, PositionSizeSnpTable,
 	)
 	// надо что-то думать с чертежом (ели он есть)

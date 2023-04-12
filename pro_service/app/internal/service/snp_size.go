@@ -33,3 +33,24 @@ func (s *SnpSizeService) Create(ctx context.Context, size *snp_size_api.CreateSn
 	}
 	return nil
 }
+
+func (s *SnpSizeService) CreateSeveral(ctx context.Context, sizes *snp_size_api.CreateSeveralSnpSize) error {
+	if err := s.repo.CreateSeveral(ctx, sizes); err != nil {
+		return fmt.Errorf("failed to create snp sizes. error: %w", err)
+	}
+	return nil
+}
+
+func (s *SnpSizeService) Update(ctx context.Context, size *snp_size_api.UpdateSnpSize) error {
+	if err := s.repo.Update(ctx, size); err != nil {
+		return fmt.Errorf("failed to update snp size. error: %w", err)
+	}
+	return nil
+}
+
+func (s *SnpSizeService) Delete(ctx context.Context, size *snp_size_api.DeleteSnpSize) error {
+	if err := s.repo.Delete(ctx, size); err != nil {
+		return fmt.Errorf("failed to delete snp size. error: %w", err)
+	}
+	return nil
+}

@@ -152,7 +152,8 @@ func (h *AuthHandler) singUp(c *gin.Context) {
 		Name:  dto.Name,
 		Email: dto.Email,
 		//TODO
-		Link: fmt.Sprintf("%s/auth/confirm?code=%s", h.http.Host, code),
+		Link: fmt.Sprintf("%s/auth/confirm?code=%s", h.auth.Domain, code),
+		// Link: fmt.Sprintf("%s/auth/confirm?code=%s", h.http.Host, code),
 	}
 	_, err = h.emailApi.ConfirmUser(c, data)
 	if err != nil {

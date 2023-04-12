@@ -17,6 +17,7 @@ func NewZipService() *ZipService {
 	return &ZipService{}
 }
 
+// создание архива с файлом excel
 func (s *ZipService) Create(fileName string, excel *excelize.File) (*bytes.Buffer, error) {
 	buffer := new(bytes.Buffer)
 
@@ -38,6 +39,8 @@ func (s *ZipService) Create(fileName string, excel *excelize.File) (*bytes.Buffe
 	return buffer, nil
 }
 
+// создание архива с файлом excel и чертежами
+// ? вставить чертежи в существующий архив не получилось (размер архива увеличивался, но файл в нем не отображался. решить это не смог)
 func (s *ZipService) CreateWithDrawings(excelName string, excel *excelize.File, file bytes.Buffer, drawings []string) (*bytes.Buffer, error) {
 	buffer := new(bytes.Buffer)
 
@@ -91,6 +94,7 @@ func (s *ZipService) CreateWithDrawings(excelName string, excel *excelize.File, 
 	return buffer, nil
 }
 
+// вставка в существующий архив чертежей
 func (s *ZipService) InsertDrawings(file bytes.Buffer, drawings []string, buffer *bytes.Buffer) (*bytes.Buffer, error) {
 	reader := bytes.NewReader(file.Bytes())
 	zipReader, err := zip.NewReader(reader, reader.Size())
@@ -134,6 +138,7 @@ func (s *ZipService) InsertDrawings(file bytes.Buffer, drawings []string, buffer
 	return buffer, nil
 }
 
+// чтение из архива файлов
 func (s *ZipService) read(zf *zip.File) ([]byte, error) {
 	f, err := zf.Open()
 	if err != nil {

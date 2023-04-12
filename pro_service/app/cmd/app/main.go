@@ -29,7 +29,6 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/snp_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/temperature_api"
-	"github.com/Alexander272/sealur_proto/api/pro_api"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
@@ -147,7 +146,6 @@ func main() {
 	}
 
 	server := grpc.NewServer(opts...)
-	pro_api.RegisterProServiceServer(server, handlers)
 	flange_standard_api.RegisterFlangeStandardServiceServer(server, handlers.FlangeStandard)
 	flange_type_snp_api.RegisterFlangeTypeSnpServiceServer(server, handlers.FlangeTypeSnp)
 	material_api.RegisterMaterialServiceServer(server, handlers.Material)

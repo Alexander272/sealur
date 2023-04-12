@@ -2,18 +2,6 @@ package models
 
 import "github.com/lib/pq"
 
-type SNP struct {
-	Id       string `db:"id"`
-	TypeFlId string `db:"type_fl_id"`
-	TypePr   string `db:"type_pr"`
-	Fillers  string `db:"filler"`
-	Frame    string `db:"frame"`
-	Ir       string `db:"in_ring"`
-	Or       string `db:"ou_ring"`
-	Mounting string `db:"mounting"`
-	Graphite string `db:"graphite"`
-}
-
 type SnpDTO struct {
 	Id       string `db:"id"`
 	StandId  string `db:"stand_id"`
@@ -78,44 +66,46 @@ type SnpMaterialBlock struct {
 	OuterRingShortRus *string `db:"m3_short_rus"`
 }
 type SnpMaterialBlockNew struct {
-	Id                  string  `db:"id"`
-	PositionId          string  `db:"position_id"`
-	FillerId            string  `db:"filler_id"`
-	FillerBaseCode      string  `db:"base_code"`
-	FillerCode          string  `db:"code"`
-	FillerTitle         string  `db:"title"`
-	FillerDescription   string  `db:"description"`
-	FillerDesignation   string  `db:"designation"`
-	FrameId             string  `db:"frame_id"`
-	FrameTitle          string  `db:"frame_title"`
-	FrameBaseCode       string  `db:"frame_code"`
-	FrameCode           *string `db:"m1_code"`
-	FrameMaterialId     *string `db:"m1_material_id"`
-	FrameType           *string `db:"m1_type"`
-	FrameIsDefault      *bool   `db:"m1_is_default"`
-	FrameIsStandard     *bool   `db:"m1_is_standard"`
-	InnerRingId         string  `db:"inner_ring_id"`
-	InnerRingTitle      string  `db:"inner_ring_title"`
-	InnerRingBaseCode   string  `db:"inner_ring_code"`
-	InnerRingCode       *string `db:"m2_code"`
-	InnerRingMaterialId *string `db:"m2_material_id"`
-	InnerRingType       *string `db:"m2_type"`
-	InnerRingIsDefault  *bool   `db:"m2_is_default"`
-	InnerRingIsStandard *bool   `db:"m2_is_standard"`
-	OuterRingId         string  `db:"outer_ring_id"`
-	OuterRingTitle      string  `db:"outer_ring_title"`
-	OuterRingBaseCode   string  `db:"outer_ring_code"`
-	OuterRingCode       *string `db:"m3_code"`
-	OuterRingMaterialId *string `db:"m3_material_id"`
-	OuterRingType       *string `db:"m3_type"`
-	OuterRingIsDefault  *bool   `db:"m3_is_default"`
-	OuterRingIsStandard *bool   `db:"m3_is_standard"`
+	Id                  string         `db:"id"`
+	PositionId          string         `db:"position_id"`
+	FillerId            string         `db:"filler_id"`
+	FillerBaseCode      string         `db:"base_code"`
+	FillerCode          string         `db:"code"`
+	FillerTitle         string         `db:"title"`
+	FillerDescription   string         `db:"description"`
+	FillerDesignation   string         `db:"designation"`
+	FillerDisabledTypes pq.StringArray `db:"disabled_types"`
+	FrameId             string         `db:"frame_id"`
+	FrameTitle          string         `db:"frame_title"`
+	FrameBaseCode       string         `db:"frame_code"`
+	FrameCode           *string        `db:"m1_code"`
+	FrameMaterialId     *string        `db:"m1_material_id"`
+	FrameType           *string        `db:"m1_type"`
+	FrameIsDefault      *bool          `db:"m1_is_default"`
+	FrameIsStandard     *bool          `db:"m1_is_standard"`
+	InnerRingId         string         `db:"inner_ring_id"`
+	InnerRingTitle      string         `db:"inner_ring_title"`
+	InnerRingBaseCode   string         `db:"inner_ring_code"`
+	InnerRingCode       *string        `db:"m2_code"`
+	InnerRingMaterialId *string        `db:"m2_material_id"`
+	InnerRingType       *string        `db:"m2_type"`
+	InnerRingIsDefault  *bool          `db:"m2_is_default"`
+	InnerRingIsStandard *bool          `db:"m2_is_standard"`
+	OuterRingId         string         `db:"outer_ring_id"`
+	OuterRingTitle      string         `db:"outer_ring_title"`
+	OuterRingBaseCode   string         `db:"outer_ring_code"`
+	OuterRingCode       *string        `db:"m3_code"`
+	OuterRingMaterialId *string        `db:"m3_material_id"`
+	OuterRingType       *string        `db:"m3_type"`
+	OuterRingIsDefault  *bool          `db:"m3_is_default"`
+	OuterRingIsStandard *bool          `db:"m3_is_standard"`
 }
 
 type SnpSizeBlock struct {
 	Id         string `db:"id"`
 	PositionId string `db:"position_id"`
 	Dn         string `db:"dn"`
+	DnMm       string `db:"dn_mm"`
 	PnMpa      string `db:"pn_mpa"`
 	PnKg       string `db:"pn_kg"`
 	D4         string `db:"d4"`

@@ -42,16 +42,23 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 
 	order := api.Group("/orders", h.middleware.UserIdentity)
 	{
-		order.GET("/:id", handler.get)
+		// order.GET("/:id", handler.get)
 		order.GET("/current", handler.getCurrent)
 		order.GET("/all", handler.getAll)
-		order.GET("/open", handler.getOpen)
+		// order.GET("/open", handler.getOpen)
 		order.GET("/:id/заявка.zip", handler.getFile)
 		order.POST("/", handler.create)
 		order.POST("/copy", handler.copy)
 		order.POST("/save", handler.save)
-		order.POST("/finish", handler.finish)
-		order.POST("/manager", handler.setManager)
+		manager := order.Group("/", h.middleware.AccessForManager)
+		{
+			manager.GET("/:id", handler.get)
+			manager.GET("/open", handler.getOpen)
+			manager.POST("/finish", handler.finish)
+			manager.POST("/manager", handler.setManager)
+		}
+		// order.POST("/finish", handler.finish)
+		// order.POST("/manager", handler.setManager)
 	}
 }
 

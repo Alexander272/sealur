@@ -88,6 +88,7 @@ func unmarhal(conf *Config) error {
 }
 
 func setFromEnv(conf *Config) error {
+	//TODO envconfig тут лишний viper может сам читать env
 	if err := envconfig.Process("postgres", &conf.Postgres); err != nil {
 		return err
 	}

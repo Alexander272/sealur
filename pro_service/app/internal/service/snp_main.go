@@ -39,6 +39,7 @@ func NewSnpService(filler SnpFiller, material SnpMaterial, snpType SnpType, moun
 	}
 }
 
+// получение данных о выбранной прокладке и ее размеры (зависит от выбранного типа)
 func (s *SnpService) Get(ctx context.Context, req *snp_api.GetSnp) (snp *snp_api.Snp, err error) {
 	snpData, err := s.snpData.Get(ctx, &snp_data_api.GetSnpData{TypeId: req.SnpTypeId})
 	if err != nil {
@@ -58,6 +59,7 @@ func (s *SnpService) Get(ctx context.Context, req *snp_api.GetSnp) (snp *snp_api
 	return snp, nil
 }
 
+// получение общих данных (материалов, наполнителей, типах фланца, креплений) о типах прокладок (зависит от стандарта)
 func (s *SnpService) GetData(ctx context.Context, req *snp_api.GetSnpData) (snpData *snp_model.SnpData, err error) {
 	var mounting []*mounting_model.Mounting
 	snpData = &snp_model.SnpData{}
@@ -76,7 +78,6 @@ func (s *SnpService) GetData(ctx context.Context, req *snp_api.GetSnpData) (snpD
 		}
 
 	}
-
 	snpData.Mounting = mounting
 
 	snpTypes, err := s.snpType.GetWithFlange(ctx, req)

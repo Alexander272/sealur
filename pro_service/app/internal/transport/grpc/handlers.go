@@ -1,8 +1,6 @@
 package grpc
 
 import (
-	"context"
-
 	"github.com/Alexander272/sealur/pro_service/internal/config"
 	"github.com/Alexander272/sealur/pro_service/internal/service"
 	"github.com/Alexander272/sealur_proto/api/pro/flange_standard_api"
@@ -20,7 +18,6 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/snp_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/temperature_api"
-	"github.com/Alexander272/sealur_proto/api/pro_api"
 )
 
 type FlangeStandard interface {
@@ -72,7 +69,6 @@ type Position interface {
 type Handler struct {
 	service *service.Services
 	conf    config.ApiConfig
-	pro_api.UnimplementedProServiceServer
 
 	FlangeStandard
 	FlangeTypeSnp
@@ -114,6 +110,6 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 	}
 }
 
-func (h *Handler) Ping(ctx context.Context, req *pro_api.PingRequest) (*pro_api.PingResponse, error) {
-	return &pro_api.PingResponse{Ping: "pong"}, nil
-}
+// func (h *Handler) Ping(ctx context.Context, req *pro_api.PingRequest) (*pro_api.PingResponse, error) {
+// 	return &pro_api.PingResponse{Ping: "pong"}, nil
+// }
