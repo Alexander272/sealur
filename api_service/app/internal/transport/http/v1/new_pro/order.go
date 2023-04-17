@@ -71,13 +71,17 @@ func (h *OrderHandler) get(c *gin.Context) {
 
 	order, err := h.orderApi.Get(c, &order_api.GetOrder{Id: id})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		if strings.Contains(err.Error(), "order is not exist") {
+			models.NewErrorResponse(c, http.StatusBadRequest, "order is not exist", "Ошибка: Данный заказ не найден")
+			return
+		}
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 		return
 	}
 
 	user, err := h.userApi.Get(c, &user_api.GetUser{Id: order.Order.UserId})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 		return
 	}
 	order.User = user
@@ -132,7 +136,7 @@ func (h *OrderHandler) getOpen(c *gin.Context) {
 
 	orders, err := h.orderApi.GetOpen(c, &order_api.GetManagerOrders{ManagerId: userId.(string)})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 		return
 	}
 
@@ -243,7 +247,7 @@ func (h *OrderHandler) copy(c *gin.Context) {
 	_, err := h.orderApi.Copy(c, dto)
 	if err != nil {
 		if strings.Contains(err.Error(), "position exists") {
-			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Одна или несколько позиций дублируются")
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Ошибка: Одна или несколько позиций дублируются")
 			return
 		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка во время копирования")
@@ -310,7 +314,7 @@ func (h *OrderHandler) finish(c *gin.Context) {
 
 	_, err := h.orderApi.SetStatus(c, dto)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated status successfully"})
@@ -326,7 +330,7 @@ func (h *OrderHandler) setManager(c *gin.Context) {
 	//TODO отправлять email при изменении (? а надо ли это вообще)
 	_, err := h.orderApi.SetManager(c, dto)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated manager successfully"})

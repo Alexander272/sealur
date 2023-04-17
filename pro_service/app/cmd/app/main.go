@@ -15,6 +15,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/Alexander272/sealur_proto/api/pro/flange_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/flange_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/flange_type_snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
@@ -147,6 +148,7 @@ func main() {
 
 	server := grpc.NewServer(opts...)
 	flange_standard_api.RegisterFlangeStandardServiceServer(server, handlers.FlangeStandard)
+	flange_type_api.RegisterFlangeTypeServiceServer(server, handlers.FlangeType)
 	flange_type_snp_api.RegisterFlangeTypeSnpServiceServer(server, handlers.FlangeTypeSnp)
 	material_api.RegisterMaterialServiceServer(server, handlers.Material)
 	mounting_api.RegisterMountingServiceServer(server, handlers.Mounting)

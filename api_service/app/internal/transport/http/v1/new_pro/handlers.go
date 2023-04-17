@@ -6,11 +6,18 @@ import (
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/file_api"
+	"github.com/Alexander272/sealur_proto/api/pro/flange_type_api"
+	"github.com/Alexander272/sealur_proto/api/pro/material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_type_api"
+	"github.com/Alexander272/sealur_proto/api/pro/temperature_api"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -24,7 +31,14 @@ type Handler struct {
 	snpStandardApi snp_standard_api.SnpStandardServiceClient
 	orderApi       order_api.OrderServiceClient
 	positionApi    position_api.PositionServiceClient
-	materialApi    snp_material_api.SnpMaterialServiceClient
+	materialApi    material_api.MaterialServiceClient
+	snpMaterialApi snp_material_api.SnpMaterialServiceClient
+	snpFillerApi   snp_filler_api.SnpFillerServiceClient
+	temperatureApi temperature_api.TemperatureServiceClient
+	flangeTypeApi  flange_type_api.FlangeTypeServiceClient
+	snpTypeApi     snp_type_api.SnpTypeServiceClient
+	sizeApi        snp_size_api.SnpSizeServiceClient
+	snpDataApi     snp_data_api.SnpDataServiceClient
 
 	userApi  user_api.UserServiceClient
 	emailApi email_api.EmailServiceClient
@@ -94,7 +108,14 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.snpStandardApi = snp_standard_api.NewSnpStandardServiceClient(connect)
 	h.orderApi = order_api.NewOrderServiceClient(connect)
 	h.positionApi = position_api.NewPositionServiceClient(connect)
-	h.materialApi = snp_material_api.NewSnpMaterialServiceClient(connect)
+	h.materialApi = material_api.NewMaterialServiceClient(connect)
+	h.snpMaterialApi = snp_material_api.NewSnpMaterialServiceClient(connect)
+	h.snpFillerApi = snp_filler_api.NewSnpFillerServiceClient(connect)
+	h.temperatureApi = temperature_api.NewTemperatureServiceClient(connect)
+	h.flangeTypeApi = flange_type_api.NewFlangeTypeServiceClient(connect)
+	h.snpTypeApi = snp_type_api.NewSnpTypeServiceClient(connect)
+	h.sizeApi = snp_size_api.NewSnpSizeServiceClient(connect)
+	h.snpDataApi = snp_data_api.NewSnpDataServiceClient(connect)
 
 	pro := api.Group("/sealur-pro")
 	{
@@ -106,6 +127,13 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.initPositionRoutes(pro)
 	h.initConnectRoutes(pro)
 	h.initMaterialRoutes(pro)
+	h.initSnpMaterialRoutes(pro)
+	h.initSnpFillerRoutes(pro)
+	h.initTemperatureRoutes(pro)
+	h.initFlangeTypeRoutes(pro)
+	h.initSnpTypeRoutes(pro)
+	h.initSizeRoutes(pro)
+	h.initSnpDataRoutes(pro)
 }
 
 // func (h *Handler) ping(c *gin.Context) {

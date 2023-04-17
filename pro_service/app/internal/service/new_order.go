@@ -40,6 +40,9 @@ func NewOrderService_New(repo repository.OrderNew, position Position, zip Zip, f
 func (s *OrderServiceNew) Get(ctx context.Context, req *order_api.GetOrder) (*order_model.CurrentOrder, error) {
 	o, err := s.repo.Get(ctx, req)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("order is not exist")
+		}
 		return nil, fmt.Errorf("failed to get order. error: %w", err)
 	}
 

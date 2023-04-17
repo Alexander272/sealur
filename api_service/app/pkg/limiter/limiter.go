@@ -25,7 +25,7 @@ type rateLimiter struct {
 	ttl      time.Duration
 }
 
-// newRateLimiter creates an instance of the rateLimite
+// newRateLimiter creates an instance of the rateLimiter
 func newRateLimiter(rps, burst int, ttl time.Duration) *rateLimiter {
 	return &rateLimiter{
 		visitors: make(map[string]*visitor),

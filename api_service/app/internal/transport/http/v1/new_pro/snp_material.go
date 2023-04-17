@@ -4,47 +4,55 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
-	"github.com/Alexander272/sealur_proto/api/pro/material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/snp_material_api"
 	"github.com/gin-gonic/gin"
 )
 
-type MaterialHandler struct {
-	materialApi material_api.MaterialServiceClient
+type SnpMaterialHandler struct {
+	materialApi snp_material_api.SnpMaterialServiceClient
 }
 
-func NewMaterialHandler(materialApi material_api.MaterialServiceClient) *MaterialHandler {
-	return &MaterialHandler{
+func NewSnpMaterialHandler(materialApi snp_material_api.SnpMaterialServiceClient) *SnpMaterialHandler {
+	return &SnpMaterialHandler{
 		materialApi: materialApi,
 	}
 }
 
-func (h *Handler) initMaterialRoutes(api *gin.RouterGroup) {
-	handler := NewMaterialHandler(h.materialApi)
+func (h *Handler) initSnpMaterialRoutes(api *gin.RouterGroup) *gin.RouterGroup {
+	handler := NewSnpMaterialHandler(h.snpMaterialApi)
 
 	// TODO проверять авторизацию
-	materials := api.Group("/materials")
+	material := api.Group("/snp/materials")
 	{
-		materials.GET("/", handler.get)
+		material.GET("/", handler.get)
 		// TODO только для админа
-		materials.POST("/", handler.create)
-		materials.PUT("/:id", handler.update)
-		materials.DELETE("/:id", handler.delete)
+		material.POST("/", handler.create)
+		material.PUT("/:id", handler.update)
+		material.DELETE("/:id", handler.delete)
 	}
+
+	return material
 }
 
-func (h *MaterialHandler) get(c *gin.Context) {
-	materials, err := h.materialApi.GetAll(c, &material_api.GetAllMaterials{})
+func (h *SnpMaterialHandler) get(c *gin.Context) {
+	standardId := c.Query("standardId")
+	if standardId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "стандарт не задан")
+		return
+	}
+
+	materials, err := h.materialApi.Get(c, &snp_material_api.GetSnpMaterial{StandardId: standardId})
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Не удалось получить материалы")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Не удалось получить материалы для стандарта")
 		return
 	}
 	c.JSON(http.StatusOK, models.DataResponse{Data: materials})
 }
 
-func (h *MaterialHandler) create(c *gin.Context) {
-	var dto *material_api.CreateMaterial
+func (h *SnpMaterialHandler) create(c *gin.Context) {
+	var dto *snp_material_api.CreateSnpMaterial
 	if err := c.BindJSON(&dto); err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Отправлены некорректные данные")
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "отправлены некорректные данные")
 		return
 	}
 
@@ -56,14 +64,14 @@ func (h *MaterialHandler) create(c *gin.Context) {
 	c.JSON(http.StatusCreated, models.IdResponse{Message: "Материал успешно создан"})
 }
 
-func (h *MaterialHandler) update(c *gin.Context) {
+func (h *SnpMaterialHandler) update(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty id param")
 		return
 	}
 
-	var dto *material_api.UpdateMaterial
+	var dto *snp_material_api.UpdateSnpMaterial
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "отправлены некорректные данные")
 		return
@@ -78,14 +86,14 @@ func (h *MaterialHandler) update(c *gin.Context) {
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Материал успешно обновлен"})
 }
 
-func (h *MaterialHandler) delete(c *gin.Context) {
+func (h *SnpMaterialHandler) delete(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty id param")
 		return
 	}
 
-	_, err := h.materialApi.Delete(c, &material_api.DeleteMaterial{Id: id})
+	_, err := h.materialApi.Delete(c, &snp_material_api.DeleteSnpMaterial{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Не удалось удалить материал")
 		return

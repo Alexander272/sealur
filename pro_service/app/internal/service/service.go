@@ -8,9 +8,11 @@ import (
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/Alexander272/sealur_proto/api/pro/flange_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/flange_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/flange_type_snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_standard_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_snp_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
@@ -153,6 +155,13 @@ type Temperature interface {
 	Delete(context.Context, *temperature_api.DeleteTemperature) error
 }
 
+type FlangeType interface {
+	Get(context.Context, *flange_type_api.GetFlangeType) ([]*flange_type_model.FlangeType, error)
+	Create(context.Context, *flange_type_api.CreateFlangeType) error
+	Update(context.Context, *flange_type_api.UpdateFlangeType) error
+	Delete(context.Context, *flange_type_api.DeleteFlangeType) error
+}
+
 type FlangeTypeSnp interface {
 	Get(context.Context, *flange_type_snp_api.GetFlangeTypeSnp) ([]*flange_type_snp_model.FlangeTypeSnp, error)
 	Create(context.Context, *flange_type_snp_api.CreateFlangeTypeSnp) error
@@ -269,6 +278,7 @@ type Services struct {
 	Mounting
 	Standard
 	Temperature
+	FlangeType
 	FlangeTypeSnp
 	SnpFiller
 	SnpStandard
@@ -315,6 +325,7 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		Mounting:       mounting,
 		Standard:       standard,
 		Temperature:    NewTemperatureService(repos.Temperature),
+		FlangeType:     NewFlangeTypeService(repos.FlangeType),
 		FlangeTypeSnp:  NewFlangeTypeSnpService(repos.FlangeTypeSnp),
 		SnpFiller:      filler,
 		SnpStandard:    snpStandard,

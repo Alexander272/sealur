@@ -4,6 +4,7 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/config"
 	"github.com/Alexander272/sealur/pro_service/internal/service"
 	"github.com/Alexander272/sealur_proto/api/pro/flange_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/flange_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/flange_type_snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
@@ -22,6 +23,9 @@ import (
 
 type FlangeStandard interface {
 	flange_standard_api.FlangeStandardServiceServer
+}
+type FlangeType interface {
+	flange_type_api.FlangeTypeServiceServer
 }
 type FlangeTypeSnp interface {
 	flange_type_snp_api.FlangeTypeSnpServiceServer
@@ -71,6 +75,7 @@ type Handler struct {
 	conf    config.ApiConfig
 
 	FlangeStandard
+	FlangeType
 	FlangeTypeSnp
 	Material
 	Mounting
@@ -93,6 +98,7 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		conf:    conf,
 
 		FlangeStandard: NewFlangeStandardHandlers(service.FlangeStandard),
+		FlangeType:     NewFlangeTypeHandlers(service.FlangeType),
 		FlangeTypeSnp:  NewFlangeTypeSnpHandlers(service.FlangeTypeSnp),
 		Material:       NewMaterialHandlers(service.Material),
 		Mounting:       NewMountingHandlers(service.Mounting),

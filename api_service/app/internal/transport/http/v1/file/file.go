@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
@@ -113,6 +114,22 @@ func (h *Handler) getDrawing(c *gin.Context) {
 	c.Data(http.StatusOK, meta.Type, imageData.Bytes())
 }
 
+var disabledFileTypes = []string{
+	"application/octet-stream",
+	"application/x-ms-dos-executable",
+	"magnus-internal/cgi",
+	"text/javascript",
+	"application/javascript",
+	"application/vnd.microsoft.portable-executable",
+	"application/jar",
+	"application/x-iso9660-image",
+	"application/x-sh",
+}
+
+var disabledExtension = []string{
+	".bat", ".ini", ".msi", ".sys", ".reg",
+}
+
 // @Summary Create Drawing
 // @Tags Files -> drawing
 // @Description создание чертежа
@@ -140,6 +157,19 @@ func (h *Handler) createDrawing(c *gin.Context) {
 	}
 
 	fileType := file.Header.Get("Content-Type")
+
+	for _, v := range disabledFileTypes {
+		if v == fileType {
+			models.NewErrorResponse(c, http.StatusBadRequest, "forbidden file", "forbidden file")
+			return
+		}
+	}
+	for _, v := range disabledExtension {
+		if strings.Contains(file.Filename, v) {
+			models.NewErrorResponse(c, http.StatusBadRequest, "forbidden file", "forbidden file")
+			return
+		}
+	}
 
 	f, err := file.Open()
 	if err != nil {

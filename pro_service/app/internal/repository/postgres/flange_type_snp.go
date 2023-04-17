@@ -12,16 +12,15 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type FlangeTypeRepo struct {
+type FlangeTypeSnpRepo struct {
 	db *sqlx.DB
 }
 
-func NewFlangeTypeRepo(db *sqlx.DB) *FlangeTypeRepo {
-	return &FlangeTypeRepo{db: db}
+func NewFlangeTypeSnpRepo(db *sqlx.DB) *FlangeTypeSnpRepo {
+	return &FlangeTypeSnpRepo{db: db}
 }
 
-// добавить описание для фланцев
-func (r *FlangeTypeRepo) Get(ctx context.Context, flange *flange_type_snp_api.GetFlangeTypeSnp) (flanges []*flange_type_snp_model.FlangeTypeSnp, err error) {
+func (r *FlangeTypeSnpRepo) Get(ctx context.Context, flange *flange_type_snp_api.GetFlangeTypeSnp) (flanges []*flange_type_snp_model.FlangeTypeSnp, err error) {
 	var data []models.FlangeTypeSnp
 	query := fmt.Sprintf("SELECT id, title, code FROM %s WHERE standard_id=$1", FlangeTypeSNPTable)
 
@@ -40,7 +39,7 @@ func (r *FlangeTypeRepo) Get(ctx context.Context, flange *flange_type_snp_api.Ge
 	return flanges, nil
 }
 
-func (r *FlangeTypeRepo) Create(ctx context.Context, flange *flange_type_snp_api.CreateFlangeTypeSnp) error {
+func (r *FlangeTypeSnpRepo) Create(ctx context.Context, flange *flange_type_snp_api.CreateFlangeTypeSnp) error {
 	query := fmt.Sprintf("INSERT INTO %s (id, title, code, standard_id) VALUES ($1, $2, $3, $4)", FlangeTypeSNPTable)
 	id := uuid.New()
 
@@ -51,7 +50,7 @@ func (r *FlangeTypeRepo) Create(ctx context.Context, flange *flange_type_snp_api
 	return nil
 }
 
-func (r *FlangeTypeRepo) CreateSeveral(ctx context.Context, flanges *flange_type_snp_api.CreateSeveralFlangeTypeSnp) error {
+func (r *FlangeTypeSnpRepo) CreateSeveral(ctx context.Context, flanges *flange_type_snp_api.CreateSeveralFlangeTypeSnp) error {
 	query := fmt.Sprintf("INSERT INTO %s (id, title, code, standard_id) VALUES ", FlangeTypeSNPTable)
 
 	args := make([]interface{}, 0)
@@ -72,7 +71,7 @@ func (r *FlangeTypeRepo) CreateSeveral(ctx context.Context, flanges *flange_type
 	return nil
 }
 
-func (r *FlangeTypeRepo) Update(ctx context.Context, flange *flange_type_snp_api.UpdateFlangeTypeSnp) error {
+func (r *FlangeTypeSnpRepo) Update(ctx context.Context, flange *flange_type_snp_api.UpdateFlangeTypeSnp) error {
 	query := fmt.Sprintf("UPDATE %s	SET title=$1, code=$2, standard_id=$3 WHERE id=$4", FlangeTypeSNPTable)
 
 	_, err := r.db.Exec(query, flange.Title, flange.Code, flange.StandardId, flange.Id)
@@ -82,7 +81,7 @@ func (r *FlangeTypeRepo) Update(ctx context.Context, flange *flange_type_snp_api
 	return nil
 }
 
-func (r *FlangeTypeRepo) Delete(ctx context.Context, flange *flange_type_snp_api.DeleteFlangeTypeSnp) error {
+func (r *FlangeTypeSnpRepo) Delete(ctx context.Context, flange *flange_type_snp_api.DeleteFlangeTypeSnp) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", FlangeTypeSNPTable)
 
 	if _, err := r.db.Exec(query, flange.Id); err != nil {
