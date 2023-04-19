@@ -51,7 +51,7 @@ func (h *PositionHandler) create(c *gin.Context) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Такая позиция уже добавлена в заявку")
 			return
 		}
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 		return
 	}
 

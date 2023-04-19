@@ -20,16 +20,23 @@ func (m *Middleware) UserIdentity(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error(), "user is not authorized")
 		return
 	}
+	if token == "" {
+		models.NewErrorResponse(c, http.StatusUnauthorized, "empty token", "user is not authorized")
+		return
+	}
 
 	user, err := m.services.Session.TokenParse(token)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error(), "user is not authorized")
+		//TODO проверить работоспособность
+		c.SetCookie(m.CookieName, token, -1, "/", m.auth.Domain, m.auth.Secure, true)
+		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error()+" token: "+token, "user is not authorized")
 		return
 	}
 
 	isRefresh, err := m.services.Session.CheckSession(c, user, token)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error(), "user is not authorized")
+		c.SetCookie(m.CookieName, token, -1, "/", m.auth.Domain, m.auth.Secure, true)
+		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error()+" token: "+token+" userId: "+user.Id, "user is not authorized")
 		return
 	}
 

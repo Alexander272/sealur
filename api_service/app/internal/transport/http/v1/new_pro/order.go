@@ -327,11 +327,31 @@ func (h *OrderHandler) setManager(c *gin.Context) {
 		return
 	}
 
-	//TODO отправлять email при изменении (? а надо ли это вообще)
-	_, err := h.orderApi.SetManager(c, dto)
+	user, err := h.userApi.Get(c, &user_api.GetUser{Id: dto.UserId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 		return
 	}
+
+	manager, err := h.userApi.Get(c, &user_api.GetUser{Id: dto.OldManagerId})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		return
+	}
+
+	// отправлять email при изменении (? а надо ли это вообще)
+	//? если отдавать новому менеджеру фио того кто переслал и данные о заказчике, то мне надо сделать еще два запроса для получения этих данных
+	_, err = h.orderApi.SetManager(c, dto)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		return
+	}
+
+	_, err = h.emailApi.SendRedirect(c, &email_api.RedirectData{Email: dto.ManagerEmail, OrderId: dto.OrderId, User: user, Manager: manager})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Не удалось отправить email: "+err.Error())
+		return
+	}
+
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated manager successfully"})
 }

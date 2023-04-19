@@ -16,6 +16,7 @@ type Interview interface {
 type Order interface {
 	SendOrder(*email_api.OrderData, *bytes.Buffer) error
 	SendNotification(context.Context, *email_api.NotificationData) error
+	SendRedirect(context.Context, *email_api.RedirectData) error
 }
 
 type User interface {

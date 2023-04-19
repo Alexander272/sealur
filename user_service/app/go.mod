@@ -3,11 +3,11 @@ module github.com/Alexander272/sealur/user_service
 go 1.19
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230410095306-b8f44eb8af29
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230417063045-9e96ee09ba4c
 	github.com/google/uuid v1.3.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/lib/pq v1.10.7
+	github.com/lib/pq v1.10.8
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.15.0
 	google.golang.org/grpc v1.54.0
@@ -28,7 +28,7 @@ require (
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
-	google.golang.org/genproto v0.0.0-20230403163135-c38d8f061ccd // indirect
+	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

@@ -19,6 +19,17 @@ type OrderTemplate struct {
 	Link     string
 }
 
+type RedirectOrderTemplate struct {
+	Manager  string
+	Name     string
+	Position string
+	Company  string
+	Address  string
+	Email    string
+	Phone    string
+	Link     string
+}
+
 type ConfirmTemplate struct {
 	Name         string
 	Organization string

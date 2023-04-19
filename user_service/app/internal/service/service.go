@@ -42,10 +42,15 @@ type IP interface {
 	// Add(ctx context.Context, ip *user_api.AddIpRequest) error
 }
 
+type Region interface {
+	GetManagerByRegion(ctx context.Context, region string) (*user_model.User, error)
+}
+
 type Services struct {
 	User
 	Role
 	IP
+	Region
 }
 
 type Deps struct {
@@ -56,11 +61,13 @@ type Deps struct {
 
 func NewServices(deps Deps) *Services {
 	role := NewRoleService(deps.Repos.Role)
-	user := NewUserService(deps.Repos.Users, deps.Hasher, deps.Repos.Role)
+	region := NewRegionService(deps.Repos.Region)
+	user := NewUserService(deps.Repos.Users, deps.Hasher, role, region)
 
 	return &Services{
-		Role: role,
-		User: user,
+		Role:   role,
+		User:   user,
+		Region: region,
 		// User: NewUserService(deps.Repos.Users, deps.Repos.Role, deps.Repos.IP, deps.Hasher, deps.Email),
 		// Role: NewRoleService(deps.Repos.Role),
 		// IP:   NewIpService(deps.Repos.IP),

@@ -1,14 +1,15 @@
 package constants
 
 const (
-	ConfirmTemplate    = "confirm.html"
-	NewConfirmTemplate = "new_confirm.html"
-	JoinTemplate       = "join.html"
-	RejectTemplate     = "reject.html"
-	OrderTemplate      = "order.html"
-	OrderNewTemplate   = "order_new.html"
-	InterviewTemplate  = "interview.html"
-	BlockedTemplate    = "blocked.html"
-	FeedbackTemplate   = "connect.html"
-	RecoveryTemplate   = "recovery.html"
+	ConfirmTemplate       = "confirm.html"
+	NewConfirmTemplate    = "new_confirm.html"
+	JoinTemplate          = "join.html"
+	RejectTemplate        = "reject.html"
+	OrderTemplate         = "order.html"
+	OrderNewTemplate      = "order_new.html"
+	RedirectOrderTemplate = "redirect_order.html"
+	InterviewTemplate     = "interview.html"
+	BlockedTemplate       = "blocked.html"
+	FeedbackTemplate      = "connect.html"
+	RecoveryTemplate      = "recovery.html"
 )

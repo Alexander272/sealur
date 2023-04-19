@@ -67,7 +67,7 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 
 	limit, err := h.services.Limit.Get(c, c.ClientIP())
 	if err != nil && !errors.Is(err, models.ErrClientIPNotFound) {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error()+" user email: "+dto.Email, "Произошла ошибка")
 		return
 	}
 	if errors.Is(err, models.ErrClientIPNotFound) {
@@ -151,9 +151,7 @@ func (h *AuthHandler) singUp(c *gin.Context) {
 	data := &email_api.ConfirmUserRequest{
 		Name:  dto.Name,
 		Email: dto.Email,
-		//TODO
-		Link: fmt.Sprintf("%s/auth/confirm?code=%s", h.auth.Domain, code),
-		// Link: fmt.Sprintf("%s/auth/confirm?code=%s", h.http.Host, code),
+		Link:  fmt.Sprintf("%s/auth/confirm?code=%s", h.http.Domain, code),
 	}
 	_, err = h.emailApi.ConfirmUser(c, data)
 	if err != nil {
@@ -182,7 +180,7 @@ func (h *AuthHandler) signOut(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie(h.cookieName, "", 0, "/", c.Request.Host, h.auth.Secure, true)
+	c.SetCookie(h.cookieName, "", -1, "/", c.Request.Host, h.auth.Secure, true)
 	c.JSON(http.StatusNoContent, models.IdResponse{Message: "Sign-out completed successfully"})
 }
 
@@ -192,16 +190,22 @@ func (h *AuthHandler) refresh(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error(), "user is not authorized")
 		return
 	}
+	if token == "" {
+		models.NewErrorResponse(c, http.StatusUnauthorized, "empty token", "user is not authorized")
+		return
+	}
 
 	user, err := h.services.Session.TokenParse(token)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error(), "user is not authorized")
+		c.SetCookie(h.cookieName, token, -1, "/", c.Request.Host, h.auth.Secure, true)
+		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error()+" token: "+token, "user is not authorized")
 		return
 	}
 
 	_, err = h.services.CheckSession(c, user, token)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error(), "user is not authorized")
+		c.SetCookie(h.cookieName, token, -1, "/", c.Request.Host, h.auth.Secure, true)
+		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error()+" token: "+token+" userId: "+user.Id, "user is not authorized")
 		return
 	}
 

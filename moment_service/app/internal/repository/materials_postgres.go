@@ -80,9 +80,9 @@ func (r *MaterialsRepo) GetAllData(ctx context.Context, req *material_api.GetMat
 }
 
 func (r *MaterialsRepo) CreateMaterial(ctx context.Context, material *material_api.CreateMaterialRequest) (id string, err error) {
-	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", MaterialsTable)
+	query := fmt.Sprintf("INSERT INTO %s (title, type) VALUES ($1, $2) RETURNING id", MaterialsTable)
 
-	row := r.db.QueryRow(query, material.Title)
+	row := r.db.QueryRow(query, material.Title, material.Type.String())
 	if row.Err() != nil {
 		return "", fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -97,7 +97,9 @@ func (r *MaterialsRepo) CreateMaterial(ctx context.Context, material *material_a
 
 func (r *MaterialsRepo) UpdateMaterial(ctx context.Context, material *material_api.UpdateMaterialRequest) error {
 	query := fmt.Sprintf("UPDATE %s SET title=$1 WHERE id=$2", MaterialsTable)
+	// query := fmt.Sprintf("UPDATE %s SET title=$1, type=$2 WHERE id=$3", MaterialsTable)
 
+	// TODO добавить material.Type.String(),
 	_, err := r.db.Exec(query, material.Title, material.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)

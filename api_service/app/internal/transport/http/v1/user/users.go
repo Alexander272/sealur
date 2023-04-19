@@ -15,6 +15,7 @@ import (
 type UserHandler struct {
 	userApi    user_api.UserServiceClient
 	emailApi   email_api.EmailServiceClient
+	http       config.HttpConfig
 	auth       config.AuthConfig
 	services   *service.Services
 	cookieName string
@@ -22,7 +23,7 @@ type UserHandler struct {
 
 func NewUserHandler(
 	userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient,
-	auth config.AuthConfig,
+	http config.HttpConfig, auth config.AuthConfig,
 	services *service.Services,
 	cookieName string,
 ) *UserHandler {
@@ -36,7 +37,7 @@ func NewUserHandler(
 }
 
 func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
-	handler := NewUserHandler(h.userApi, h.emailApi, h.auth, h.services, h.cookieName)
+	handler := NewUserHandler(h.userApi, h.emailApi, h.http, h.auth, h.services, h.cookieName)
 
 	users := api.Group("/users")
 	{
@@ -114,7 +115,7 @@ func (h *UserHandler) setManager(c *gin.Context) {
 
 	_, err := h.userApi.SetManager(c, dto)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated manager successfully"})
@@ -142,9 +143,7 @@ func (h *UserHandler) recoveryPassword(c *gin.Context) {
 
 	data := &email_api.RecoveryPassword{
 		Email: user.Email,
-		// TODO использовать тут хост как-то не особо правильно выглядит
-		Link: fmt.Sprintf("%s/auth/recovery/%s", h.auth.Domain, code),
-		// Link: fmt.Sprintf("%s/auth/recovery/%s", "http://pro.sealur.ru", code),
+		Link:  fmt.Sprintf("%s/auth/recovery/%s", h.http.Domain, code),
 	}
 
 	_, err = h.emailApi.Recovery(c, data)

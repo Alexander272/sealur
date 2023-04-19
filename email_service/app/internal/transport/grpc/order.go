@@ -53,3 +53,10 @@ func (h *Handler) SendNotification(ctx context.Context, data *email_api.Notifica
 	}
 	return &email_api.SuccessResponse{Success: true}, nil
 }
+
+func (h *Handler) SendRedirect(ctx context.Context, data *email_api.RedirectData) (*email_api.SuccessResponse, error) {
+	if err := h.service.Order.SendRedirect(ctx, data); err != nil {
+		return nil, fmt.Errorf("failed to send redirect order. error: %w", err)
+	}
+	return &email_api.SuccessResponse{Success: true}, nil
+}

@@ -219,21 +219,28 @@ func (c *Calc) Parse() (*calc_api.DevCoolingRequest, error) {
 	return result, nil
 }
 
-func (m *MaterialData) Parse() (*dev_cooling_model.MaterialData, error) {
-	e, err := strconv.ParseFloat(m.Epsilon, 64)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse material epsilon. error: %w", err)
+func (m *MaterialData) Parse() (mat *dev_cooling_model.MaterialData, err error) {
+	var e, sAt20, s float64
+	if m.Epsilon != "" {
+		e, err = strconv.ParseFloat(m.Epsilon, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse material epsilon. error: %w", err)
+		}
 	}
-	sAt20, err := strconv.ParseFloat(m.SigmaAt20, 64)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse material sigma at 20. error: %w", err)
+	if m.SigmaAt20 != "" {
+		sAt20, err = strconv.ParseFloat(m.SigmaAt20, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse material sigma at 20. error: %w", err)
+		}
 	}
-	s, err := strconv.ParseFloat(m.Sigma, 64)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse material sigma. error: %w", err)
+	if m.Sigma != "" {
+		s, err = strconv.ParseFloat(m.Sigma, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse material sigma. error: %w", err)
+		}
 	}
 
-	mat := &dev_cooling_model.MaterialData{
+	mat = &dev_cooling_model.MaterialData{
 		Title:     m.Title,
 		Epsilon:   e,
 		SigmaAt20: sAt20,

@@ -32,7 +32,8 @@ func (s *SMTPSender) Send(input email.SendEmailInput) error {
 	server.Port = s.port
 	server.Username = s.from
 	server.Password = s.pass
-	server.Encryption = mail.EncryptionSTARTTLS
+	server.Encryption = mail.EncryptionNone
+	server.Helo = "pro.sealur.ru"
 
 	smtpClient, err := server.Connect()
 	if err != nil {

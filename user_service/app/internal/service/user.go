@@ -10,7 +10,6 @@ import (
 	"github.com/Alexander272/sealur/user_service/internal/models"
 	"github.com/Alexander272/sealur/user_service/internal/repo"
 	"github.com/Alexander272/sealur/user_service/pkg/hasher"
-	"github.com/Alexander272/sealur/user_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/user/models/user_model"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	"github.com/google/uuid"
@@ -20,13 +19,15 @@ type UserService struct {
 	repo   repo.Users
 	hasher hasher.PasswordHasher
 	role   Role
+	region Region
 }
 
-func NewUserService(repo repo.Users, hasher hasher.PasswordHasher, role Role) *UserService {
+func NewUserService(repo repo.Users, hasher hasher.PasswordHasher, role Role, region Region) *UserService {
 	return &UserService{
 		repo:   repo,
 		hasher: hasher,
 		role:   role,
+		region: region,
 	}
 }
 
@@ -71,15 +72,13 @@ func (s *UserService) GetManager(ctx context.Context, req *user_api.GetUser) (ma
 		return nil, fmt.Errorf("failed to get user. error: %w", err)
 	}
 
-	m := &user_model.User{}
-	if user.ManagerId != uuid.Nil.String() {
-		m, err = s.repo.Get(ctx, &user_api.GetUser{Id: user.ManagerId})
-		if err != nil {
-			return nil, fmt.Errorf("failed to get manager. error: %w", err)
-		}
-	} else {
-		logger.Debug("not implemented")
-		// TODO получить id менеджера по региону пользователя
+	if user.ManagerId == uuid.Nil.String() {
+		return nil, fmt.Errorf("manager not assigned")
+	}
+
+	m, err := s.repo.Get(ctx, &user_api.GetUser{Id: user.ManagerId})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get manager. error: %w", err)
 	}
 
 	manager = &user_api.Manager{
@@ -122,6 +121,14 @@ func (s *UserService) Create(ctx context.Context, user *user_api.CreateUser) (st
 		return "", fmt.Errorf("failed to hash password. error: %w", err)
 	}
 	user.Password = fmt.Sprintf("%s.%s", pass, salt)
+
+	if user.ManagerId == "" || user.ManagerId == uuid.Nil.String() {
+		manager, err := s.region.GetManagerByRegion(ctx, user.Region)
+		if err != nil {
+			return "", err
+		}
+		user.ManagerId = manager.Id
+	}
 
 	id, err := s.repo.Create(ctx, user, role.Id)
 	if err != nil {

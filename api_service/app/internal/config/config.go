@@ -43,6 +43,7 @@ type (
 		ReadTimeout        time.Duration `mapstructure:"readTimeout"`
 		WriteTimeout       time.Duration `mapstructure:"writeTimeout"`
 		MaxHeaderMegabytes int           `mapstructure:"maxHeaderBytes"`
+		Domain             string        `mapstructure:"domain"`
 	}
 
 	LimiterConfig struct {

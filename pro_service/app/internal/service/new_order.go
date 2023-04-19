@@ -176,9 +176,22 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 				drawings = append(drawings, fmt.Sprintf("%d_%s", snpCount, parts[len(parts)-1]))
 			}
 
+			var d4, d1 interface{}
+
+			if snpData.Size.D4 != "" {
+				d4 = snpData.Size.D4
+			} else {
+				d4 = nil
+			}
+			if snpData.Size.D1 != "" {
+				d1 = snpData.Size.D1
+			} else {
+				d1 = nil
+			}
+
 			snpLine := []interface{}{
 				snpCount, p.Title,
-				snpData.Size.D4, snpData.Size.D3, snpData.Size.D2, snpData.Size.D1, snpThickness,
+				d4, snpData.Size.D3, snpData.Size.D2, d1, snpThickness,
 				snpData.Material.InnerRingCode, snpData.Material.FrameCode, snpData.Material.FillerCode, snpData.Material.OuterRingCode,
 				jumper, hole, mounting, drawing,
 			}

@@ -30,6 +30,10 @@ type Role interface {
 	GetDefault(context.Context) (*role_model.Role, error)
 }
 
+type Region interface {
+	GetManagerByRegion(ctx context.Context, region string) (*user_model.User, error)
+}
+
 // type Role interface {
 // 	Get(context.Context, *user_api.GetRoles) ([]models.Role, error)
 // 	GetAll(context.Context, *user_api.GetAllRoles) ([]models.Role, error)
@@ -46,13 +50,15 @@ type Role interface {
 type Repo struct {
 	Users
 	Role
+	Region
 	// IP
 }
 
 func NewRepo(db *sqlx.DB, conf *config.Config) *Repo {
 	return &Repo{
-		Users: postgres.NewUserRepo(db),
-		Role:  postgres.NewRoleRepo(db),
+		Users:  postgres.NewUserRepo(db),
+		Role:   postgres.NewRoleRepo(db),
+		Region: postgres.NewRegionRepo(db),
 		// Users: postgres.NewUserRepo(db),
 		// Role:  NewRoleRepo(db, RolesTable),
 		// IP:    NewIpRepo(db, IpTable, conf.IP),

@@ -97,6 +97,30 @@ func (s *OrderService) SendNotification(ctx context.Context, req *email_api.Noti
 	return s.sender.Send(input)
 }
 
+func (s *OrderService) SendRedirect(ctx context.Context, req *email_api.RedirectData) error {
+	input := email.SendEmailInput{
+		Subject: s.conf.OrderSubject,
+		To:      []string{req.Email},
+	}
+
+	data := models.RedirectOrderTemplate{
+		Manager:  req.Manager.Name,
+		Name:     req.User.Name,
+		Position: req.User.Position,
+		Company:  req.User.Company,
+		Address:  req.User.Address,
+		Email:    req.User.Email,
+		Phone:    req.User.Phone,
+		Link:     fmt.Sprintf("%s/%s?action=save", s.conf.OrderLink, req.OrderId),
+	}
+
+	if err := input.GenerateBodyFromHTML(constants.RedirectOrderTemplate, data); err != nil {
+		return err
+	}
+
+	return s.sender.Send(input)
+}
+
 func (s *OrderService) readZipFile(zf *zip.File) ([]byte, error) {
 	f, err := zf.Open()
 	if err != nil {

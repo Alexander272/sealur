@@ -83,13 +83,18 @@ func (f *Calc) Parse() (ex *calc_api.ExpressCircleRequest, err error) {
 }
 
 func (m *MaterialData) Parse() (mat *express_circle_model.MaterialData, err error) {
-	eAt20, err := strconv.ParseFloat(m.EpsilonAt20, 64)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse epsilon at 20. error: %w", err)
+	var eAt20, sAt20 float64
+	if m.EpsilonAt20 != "" {
+		eAt20, err = strconv.ParseFloat(m.EpsilonAt20, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse epsilon at 20. error: %w", err)
+		}
 	}
-	sAt20, err := strconv.ParseFloat(m.SigmaAt20, 64)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse sigma at 20. error: %w", err)
+	if m.SigmaAt20 != "" {
+		sAt20, err = strconv.ParseFloat(m.SigmaAt20, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse sigma at 20. error: %w", err)
+		}
 	}
 
 	mat = &express_circle_model.MaterialData{
