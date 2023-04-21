@@ -44,6 +44,7 @@ type (
 		WriteTimeout       time.Duration `mapstructure:"writeTimeout"`
 		MaxHeaderMegabytes int           `mapstructure:"maxHeaderBytes"`
 		Domain             string        `mapstructure:"domain"`
+		Link               string        `mapstructure:"link"`
 	}
 
 	LimiterConfig struct {

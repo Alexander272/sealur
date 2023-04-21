@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Alexander272/sealur/user_service/internal/models"
+	"github.com/Alexander272/sealur/user_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/user/models/user_model"
 	"github.com/jmoiron/sqlx"
 )
@@ -29,6 +30,12 @@ func (r *RegionRepo) GetManagerByRegion(ctx context.Context, region string) (*us
 
 	if err := r.db.Get(&data, query, region); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	query = fmt.Sprintf(`UPDATE %s SET count_query=count_query+1 WHERE title=$1`, RegionTable)
+	_, err := r.db.Exec(query, region)
+	if err != nil {
+		logger.Error("failed to update count_query. error: %w", err)
 	}
 
 	user := &user_model.User{

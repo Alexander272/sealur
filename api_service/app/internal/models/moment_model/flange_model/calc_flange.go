@@ -28,6 +28,7 @@ type CalcFlange struct {
 	IsUseWasher    bool           `json:"isUseWasher"`
 	Washer         WasherData     `json:"washer"`
 	IsNeedFormulas bool           `json:"isNeedFormulas"`
+	Friction       string         `json:"friction"`
 }
 
 type GasketFullData struct {
@@ -139,6 +140,13 @@ func (f *CalcFlange) NewFlange() (flange *calc_api.FlangeRequest, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse temp. error: %w", err)
 	}
+	friction := 0.3
+	if f.Friction != "" {
+		friction, err = strconv.ParseFloat(f.Friction, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse friction. error: %w", err)
+		}
+	}
 
 	flanges := calc_api.FlangeRequest_Flanges_value[f.Flanges]
 	typeB := calc_api.FlangeRequest_Type_value[f.TypeB]
@@ -205,6 +213,7 @@ func (f *CalcFlange) NewFlange() (flange *calc_api.FlangeRequest, err error) {
 		Gasket:         gasket,
 		Washer:         washer,
 		Embed:          embed,
+		Friction:       friction,
 	}
 	return flange, nil
 }

@@ -23,6 +23,7 @@ type Calc struct {
 	Bolts          BoltsData        `json:"bolts"`
 	Gasket         GasketFullData   `json:"gasket"`
 	IsNeedFormulas bool             `json:"isNeedFormulas"`
+	Friction       string           `json:"friction"`
 }
 
 type GasketFullData struct {
@@ -96,6 +97,13 @@ func (f *Calc) Parse() (ex *calc_api.GasCoolingRequest, err error) {
 			return nil, fmt.Errorf("failed to parse test pressure. error: %w", err)
 		}
 	}
+	friction := 0.3
+	if f.Friction != "" {
+		friction, err = strconv.ParseFloat(f.Friction, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse friction. error: %w", err)
+		}
+	}
 
 	typeBolt := gas_cooling_model.MainData_TypeBolt_value[f.TypeBolt]
 	condition := gas_cooling_model.MainData_Condition_value[f.Condition]
@@ -150,6 +158,7 @@ func (f *Calc) Parse() (ex *calc_api.GasCoolingRequest, err error) {
 		TestPressure:  testPressure,
 		TypeBolt:      gas_cooling_model.MainData_TypeBolt(typeBolt),
 		Condition:     gas_cooling_model.MainData_Condition(condition),
+		Friction:      friction,
 	}
 
 	ex = &calc_api.GasCoolingRequest{

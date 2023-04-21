@@ -23,7 +23,7 @@ func NewOrderRepo(db *sqlx.DB) *OrderRepo {
 
 func (r *OrderRepo) Get(ctx context.Context, req *order_api.GetOrder) (order *order_model.FullOrder, err error) {
 	var data models.ManagerOrder
-	query := fmt.Sprintf("SELECT id, date, count_position, number, user_id FROM \"%s\" WHERE id=$1", OrderTable)
+	query := fmt.Sprintf("SELECT id, date, count_position, info, number, user_id FROM \"%s\" WHERE id=$1", OrderTable)
 
 	if err := r.db.Get(&data, query, req.Id); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -35,6 +35,7 @@ func (r *OrderRepo) Get(ctx context.Context, req *order_api.GetOrder) (order *or
 		CountPosition: data.Count,
 		Number:        data.Number,
 		UserId:        data.UserId,
+		Info:          data.Info,
 	}
 
 	return order, nil
@@ -42,7 +43,7 @@ func (r *OrderRepo) Get(ctx context.Context, req *order_api.GetOrder) (order *or
 
 func (r *OrderRepo) GetCurrent(ctx context.Context, req *order_api.GetCurrentOrder) (order *order_model.CurrentOrder, err error) {
 	var data models.OrderNew
-	query := fmt.Sprintf("SELECT id, number FROM \"%s\" WHERE user_id=$1 AND date=''", OrderTable)
+	query := fmt.Sprintf("SELECT id, number, info FROM \"%s\" WHERE user_id=$1 AND date=''", OrderTable)
 
 	if err := r.db.Get(&data, query, req.UserId); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -54,6 +55,7 @@ func (r *OrderRepo) GetCurrent(ctx context.Context, req *order_api.GetCurrentOrd
 	order = &order_model.CurrentOrder{
 		Id:     data.Id,
 		Number: data.Number,
+		Info:   data.Info,
 	}
 
 	return order, nil
@@ -61,7 +63,7 @@ func (r *OrderRepo) GetCurrent(ctx context.Context, req *order_api.GetCurrentOrd
 
 func (r *OrderRepo) GetAll(ctx context.Context, req *order_api.GetAllOrders) (orders []*order_model.Order, err error) {
 	var data []models.OrderWithPosition
-	query := fmt.Sprintf(`SELECT "%s".id, date, count_position, number, %s.id as position_id, title, amount, %s.count as position_count
+	query := fmt.Sprintf(`SELECT "%s".id, date, info, count_position, number, %s.id as position_id, title, amount, %s.count as position_count
 		FROM "%s" INNER JOIN %s on order_id="%s".id WHERE user_id=$1 AND date != '' ORDER BY number DESC, position_count`,
 		OrderTable, PositionTable, PositionTable, OrderTable, PositionTable, OrderTable,
 	)
@@ -84,6 +86,7 @@ func (r *OrderRepo) GetAll(ctx context.Context, req *order_api.GetAllOrders) (or
 				Date:          o.Date,
 				CountPosition: o.Count,
 				Number:        o.Number,
+				Info:          o.Info,
 				Positions: []*position_model.Position{{
 					Id:     o.PositionId,
 					Count:  o.PositionCount,
@@ -148,9 +151,19 @@ func (r *OrderRepo) GetOpen(ctx context.Context, managerId string) (orders []*or
 }
 
 func (r *OrderRepo) Create(ctx context.Context, order *order_api.CreateOrder, date string) error {
-	query := fmt.Sprintf(`INSERT INTO "%s" (id, user_id, date, count_position, manager_id) VALUES ($1, $2, $3, $4, $5)`, OrderTable)
+	query := fmt.Sprintf(`INSERT INTO "%s" (id, user_id, date, count_position, manager_id, info) VALUES ($1, $2, $3, $4, $5, $6)`, OrderTable)
 
-	_, err := r.db.Exec(query, order.Id, order.UserId, date, order.Count, order.ManagerId)
+	_, err := r.db.Exec(query, order.Id, order.UserId, date, order.Count, order.ManagerId, order.Info)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *OrderRepo) SetInfo(ctx context.Context, order *order_api.Info) error {
+	query := fmt.Sprintf(`UPDATE "%s" SET info=$1 WHERE id=$2`, OrderTable)
+
+	_, err := r.db.Exec(query, order.Info, order.OrderId)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

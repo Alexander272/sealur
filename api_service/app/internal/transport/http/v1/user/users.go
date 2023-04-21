@@ -143,7 +143,7 @@ func (h *UserHandler) recoveryPassword(c *gin.Context) {
 
 	data := &email_api.RecoveryPassword{
 		Email: user.Email,
-		Link:  fmt.Sprintf("%s/auth/recovery/%s", h.http.Domain, code),
+		Link:  fmt.Sprintf("%s/auth/recovery/%s", h.http.Link, code),
 	}
 
 	_, err = h.emailApi.Recovery(c, data)

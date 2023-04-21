@@ -34,6 +34,9 @@ func (h *UserHandler) Get(ctx context.Context, req *user_api.GetUser) (*user_mod
 func (h *UserHandler) GetByEmail(ctx context.Context, req *user_api.GetUserByEmail) (*user_model.User, error) {
 	user, err := h.service.GetByEmail(ctx, req)
 	if err != nil {
+		if errors.Is(err, models.ErrUserNotVerified) {
+			return nil, models.ErrUserNotVerified
+		}
 		if errors.Is(err, models.ErrPassword) || errors.Is(err, models.ErrUserNotFound) {
 			return nil, errors.New("invalid credentials")
 		}

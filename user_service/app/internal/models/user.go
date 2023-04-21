@@ -28,6 +28,7 @@ type User struct {
 	RoleCode  string `db:"role_code"`
 	Password  string `db:"password"`
 	ManagerId string `db:"manager_id"`
+	Confirmed bool   `db:"confirmed"`
 }
 
 type ConfirmUser struct {

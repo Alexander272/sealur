@@ -56,6 +56,7 @@ func (s *OrderServiceNew) Get(ctx context.Context, req *order_api.GetOrder) (*or
 		Number:    o.Number,
 		UserId:    o.UserId,
 		Positions: positions,
+		Info:      o.Info,
 	}
 
 	return order, nil
@@ -348,6 +349,13 @@ func (s *OrderServiceNew) Create(ctx context.Context, order *order_api.CreateOrd
 	}
 
 	return orderId, nil
+}
+
+func (s *OrderServiceNew) SetInfo(ctx context.Context, info *order_api.Info) error {
+	if err := s.repo.SetInfo(ctx, info); err != nil {
+		return fmt.Errorf("failed to set info. error: %w", err)
+	}
+	return nil
 }
 
 func (s *OrderServiceNew) SetStatus(ctx context.Context, status *order_api.Status) error {

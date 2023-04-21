@@ -7,5 +7,6 @@ var (
 	ErrUsersEmpty = errors.New("user list is empty")
 	ErrUserExist  = errors.New("user already exists")
 
-	ErrUserNotFound = errors.New("user is not found")
+	ErrUserNotFound    = errors.New("user is not found")
+	ErrUserNotVerified = errors.New("user not verified")
 )

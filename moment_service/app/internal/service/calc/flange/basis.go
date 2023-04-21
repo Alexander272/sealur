@@ -19,7 +19,7 @@ func (s *FlangeService) basisCalculate(data models.DataFlange, req *calc_api.Fla
 	ok := (bolts.VSigmaB1 && bolts.VSigmaB2 && data.TypeGasket != flange_model.GasketData_Soft) ||
 		(bolts.VSigmaB1 && bolts.VSigmaB2 && bolts.Q <= float64(data.Gasket.PermissiblePres) && data.TypeGasket == flange_model.GasketData_Soft)
 	if ok {
-		moment = s.momentCalculate(data, bolts.SigmaB1, bolts.DSigmaM, forces.Pb, forces.A, deformation.Dcp, true)
+		moment = s.momentCalculate(req.Friction, data, bolts.SigmaB1, bolts.DSigmaM, forces.Pb, forces.A, deformation.Dcp, true)
 	}
 
 	res := &flange_model.Calculated_Basis{
@@ -235,17 +235,21 @@ func (s *FlangeService) boltStrengthCalculate(
 
 // Расчет момента затяжки (иногда требуется не полных расчет, а только 2 значения. для определения подобных ситуаций используется флаг fullCalculate)
 func (s *FlangeService) momentCalculate(
+	Friction float64,
 	data models.DataFlange,
 	SigmaB1, DSigmaM, Pbm, Ab, Dcp float64,
 	fullCalculate bool,
 ) *flange_model.CalcMoment {
 	moment := &flange_model.CalcMoment{}
 
+	// TODO понять куда вставлять коэффициент трения
+
 	if SigmaB1 > constants.MaxSigmaB && data.Bolt.Diameter >= constants.MinDiameter && data.Bolt.Diameter <= constants.MaxDiameter {
 		moment.Mkp = s.graphic.CalculateMkp(data.Bolt.Diameter, SigmaB1)
 	} else {
 		//? вроде как формула изменилась, но почему-то использовалась новая формула
-		moment.Mkp = (0.3 * Pbm * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		moment.Mkp = (Friction * Pbm * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		// moment.Mkp = (0.3 * Pbm * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 	}
 
 	moment.Mkp1 = 0.75 * moment.Mkp
@@ -253,7 +257,8 @@ func (s *FlangeService) momentCalculate(
 	if fullCalculate {
 		Prek := 0.8 * Ab * data.Bolt.SigmaAt20
 		moment.Qrek = Prek / (math.Pi * Dcp * data.Gasket.Width)
-		moment.Mrek = (0.3 * Prek * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		moment.Mrek = (Friction * Prek * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		// moment.Mrek = (0.3 * Prek * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 
 		Pmax := DSigmaM * Ab
 		moment.Qmax = Pmax / (math.Pi * Dcp * data.Gasket.Width)
@@ -263,7 +268,8 @@ func (s *FlangeService) momentCalculate(
 			moment.Qmax = data.Gasket.PermissiblePres
 		}
 
-		moment.Mmax = (0.3 * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		moment.Mmax = (Friction * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		// moment.Mmax = (0.3 * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 	}
 
 	return moment

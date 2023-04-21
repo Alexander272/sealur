@@ -204,6 +204,7 @@ type OrderNew interface {
 	GetNumber(ctx context.Context, order *order_api.CreateOrder, date string) (int64, error)
 	GetOpen(ctx context.Context, managerId string) (orders []*order_model.ManagerOrder, err error)
 	Create(ctx context.Context, order *order_api.CreateOrder, date string) error
+	SetInfo(context.Context, *order_api.Info) error
 	SetStatus(context.Context, *order_api.Status) error
 	SetManager(context.Context, *order_api.Manager) error
 }

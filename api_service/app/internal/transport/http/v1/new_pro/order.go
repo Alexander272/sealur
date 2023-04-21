@@ -50,6 +50,7 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 		order.POST("/", handler.create)
 		order.POST("/copy", handler.copy)
 		order.POST("/save", handler.save)
+		order.PUT("/info", handler.setInfo)
 		manager := order.Group("/", h.middleware.AccessForManager)
 		{
 			manager.GET("/:id", handler.get)
@@ -302,6 +303,21 @@ func (h *OrderHandler) save(c *gin.Context) {
 
 	// c.Header("Location", fmt.Sprintf("/api/v1/sealur-pro/orders/%s", order.Id))
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Saved"})
+}
+
+func (h *OrderHandler) setInfo(c *gin.Context) {
+	var dto *order_api.Info
+	if err := c.BindJSON(&dto); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "отправлены некорректные данные")
+		return
+	}
+
+	_, err := h.orderApi.SetInfo(c, dto)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated"})
 }
 
 func (h *OrderHandler) finish(c *gin.Context) {

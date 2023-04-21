@@ -110,9 +110,12 @@ func (s *MaterialsService) GetMaterials(ctx context.Context, req *material_api.G
 	}
 
 	for _, item := range mats {
+		materialType := material_model.MaterialType_value[item.Type]
+
 		materials = append(materials, &material_model.Material{
 			Id:    item.Id,
 			Title: item.Title,
+			Type:  material_model.MaterialType(materialType),
 		})
 	}
 
@@ -127,9 +130,12 @@ func (s *MaterialsService) GetMaterialsWithIsEmpty(ctx context.Context, req *mat
 	}
 
 	for _, item := range mats {
+		materialType := material_model.MaterialType_value[item.Type]
+
 		materials = append(materials, &material_model.MaterialWithIsEmpty{
 			Id:                item.Id,
 			Title:             item.Title,
+			Type:              material_model.MaterialType(materialType),
 			IsEmptyAlpha:      item.IsEmptyAlpha,
 			IsEmptyElasticity: item.IsEmptyElasticity,
 			IsEmptyVoltage:    item.IsEmptyVoltage,

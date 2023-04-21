@@ -36,9 +36,9 @@ func (r *MaterialsRepo) GetMaterialsWithIsEmpty(ctx context.Context, req *materi
 			COALESCE((SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0, true) as is_empty_elasticity, 
 			COALESCE((SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0, true) as is_empty_voltage, 
 			COALESCE((SELECT count(mark_id) FROM %s GROUP BY mark_id HAVING mark_id = %s.id) = 0, true) as is_empty_alpha
-		FROM %s ORDER BY id`, ElasticityTable, MaterialsTable, VoltageTable, MaterialsTable, AlphaTable, MaterialsTable, MaterialsTable)
+		FROM %s WHERE type=$1 ORDER BY id`, ElasticityTable, MaterialsTable, VoltageTable, MaterialsTable, AlphaTable, MaterialsTable, MaterialsTable)
 
-	if err := r.db.Select(&materials, query); err != nil {
+	if err := r.db.Select(&materials, query, req.Type.String()); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return materials, nil

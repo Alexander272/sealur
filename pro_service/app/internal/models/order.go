@@ -6,6 +6,7 @@ type OrderNew struct {
 	Count  int64  `db:"count_position"`
 	Number int64  `db:"number"`
 	Status string `db:"status"`
+	Info   string `db:"info"`
 }
 
 type ManagerOrder struct {
@@ -16,6 +17,7 @@ type ManagerOrder struct {
 	Count   int64  `db:"count_position"`
 	Number  int64  `db:"number"`
 	Status  string `db:"status"`
+	Info    string `db:"info"`
 }
 
 type OrderWithPosition struct {
@@ -27,4 +29,5 @@ type OrderWithPosition struct {
 	Title         string `db:"title"`
 	Amount        string `db:"amount"`
 	PositionCount int64  `db:"position_count"`
+	Info          string `db:"info"`
 }

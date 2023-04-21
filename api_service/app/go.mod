@@ -50,7 +50,7 @@ require (
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
-	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
+	github.com/xuri/efp v0.0.0-20230418022843-d151280498a4 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/crypto v0.8.0 // indirect
@@ -62,10 +62,10 @@ require (
 )
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230417063045-9e96ee09ba4c
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230420091415-ccbdde140999
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/lib/pq v1.10.8
-	github.com/swaggo/swag v1.8.12
+	github.com/swaggo/swag v1.16.1
 )
 
 require (

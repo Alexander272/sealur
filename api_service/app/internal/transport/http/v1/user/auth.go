@@ -91,6 +91,12 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 
 	user, err := h.userApi.GetByEmail(c, dto)
 	if err != nil && !strings.Contains(err.Error(), "invalid credentials") {
+		if strings.Contains(err.Error(), "user not verified") {
+			models.NewErrorResponse(c, http.StatusBadRequest, "user not verified",
+				"Учетная запись не активирована. Для активации учетной записи перейдите по ссылке, отправленной вам в письме.",
+			)
+			return
+		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 		return
 	}
@@ -146,12 +152,12 @@ func (h *AuthHandler) singUp(c *gin.Context) {
 		return
 	}
 
-	logger.Info(fmt.Sprintf("%s/auth/confirm?code=%s", c.Request.Host, code))
+	logger.Debug(fmt.Sprintf("%s/auth/confirm?code=%s", h.http.Link, code))
 
 	data := &email_api.ConfirmUserRequest{
 		Name:  dto.Name,
 		Email: dto.Email,
-		Link:  fmt.Sprintf("%s/auth/confirm?code=%s", h.http.Domain, code),
+		Link:  fmt.Sprintf("%s/auth/confirm?code=%s", h.http.Link, code),
 	}
 	_, err = h.emailApi.ConfirmUser(c, data)
 	if err != nil {

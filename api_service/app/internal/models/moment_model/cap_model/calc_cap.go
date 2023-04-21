@@ -27,6 +27,7 @@ type CalcCapOld struct {
 	IsUseWasher    bool           `json:"isUseWasher"`
 	Washer         WasherData     `json:"washer"`
 	IsNeedFormulas bool           `json:"isNeedFormulas"`
+	Friction       string         `json:"friction"`
 }
 
 type CalcCap struct {
@@ -51,6 +52,7 @@ type MainData struct {
 	TypeB       string `json:"type"`
 	Condition   string `json:"condition"`
 	Calculation string `json:"calculation"`
+	Friction    string `json:"friction"`
 }
 
 type Cap struct {
@@ -167,6 +169,13 @@ func (c *CalcCapOld) NewCap() (cap *calc_api.CapRequestOld, err error) {
 	if err != nil {
 		return nil, err
 	}
+	friction := 0.3
+	if c.Friction != "" {
+		friction, err = strconv.ParseFloat(c.Friction, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse friction. error: %w", err)
+		}
+	}
 
 	flanges := calc_api.CapRequestOld_Flanges_value[c.Flanges]
 	typeB := calc_api.CapRequestOld_Type_value[c.TypeB]
@@ -227,6 +236,7 @@ func (c *CalcCapOld) NewCap() (cap *calc_api.CapRequestOld, err error) {
 		Gasket:         gasket,
 		Washer:         washer,
 		Embed:          embed,
+		Friction:       friction,
 	}
 	return cap, nil
 }
@@ -300,6 +310,13 @@ func (d *MainData) Parse() (data *cap_model.MainData, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse temp. error: %w", err)
 	}
+	friction := 0.3
+	if d.Friction != "" {
+		friction, err = strconv.ParseFloat(d.Friction, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse friction. error: %w", err)
+		}
+	}
 
 	flanges := cap_model.MainData_Flanges_value[d.Flanges]
 	typeB := cap_model.MainData_Type_value[d.TypeB]
@@ -316,6 +333,7 @@ func (d *MainData) Parse() (data *cap_model.MainData, err error) {
 		Type:        cap_model.MainData_Type(typeB),
 		Condition:   cap_model.MainData_Condition(condition),
 		Calculation: cap_model.MainData_Calcutation(calculation),
+		Friction:    friction,
 	}
 	return data, nil
 }

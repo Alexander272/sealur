@@ -232,8 +232,9 @@ type OrderNew interface {
 	Save(context.Context, *order_api.CreateOrder) (*order_api.OrderNumber, error)
 	Copy(context.Context, *order_api.CopyOrder) error
 	Create(context.Context, *order_api.CreateOrder) (string, error)
-	SetStatus(ctx context.Context, status *order_api.Status) error
-	SetManager(ctx context.Context, manager *order_api.Manager) error
+	SetInfo(context.Context, *order_api.Info) error
+	SetStatus(context.Context, *order_api.Status) error
+	SetManager(context.Context, *order_api.Manager) error
 }
 
 type Position interface {

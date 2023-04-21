@@ -32,6 +32,7 @@ type Calc struct {
 	Bolts          BoltData       `json:"bolts"`
 	Gasket         GasketFullData `json:"gasket"`
 	IsNeedFormulas bool           `json:"isNeedFormulas"`
+	Friction       string         `json:"friction"`
 }
 
 type MaterialData struct {
@@ -166,6 +167,13 @@ func (c *Calc) Parse() (*calc_api.DevCoolingRequest, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse temp. error: %w", err)
 	}
+	friction := 0.3
+	if c.Friction != "" {
+		friction, err = strconv.ParseFloat(c.Friction, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse friction. error: %w", err)
+		}
+	}
 
 	typeBolt := calc_api.DevCoolingRequest_TypeBolt_value[c.TypeBolt]
 	method := calc_api.DevCoolingRequest_MountingMethod_value[c.Method]
@@ -214,6 +222,7 @@ func (c *Calc) Parse() (*calc_api.DevCoolingRequest, error) {
 		Bolts:          bolts,
 		Gasket:         gasket,
 		IsNeedFormulas: c.IsNeedFormulas,
+		Friction:       friction,
 	}
 
 	return result, nil

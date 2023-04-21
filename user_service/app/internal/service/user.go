@@ -46,6 +46,9 @@ func (s *UserService) GetByEmail(ctx context.Context, req *user_api.GetUserByEma
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, models.ErrUserNotFound
 		}
+		if errors.Is(err, models.ErrUserNotVerified) {
+			return nil, models.ErrUserNotVerified
+		}
 		return nil, fmt.Errorf("failed to get user. error: %w", err)
 	}
 

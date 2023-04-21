@@ -7,6 +7,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/moment_model"
 	"github.com/Alexander272/sealur_proto/api/moment/material_api"
+	"github.com/Alexander272/sealur_proto/api/moment/models/material_model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,7 +39,13 @@ func (h *Handler) initMaterialsRoutes(api *gin.RouterGroup) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/materials/ [get]
 func (h *Handler) getMaterials(c *gin.Context) {
-	materials, err := h.materialsClient.GetMaterials(c, &material_api.GetMaterialsRequest{})
+	materialType := c.Query("type")
+	if materialType == "" {
+		materialType = "bolt"
+	}
+	reqType := material_model.MaterialType_value[materialType]
+
+	materials, err := h.materialsClient.GetMaterials(c, &material_api.GetMaterialsRequest{Type: material_model.MaterialType(reqType)})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -60,7 +67,14 @@ func (h *Handler) getMaterials(c *gin.Context) {
 // @Failure default {object} models.ErrorResponse
 // @Router /sealur-moment/materials/empty [get]
 func (h *Handler) getMaterialsWithIsEmpty(c *gin.Context) {
-	materials, err := h.materialsClient.GetMaterialsWithIsEmpty(c, &material_api.GetMaterialsRequest{})
+	req := &material_api.GetMaterialsRequest{Type: material_model.MaterialType_bolt}
+	materialType := c.Query("type")
+	if materialType != "" {
+		newType := material_model.MaterialType_value[materialType]
+		req.Type = material_model.MaterialType(newType)
+	}
+
+	materials, err := h.materialsClient.GetMaterialsWithIsEmpty(c, req)
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -116,8 +130,10 @@ func (h *Handler) createMaterial(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "invalid data send")
 		return
 	}
+	newType := material_model.MaterialType_value[dto.Type]
+	materialType := material_model.MaterialType(newType)
 
-	material, err := h.materialsClient.CreateMaterial(c, &material_api.CreateMaterialRequest{Title: dto.Title})
+	material, err := h.materialsClient.CreateMaterial(c, &material_api.CreateMaterialRequest{Title: dto.Title, Type: materialType})
 	if err != nil {
 		models.NewErrorResponseWithCode(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

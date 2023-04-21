@@ -19,6 +19,7 @@ type Calc struct {
 	FlangeData     Flange         `json:"flangeData"`
 	CapData        Cap            `json:"capData"`
 	IsNeedFormulas bool           `json:"isNeedFormulas"`
+	Friction       string         `json:"friction"`
 }
 
 type Cap struct {
@@ -85,6 +86,13 @@ func (f *Calc) New() (float *calc_api.FloatRequest, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse pressure. error: %w", err)
 	}
+	friction := 0.3
+	if f.Friction != "" {
+		friction, err = strconv.ParseFloat(f.Friction, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse friction. error: %w", err)
+		}
+	}
 
 	condition := calc_api.FloatRequest_Condition_value[f.Condition]
 	typeB := calc_api.FlangeRequest_Type_value[f.TypeB]
@@ -120,6 +128,7 @@ func (f *Calc) New() (float *calc_api.FloatRequest, err error) {
 		CapData:        capData,
 		Bolts:          bolts,
 		Gasket:         gasket,
+		Friction:       friction,
 	}
 	return float, nil
 }

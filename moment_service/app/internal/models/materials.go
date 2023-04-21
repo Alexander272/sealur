@@ -37,6 +37,7 @@ type MaterialsWithIsEmpty struct {
 type MaterialsDTO struct {
 	Id    string `db:"id"`
 	Title string `db:"title"`
+	Type  string `db:"type"`
 }
 
 type VoltageDTO struct {

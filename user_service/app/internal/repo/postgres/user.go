@@ -55,13 +55,17 @@ func (r *UserRepo) Get(ctx context.Context, req *user_api.GetUser) (*user_model.
 
 func (r *UserRepo) GetByEmail(ctx context.Context, req *user_api.GetUserByEmail) (*user_model.User, string, error) {
 	var data models.User
-	query := fmt.Sprintf(`SELECT "%s".id, company, inn, kpp, region, city, "position", phone, password, email, %s.code as role_code, name, address
-		FROM "%s" INNER JOIN %s on %s.id=role_id WHERE email=$1 AND confirmed=true`,
+	query := fmt.Sprintf(`SELECT "%s".id, confirmed, company, inn, kpp, region, city, "position", phone, password, email, %s.code as role_code, name, address
+		FROM "%s" INNER JOIN %s on %s.id=role_id WHERE email=$1`,
 		UserTable, RoleTable, UserTable, RoleTable, RoleTable,
 	)
 
 	if err := r.db.Get(&data, query, req.Email); err != nil {
 		return nil, "", fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	if !data.Confirmed {
+		return nil, "", models.ErrUserNotVerified
 	}
 
 	user := &user_model.User{

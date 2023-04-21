@@ -2,6 +2,7 @@ package moment_model
 
 type MaterialsDTO struct {
 	Title string `json:"title" binding:"required"`
+	Type  string `json:"type"`
 }
 
 type Alpha struct {
