@@ -144,13 +144,15 @@ func (s *ExCircleService) CalculateExCircle(ctx context.Context, data *calc_api.
 		if Bolts.RatedStress > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {
 			Moment.Mkp = s.graphic.CalculateMkp(d.Bolt.Diameter, Bolts.RatedStress)
 		} else {
-			Moment.Mkp = (0.3 * ForcesInBolts.DesignLoad * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+			Moment.Mkp = (data.Friction * ForcesInBolts.DesignLoad * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+			// Moment.Mkp = (0.3 * ForcesInBolts.DesignLoad * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 		}
 		Moment.Mkp1 = 0.75 * Moment.Mkp
 
 		Prek := 0.8 * ForcesInBolts.Area * d.Bolt.SigmaAt20
 		Moment.Qrek = Prek / (math.Pi * Deformation.Diameter * d.Gasket.Width)
-		Moment.Mrek = (0.3 * Prek * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		Moment.Mrek = (data.Friction * Prek * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		// Moment.Mrek = (0.3 * Prek * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 
 		Pmax := Bolts.AllowableVoltage * ForcesInBolts.Area
 		Moment.Qmax = Pmax / (math.Pi * Deformation.Diameter * d.Gasket.Width)
@@ -160,7 +162,15 @@ func (s *ExCircleService) CalculateExCircle(ctx context.Context, data *calc_api.
 			Moment.Qmax = d.Gasket.PermissiblePres
 		}
 
-		Moment.Mmax = (0.3 * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		Moment.Mmax = (data.Friction * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		// Moment.Mmax = (0.3 * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+
+		if Moment.Mrek > Moment.Mmax {
+			Moment.Mrek = Moment.Mmax
+		}
+		if Moment.Qrek > Moment.Qmax {
+			Moment.Qrek = Moment.Qmax
+		}
 	}
 
 	result.Calc.Deformation = Deformation

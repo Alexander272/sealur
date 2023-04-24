@@ -13,14 +13,14 @@ func (s *CapService) strengthCalculate(data models.DataCap, req *calc_api.CapReq
 	auxiliary := s.auxiliaryCalculate(data, req)
 	tightness := s.tightnessCalculate(auxiliary, data, req)
 	bolt1 := s.boltStrengthCalculate(data, req, tightness.Pb, tightness.Pbr, auxiliary.A, auxiliary.Dcp, false)
-	moment1 := s.momentCalculate(data, bolt1.SigmaB1, bolt1.DSigmaM, tightness.Pb, auxiliary.A, auxiliary.Dcp, false)
+	moment1 := s.momentCalculate(req.Data.Friction, data, bolt1.SigmaB1, bolt1.DSigmaM, tightness.Pb, auxiliary.A, auxiliary.Dcp, false)
 
 	static1 := s.staticResistanceCalculate(data.Flange, auxiliary.Flange, data.FlangeType, data, req, tightness.Pb, tightness.Pbr, tightness.Qd, tightness.Qfm)
 	conditions1 := s.conditionsForStrengthCalculate(data.FlangeType, data.Flange, auxiliary.Flange, static1, req.Data.IsWork, false)
 
 	tigLoad := s.tightnessLoadCalculate(auxiliary, tightness, data, req)
 	bolt2 := s.boltStrengthCalculate(data, req, tigLoad.Pb, tigLoad.Pbr, auxiliary.A, auxiliary.Dcp, true)
-	moment2 := s.momentCalculate(data, bolt2.SigmaB1, bolt2.DSigmaM, tigLoad.Pb, auxiliary.A, auxiliary.Dcp, false)
+	moment2 := s.momentCalculate(req.Data.Friction, data, bolt2.SigmaB1, bolt2.DSigmaM, tigLoad.Pb, auxiliary.A, auxiliary.Dcp, false)
 
 	static2 := s.staticResistanceCalculate(data.Flange, auxiliary.Flange, data.FlangeType, data, req, tigLoad.Pb, tigLoad.Pbr, tightness.Qd, tightness.Qfm)
 	conditions2 := s.conditionsForStrengthCalculate(data.FlangeType, data.Flange, auxiliary.Flange, static2, req.Data.IsWork, true)
@@ -48,7 +48,7 @@ func (s *CapService) strengthCalculate(data models.DataCap, req *calc_api.CapReq
 
 	finalMoment := &cap_model.CalcMoment{}
 	if ok {
-		finalMoment = s.momentCalculate(data, bolt2.SigmaB1, bolt2.DSigmaM, tigLoad.Pb, auxiliary.A, auxiliary.Dcp, true)
+		finalMoment = s.momentCalculate(req.Data.Friction, data, bolt2.SigmaB1, bolt2.DSigmaM, tigLoad.Pb, auxiliary.A, auxiliary.Dcp, true)
 	}
 
 	deformation := &cap_model.CalcDeformation{

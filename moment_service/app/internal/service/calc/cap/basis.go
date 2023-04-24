@@ -19,7 +19,7 @@ func (s *CapService) basisCalculate(data models.DataCap, req *calc_api.CapReques
 	ok := (bolts.VSigmaB1 && bolts.VSigmaB2 && data.TypeGasket != cap_model.GasketData_Soft) ||
 		(bolts.VSigmaB1 && bolts.VSigmaB2 && bolts.Q <= float64(data.Gasket.PermissiblePres) && data.TypeGasket == cap_model.GasketData_Soft)
 	if ok {
-		moment = s.momentCalculate(data, bolts.SigmaB1, bolts.DSigmaM, forces.Pb, forces.A, deformation.Dcp, true)
+		moment = s.momentCalculate(req.Data.Friction, data, bolts.SigmaB1, bolts.DSigmaM, forces.Pb, forces.A, deformation.Dcp, true)
 	}
 
 	res := &cap_model.Calculated_Basis{
@@ -206,6 +206,7 @@ func (s *CapService) boltStrengthCalculate(
 
 // Расчет момента затяжки (иногда требуется не полных расчет, а только 2 значения. для определения подобных ситуаций используется флаг fullCalculate)
 func (s *CapService) momentCalculate(
+	Friction float64,
 	data models.DataCap,
 	SigmaB1, DSigmaM, Pbm, Ab, Dcp float64,
 	fullCalculate bool,
@@ -216,7 +217,8 @@ func (s *CapService) momentCalculate(
 		moment.Mkp = s.graphic.CalculateMkp(data.Bolt.Diameter, SigmaB1)
 	} else {
 		//? вроде как формула изменилась, но почему-то использовалась новая формула
-		moment.Mkp = (0.3 * Pbm * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		moment.Mkp = (Friction * Pbm * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		// moment.Mkp = (0.3 * Pbm * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 	}
 
 	moment.Mkp1 = 0.75 * moment.Mkp
@@ -224,7 +226,8 @@ func (s *CapService) momentCalculate(
 	if fullCalculate {
 		Prek := 0.8 * Ab * data.Bolt.SigmaAt20
 		moment.Qrek = Prek / (math.Pi * Dcp * data.Gasket.Width)
-		moment.Mrek = (0.3 * Prek * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		moment.Mrek = (Friction * Prek * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		// moment.Mrek = (0.3 * Prek * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 
 		Pmax := DSigmaM * Ab
 		moment.Qmax = Pmax / (math.Pi * Dcp * data.Gasket.Width)
@@ -234,7 +237,16 @@ func (s *CapService) momentCalculate(
 			moment.Qmax = data.Gasket.PermissiblePres
 		}
 
-		moment.Mmax = (0.3 * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		moment.Mmax = (Friction * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		// moment.Mmax = (0.3 * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+
+		if moment.Mrek > moment.Mmax {
+			moment.Mrek = moment.Mmax
+		}
+		if moment.Qrek > moment.Qmax {
+			moment.Qrek = moment.Qmax
+		}
+
 	}
 
 	return moment

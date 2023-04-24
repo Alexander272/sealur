@@ -427,7 +427,8 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 			// Крутящий момент при затяжке болтов/шпилек
 			Moment.Mkp = s.graphic.CalculateMkp(d.Bolt.Diameter, Bolt.WorkCond.X)
 		} else {
-			Moment.Mkp = (0.3 * Bolt.Effort * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+			Moment.Mkp = (data.Friction * Bolt.Effort * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+			// Moment.Mkp = (0.3 * Bolt.Effort * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 		}
 
 		// Крутящий момент при затяжке болтов/шпилек со смазкой снижается на 25%
@@ -437,7 +438,8 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 		// Напряжение на прокладке
 		Moment.Qrek = Prek / (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
 		// Момент затяжки при применении уплотнения на старых (изношенных) фланцах, имеющих перекосы
-		Moment.Mrek = (0.3 * Prek * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		Moment.Mrek = (data.Friction * Prek * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		// Moment.Mrek = (0.3 * Prek * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 
 		Pmax := Bolt.WorkCond.Y * Ab
 		// Максимальное напряжение на прокладке
@@ -448,7 +450,15 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 		}
 
 		// Максимальный крутящий момент при затяжке болтов/шпилек
-		Moment.Mmax = (0.3 * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		Moment.Mmax = (data.Friction * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		// Moment.Mmax = (0.3 * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+
+		if Moment.Mrek > Moment.Mmax {
+			Moment.Mrek = Moment.Mmax
+		}
+		if Moment.Qrek > Moment.Qmax {
+			Moment.Qrek = Moment.Qmax
+		}
 	}
 
 	result.Calc.Auxiliary = Auxiliary

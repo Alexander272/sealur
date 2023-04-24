@@ -242,8 +242,6 @@ func (s *FlangeService) momentCalculate(
 ) *flange_model.CalcMoment {
 	moment := &flange_model.CalcMoment{}
 
-	// TODO понять куда вставлять коэффициент трения
-
 	if SigmaB1 > constants.MaxSigmaB && data.Bolt.Diameter >= constants.MinDiameter && data.Bolt.Diameter <= constants.MaxDiameter {
 		moment.Mkp = s.graphic.CalculateMkp(data.Bolt.Diameter, SigmaB1)
 	} else {
@@ -270,6 +268,13 @@ func (s *FlangeService) momentCalculate(
 
 		moment.Mmax = (Friction * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 		// moment.Mmax = (0.3 * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+
+		if moment.Mrek > moment.Mmax {
+			moment.Mrek = moment.Mmax
+		}
+		if moment.Qrek > moment.Qmax {
+			moment.Qrek = moment.Qmax
+		}
 	}
 
 	return moment

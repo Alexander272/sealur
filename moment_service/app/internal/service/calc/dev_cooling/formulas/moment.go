@@ -21,6 +21,7 @@ func (s *FormulasService) getMomentFormulas(
 	Ab := d.Bolt.Area * float64(d.Bolt.Count)
 
 	// перевод чисел в строки
+	friction := strconv.FormatFloat(data.Friction, 'G', 3, 64)
 	sAb := strings.ReplaceAll(strconv.FormatFloat(Ab, 'G', 3, 64), "E", "*10^")
 
 	diameter := strconv.FormatFloat(d.Bolt.Diameter, 'G', 3, 64)
@@ -39,7 +40,7 @@ func (s *FormulasService) getMomentFormulas(
 	Mkp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Moment.Mkp, 'G', 3, 64), "E", "*10^")
 
 	if !(result.Calc.Bolt.WorkCond.X > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter) {
-		Moment.Mkp = fmt.Sprintf("(0.3 * %s * %s / %d) / 1000", Effort, diameter, count)
+		Moment.Mkp = fmt.Sprintf("(%s * %s * %s / %d) / 1000", friction, Effort, diameter, count)
 	}
 
 	// Крутящий момент при затяжке болтов/шпилек со смазкой снижается на 25%
@@ -49,7 +50,7 @@ func (s *FormulasService) getMomentFormulas(
 	// Напряжение на прокладке
 	Moment.Qrek = fmt.Sprintf("%s / (2 * (%s + %s) * %s)", Prek, Lp, Bp, gWidth)
 	// Момент затяжки при применении уплотнения на старых (изношенных) фланцах, имеющих перекосы
-	Moment.Mrek = fmt.Sprintf("(0.3 * %s * %s / %d) / 1000", Prek, diameter, count)
+	Moment.Mrek = fmt.Sprintf("(%s * %s * %s / %d) / 1000", friction, Prek, diameter, count)
 
 	Pmax := fmt.Sprintf("%s * %s", WorkCondY, sAb)
 	// Максимальное напряжение на прокладке
@@ -59,8 +60,15 @@ func (s *FormulasService) getMomentFormulas(
 		Moment.Qmax = ""
 	}
 
+	if result.Calc.Moment.Mrek > result.Calc.Moment.Mmax {
+		Moment.Mrek = ""
+	}
+	if result.Calc.Moment.Qrek > result.Calc.Moment.Qmax {
+		Moment.Qrek = ""
+	}
+
 	// Максимальный крутящий момент при затяжке болтов/шпилек
-	Moment.Mmax = fmt.Sprintf("(0.3 * %s * %s / %d) / 1000", Pmax, diameter, count)
+	Moment.Mmax = fmt.Sprintf("(%s * %s * %s / %d) / 1000", friction, Pmax, diameter, count)
 
 	return Moment
 }

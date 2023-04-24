@@ -16,6 +16,7 @@ func (s *FormulasService) getMomentFormulas(req *calc_api.GasCoolingRequest, dat
 	Moment := &gas_cooling_model.MomentFormulas{}
 
 	// перевод чисел в строки
+	friction := strconv.FormatFloat(req.Data.Friction, 'G', 3, 64)
 	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 3, 64)
 	count := data.Bolt.Count
 	sigmaAt20 := strconv.FormatFloat(data.Bolt.SigmaAt20, 'G', 3, 64)
@@ -34,13 +35,13 @@ func (s *FormulasService) getMomentFormulas(req *calc_api.GasCoolingRequest, dat
 	Mkp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Moment.Mkp, 'G', 3, 64), "E", "*10^")
 
 	if !(result.Calc.Bolt.RatedStress > constants.MaxSigmaB && data.Bolt.Diameter >= constants.MinDiameter && data.Bolt.Diameter <= constants.MaxDiameter) {
-		Moment.Mkp = fmt.Sprintf("(0.3 * %s * %s / %d) / 1000", Effort, diameter, count)
+		Moment.Mkp = fmt.Sprintf("(%s * %s * %s / %d) / 1000", friction, Effort, diameter, count)
 	}
 	Moment.Mkp1 = fmt.Sprintf("0.75 * %s", Mkp)
 
 	Prek := fmt.Sprintf("0.8 * %s * %s", Area, sigmaAt20)
 	Moment.Qrek = fmt.Sprintf("%s / (2 * (%s + %s) * %s)", Prek, SizeLong, SizeTrans, width)
-	Moment.Mrek = fmt.Sprintf("(0.3 * %s * %s / %d) / 1000", Prek, diameter, count)
+	Moment.Mrek = fmt.Sprintf("(%s * %s * %s / %d) / 1000", friction, Prek, diameter, count)
 
 	Pmax := fmt.Sprintf("%s * %s", AllowableVoltage, Area)
 	Moment.Qmax = fmt.Sprintf("%s / (2 * (%s + %s) * %s)", Pmax, SizeLong, SizeTrans, width)
@@ -49,7 +50,14 @@ func (s *FormulasService) getMomentFormulas(req *calc_api.GasCoolingRequest, dat
 		Pmax = fmt.Sprintf("%s * (2 * (%s + %s) * %s)", permissiblePres, SizeLong, SizeTrans, width)
 	}
 
-	Moment.Mmax = fmt.Sprintf("(0.3 * %s * %s / %d) / 1000", Pmax, diameter, count)
+	if result.Calc.Moment.Mrek > result.Calc.Moment.Mmax {
+		Moment.Mrek = ""
+	}
+	if result.Calc.Moment.Qrek > result.Calc.Moment.Qmax {
+		Moment.Qrek = ""
+	}
+
+	Moment.Mmax = fmt.Sprintf("(%s * %s * %s / %d) / 1000", friction, Pmax, diameter, count)
 
 	return Moment
 }

@@ -257,6 +257,7 @@ func (s *FormulasService) momentFormulas(
 	moment := &cap_model.MomentFormulas{}
 
 	// перевод чисел в строки
+	friction := strconv.FormatFloat(req.Data.Friction, 'G', 3, 64)
 	sigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 3, 64)
 	diameter := strconv.FormatFloat(d.Bolt.Diameter, 'G', 3, 64)
 	count := d.Bolt.Count
@@ -271,7 +272,7 @@ func (s *FormulasService) momentFormulas(
 	Mkp := strings.ReplaceAll(strconv.FormatFloat(mom.Mkp, 'G', 3, 64), "E", "*10^")
 
 	if !(SigmaB1 > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter) {
-		moment.Mkp = fmt.Sprintf("(0.3 * %s * %s / %d) / 1000", Pb_, diameter, count)
+		moment.Mkp = fmt.Sprintf("(%s * %s * %s / %d) / 1000", friction, Pb_, diameter, count)
 	}
 
 	moment.Mkp1 = fmt.Sprintf("0.75 * %s", Mkp)
@@ -279,7 +280,7 @@ func (s *FormulasService) momentFormulas(
 	if fullCalculate {
 		Prek := fmt.Sprintf("0.8 * %s * %s", Ab_, sigmaAt20)
 		moment.Qrek = fmt.Sprintf("%s / (%f * %s * %s)", Prek, math.Pi, Dcp_, width)
-		moment.Mrek = fmt.Sprintf("(0.3 * %s * %s / %d) / 1000", Prek, diameter, count)
+		moment.Mrek = fmt.Sprintf("(%s * %s * %s / %d) / 1000", friction, Prek, diameter, count)
 
 		Pmax := fmt.Sprintf("%s * %s", DSigmaM_, Ab_)
 		moment.Qmax = fmt.Sprintf("%s / (%f * %s * %s)", Pmax, math.Pi, Dcp_, width)
@@ -288,7 +289,14 @@ func (s *FormulasService) momentFormulas(
 			Pmax = fmt.Sprintf("%s * (%f * %s * %s)", perPres, math.Pi, Dcp_, width)
 		}
 
-		moment.Mmax = fmt.Sprintf("(0.3 * %s * %s / %d) / 1000", Pmax, diameter, count)
+		if mom.Mrek > mom.Mmax {
+			moment.Mrek = ""
+		}
+		if mom.Qrek > mom.Qmax {
+			moment.Qrek = ""
+		}
+
+		moment.Mmax = fmt.Sprintf("(%s * %s * %s / %d) / 1000", friction, Pmax, diameter, count)
 	}
 
 	return moment

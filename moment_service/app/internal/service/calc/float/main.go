@@ -154,7 +154,8 @@ func (s *FloatService) CalculationFloat(ctx context.Context, data *calc_api.Floa
 			// Крутящий момент при затяжке болтов/шпилек
 			result.Calc.Mkp = s.graphic.CalculateMkp(d.Bolt.Diameter, result.Calc.SigmaB1)
 		} else {
-			result.Calc.Mkp = (0.3 * result.Calc.Pb * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+			result.Calc.Mkp = (data.Friction * result.Calc.Pb * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+			// result.Calc.Mkp = (0.3 * result.Calc.Pb * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 		}
 
 		// Крутящий момент при затяжке болтов/шпилек со смазкой снижается на 25%
@@ -164,7 +165,8 @@ func (s *FloatService) CalculationFloat(ctx context.Context, data *calc_api.Floa
 		// Напряжение на прокладке
 		result.Calc.Qrek = Prek / (math.Pi * d.Dcp * d.Gasket.Width)
 		// Момент затяжки при применении уплотнения на старых (изношенных) фланцах, имеющих перекосы
-		result.Calc.Mrek = (0.3 * Prek * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		result.Calc.Mrek = (data.Friction * Prek * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		// result.Calc.Mrek = (0.3 * Prek * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 
 		Pmax := result.Calc.DSigmaM * result.Calc.A
 		// Максимальное напряжение на прокладке
@@ -175,12 +177,21 @@ func (s *FloatService) CalculationFloat(ctx context.Context, data *calc_api.Floa
 			result.Calc.Qmax = d.Gasket.PermissiblePres
 		}
 
+		if result.Calc.Mrek > result.Calc.Mmax {
+			result.Calc.Mrek = result.Calc.Mmax
+		}
+		if result.Calc.Qrek > result.Calc.Qmax {
+			result.Calc.Qrek = result.Calc.Qmax
+		}
+
 		// Максимальный крутящий момент при затяжке болтов/шпилек
-		result.Calc.Mmax = (0.3 * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		result.Calc.Mmax = (data.Friction * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
+		// result.Calc.Mmax = (0.3 * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 	}
 
 	if data.IsNeedFormulas {
 		result.Formulas = s.formulas.GetFormulas(
+			data,
 			data.Condition.String(), data.Type.String(),
 			data.IsWork,
 			d,

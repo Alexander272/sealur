@@ -41,6 +41,7 @@ func NewFormulasService() *FormulasService {
 }
 
 func (s *FormulasService) GetFormulas(
+	req *calc_api.FloatRequest,
 	Condition, TypeBolt string,
 	IsWork bool,
 	data models.DataFloat,
@@ -48,6 +49,7 @@ func (s *FormulasService) GetFormulas(
 ) *float_model.Formulas {
 	formulas := &float_model.Formulas{}
 
+	friction := strconv.FormatFloat(req.Friction, 'G', 3, 64)
 	area := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Area, 'G', 3, 64), "E", "*10^")
 	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 3, 64)
 	Lb0 := strings.ReplaceAll(strconv.FormatFloat(result.Bolt.Lenght, 'G', 3, 64), "E", "*10^")
@@ -128,13 +130,13 @@ func (s *FormulasService) GetFormulas(
 	}
 
 	if !(result.Calc.SigmaB1 > constants.MaxSigmaB && data.Bolt.Diameter >= constants.MinDiameter && data.Bolt.Diameter <= constants.MaxDiameter) {
-		formulas.Mkp = fmt.Sprintf("(0.3 * %s * %s/%d) / 1000", Pb, diameter, count)
+		formulas.Mkp = fmt.Sprintf("(%s * %s * %s/%d) / 1000", friction, Pb, diameter, count)
 	}
 	formulas.Mkp1 = fmt.Sprintf("0.75 * %s", Mkp)
 
 	Prek := fmt.Sprintf("0.8 * %s * %s", A, bSigmaAt20)
 	formulas.Qrek = fmt.Sprintf("(%s) / (%f * %s * %s)", Prek, math.Pi, Dcp, gWidth)
-	formulas.Mrek = fmt.Sprintf("(0.3 * %s * %s/%d) / 1000", Prek, diameter, count)
+	formulas.Mrek = fmt.Sprintf("(%s * %s * %s/%d) / 1000", friction, Prek, diameter, count)
 
 	Pmax := fmt.Sprintf("%s * %s", dSigmaM, A)
 	formulas.Qmax = fmt.Sprintf("(%s) / (%f * %s *%s)", Pmax, math.Pi, Dcp, gWidth)
@@ -142,7 +144,15 @@ func (s *FormulasService) GetFormulas(
 	if data.TypeGasket == "Soft" && result.Calc.Qmax > data.Gasket.PermissiblePres {
 		Pmax = fmt.Sprintf("%s * %f * %s *%s", gPermissiblePres, math.Pi, Dcp, gWidth)
 	}
-	formulas.Mmax = fmt.Sprintf("(0.3 * %s *%s / %d) / 1000", Pmax, diameter, count)
+
+	if result.Calc.Mrek > result.Calc.Mmax {
+		formulas.Mrek = ""
+	}
+	if result.Calc.Qrek > result.Calc.Qmax {
+		formulas.Qrek = ""
+	}
+
+	formulas.Mmax = fmt.Sprintf("(%s * %s *%s / %d) / 1000", friction, Pmax, diameter, count)
 
 	return formulas
 }

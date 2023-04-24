@@ -75,7 +75,7 @@ func (s *CoolingService) CalculateGasCooling(ctx context.Context, data *calc_api
 	result.Calc.Auxiliary = s.CalcAuxiliary(ctx, d)
 	result.Calc.ForcesInBolts = s.CalcForcesInBolts(ctx, d, result.Calc.Auxiliary)
 	result.Calc.Bolt = s.CalcBolts(ctx, d, result.Calc.ForcesInBolts, result.Calc.Auxiliary)
-	result.Calc.Moment = s.CalcMoment(ctx, d, result.Calc.Bolt, result.Calc.ForcesInBolts, result.Calc.Auxiliary)
+	result.Calc.Moment = s.CalcMoment(ctx, data.Data.Friction, d, result.Calc.Bolt, result.Calc.ForcesInBolts, result.Calc.Auxiliary)
 
 	if data.IsNeedFormulas {
 		result.Formulas = s.formulas.GetFormulas(data, d, result)
@@ -145,6 +145,7 @@ func (s *CoolingService) CalcBolts(
 
 func (s *CoolingService) CalcMoment(
 	ctx context.Context,
+	Friction float64,
 	data models.DataGasCooling,
 	bolts *gas_cooling_model.CalcBolts,
 	forces *gas_cooling_model.CalcForcesInBolts,
@@ -159,13 +160,15 @@ func (s *CoolingService) CalcMoment(
 		if bolts.RatedStress > constants.MaxSigmaB && data.Bolt.Diameter >= constants.MinDiameter && data.Bolt.Diameter <= constants.MaxDiameter {
 			moment.Mkp = s.graphic.CalculateMkp(data.Bolt.Diameter, bolts.RatedStress)
 		} else {
-			moment.Mkp = (0.3 * forces.Effort * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+			moment.Mkp = (Friction * forces.Effort * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+			// moment.Mkp = (0.3 * forces.Effort * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 		}
 		moment.Mkp1 = 0.75 * moment.Mkp
 
 		Prek := 0.8 * forces.Area * data.Bolt.SigmaAt20
 		moment.Qrek = Prek / (2 * (aux.SizeLong + aux.SizeTrans) * data.Gasket.Width)
-		moment.Mrek = (0.3 * Prek * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		moment.Mrek = (Friction * Prek * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		// moment.Mrek = (0.3 * Prek * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 
 		Pmax := bolts.AllowableVoltage * forces.Area
 		moment.Qmax = Pmax / (2 * (aux.SizeLong + aux.SizeTrans) * data.Gasket.Width)
@@ -175,7 +178,16 @@ func (s *CoolingService) CalcMoment(
 			moment.Qmax = data.Gasket.PermissiblePres
 		}
 
-		moment.Mmax = (0.3 * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		moment.Mmax = (Friction * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+		// moment.Mmax = (0.3 * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
+
+		if moment.Mrek > moment.Mmax {
+			moment.Mrek = moment.Mmax
+		}
+		if moment.Qrek > moment.Qmax {
+			moment.Qrek = moment.Qmax
+		}
+
 	}
 
 	return moment
