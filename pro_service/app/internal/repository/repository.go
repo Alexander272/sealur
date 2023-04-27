@@ -16,6 +16,14 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/order_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_configuration_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_construction_type_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_data_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_filler_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_flange_type_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_material_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_size_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
@@ -28,6 +36,14 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_conf_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_construction_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_data_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_filler_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_flange_type_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -197,6 +213,38 @@ type SnpSize interface {
 	Delete(context.Context, *snp_size_api.DeleteSnpSize) error
 }
 
+type PutgConfiguration interface {
+	Get(context.Context, *putg_conf_api.GetPutgConfiguration) ([]*putg_configuration_model.PutgConfiguration, error)
+}
+
+type PutgConstruction interface {
+	Get(context.Context, *putg_construction_api.GetPutgConstruction) ([]*putg_construction_type_model.PutgConstruction, error)
+}
+
+type PutgFiller interface {
+	Get(context.Context, *putg_filler_api.GetPutgFiller) ([]*putg_filler_model.PutgFiller, error)
+}
+
+type PutgFlangeType interface {
+	Get(context.Context, *putg_flange_type_api.GetPutgFlangeType) ([]*putg_flange_type_model.PutgFlangeType, error)
+}
+
+type PutgStandard interface {
+	Get(context.Context, *putg_standard_api.GetPutgStandard) ([]*putg_standard_model.PutgStandard, error)
+}
+
+type PutgData interface {
+	Get(context.Context, *putg_data_api.GetPutgData) ([]*putg_data_model.PutgData, error)
+}
+
+type PutgSize interface {
+	Get(context.Context, *putg_size_api.GetPutgSize) ([]*putg_size_model.PutgSize, error)
+}
+
+type PutgMaterial interface {
+	Get(context.Context, *putg_material_api.GetPutgMaterial) (*putg_material_model.PutgMaterials, error)
+}
+
 type OrderNew interface {
 	Get(context.Context, *order_api.GetOrder) (*order_model.FullOrder, error)
 	GetCurrent(context.Context, *order_api.GetCurrentOrder) (*order_model.CurrentOrder, error)
@@ -244,6 +292,7 @@ type Repositories struct {
 	Mounting
 	Standard
 	Temperature
+
 	FlangeType
 	FlangeTypeSnp
 	SnpFiller
@@ -252,6 +301,16 @@ type Repositories struct {
 	SnpMaterial
 	SnpData
 	SnpSize
+
+	PutgConfiguration
+	PutgConstruction
+	PutgFiller
+	PutgFlangeType
+	PutgStandard
+	PutgMaterial
+	PutgData
+	PutgSize
+
 	OrderNew
 	Position
 	PositionSnp
@@ -271,16 +330,27 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		Mounting:       postgres.NewMountingRepo(db),
 		Standard:       postgres.NewStandardRepo(db),
 		Temperature:    postgres.NewTemperatureRepo(db),
-		FlangeType:     postgres.NewFlangeTypeRepo(db),
-		FlangeTypeSnp:  postgres.NewFlangeTypeSnpRepo(db),
-		SnpFiller:      postgres.NewSNPFillerRepo(db),
-		SnpStandard:    postgres.NewSnpStandardRepo(db),
-		SnpType:        postgres.NewSNPTypeRepo(db),
-		SnpMaterial:    postgres.NewSnpMaterialRepo(db),
-		SnpData:        postgres.NewSnpDataRepo(db),
-		SnpSize:        postgres.NewSnpSizeRepo(db),
-		OrderNew:       postgres.NewOrderRepo(db),
-		Position:       postgres.NewPositionRepo(db),
-		PositionSnp:    postgres.NewPositionSnpRepo(db),
+
+		FlangeType:    postgres.NewFlangeTypeRepo(db),
+		FlangeTypeSnp: postgres.NewFlangeTypeSnpRepo(db),
+		SnpFiller:     postgres.NewSNPFillerRepo(db),
+		SnpStandard:   postgres.NewSnpStandardRepo(db),
+		SnpType:       postgres.NewSNPTypeRepo(db),
+		SnpMaterial:   postgres.NewSnpMaterialRepo(db),
+		SnpData:       postgres.NewSnpDataRepo(db),
+		SnpSize:       postgres.NewSnpSizeRepo(db),
+
+		PutgConfiguration: postgres.NewPutgConfigurationRepo(db),
+		PutgConstruction:  postgres.NewPutgConstructionRepo(db),
+		PutgFiller:        postgres.NewPutgFillerRepo(db),
+		PutgFlangeType:    postgres.NewPutgFlangeTypeRepo(db),
+		PutgStandard:      postgres.NewPutgStandardRepo(db),
+		PutgMaterial:      postgres.NewPutgMaterialRepo(db),
+		PutgData:          postgres.NewPutgDataRepo(db),
+		PutgSize:          postgres.NewPutgSizeRepo(db),
+
+		OrderNew:    postgres.NewOrderRepo(db),
+		Position:    postgres.NewPositionRepo(db),
+		PositionSnp: postgres.NewPositionSnpRepo(db),
 	}
 }

@@ -6,6 +6,7 @@ type PositionNew struct {
 	Amount string `db:"amount"`
 	Type   string `db:"type"`
 	Count  int64  `db:"count"`
+	Info   string `db:"info"`
 }
 
 type FullPosition struct {
@@ -14,6 +15,7 @@ type FullPosition struct {
 	Amount string `db:"amount"`
 	Type   string `db:"type"`
 	Count  int64  `db:"count"`
+	Info   string `db:"info"`
 
 	MainSnpStandardId   string `db:"snp_standard_id"`
 	MainTypeId          string `db:"snp_type_id"`

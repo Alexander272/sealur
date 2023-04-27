@@ -18,6 +18,14 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/order_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_configuration_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_construction_type_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_data_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_filler_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_flange_type_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_material_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_size_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
@@ -30,6 +38,15 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_conf_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_construction_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_data_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_filler_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_flange_type_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -51,21 +68,21 @@ type PutgImage interface {
 	Delete(image *pro_api.DeletePutgImageRequest) error
 }
 
-type Putg interface {
-	Get(*pro_api.GetPutgRequest) ([]*pro_api.Putg, error)
-	Create(*pro_api.CreatePutgRequest) (*pro_api.IdResponse, error)
-	Update(*pro_api.UpdatePutgRequest) error
-	Delete(*pro_api.DeletePutgRequest) error
+// type Putg interface {
+// 	Get(*pro_api.GetPutgRequest) ([]*pro_api.Putg, error)
+// 	Create(*pro_api.CreatePutgRequest) (*pro_api.IdResponse, error)
+// 	Update(*pro_api.UpdatePutgRequest) error
+// 	Delete(*pro_api.DeletePutgRequest) error
 
-	DeleteGrap(id string) error
-	DeleteTemp(id string) error
-	DeleteMod(id string) error
-	DeleteMat(id string, materials []*pro_api.AddMaterials) error
-	DeleteCon(id string) error
-	DeleteObt(id string) error
-	DeleteMoun(id string) error
-	DeleteCoating(id string) error
-}
+// 	DeleteGrap(id string) error
+// 	DeleteTemp(id string) error
+// 	DeleteMod(id string) error
+// 	DeleteMat(id string, materials []*pro_api.AddMaterials) error
+// 	DeleteCon(id string) error
+// 	DeleteObt(id string) error
+// 	DeleteMoun(id string) error
+// 	DeleteCoating(id string) error
+// }
 
 type PutgmImage interface {
 	Get(req *pro_api.GetPutgmImageRequest) ([]*pro_api.PutgmImage, error)
@@ -223,6 +240,43 @@ type Snp interface {
 	GetData(context.Context, *snp_api.GetSnpData) (*snp_model.SnpData, error)
 }
 
+type PutgConfiguration interface {
+	Get(context.Context, *putg_conf_api.GetPutgConfiguration) ([]*putg_configuration_model.PutgConfiguration, error)
+}
+
+type PutgConstruction interface {
+	Get(context.Context, *putg_construction_api.GetPutgConstruction) ([]*putg_construction_type_model.PutgConstruction, error)
+}
+
+type PutgFiller interface {
+	Get(context.Context, *putg_filler_api.GetPutgFiller) ([]*putg_filler_model.PutgFiller, error)
+}
+
+type PutgFlangeType interface {
+	Get(context.Context, *putg_flange_type_api.GetPutgFlangeType) ([]*putg_flange_type_model.PutgFlangeType, error)
+}
+
+type PutgStandard interface {
+	Get(context.Context, *putg_standard_api.GetPutgStandard) ([]*putg_standard_model.PutgStandard, error)
+}
+
+type PutgMaterial interface {
+	Get(context.Context, *putg_material_api.GetPutgMaterial) (*putg_material_model.PutgMaterials, error)
+}
+
+type PutgData interface {
+	Get(context.Context, *putg_data_api.GetPutgData) ([]*putg_data_model.PutgData, error)
+}
+
+type PutgSize interface {
+	Get(context.Context, *putg_size_api.GetPutgSize) ([]*putg_size_model.PutgSize, error)
+}
+
+type Putg interface {
+	GetBase(context.Context, *putg_api.GetPutgBase) (*putg_api.PutgBase, error)
+	GetData(context.Context, *putg_api.GetPutgData) (*putg_api.PutgData, error)
+}
+
 type OrderNew interface {
 	Get(context.Context, *order_api.GetOrder) (*order_model.CurrentOrder, error)
 	GetCurrent(context.Context, *order_api.GetCurrentOrder) (*order_model.CurrentOrder, error)
@@ -266,7 +320,6 @@ type Zip interface {
 
 type Services struct {
 	PutgImage
-	Putg
 	PutgmImage
 	Putgm
 	BoltMaterials
@@ -279,6 +332,7 @@ type Services struct {
 	Mounting
 	Standard
 	Temperature
+
 	FlangeType
 	FlangeTypeSnp
 	SnpFiller
@@ -288,6 +342,17 @@ type Services struct {
 	SnpData
 	SnpSize
 	Snp
+
+	PutgConfiguration
+	PutgConstruction
+	PutgFiller
+	PutgFlangeType
+	PutgStandard
+	PutgMaterial
+	PutgData
+	PutgSize
+	Putg
+
 	OrderNew
 	Position
 	PositionSnp
@@ -305,6 +370,26 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 	snpMaterial := NewSnpMaterialService(repos.SnpMaterial)
 	snpData := NewSnpDataService(repos.SnpData)
 	snpSize := NewSnpSizeService(repos.SnpSize)
+
+	putgConfiguration := NewPutgConfigurationService(repos.PutgConfiguration)
+	putgConstruction := NewPutgConstructionService(repos.PutgConstruction)
+	putgFiller := NewPutgFillerService(repos.PutgFiller)
+	putgFlangeType := NewPutgFlangeTypeService(repos.PutgFlangeType)
+	putgStandard := NewPutgStandardService(repos.PutgStandard)
+	putgMaterial := NewPutgMaterialService(repos.PutgMaterial)
+	putgData := NewPutgDataService(repos.PutgData)
+	putgSize := NewPutgSizeService(repos.PutgSize)
+
+	putg := NewPutgService(PutgDeps{
+		Configuration: putgConfiguration,
+		Construction:  putgConstruction,
+		Filler:        putgFiller,
+		FlangeType:    putgFlangeType,
+		Standard:      putgStandard,
+		Materials:     putgMaterial,
+		Data:          putgData,
+		Sizes:         putgSize,
+	})
 
 	zip := NewZipService()
 
@@ -325,16 +410,27 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		Material:       NewMaterialService(repos.Material),
 		Mounting:       mounting,
 		Standard:       standard,
-		Temperature:    NewTemperatureService(repos.Temperature),
-		FlangeType:     NewFlangeTypeService(repos.FlangeType),
-		FlangeTypeSnp:  NewFlangeTypeSnpService(repos.FlangeTypeSnp),
-		SnpFiller:      filler,
-		SnpStandard:    snpStandard,
-		SnpType:        snpType,
-		SnpMaterial:    snpMaterial,
-		SnpData:        snpData,
-		SnpSize:        snpSize,
-		Snp:            NewSnpService(filler, snpMaterial, snpType, mounting, standard, snpData, snpStandard, snpSize),
+
+		Temperature:   NewTemperatureService(repos.Temperature),
+		FlangeType:    NewFlangeTypeService(repos.FlangeType),
+		FlangeTypeSnp: NewFlangeTypeSnpService(repos.FlangeTypeSnp),
+		SnpFiller:     filler,
+		SnpStandard:   snpStandard,
+		SnpType:       snpType,
+		SnpMaterial:   snpMaterial,
+		SnpData:       snpData,
+		SnpSize:       snpSize,
+		Snp:           NewSnpService(filler, snpMaterial, snpType, mounting, standard, snpData, snpStandard, snpSize),
+
+		PutgConfiguration: putgConfiguration,
+		PutgConstruction:  putgConstruction,
+		PutgFiller:        putgFiller,
+		PutgFlangeType:    putgFlangeType,
+		PutgStandard:      putgStandard,
+		PutgMaterial:      putgMaterial,
+		PutgData:          putgData,
+		PutgSize:          putgSize,
+		Putg:              putg,
 
 		PositionSnp: positionSnp,
 		Position:    position,

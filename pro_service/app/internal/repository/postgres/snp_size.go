@@ -27,7 +27,7 @@ func (r *SnpSizeRepo) Get(ctx context.Context, req *snp_size_api.GetSnpSize) (si
 		FROM %s WHERE snp_type_id=$1 ORDER BY count`, SnpSizeTable)
 
 	if err := r.db.Select(&data, query, req.TypeId); err != nil {
-		return nil, fmt.Errorf("failed to execute query")
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
 	for i, ss := range data {

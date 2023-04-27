@@ -21,6 +21,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -152,6 +153,7 @@ func main() {
 	flange_type_snp_api.RegisterFlangeTypeSnpServiceServer(server, handlers.FlangeTypeSnp)
 	material_api.RegisterMaterialServiceServer(server, handlers.Material)
 	mounting_api.RegisterMountingServiceServer(server, handlers.Mounting)
+
 	snp_data_api.RegisterSnpDataServiceServer(server, handlers.SnpData)
 	snp_filler_api.RegisterSnpFillerServiceServer(server, handlers.SnpFiller)
 	snp_material_api.RegisterSnpMaterialServiceServer(server, handlers.SnpMaterial)
@@ -161,6 +163,9 @@ func main() {
 	temperature_api.RegisterTemperatureServiceServer(server, handlers.Temperature)
 	snp_size_api.RegisterSnpSizeServiceServer(server, handlers.SnpSize)
 	snp_api.RegisterSnpDataServiceServer(server, handlers.Snp)
+
+	putg_api.RegisterPutgDataServiceServer(server, handlers.Putg)
+
 	order_api.RegisterOrderServiceServer(server, handlers.Order)
 	position_api.RegisterPositionServiceServer(server, handlers.Position)
 

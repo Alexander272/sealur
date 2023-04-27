@@ -115,13 +115,16 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		return nil, "", err
 	}
 
-	mainColumn := []interface{}{"№", "Наименование", "Количество"}
+	mainColumn := []interface{}{"№", "Наименование", "Доп. информация", "Количество"}
 	snpColumn := []interface{}{"№", "Наименование", "Д4", "Д3", "Д2", "Д1", "h", "материал внутр. кольца", "материал каркаса", "материал наполнителя", "материал нар. кольца", "Перемычка", "Отверстие", "Крепление", "Чертеж"}
+
+	startMain := 1
+	startAside := 7
 
 	file := excelize.NewFile()
 	sheetName := file.GetSheetName(file.GetActiveSheetIndex())
 
-	cell, err := excelize.CoordinatesToCellName(1, 1)
+	cell, err := excelize.CoordinatesToCellName(startMain, 1)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 	}
@@ -129,7 +132,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		return nil, "", fmt.Errorf("failed to create header table. error: %w", err)
 	}
 
-	cell, err = excelize.CoordinatesToCellName(6, 1)
+	cell, err = excelize.CoordinatesToCellName(startAside, 1)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 	}
@@ -142,9 +145,9 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 	snpCount := 1
 
 	for i, p := range order.Positions {
-		mainLine := []interface{}{1 + i, p.Title, p.Amount}
+		mainLine := []interface{}{1 + i, p.Title, p.Info, p.Amount}
 
-		cell, err := excelize.CoordinatesToCellName(1, 2+i)
+		cell, err := excelize.CoordinatesToCellName(startMain, 2+i)
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 		}
@@ -197,7 +200,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 				jumper, hole, mounting, drawing,
 			}
 
-			cell, err = excelize.CoordinatesToCellName(6, int(1+snpCount))
+			cell, err = excelize.CoordinatesToCellName(startAside, int(1+snpCount))
 			if err != nil {
 				return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 			}

@@ -84,7 +84,7 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 		models.NewErrorResponse(
 			c, http.StatusTooManyRequests,
 			fmt.Sprintf("too many request (%d >= %d)", limit.Count, h.auth.CountAttempt),
-			"Много некорректных запросов",
+			fmt.Sprintf("Много некорректных запросов. Доступ заблокирован на %.0f минут", h.auth.LimitAuthTTL.Minutes()),
 		)
 		return
 	}

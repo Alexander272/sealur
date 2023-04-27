@@ -14,6 +14,7 @@ type Position struct {
 	Count   int64   `json:"count"`
 	Title   string  `json:"title"`
 	Amount  string  `json:"amount"`
+	Info    string  `json:"info"`
 	Type    string  `json:"type"`
 	SnpData SnpData `json:"snpData"`
 }
@@ -27,6 +28,7 @@ func (p *Position) Parse() *position_model.FullPosition {
 		Count:   p.Count,
 		Title:   p.Title,
 		Amount:  p.Amount,
+		Info:    p.Info,
 		Type:    position_model.PositionType(positionType),
 		SnpData: p.SnpData.Parse(),
 	}

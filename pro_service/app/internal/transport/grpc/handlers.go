@@ -10,6 +10,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -63,6 +64,9 @@ type SnpSize interface {
 type Snp interface {
 	snp_api.SnpDataServiceServer
 }
+type Putg interface {
+	putg_api.PutgDataServiceServer
+}
 type Order interface {
 	order_api.OrderServiceServer
 }
@@ -88,6 +92,7 @@ type Handler struct {
 	Temperature
 	SnpSize
 	Snp
+	Putg
 	Order
 	Position
 }
@@ -111,6 +116,7 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		Temperature:    NewTemperatureHandlers(service.Temperature),
 		SnpSize:        NewSnpSizeHandlers(service.SnpSize),
 		Snp:            NewSnpHandlers(service.Snp),
+		Putg:           NewPutgHandlers(service.Putg),
 		Order:          NewOrderHandlers(service.OrderNew),
 		Position:       NewPositionHandlers(service.Position),
 	}

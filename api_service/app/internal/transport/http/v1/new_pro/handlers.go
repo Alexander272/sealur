@@ -10,6 +10,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -39,6 +40,8 @@ type Handler struct {
 	snpTypeApi     snp_type_api.SnpTypeServiceClient
 	sizeApi        snp_size_api.SnpSizeServiceClient
 	snpDataApi     snp_data_api.SnpDataServiceClient
+
+	putgApi putg_api.PutgDataServiceClient
 
 	userApi  user_api.UserServiceClient
 	emailApi email_api.EmailServiceClient
@@ -117,6 +120,8 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.sizeApi = snp_size_api.NewSnpSizeServiceClient(connect)
 	h.snpDataApi = snp_data_api.NewSnpDataServiceClient(connect)
 
+	h.putgApi = putg_api.NewPutgDataServiceClient(connect)
+
 	pro := api.Group("/sealur-pro")
 	{
 		// pro.GET("/ping", h.ping)
@@ -134,6 +139,8 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.initSnpTypeRoutes(pro)
 	h.initSizeRoutes(pro)
 	h.initSnpDataRoutes(pro)
+
+	h.initPutgRoutes(pro)
 }
 
 // func (h *Handler) ping(c *gin.Context) {

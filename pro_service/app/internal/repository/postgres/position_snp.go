@@ -31,7 +31,7 @@ func NewPositionSnpRepo(db *sqlx.DB) *PositionSnpRepo {
 func (r *PositionSnpRepo) Get(ctx context.Context, orderId string) (positions []*position_model.FullPosition, err error) {
 	//? можно не делать запрос в position, а в этом запросе забрать данные из всех 5 таблиц через inner join
 	var data []models.FullPosition
-	query := fmt.Sprintf(`SELECT %s.id, title, amount, type, count, filler_code, frame_code, inner_ring_code, outer_ring_code, d4, d3, d2, d1, h, another, 
+	query := fmt.Sprintf(`SELECT %s.id, title, amount, info, type, count, filler_code, frame_code, inner_ring_code, outer_ring_code, d4, d3, d2, d1, h, another, 
 		has_jumper, jumper_code, jumper_width, has_hole, has_mounting, mounting_code, drawing
 		FROM %s	INNER JOIN %s ON %s.position_id=%s.id INNER JOIN %s ON %s.position_id=%s.id INNER JOIN %s ON %s.position_id=%s.id
 		WHERE order_id=$1 ORDER BY count`,
@@ -48,6 +48,7 @@ func (r *PositionSnpRepo) Get(ctx context.Context, orderId string) (positions []
 			Count:  fp.Count,
 			Title:  fp.Title,
 			Amount: fp.Amount,
+			Info:   fp.Info,
 			Type:   position_model.PositionType_Snp,
 			SnpData: &position_model.PositionSnp{
 				Size: &position_model.PositionSnp_Size{
