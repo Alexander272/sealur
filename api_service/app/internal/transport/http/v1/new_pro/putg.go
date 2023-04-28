@@ -26,7 +26,7 @@ func (h *Handler) initPutgRoutes(api *gin.RouterGroup) {
 	{
 		putg.GET("/base", handler.getBase)
 		putg.GET("/data", handler.getData)
-		// putg.GET("", handler.get)
+		putg.GET("", handler.get)
 		// snp.GET("/default", h.getDefault)
 		// snp.GET("/", h.getSNP)
 		// snp = snp.Group("/", h.middleware.AccessForProAdmin)
@@ -49,12 +49,12 @@ func (h *PutgHandler) getBase(c *gin.Context) {
 }
 
 func (h *PutgHandler) getData(c *gin.Context) {
-	//TODO стандарт на не стандартные фланцы
+	// стандарт на не стандартные фланцы
 	standardId := c.Query("standardId")
-	// if standardId == "" {
-	// 	models.NewErrorResponse(c, http.StatusBadRequest, "empty param standardId", "стандарт не задан")
-	// 	return
-	// }
+	if standardId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param standardId", "стандарт не задан")
+		return
+	}
 	constructionId := c.Query("constructionId")
 	if constructionId == "" {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty param constructionId", "конструкция не задана")
@@ -69,6 +69,27 @@ func (h *PutgHandler) getData(c *gin.Context) {
 		ConstructionId: constructionId,
 		Configuration:  configuration,
 	})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: data})
+}
+
+func (h *PutgHandler) get(c *gin.Context) {
+	fillerId := c.Query("fillerId")
+	if fillerId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param fillerId", "материал прокладки не задан")
+		return
+	}
+	baseId := c.Query("baseId")
+	if baseId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param baseId", "материал прокладки не задан")
+		return
+	}
+
+	data, err := h.putgApi.Get(c, &putg_api.GetPutg{FillerId: fillerId, BaseId: baseId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

@@ -34,6 +34,14 @@ func (h *PutgHandlers) GetData(ctx context.Context, req *putg_api.GetPutgData) (
 	return putgData, nil
 }
 
+func (h *PutgHandlers) Get(ctx context.Context, req *putg_api.GetPutg) (*putg_api.Putg, error) {
+	putg, err := h.service.Get(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return putg, nil
+}
+
 // func (h *Handler) GetPutg(ctx context.Context, dto *pro_api.GetPutgRequest) (*pro_api.PutgResponse, error) {
 // 	putg, err := h.service.Putg.Get(dto)
 // 	if err != nil {

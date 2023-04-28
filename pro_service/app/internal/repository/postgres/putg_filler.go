@@ -22,9 +22,14 @@ func NewPutgFillerRepo(db *sqlx.DB) *PutgFillerRepo {
 
 func (r *PutgFillerRepo) Get(ctx context.Context, req *putg_filler_api.GetPutgFiller) (fillers []*putg_filler_model.PutgFiller, err error) {
 	var data []models.PutgFiller
-	query := fmt.Sprintf(`SELECT %s.id, %s.title as temperature, %s.title, description, designation
-		FROM %s INNER JOIN %s ON temperature_id=%s.id WHERE construction_id=$1 ORDER BY code`,
-		PutgFillerTable, TemperatureTable, PutgFillerTable, PutgFillerTable, TemperatureTable, TemperatureTable,
+	// query := fmt.Sprintf(`SELECT %s.id, %s.title as temperature, %s.title, description, designation
+	// 	FROM %s INNER JOIN %s ON temperature_id=%s.id WHERE construction_id=$1 ORDER BY code`,
+	// 	PutgFillerTable, TemperatureTable, PutgFillerTable, PutgFillerTable, TemperatureTable, TemperatureTable,
+	// )
+	//TODO
+	query := fmt.Sprintf(`SELECT %s.id, base_filler_id as base_id, %s.title as temperature, %s.title, description, designation
+		FROM %s INNER JOIN %s ON base_filler_id=%s.id INNER JOIN %s ON temperature_id=%s.id WHERE construction_id=$1 ORDER BY code`,
+		PutgFillerTableTest, TemperatureTable, PutgFillerBaseTable, PutgFillerTableTest, PutgFillerBaseTable, PutgFillerBaseTable, TemperatureTable, TemperatureTable,
 	)
 
 	if err := r.db.Select(&data, query, req.ConstructionId); err != nil {
@@ -34,6 +39,7 @@ func (r *PutgFillerRepo) Get(ctx context.Context, req *putg_filler_api.GetPutgFi
 	for _, pf := range data {
 		fillers = append(fillers, &putg_filler_model.PutgFiller{
 			Id:          pf.Id,
+			BaseId:      pf.BaseId,
 			Title:       pf.Title,
 			Temperature: pf.Temperature,
 			Description: pf.Description,

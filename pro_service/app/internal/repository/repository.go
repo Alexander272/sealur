@@ -24,6 +24,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_size_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_standard_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_type_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
@@ -44,6 +45,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/putg_material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -234,7 +236,8 @@ type PutgStandard interface {
 }
 
 type PutgData interface {
-	Get(context.Context, *putg_data_api.GetPutgData) ([]*putg_data_model.PutgData, error)
+	Get(context.Context, *putg_data_api.GetPutgData) (*putg_data_model.PutgData, error)
+	GetByConstruction(context.Context, *putg_data_api.GetPutgData) ([]*putg_data_model.PutgData, error)
 }
 
 type PutgSize interface {
@@ -243,6 +246,10 @@ type PutgSize interface {
 
 type PutgMaterial interface {
 	Get(context.Context, *putg_material_api.GetPutgMaterial) (*putg_material_model.PutgMaterials, error)
+}
+
+type PutgType interface {
+	Get(context.Context, *putg_type_api.GetPutgType) ([]*putg_type_model.PutgType, error)
 }
 
 type OrderNew interface {
@@ -310,6 +317,7 @@ type Repositories struct {
 	PutgMaterial
 	PutgData
 	PutgSize
+	PutgType
 
 	OrderNew
 	Position
@@ -348,6 +356,7 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		PutgMaterial:      postgres.NewPutgMaterialRepo(db),
 		PutgData:          postgres.NewPutgDataRepo(db),
 		PutgSize:          postgres.NewPutgSizeRepo(db),
+		PutgType:          postgres.NewPutgTypeRepo(db),
 
 		OrderNew:    postgres.NewOrderRepo(db),
 		Position:    postgres.NewPositionRepo(db),

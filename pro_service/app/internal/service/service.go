@@ -26,6 +26,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_size_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_standard_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/putg_type_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_data_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_filler_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/snp_material_model"
@@ -47,6 +48,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/putg_material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -265,16 +267,22 @@ type PutgMaterial interface {
 }
 
 type PutgData interface {
-	Get(context.Context, *putg_data_api.GetPutgData) ([]*putg_data_model.PutgData, error)
+	Get(context.Context, *putg_data_api.GetPutgData) (*putg_data_model.PutgData, error)
+	GetByConstruction(context.Context, *putg_data_api.GetPutgData) ([]*putg_data_model.PutgData, error)
 }
 
 type PutgSize interface {
 	Get(context.Context, *putg_size_api.GetPutgSize) ([]*putg_size_model.PutgSize, error)
 }
 
+type PutgType interface {
+	Get(context.Context, *putg_type_api.GetPutgType) ([]*putg_type_model.PutgType, error)
+}
+
 type Putg interface {
 	GetBase(context.Context, *putg_api.GetPutgBase) (*putg_api.PutgBase, error)
 	GetData(context.Context, *putg_api.GetPutgData) (*putg_api.PutgData, error)
+	Get(context.Context, *putg_api.GetPutg) (*putg_api.Putg, error)
 }
 
 type OrderNew interface {
@@ -351,6 +359,7 @@ type Services struct {
 	PutgMaterial
 	PutgData
 	PutgSize
+	PutgType
 	Putg
 
 	OrderNew
@@ -379,6 +388,7 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 	putgMaterial := NewPutgMaterialService(repos.PutgMaterial)
 	putgData := NewPutgDataService(repos.PutgData)
 	putgSize := NewPutgSizeService(repos.PutgSize)
+	putgType := NewPutgTypeService(repos.PutgType)
 
 	putg := NewPutgService(PutgDeps{
 		Configuration: putgConfiguration,
@@ -389,6 +399,8 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		Materials:     putgMaterial,
 		Data:          putgData,
 		Sizes:         putgSize,
+		PutgType:      putgType,
+		Mounting:      mounting,
 	})
 
 	zip := NewZipService()
@@ -430,6 +442,7 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		PutgMaterial:      putgMaterial,
 		PutgData:          putgData,
 		PutgSize:          putgSize,
+		PutgType:          putgType,
 		Putg:              putg,
 
 		PositionSnp: positionSnp,

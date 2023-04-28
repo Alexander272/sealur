@@ -22,10 +22,14 @@ const (
 	PutgStandardTable     = "putg_standard"
 	PutgConstructionTable = "putg_construction_type"
 	PutgFillerTable       = "putg_filler"
-	PutgFlangeTypeTable   = "putg_flange_type"
-	PutgDataTable         = "putg_data"
-	PutgSizeTable         = "putg_size"
-	PutgMaterialTable     = "putg_material"
+	//TODO
+	PutgFillerTableTest = "putg_filler_test"
+	PutgFillerBaseTable = "putg_filler_base"
+	PutgFlangeTypeTable = "putg_flange_type"
+	PutgDataTable       = "putg_data"
+	PutgSizeTable       = "putg_size"
+	PutgMaterialTable   = "putg_material"
+	PutgTypeTable       = "putg_type"
 
 	OrderTable               = "order"
 	PositionTable            = "position"

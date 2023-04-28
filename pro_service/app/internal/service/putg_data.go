@@ -19,8 +19,16 @@ func NewPutgDataService(repo repository.PutgData) *PutgDataService {
 	}
 }
 
-func (s *PutgDataService) Get(ctx context.Context, req *putg_data_api.GetPutgData) ([]*putg_data_model.PutgData, error) {
+func (s *PutgDataService) Get(ctx context.Context, req *putg_data_api.GetPutgData) (*putg_data_model.PutgData, error) {
 	putgData, err := s.repo.Get(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get putg data. error: %w", err)
+	}
+	return putgData, nil
+}
+
+func (s *PutgDataService) GetByConstruction(ctx context.Context, req *putg_data_api.GetPutgData) ([]*putg_data_model.PutgData, error) {
+	putgData, err := s.repo.GetByConstruction(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get putg data. error: %w", err)
 	}

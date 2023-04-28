@@ -40,6 +40,10 @@ github.com/Alexander272/sealur_proto/api v0.0.0-20230426114221-66087e75d3eb h1:Z
 github.com/Alexander272/sealur_proto/api v0.0.0-20230426114221-66087e75d3eb/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230427052807-6503dfd306bc h1:g15qxvPpoFNFL2LUs1fCtUJ+57jPhbVNgdz+5hGzwdA=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230427052807-6503dfd306bc/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230427113504-b017b693b4f6 h1:kXCgDemyIm7wujiQpGFRE9F5izzUnM713ryBahQlUEw=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230427113504-b017b693b4f6/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230428043027-0883dae064db h1:eYclMzeBzBAcCAzd0RSwojFoda6MXpnOtt1tBlwOTwg=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230428043027-0883dae064db/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=
