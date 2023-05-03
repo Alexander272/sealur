@@ -7,6 +7,7 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_flange_type_model"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_flange_type_api"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -40,4 +41,36 @@ func (r *PutgFlangeTypeRepo) Get(ctx context.Context, req *putg_flange_type_api.
 	return flangeTypes, nil
 }
 
-// TODO дописать оставшиеся функции
+func (r *PutgFlangeTypeRepo) Create(ctx context.Context, fl *putg_flange_type_api.CreatePutgFlangeType) error {
+	query := fmt.Sprintf(`INSERT INTO %s (id, title, code, putg_standard_id) VALUES ($1, $2, $3, $4)`, PutgFlangeTypeTable)
+	id := uuid.New()
+
+	_, err := r.db.Exec(query, id, fl.Title, fl.Code, fl.StandardId)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	return nil
+}
+
+func (r *PutgFlangeTypeRepo) Update(ctx context.Context, fl *putg_flange_type_api.UpdatePutgFlangeType) error {
+	query := fmt.Sprintf(`UPDATE %s SET title=$1, code=$2, putg_standard_id=$3 WHERE id=$4`, PutgFlangeTypeTable)
+
+	_, err := r.db.Exec(query, fl.Title, fl.Code, fl.StandardId, fl.Id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	return nil
+}
+
+func (r *PutgFlangeTypeRepo) Delete(ctx context.Context, fl *putg_flange_type_api.DeletePutgFlangeType) error {
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id=$1`, PutgFlangeTypeTable)
+
+	_, err := r.db.Exec(query, fl.Id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	return nil
+}

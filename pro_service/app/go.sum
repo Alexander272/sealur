@@ -40,6 +40,10 @@ github.com/Alexander272/sealur_proto/api v0.0.0-20230427113504-b017b693b4f6 h1:k
 github.com/Alexander272/sealur_proto/api v0.0.0-20230427113504-b017b693b4f6/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230428043027-0883dae064db h1:eYclMzeBzBAcCAzd0RSwojFoda6MXpnOtt1tBlwOTwg=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230428043027-0883dae064db/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230502105450-6203dd1ad72e h1:EBkzUgWuzncLPTR18qfSTqiVccq+RMdE4Zv/Lv4/d0g=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230502105450-6203dd1ad72e/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230503040909-7b6bf1af68be h1:s7pZnZApLGmqketDC90pOKoDnBMQuADtKJTzEjnB0qk=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230503040909-7b6bf1af68be/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
@@ -206,6 +210,10 @@ github.com/xuri/excelize/v2 v2.7.1 h1:gm8q0UCAyaTt3MEF5wWMjVdmthm2EHAWesGSKS9tdV
 github.com/xuri/excelize/v2 v2.7.1/go.mod h1:qc0+2j4TvAUrBw36ATtcTeC1VCM0fFdAXZOmcF4nTpY=
 github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 h1:OAmKAfT06//esDdpi/DZ8Qsdt4+M5+ltca05dA5bG2M=
 github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22/go.mod h1:WwHg+CVyzlv/TX9xqBFXEZAuxOPxn2k1GNHwG41IIUQ=
+github.com/xuri/nfp v0.0.0-20230502053742-ff4f5dcfe52b h1:yG2lL3t/0WY/XLJXqxtx8AlsSMo5ETRwvFGyGerPqbU=
+github.com/xuri/nfp v0.0.0-20230502053742-ff4f5dcfe52b/go.mod h1:WwHg+CVyzlv/TX9xqBFXEZAuxOPxn2k1GNHwG41IIUQ=
+github.com/xuri/nfp v0.0.0-20230503010013-3f38cdbb0b83 h1:xVwnvkzzi+OiwhIkWOXvh1skFI6bagk8OvGuazM80Rw=
+github.com/xuri/nfp v0.0.0-20230503010013-3f38cdbb0b83/go.mod h1:WwHg+CVyzlv/TX9xqBFXEZAuxOPxn2k1GNHwG41IIUQ=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

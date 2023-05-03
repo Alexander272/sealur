@@ -7,6 +7,7 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_material_api"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -89,4 +90,36 @@ func (r *PutgMaterialRepo) Get(ctx context.Context, req *putg_material_api.GetPu
 	return material, nil
 }
 
-// TODO дописать оставшиеся функции
+func (r *PutgMaterialRepo) Create(ctx context.Context, m *putg_material_api.CreatePutgMaterial) error {
+	query := fmt.Sprintf(`INSERT INTO %s (id, putg_standard_id, material_id, type, is_default, code) VALUES ($1, $2, $3, $4, $5, $6)`, PutgMaterialTable)
+	id := uuid.New()
+
+	_, err := r.db.Exec(query, id, m.StandardId, m.MaterialId, m.Type, m.IsDefault, m.Code)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	return nil
+}
+
+func (r *PutgMaterialRepo) Update(ctx context.Context, m *putg_material_api.UpdatePutgMaterial) error {
+	query := fmt.Sprintf(`UPDATE %s SET putg_standard_id=$1, material_id=$2, type=$3, is_default=$4, code=$5 WHERE id=$6`, PutgMaterialTable)
+
+	_, err := r.db.Exec(query, m.StandardId, m.MaterialId, m.Type, m.IsDefault, m.Code, m.Id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	return nil
+}
+
+func (r *PutgMaterialRepo) Delete(ctx context.Context, m *putg_material_api.DeletePutgMaterial) error {
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id=$1`, PutgMaterialTable)
+
+	_, err := r.db.Exec(query, m.Id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	return nil
+}

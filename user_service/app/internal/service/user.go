@@ -131,6 +131,8 @@ func (s *UserService) Create(ctx context.Context, user *user_api.CreateUser) (st
 			return "", err
 		}
 		user.ManagerId = manager.Id
+	} else {
+		user.UseLink = true
 	}
 
 	id, err := s.repo.Create(ctx, user, role.Id)

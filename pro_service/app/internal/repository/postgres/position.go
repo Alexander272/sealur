@@ -9,6 +9,7 @@ import (
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
+	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -77,6 +78,29 @@ func (r *PositionRepo) GetByTitle(ctx context.Context, title, orderId string) (s
 		return "", fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return data.Id, nil
+}
+
+func (r *PositionRepo) GetAnalytics(ctx context.Context, req *order_api.GetAnalytics) (*order_api.Analytics, error) {
+	var data models.PositionAnalytics
+	query := fmt.Sprintf(`SELECT count(DISTINCT "%s".id) as order_count, COUNT(DISTINCT user_id) as user_count, SUM(amount::integer) as position_count, 
+		SUM(case when type = 'Snp' then amount::integer end) as position_snp_count	FROM "%s" 
+		INNER JOIN "%s" ON order_id="%s".id WHERE date != ''`,
+		OrderTable, OrderTable, PositionTable, OrderTable,
+	)
+
+	if err := r.db.Get(&data, query); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	//TODO
+	analytic := &order_api.Analytics{
+		OrdersCount: data.OrderCount,
+		UsersCount:  data.UserCount,
+		// PositionCount: data.PositionCount,
+		SnpPositionCount: data.PositionSnpCount,
+	}
+
+	return analytic, nil
 }
 
 func (r *PositionRepo) Copy(ctx context.Context, position *position_api.CopyPosition) (string, error) {

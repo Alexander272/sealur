@@ -217,10 +217,16 @@ type SnpSize interface {
 
 type PutgConfiguration interface {
 	Get(context.Context, *putg_conf_api.GetPutgConfiguration) ([]*putg_configuration_model.PutgConfiguration, error)
+	Create(context.Context, *putg_conf_api.CreatePutgConfiguration) error
+	Update(context.Context, *putg_conf_api.UpdatePutgConfiguration) error
+	Delete(context.Context, *putg_conf_api.DeletePutgConfiguration) error
 }
 
 type PutgConstruction interface {
 	Get(context.Context, *putg_construction_api.GetPutgConstruction) ([]*putg_construction_type_model.PutgConstruction, error)
+	Create(context.Context, *putg_construction_api.CreatePutgConstruction) error
+	Update(context.Context, *putg_construction_api.UpdatePutgConstruction) error
+	Delete(context.Context, *putg_construction_api.DeletePutgConstruction) error
 }
 
 type PutgFiller interface {
@@ -229,27 +235,46 @@ type PutgFiller interface {
 
 type PutgFlangeType interface {
 	Get(context.Context, *putg_flange_type_api.GetPutgFlangeType) ([]*putg_flange_type_model.PutgFlangeType, error)
+	Create(ctx context.Context, fl *putg_flange_type_api.CreatePutgFlangeType) error
+	Update(ctx context.Context, fl *putg_flange_type_api.UpdatePutgFlangeType) error
+	Delete(ctx context.Context, fl *putg_flange_type_api.DeletePutgFlangeType) error
 }
 
 type PutgStandard interface {
 	Get(context.Context, *putg_standard_api.GetPutgStandard) ([]*putg_standard_model.PutgStandard, error)
+	Create(context.Context, *putg_standard_api.CreatePutgStandard) error
+	Update(context.Context, *putg_standard_api.UpdatePutgStandard) error
+	Delete(context.Context, *putg_standard_api.DeletePutgStandard) error
 }
 
 type PutgData interface {
 	Get(context.Context, *putg_data_api.GetPutgData) (*putg_data_model.PutgData, error)
 	GetByConstruction(context.Context, *putg_data_api.GetPutgData) ([]*putg_data_model.PutgData, error)
+	Create(context.Context, *putg_data_api.CreatePutgData) error
+	Update(context.Context, *putg_data_api.UpdatePutgData) error
+	Delete(context.Context, *putg_data_api.DeletePutgData) error
 }
 
 type PutgSize interface {
 	Get(context.Context, *putg_size_api.GetPutgSize) ([]*putg_size_model.PutgSize, error)
+	Create(context.Context, *putg_size_api.CreatePutgSize) error
+	CreateSeveral(context.Context, *putg_size_api.CreateSeveralPutgSize) error
+	Update(context.Context, *putg_size_api.UpdatePutgSize) error
+	Delete(context.Context, *putg_size_api.DeletePutgSize) error
 }
 
 type PutgMaterial interface {
 	Get(context.Context, *putg_material_api.GetPutgMaterial) (*putg_material_model.PutgMaterials, error)
+	Create(context.Context, *putg_material_api.CreatePutgMaterial) error
+	Update(context.Context, *putg_material_api.UpdatePutgMaterial) error
+	Delete(context.Context, *putg_material_api.DeletePutgMaterial) error
 }
 
 type PutgType interface {
 	Get(context.Context, *putg_type_api.GetPutgType) ([]*putg_type_model.PutgType, error)
+	Create(context.Context, *putg_type_api.CreatePutgType) error
+	Update(context.Context, *putg_type_api.UpdatePutgType) error
+	Delete(context.Context, *putg_type_api.DeletePutgType) error
 }
 
 type OrderNew interface {
@@ -268,6 +293,7 @@ type Position interface {
 	GetById(ctx context.Context, positionId string) (position *position_model.FullPosition, err error)
 	Get(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error)
 	GetByTitle(ctx context.Context, title, orderId string) (string, error)
+	GetAnalytics(context.Context, *order_api.GetAnalytics) (*order_api.Analytics, error)
 	Create(context.Context, *position_model.FullPosition) (string, error)
 	CreateSeveral(context.Context, []*position_model.FullPosition) error
 	Update(context.Context, *position_model.FullPosition) error

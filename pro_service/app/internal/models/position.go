@@ -1,5 +1,12 @@
 package models
 
+type PositionAnalytics struct {
+	OrderCount       int64 `db:"order_count"`
+	UserCount        int64 `db:"user_count"`
+	PositionCount    int64 `db:"position_count"`
+	PositionSnpCount int64 `db:"position_snp_count"`
+}
+
 type PositionNew struct {
 	Id     string `db:"id"`
 	Title  string `db:"title"`

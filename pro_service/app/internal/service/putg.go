@@ -94,7 +94,8 @@ func (s *PutgService) GetData(ctx context.Context, req *putg_api.GetPutgData) (*
 	if err != nil {
 		return nil, err
 	}
-	//TODO нужно свои размеры отдавать овальным и прямоугольным прокладкам
+	// TODO нужно свои размеры отдавать овальным и прямоугольным прокладкам
+	// TODO получение по стандарту неправильно, нужно тип указывать
 	sizes, err := s.sizes.Get(ctx, &putg_size_api.GetPutgSize{PutgStandardId: req.StandardId, ConstructionId: req.ConstructionId})
 	if err != nil {
 		return nil, err

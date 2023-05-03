@@ -26,3 +26,24 @@ func (s *PutgStandardService) Get(ctx context.Context, req *putg_standard_api.Ge
 	}
 	return standards, nil
 }
+
+func (s *PutgStandardService) Create(ctx context.Context, standard *putg_standard_api.CreatePutgStandard) error {
+	if err := s.repo.Create(ctx, standard); err != nil {
+		return fmt.Errorf("failed to create putg standard. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PutgStandardService) Update(ctx context.Context, standard *putg_standard_api.UpdatePutgStandard) error {
+	if err := s.repo.Update(ctx, standard); err != nil {
+		return fmt.Errorf("failed to update putg standard. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PutgStandardService) Delete(ctx context.Context, standard *putg_standard_api.DeletePutgStandard) error {
+	if err := s.repo.Delete(ctx, standard); err != nil {
+		return fmt.Errorf("failed to delete putg standard. error: %w", err)
+	}
+	return nil
+}

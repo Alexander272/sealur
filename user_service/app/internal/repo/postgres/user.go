@@ -112,9 +112,14 @@ func (r *UserRepo) GetManagers(ctx context.Context, req *user_api.GetNewUser) (u
 	return users, nil
 }
 
+func (r *UserRepo) GetAnalytics(ctx context.Context) error {
+
+	return fmt.Errorf("not implemented")
+}
+
 func (r *UserRepo) Create(ctx context.Context, user *user_api.CreateUser, roleId string) (string, error) {
-	query := fmt.Sprintf(`INSERT INTO "%s"(id, company, inn, kpp, region, city, "position", phone, password, email, role_id, name, address, manager_id)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`, UserTable)
+	query := fmt.Sprintf(`INSERT INTO "%s"(id, company, inn, kpp, region, city, "position", phone, password, email, role_id, name, address, manager_id, use_link)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`, UserTable)
 	id := uuid.New()
 
 	managerId := user.ManagerId
@@ -123,7 +128,7 @@ func (r *UserRepo) Create(ctx context.Context, user *user_api.CreateUser, roleId
 	}
 
 	_, err := r.db.Exec(query, id, user.Company, user.Inn, user.Kpp, user.Region, user.City, user.Position, user.Phone, user.Password,
-		user.Email, roleId, user.Name, user.Address, managerId,
+		user.Email, roleId, user.Name, user.Address, managerId, user.UseLink,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

@@ -31,3 +31,11 @@ type OrderWithPosition struct {
 	PositionCount int64  `db:"position_count"`
 	Info          string `db:"info"`
 }
+
+type OrderAnalytics struct {
+	UserId           string `db:"user_id"`
+	ManagerId        string `db:"manager_id"`
+	OrderCount       int64  `db:"order_count"`
+	PositionCount    int64  `db:"position_count"`
+	PositionSnpCount int64  `db:"position_snp_count"`
+}

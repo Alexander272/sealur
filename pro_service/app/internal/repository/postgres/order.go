@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/pro/models/analytic_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/order_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
@@ -148,6 +149,31 @@ func (r *OrderRepo) GetOpen(ctx context.Context, managerId string) (orders []*or
 	}
 
 	return orders, nil
+}
+
+func (r *OrderRepo) GetAnalytics(ctx context.Context, req *order_api.GetAnalytics) (orders []*analytic_model.Order, err error) {
+	var data []models.OrderAnalytics
+	query := fmt.Sprintf(`SELECT distinct user_id, manager_id, COUNT(distinct number) as order_count, SUM(amount::integer) as position_count,
+		SUM(case when type = 'Snp' then amount::integer end) as position_snp_count
+		FROM "%s" INNER JOIN "%s" ON order_id="%s".id
+		WHERE date>=$1 AND date<=$2 GROUP BY user_id, manager_id ORDER BY manager_id`,
+		OrderTable, PositionTable, OrderTable,
+	)
+
+	if err := r.db.Select(&data, query, req.PeriodAt, req.PeriodEnd); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	// TODO добавить в таблицу пользователь отметку о том как пользователь зарегистрировался (по ссылке менеджера или по ссылке на сайте)
+
+	// TODO
+	// for i, oa := range data {
+	// 	orders = append(orders, &analytic_model.Order{
+	// 		Id: oa.ManagerId,
+	// 	})
+	// }
+
+	return nil, fmt.Errorf("not implement")
 }
 
 func (r *OrderRepo) Create(ctx context.Context, order *order_api.CreateOrder, date string) error {

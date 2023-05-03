@@ -104,7 +104,7 @@ func (r *SnpSizeRepo) Create(ctx context.Context, size *snp_size_api.CreateSnpSi
 }
 
 func (r *SnpSizeRepo) CreateSeveral(ctx context.Context, sizes *snp_size_api.CreateSeveralSnpSize) error {
-	query := fmt.Sprintf("INSERT INTO %s (id, snp_type_id, count, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3) VALUES ", FlangeTypeSNPTable)
+	query := fmt.Sprintf("INSERT INTO %s (id, snp_type_id, count, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3) VALUES ", SnpSizeTable)
 
 	args := make([]interface{}, 0)
 	values := make([]string, 0, len(sizes.Sizes))

@@ -26,3 +26,24 @@ func (s *PutgFlangeTypeService) Get(ctx context.Context, req *putg_flange_type_a
 	}
 	return flangeTypes, nil
 }
+
+func (s *PutgFlangeTypeService) Create(ctx context.Context, flangeType *putg_flange_type_api.CreatePutgFlangeType) error {
+	if err := s.repo.Create(ctx, flangeType); err != nil {
+		return fmt.Errorf("failed to create putg flange type. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PutgFlangeTypeService) Update(ctx context.Context, flangeType *putg_flange_type_api.UpdatePutgFlangeType) error {
+	if err := s.repo.Update(ctx, flangeType); err != nil {
+		return fmt.Errorf("failed to update putg flange type. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PutgFlangeTypeService) Delete(ctx context.Context, flangeType *putg_flange_type_api.DeletePutgFlangeType) error {
+	if err := s.repo.Delete(ctx, flangeType); err != nil {
+		return fmt.Errorf("failed to delete putg flange type. error: %w", err)
+	}
+	return nil
+}

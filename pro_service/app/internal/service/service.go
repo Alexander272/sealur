@@ -244,10 +244,16 @@ type Snp interface {
 
 type PutgConfiguration interface {
 	Get(context.Context, *putg_conf_api.GetPutgConfiguration) ([]*putg_configuration_model.PutgConfiguration, error)
+	Create(context.Context, *putg_conf_api.CreatePutgConfiguration) error
+	Update(context.Context, *putg_conf_api.UpdatePutgConfiguration) error
+	Delete(context.Context, *putg_conf_api.DeletePutgConfiguration) error
 }
 
 type PutgConstruction interface {
 	Get(context.Context, *putg_construction_api.GetPutgConstruction) ([]*putg_construction_type_model.PutgConstruction, error)
+	Create(context.Context, *putg_construction_api.CreatePutgConstruction) error
+	Update(context.Context, *putg_construction_api.UpdatePutgConstruction) error
+	Delete(context.Context, *putg_construction_api.DeletePutgConstruction) error
 }
 
 type PutgFiller interface {
@@ -256,14 +262,23 @@ type PutgFiller interface {
 
 type PutgFlangeType interface {
 	Get(context.Context, *putg_flange_type_api.GetPutgFlangeType) ([]*putg_flange_type_model.PutgFlangeType, error)
+	Create(context.Context, *putg_flange_type_api.CreatePutgFlangeType) error
+	Update(context.Context, *putg_flange_type_api.UpdatePutgFlangeType) error
+	Delete(context.Context, *putg_flange_type_api.DeletePutgFlangeType) error
 }
 
 type PutgStandard interface {
 	Get(context.Context, *putg_standard_api.GetPutgStandard) ([]*putg_standard_model.PutgStandard, error)
+	Create(context.Context, *putg_standard_api.CreatePutgStandard) error
+	Update(context.Context, *putg_standard_api.UpdatePutgStandard) error
+	Delete(context.Context, *putg_standard_api.DeletePutgStandard) error
 }
 
 type PutgMaterial interface {
 	Get(context.Context, *putg_material_api.GetPutgMaterial) (*putg_material_model.PutgMaterials, error)
+	Create(context.Context, *putg_material_api.CreatePutgMaterial) error
+	Update(context.Context, *putg_material_api.UpdatePutgMaterial) error
+	Delete(context.Context, *putg_material_api.DeletePutgMaterial) error
 }
 
 type PutgData interface {

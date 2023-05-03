@@ -26,3 +26,26 @@ func (s *PutgMaterialService) Get(ctx context.Context, req *putg_material_api.Ge
 	}
 	return materials, nil
 }
+
+//TODO добавить создание материалов (которые в MaterialId идут)
+
+func (s *PutgMaterialService) Create(ctx context.Context, material *putg_material_api.CreatePutgMaterial) error {
+	if err := s.repo.Create(ctx, material); err != nil {
+		return fmt.Errorf("failed to create putg material. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PutgMaterialService) Update(ctx context.Context, material *putg_material_api.UpdatePutgMaterial) error {
+	if err := s.repo.Update(ctx, material); err != nil {
+		return fmt.Errorf("failed to update putg material. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PutgMaterialService) Delete(ctx context.Context, material *putg_material_api.DeletePutgMaterial) error {
+	if err := s.repo.Delete(ctx, material); err != nil {
+		return fmt.Errorf("failed to delete putg material. error: %w", err)
+	}
+	return nil
+}
