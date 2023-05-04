@@ -100,6 +100,14 @@ func (s *UserService) GetManagers(ctx context.Context, req *user_api.GetNewUser)
 	return users, nil
 }
 
+func (s *UserService) GetAnalytics(ctx context.Context, req *user_api.GetUserAnalytics) (*user_api.Analytics, error) {
+	analytics, err := s.repo.GetAnalytics(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user analytics. error: %w", err)
+	}
+	return analytics, nil
+}
+
 func (s *UserService) Create(ctx context.Context, user *user_api.CreateUser) (string, error) {
 	candidate, _, err := s.repo.GetByEmail(ctx, &user_api.GetUserByEmail{Email: user.Email})
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {

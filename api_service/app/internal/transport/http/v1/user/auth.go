@@ -42,7 +42,7 @@ func NewAuthHandler(
 }
 
 func (h *Handler) initAuthRoutes(api *gin.RouterGroup) {
-	handler := NewAuthHandler(h.userApi, h.emailApi, h.auth, h.http, h.services, h.cookieName)
+	handler := NewAuthHandler(h.userApi, h.emailApi, h.conf.Auth, h.conf.Http, h.services, h.cookieName)
 
 	auth := api.Group("/auth")
 	{

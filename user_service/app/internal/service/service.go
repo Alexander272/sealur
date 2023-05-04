@@ -15,7 +15,8 @@ type User interface {
 	Get(context.Context, *user_api.GetUser) (*user_model.User, error)
 	GetByEmail(context.Context, *user_api.GetUserByEmail) (*user_model.User, error)
 	GetManager(context.Context, *user_api.GetUser) (*user_api.Manager, error)
-	GetManagers(ctx context.Context, req *user_api.GetNewUser) ([]*user_model.User, error)
+	GetManagers(context.Context, *user_api.GetNewUser) ([]*user_model.User, error)
+	GetAnalytics(context.Context, *user_api.GetUserAnalytics) (*user_api.Analytics, error)
 	Create(context.Context, *user_api.CreateUser) (string, error)
 	Confirm(context.Context, *user_api.ConfirmUser) (*user_model.User, error)
 	SetManager(context.Context, *user_api.UserManager) error

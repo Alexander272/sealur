@@ -17,6 +17,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
+	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	"github.com/google/uuid"
 	"github.com/xuri/excelize/v2"
 )
@@ -25,15 +26,18 @@ type OrderServiceNew struct {
 	repo     repository.OrderNew
 	position Position
 	zip      Zip
+	userApi  user_api.UserServiceClient
 	fileApi  file_api.FileServiceClient
 }
 
-func NewOrderService_New(repo repository.OrderNew, position Position, zip Zip, fileApi file_api.FileServiceClient) *OrderServiceNew {
+func NewOrderService_New(repo repository.OrderNew, position Position, zip Zip, userApi user_api.UserServiceClient, fileApi file_api.FileServiceClient,
+) *OrderServiceNew {
 	return &OrderServiceNew{
 		repo:     repo,
 		position: position,
 		zip:      zip,
 		fileApi:  fileApi,
+		userApi:  userApi,
 	}
 }
 
@@ -280,6 +284,37 @@ func (s *OrderServiceNew) GetOpen(ctx context.Context, req *order_api.GetManager
 		return nil, fmt.Errorf("failed to get open orders. error: %w", err)
 	}
 	return orders, nil
+}
+
+func (s *OrderServiceNew) GetAnalytics(ctx context.Context, req *order_api.GetOrderAnalytics) (*order_api.Analytics, error) {
+	data, err := s.repo.GetAnalytics(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get analytics order. error: %w", err)
+	}
+
+	a, err := s.position.GetAnalytics(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	userAnalytics, err := s.userApi.GetAnalytics(ctx, &user_api.GetUserAnalytics{PeriodAt: req.PeriodAt, PeriodEnd: req.PeriodEnd})
+	if err != nil {
+		return nil, err
+	}
+
+	analytics := &order_api.Analytics{
+		OrdersCount:        a.OrdersCount,
+		UsersCountRegister: userAnalytics.UsersCountRegister,
+		UserCountLink:      userAnalytics.UserCountLink,
+		UserCount:          a.UserCount,
+		PositionCount:      a.PositionCount,
+		SnpPositionCount:   a.SnpPositionCount,
+		NewUserCount:       userAnalytics.NewUserCount,
+		NewUserCountLink:   userAnalytics.NewUserCountLink,
+		Orders:             data,
+	}
+
+	return analytics, nil
 }
 
 func (s *OrderServiceNew) Save(ctx context.Context, order *order_api.CreateOrder) (*order_api.OrderNumber, error) {

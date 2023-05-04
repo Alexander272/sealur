@@ -30,6 +30,7 @@ func NewUserHandler(
 	return &UserHandler{
 		userApi:    userApi,
 		emailApi:   emailApi,
+		http:       http,
 		auth:       auth,
 		services:   services,
 		cookieName: cookieName,
@@ -37,7 +38,7 @@ func NewUserHandler(
 }
 
 func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
-	handler := NewUserHandler(h.userApi, h.emailApi, h.http, h.auth, h.services, h.cookieName)
+	handler := NewUserHandler(h.userApi, h.emailApi, h.conf.Http, h.conf.Auth, h.services, h.cookieName)
 
 	users := api.Group("/users")
 	{

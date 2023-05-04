@@ -47,6 +47,7 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 		order.GET("/all", handler.getAll)
 		// order.GET("/open", handler.getOpen)
 		order.GET("/:id/заявка.zip", handler.getFile)
+		order.GET("/analytics", handler.getAnalytics)
 		order.POST("/", handler.create)
 		order.POST("/copy", handler.copy)
 		order.POST("/save", handler.save)
@@ -206,6 +207,27 @@ func (h *OrderHandler) getFile(c *gin.Context) {
 	c.File(meta.Name)
 }
 
+func (h *OrderHandler) getAnalytics(c *gin.Context) {
+	periodAt := c.Query("periodAt")
+	if periodAt == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty user id param")
+		return
+	}
+	periodEnd := c.Query("periodEnd")
+	if periodEnd == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param", "empty user id param")
+		return
+	}
+
+	analytics, err := h.orderApi.GetAnalytics(c, &order_api.GetOrderAnalytics{PeriodAt: periodAt, PeriodEnd: periodEnd})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: analytics})
+}
+
 func (h *OrderHandler) create(c *gin.Context) {
 	userId, exists := c.Get(middleware.UserIdCtx)
 	if !exists {
@@ -302,7 +324,7 @@ func (h *OrderHandler) save(c *gin.Context) {
 	}
 
 	// c.Header("Location", fmt.Sprintf("/api/v1/sealur-pro/orders/%s", order.Id))
-	c.JSON(http.StatusOK, models.IdResponse{Message: "Saved"})
+	c.JSON(http.StatusCreated, models.IdResponse{Message: "Saved"})
 }
 
 func (h *OrderHandler) setInfo(c *gin.Context) {

@@ -9,6 +9,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/flange_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/flange_type_snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/models/analytic_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_snp_model"
@@ -282,7 +283,8 @@ type OrderNew interface {
 	GetCurrent(context.Context, *order_api.GetCurrentOrder) (*order_model.CurrentOrder, error)
 	GetAll(context.Context, *order_api.GetAllOrders) ([]*order_model.Order, error)
 	GetNumber(ctx context.Context, order *order_api.CreateOrder, date string) (int64, error)
-	GetOpen(ctx context.Context, managerId string) (orders []*order_model.ManagerOrder, err error)
+	GetOpen(ctx context.Context, managerId string) ([]*order_model.ManagerOrder, error)
+	GetAnalytics(context.Context, *order_api.GetOrderAnalytics) ([]*analytic_model.Order, error)
 	Create(ctx context.Context, order *order_api.CreateOrder, date string) error
 	SetInfo(context.Context, *order_api.Info) error
 	SetStatus(context.Context, *order_api.Status) error
@@ -293,7 +295,7 @@ type Position interface {
 	GetById(ctx context.Context, positionId string) (position *position_model.FullPosition, err error)
 	Get(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error)
 	GetByTitle(ctx context.Context, title, orderId string) (string, error)
-	GetAnalytics(context.Context, *order_api.GetAnalytics) (*order_api.Analytics, error)
+	GetAnalytics(context.Context, *order_api.GetOrderAnalytics) (*order_api.Analytics, error)
 	Create(context.Context, *position_model.FullPosition) (string, error)
 	CreateSeveral(context.Context, []*position_model.FullPosition) error
 	Update(context.Context, *position_model.FullPosition) error

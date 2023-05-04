@@ -306,6 +306,7 @@ type OrderNew interface {
 	GetAll(context.Context, *order_api.GetAllOrders) ([]*order_model.Order, error)
 	GetFile(context.Context, *order_api.GetOrder) (*bytes.Buffer, string, error)
 	GetOpen(context.Context, *order_api.GetManagerOrders) ([]*order_model.ManagerOrder, error)
+	GetAnalytics(context.Context, *order_api.GetOrderAnalytics) (*order_api.Analytics, error)
 	Save(context.Context, *order_api.CreateOrder) (*order_api.OrderNumber, error)
 	Copy(context.Context, *order_api.CopyOrder) error
 	Create(context.Context, *order_api.CreateOrder) (string, error)
@@ -318,6 +319,7 @@ type Position interface {
 	Get(ctx context.Context, orderId string) (positions []*position_model.FullPosition, err error)
 	GetAll(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error)
 	GetFull(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error)
+	GetAnalytics(context.Context, *order_api.GetOrderAnalytics) (*order_api.Analytics, error)
 	Create(context.Context, *position_model.FullPosition) (string, error)
 	CreateSeveral(ctx context.Context, positions []*position_model.FullPosition, orderId string) error
 	Update(context.Context, *position_model.FullPosition) error
@@ -422,7 +424,7 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 
 	positionSnp := NewPositionSnpService(repos.PositionSnp)
 	position := NewPositionService_New(repos.Position, positionSnp, file)
-	order := NewOrderService_New(repos.OrderNew, position, zip, file)
+	order := NewOrderService_New(repos.OrderNew, position, zip, user, file)
 
 	return &Services{
 		// PutgImage:     NewPutgImageService(repos.PutgImage),

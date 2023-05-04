@@ -44,3 +44,10 @@ type DeleteUser struct {
 type Count struct {
 	Count int32 `db:"count"`
 }
+
+type Analytics struct {
+	UserCount         int64 `db:"user_count"`
+	LinkCount         int64 `db:"link_count"`
+	RegisterCount     int64 `db:"register_count"`
+	RegisterLinkCount int64 `db:"register_link_count"`
+}

@@ -102,6 +102,14 @@ func (h *OrderHandlers) GetFile(req *order_api.GetOrder, stream order_api.OrderS
 	return nil
 }
 
+func (h *OrderHandlers) GetAnalytics(ctx context.Context, req *order_api.GetOrderAnalytics) (*order_api.Analytics, error) {
+	analytics, err := h.service.GetAnalytics(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return analytics, nil
+}
+
 func (h *OrderHandlers) Save(ctx context.Context, order *order_api.CreateOrder) (*order_api.OrderNumber, error) {
 	number, err := h.service.Save(ctx, order)
 	if err != nil {

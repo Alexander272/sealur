@@ -80,7 +80,7 @@ func (r *PositionRepo) GetByTitle(ctx context.Context, title, orderId string) (s
 	return data.Id, nil
 }
 
-func (r *PositionRepo) GetAnalytics(ctx context.Context, req *order_api.GetAnalytics) (*order_api.Analytics, error) {
+func (r *PositionRepo) GetAnalytics(ctx context.Context, req *order_api.GetOrderAnalytics) (*order_api.Analytics, error) {
 	var data models.PositionAnalytics
 	query := fmt.Sprintf(`SELECT count(DISTINCT "%s".id) as order_count, COUNT(DISTINCT user_id) as user_count, SUM(amount::integer) as position_count, 
 		SUM(case when type = 'Snp' then amount::integer end) as position_snp_count	FROM "%s" 
@@ -92,11 +92,10 @@ func (r *PositionRepo) GetAnalytics(ctx context.Context, req *order_api.GetAnaly
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	//TODO
 	analytic := &order_api.Analytics{
-		OrdersCount: data.OrderCount,
-		UsersCount:  data.UserCount,
-		// PositionCount: data.PositionCount,
+		OrdersCount:      data.OrderCount,
+		UserCount:        data.UserCount,
+		PositionCount:    data.PositionCount,
 		SnpPositionCount: data.PositionSnpCount,
 	}
 

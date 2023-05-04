@@ -34,7 +34,9 @@ type OrderWithPosition struct {
 
 type OrderAnalytics struct {
 	UserId           string `db:"user_id"`
+	Company          string `db:"user_company"`
 	ManagerId        string `db:"manager_id"`
+	Manager          string `db:"manager"`
 	OrderCount       int64  `db:"order_count"`
 	PositionCount    int64  `db:"position_count"`
 	PositionSnpCount int64  `db:"position_snp_count"`

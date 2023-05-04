@@ -11,6 +11,7 @@ import (
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
+	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/google/uuid"
 )
@@ -75,6 +76,15 @@ func (s *PositionServiceNew) GetFull(ctx context.Context, orderId string) ([]*po
 	}
 
 	return positions, nil
+}
+
+func (s *PositionServiceNew) GetAnalytics(ctx context.Context, req *order_api.GetOrderAnalytics) (*order_api.Analytics, error) {
+	data, err := s.repo.GetAnalytics(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get position analytics. error: %w", err)
+	}
+
+	return data, nil
 }
 
 func (s *PositionServiceNew) Create(ctx context.Context, position *position_model.FullPosition) (string, error) {

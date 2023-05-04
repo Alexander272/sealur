@@ -15,6 +15,7 @@ type Users interface {
 	Get(context.Context, *user_api.GetUser) (*user_model.User, error)
 	GetByEmail(context.Context, *user_api.GetUserByEmail) (*user_model.User, string, error)
 	GetManagers(context.Context, *user_api.GetNewUser) ([]*user_model.User, error)
+	GetAnalytics(context.Context, *user_api.GetUserAnalytics) (*user_api.Analytics, error)
 	// Get(context.Context, *user_api.GetUser) (models.User, error)
 	// GetAll(context.Context, *user_api.GetAllUser) ([]models.User, error)
 	// GetNew(context.Context, *user_api.GetNewUser) ([]models.User, error)
