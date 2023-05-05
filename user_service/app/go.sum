@@ -52,6 +52,10 @@ github.com/Alexander272/sealur_proto/api v0.0.0-20230503095354-4482610b5be0 h1:f
 github.com/Alexander272/sealur_proto/api v0.0.0-20230503095354-4482610b5be0/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230504041055-876e5a3f9f53 h1:kL8voxduPIK0OgdRsOEmrVeFhZw4EW04ENhhu5+SNo8=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230504041055-876e5a3f9f53/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230504093903-c8f3647098ec h1:M9WidwwxlALFgxr5XmQcEX5vQorXaj0aVOHtmRYWJdM=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230504093903-c8f3647098ec/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230505055700-31d01a4a8dba h1:b/XkaMyajFi2Sv0KkHLm9dgjzCmZLXukhdXz9Q4511M=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230505055700-31d01a4a8dba/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
@@ -349,6 +353,8 @@ golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20220908164124-27713097b956/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.7.0 h1:3jlCCIQZPdOYu1h8BkNvLz8Kgwtae2cagcG/VamtZRU=
 golang.org/x/sys v0.7.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.8.0 h1:EBmGv8NaZBZTWvrbjNoL6HVt+IVy3QDQpJs7VRIw3tU=
+golang.org/x/sys v0.8.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/text v0.0.0-20170915032832-14c0d48ead0c/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
@@ -498,6 +504,8 @@ google.golang.org/grpc v1.34.0/go.mod h1:WotjhfgOW/POjDeRt8vscBtXq+2VjORFy659qA5
 google.golang.org/grpc v1.35.0/go.mod h1:qjiiYl8FncCW8feJPdyg3v6XW24KsRHe+dy9BAGRRjU=
 google.golang.org/grpc v1.54.0 h1:EhTqbhiYeixwWQtAEZAxmV9MGqcjEU2mFx52xCzNyag=
 google.golang.org/grpc v1.54.0/go.mod h1:PUSEXI6iWghWaB6lXM4knEgpJNu2qUcKfDtNci3EC2g=
+google.golang.org/grpc v1.55.0 h1:3Oj82/tFSCeUrRTg/5E/7d/W5A1tj6Ky1ABAuZuv5ag=
+google.golang.org/grpc v1.55.0/go.mod h1:iYEXKGkEBhg1PjZQvoYEVPTDkHo1/bjTnfwTeGONTY8=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=
 google.golang.org/protobuf v0.0.0-20200221191635-4d8936d0db64/go.mod h1:kwYJMbMJ01Woi6D6+Kah6886xMZcty6N08ah7+eCXa0=
 google.golang.org/protobuf v0.0.0-20200228230310-ab0ca4ff8a60/go.mod h1:cfTl7dwQJ+fmap5saPgwCLgHXTUD7jkjRqWcaiX5VyM=

@@ -426,10 +426,12 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 		if Bolt.WorkCond.X > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {
 			// Крутящий момент при затяжке болтов/шпилек
 			Moment.Mkp = s.graphic.CalculateMkp(d.Bolt.Diameter, Bolt.WorkCond.X)
+			Moment.UseGraphic = true
 		} else {
 			Moment.Mkp = (data.Friction * Bolt.Effort * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 			// Moment.Mkp = (0.3 * Bolt.Effort * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 		}
+		Moment.Friction = data.Friction
 
 		// Крутящий момент при затяжке болтов/шпилек со смазкой снижается на 25%
 		Moment.Mkp1 = 0.75 * Moment.Mkp

@@ -121,10 +121,12 @@ func (s *ExRectService) CalculateExRect(ctx context.Context, data *calc_api.Expr
 	if ok {
 		if Bolts.RatedStress > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {
 			Moment.Mkp = s.graphic.CalculateMkp(d.Bolt.Diameter, Bolts.RatedStress)
+			Moment.UseGraphic = true
 		} else {
 			Moment.Mkp = (data.Friction * ForcesInBolts.Effort * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 			// Moment.Mkp = (0.3 * ForcesInBolts.Effort * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 		}
+		Moment.Friction = data.Friction
 		Moment.Mkp1 = 0.75 * Moment.Mkp
 
 		Prek := 0.8 * ForcesInBolts.Area * d.Bolt.SigmaAt20

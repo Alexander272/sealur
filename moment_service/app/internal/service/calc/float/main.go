@@ -153,10 +153,12 @@ func (s *FloatService) CalculationFloat(ctx context.Context, data *calc_api.Floa
 		if result.Calc.SigmaB1 > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {
 			// Крутящий момент при затяжке болтов/шпилек
 			result.Calc.Mkp = s.graphic.CalculateMkp(d.Bolt.Diameter, result.Calc.SigmaB1)
+			result.Calc.UseGraphic = true
 		} else {
 			result.Calc.Mkp = (data.Friction * result.Calc.Pb * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 			// result.Calc.Mkp = (0.3 * result.Calc.Pb * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 		}
+		result.Calc.Friction = data.Friction
 
 		// Крутящий момент при затяжке болтов/шпилек со смазкой снижается на 25%
 		result.Calc.Mkp1 = 0.75 * result.Calc.Mkp

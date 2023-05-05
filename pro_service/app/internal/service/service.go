@@ -11,6 +11,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/flange_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/flange_type_snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/models/analytic_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_type_snp_model"
@@ -307,6 +308,7 @@ type OrderNew interface {
 	GetFile(context.Context, *order_api.GetOrder) (*bytes.Buffer, string, error)
 	GetOpen(context.Context, *order_api.GetManagerOrders) ([]*order_model.ManagerOrder, error)
 	GetAnalytics(context.Context, *order_api.GetOrderAnalytics) (*order_api.Analytics, error)
+	GetFullAnalytics(context.Context, *order_api.GetFullOrderAnalytics) ([]*analytic_model.FullOrder, error)
 	Save(context.Context, *order_api.CreateOrder) (*order_api.OrderNumber, error)
 	Copy(context.Context, *order_api.CopyOrder) error
 	Create(context.Context, *order_api.CreateOrder) (string, error)

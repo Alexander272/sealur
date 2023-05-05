@@ -211,11 +211,14 @@ func (s *CapService) momentCalculate(
 	SigmaB1, DSigmaM, Pbm, Ab, Dcp float64,
 	fullCalculate bool,
 ) *cap_model.CalcMoment {
-	moment := &cap_model.CalcMoment{}
+	moment := &cap_model.CalcMoment{
+		Friction: Friction,
+	}
 
 	if SigmaB1 > constants.MaxSigmaB && data.Bolt.Diameter >= constants.MinDiameter && data.Bolt.Diameter <= constants.MaxDiameter {
 		//TODO возвращать Friction и как-то определять на клиенте считается ли по формуле или по графику
 		moment.Mkp = s.graphic.CalculateMkp(data.Bolt.Diameter, SigmaB1)
+		moment.UseGraphic = true
 	} else {
 		//? вроде как формула изменилась, но почему-то использовалась новая формула
 		moment.Mkp = (Friction * Pbm * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000

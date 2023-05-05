@@ -13,6 +13,7 @@ import (
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/file_api"
+	"github.com/Alexander272/sealur_proto/api/pro/models/analytic_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/order_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/position_model"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
@@ -315,6 +316,14 @@ func (s *OrderServiceNew) GetAnalytics(ctx context.Context, req *order_api.GetOr
 	}
 
 	return analytics, nil
+}
+
+func (s *OrderServiceNew) GetFullAnalytics(ctx context.Context, req *order_api.GetFullOrderAnalytics) ([]*analytic_model.FullOrder, error) {
+	data, err := s.repo.GetFullAnalytics(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get order analytics. error: %w", err)
+	}
+	return data, nil
 }
 
 func (s *OrderServiceNew) Save(ctx context.Context, order *order_api.CreateOrder) (*order_api.OrderNumber, error) {

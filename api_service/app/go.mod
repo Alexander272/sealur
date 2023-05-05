@@ -16,7 +16,7 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.3.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
@@ -62,7 +62,7 @@ require (
 )
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230504041055-876e5a3f9f53
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230505055700-31d01a4a8dba
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/lib/pq v1.10.9
 	github.com/swaggo/swag v1.16.1
@@ -75,5 +75,5 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/xuri/excelize/v2 v2.7.1
-	google.golang.org/grpc v1.54.0
+	google.golang.org/grpc v1.55.0
 )

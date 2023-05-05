@@ -159,10 +159,12 @@ func (s *CoolingService) CalcMoment(
 	if ok {
 		if bolts.RatedStress > constants.MaxSigmaB && data.Bolt.Diameter >= constants.MinDiameter && data.Bolt.Diameter <= constants.MaxDiameter {
 			moment.Mkp = s.graphic.CalculateMkp(data.Bolt.Diameter, bolts.RatedStress)
+			moment.UseGraphic = true
 		} else {
 			moment.Mkp = (Friction * forces.Effort * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 			// moment.Mkp = (0.3 * forces.Effort * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 		}
+		moment.Friction = Friction
 		moment.Mkp1 = 0.75 * moment.Mkp
 
 		Prek := 0.8 * forces.Area * data.Bolt.SigmaAt20

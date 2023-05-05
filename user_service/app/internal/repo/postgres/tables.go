@@ -5,4 +5,6 @@ const (
 	RoleTable   = "role"
 	IpTable     = "ips"
 	RegionTable = "regions"
+
+	OrderTable = "order"
 )

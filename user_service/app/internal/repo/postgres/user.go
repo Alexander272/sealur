@@ -140,6 +140,69 @@ func (r *UserRepo) GetAnalytics(ctx context.Context, req *user_api.GetUserAnalyt
 	return analytics, nil
 }
 
+func (r *UserRepo) GetFullAnalytics(ctx context.Context, req *user_api.GetUsersByParam) (users []*user_model.AnalyticUsers, err error) {
+	var condition string
+	var params []interface{}
+
+	if !req.Empty {
+		if req.HasOrder {
+			condition += " AND has_order=true"
+		} else {
+			condition += fmt.Sprintf(" AND use_link=%t", req.UseLink)
+		}
+	}
+	if req.PeriodAt != "" {
+		condition += " AND date>=$1 AND date<=$2"
+		params = append(params, req.PeriodAt, req.PeriodEnd)
+	}
+
+	var data []models.UserAnalytics
+	query := fmt.Sprintf(`SELECT id, company, "position", phone, email, date, name, manager_id, use_link,
+		(SELECT name FROM "%s" as u WHERE id="%s".manager_id) as manager,
+		(SELECT count(id)>0 FROM "%s" WHERE date!='' AND user_id="%s".id) as has_order
+		FROM "%s" WHERE is_inner=false %s ORDER BY manager_id`,
+		UserTable, UserTable, OrderTable, UserTable, UserTable, condition,
+	)
+
+	if err := r.db.Select(&data, query, params...); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for i, ua := range data {
+		if i == 0 || users[len(users)-1].Id != ua.ManagerId {
+			users = append(users, &user_model.AnalyticUsers{
+				Id:      ua.ManagerId,
+				Manager: ua.Manager,
+				Users: []*user_model.User{{
+					Id:       ua.Id,
+					Company:  ua.Company,
+					Position: ua.Position,
+					Phone:    ua.Phone,
+					Email:    ua.Email,
+					// Date: ua.Date,
+					Name:    ua.Name,
+					UseLink: ua.UseLink,
+					// HasOrder: ua.HasOrder,
+				}},
+			})
+		} else {
+			users[len(users)-1].Users = append(users[len(users)-1].Users, &user_model.User{
+				Id:       ua.Id,
+				Company:  ua.Company,
+				Position: ua.Position,
+				Phone:    ua.Phone,
+				Email:    ua.Email,
+				// Date: ua.Date,
+				Name:    ua.Name,
+				UseLink: ua.UseLink,
+				// HasOrder: ua.HasOrder,
+			})
+		}
+	}
+
+	return users, nil
+}
+
 func (r *UserRepo) Create(ctx context.Context, user *user_api.CreateUser, roleId string) (string, error) {
 	query := fmt.Sprintf(`INSERT INTO "%s"(id, company, inn, kpp, region, city, "position", phone, password, email, role_id, name, address, manager_id, use_link)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`, UserTable)

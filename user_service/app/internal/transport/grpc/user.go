@@ -70,6 +70,14 @@ func (h *UserHandler) GetAnalytics(ctx context.Context, req *user_api.GetUserAna
 	return analytics, nil
 }
 
+func (h *UserHandler) GetByParam(ctx context.Context, req *user_api.GetUsersByParam) (*user_api.AnalyticsUsers, error) {
+	users, err := h.service.GetFullAnalytics(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &user_api.AnalyticsUsers{Users: users}, nil
+}
+
 func (h *UserHandler) Create(ctx context.Context, user *user_api.CreateUser) (*response_model.IdResponse, error) {
 	logger.Info("create")
 	id, err := h.service.Create(ctx, user)

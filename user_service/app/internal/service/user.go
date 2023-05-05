@@ -108,6 +108,14 @@ func (s *UserService) GetAnalytics(ctx context.Context, req *user_api.GetUserAna
 	return analytics, nil
 }
 
+func (s *UserService) GetFullAnalytics(ctx context.Context, req *user_api.GetUsersByParam) ([]*user_model.AnalyticUsers, error) {
+	users, err := s.repo.GetFullAnalytics(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user full analytics. error: %w", err)
+	}
+	return users, nil
+}
+
 func (s *UserService) Create(ctx context.Context, user *user_api.CreateUser) (string, error) {
 	candidate, _, err := s.repo.GetByEmail(ctx, &user_api.GetUserByEmail{Email: user.Email})
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
@@ -133,7 +141,10 @@ func (s *UserService) Create(ctx context.Context, user *user_api.CreateUser) (st
 	}
 	user.Password = fmt.Sprintf("%s.%s", pass, salt)
 
-	if user.ManagerId == "" || user.ManagerId == uuid.Nil.String() {
+	if user.ManagerId == "dynamic" {
+		user.UseLink = true
+	}
+	if user.ManagerId == "" || user.ManagerId == uuid.Nil.String() || user.ManagerId == "dynamic" {
 		manager, err := s.region.GetManagerByRegion(ctx, user.Region)
 		if err != nil {
 			return "", err

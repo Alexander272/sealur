@@ -110,6 +110,14 @@ func (h *OrderHandlers) GetAnalytics(ctx context.Context, req *order_api.GetOrde
 	return analytics, nil
 }
 
+func (h *OrderHandlers) GetBidAnalytics(ctx context.Context, req *order_api.GetFullOrderAnalytics) (*order_api.OrderAnalytics, error) {
+	analytics, err := h.service.GetFullAnalytics(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &order_api.OrderAnalytics{Orders: analytics}, nil
+}
+
 func (h *OrderHandlers) Save(ctx context.Context, order *order_api.CreateOrder) (*order_api.OrderNumber, error) {
 	number, err := h.service.Save(ctx, order)
 	if err != nil {

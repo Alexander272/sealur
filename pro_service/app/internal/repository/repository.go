@@ -285,6 +285,7 @@ type OrderNew interface {
 	GetNumber(ctx context.Context, order *order_api.CreateOrder, date string) (int64, error)
 	GetOpen(ctx context.Context, managerId string) ([]*order_model.ManagerOrder, error)
 	GetAnalytics(context.Context, *order_api.GetOrderAnalytics) ([]*analytic_model.Order, error)
+	GetFullAnalytics(context.Context, *order_api.GetFullOrderAnalytics) ([]*analytic_model.FullOrder, error)
 	Create(ctx context.Context, order *order_api.CreateOrder, date string) error
 	SetInfo(context.Context, *order_api.Info) error
 	SetStatus(context.Context, *order_api.Status) error

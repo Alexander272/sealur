@@ -17,6 +17,7 @@ type User interface {
 	GetManager(context.Context, *user_api.GetUser) (*user_api.Manager, error)
 	GetManagers(context.Context, *user_api.GetNewUser) ([]*user_model.User, error)
 	GetAnalytics(context.Context, *user_api.GetUserAnalytics) (*user_api.Analytics, error)
+	GetFullAnalytics(context.Context, *user_api.GetUsersByParam) ([]*user_model.AnalyticUsers, error)
 	Create(context.Context, *user_api.CreateUser) (string, error)
 	Confirm(context.Context, *user_api.ConfirmUser) (*user_model.User, error)
 	SetManager(context.Context, *user_api.UserManager) error

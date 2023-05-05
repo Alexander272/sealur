@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
@@ -43,6 +44,7 @@ func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
 	users := api.Group("/users")
 	{
 		users.GET("/managers", handler.getManagers)
+		users.GET("/analytics", handler.getByParam)
 		users.GET("/:id", handler.getUser)
 		users.POST("/confirm/:code", handler.confirm)
 		users.POST("/manager", handler.setManager)
@@ -75,6 +77,47 @@ func (h *UserHandler) getUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, models.DataResponse{Data: user})
+}
+
+func (h *UserHandler) getByParam(c *gin.Context) {
+	periodAt := c.Query("periodAt")
+	periodEnd := c.Query("periodEnd")
+	useLink := c.Query("useLink")
+	hasOrder := c.Query("hasOrder")
+
+	empty, link, order := false, false, false
+	var err error
+	if useLink == "" && hasOrder == "" {
+		empty = true
+	}
+	if useLink != "" {
+		link, err = strconv.ParseBool(useLink)
+		if err != nil {
+			models.NewErrorResponse(c, http.StatusBadRequest, "failed parse use link", err.Error())
+			return
+		}
+	}
+	if hasOrder != "" {
+		order, err = strconv.ParseBool(hasOrder)
+		if err != nil {
+			models.NewErrorResponse(c, http.StatusBadRequest, "failed parse has order", err.Error())
+			return
+		}
+	}
+
+	data, err := h.userApi.GetByParam(c, &user_api.GetUsersByParam{
+		Empty:     empty,
+		PeriodAt:  periodAt,
+		PeriodEnd: periodEnd,
+		UseLink:   link,
+		HasOrder:  order,
+	})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: data.Users})
 }
 
 func (h *UserHandler) confirm(c *gin.Context) {

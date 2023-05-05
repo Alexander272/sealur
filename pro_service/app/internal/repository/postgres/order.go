@@ -205,6 +205,76 @@ func (r *OrderRepo) GetAnalytics(ctx context.Context, req *order_api.GetOrderAna
 	return orders, nil
 }
 
+func (r *OrderRepo) GetFullAnalytics(ctx context.Context, req *order_api.GetFullOrderAnalytics) (orders []*analytic_model.FullOrder, err error) {
+	var condition string
+	var params []interface{}
+
+	if req.UserId != "" {
+		params = append(params, req.UserId)
+		condition += fmt.Sprintf(" AND user_id=$%d", len(params))
+	}
+	if req.PeriodAt != "" {
+		params = append(params, req.PeriodAt, req.PeriodEnd)
+		condition += fmt.Sprintf(" AND date>=$%d AND date<=$%d", len(params)-1, len(params))
+	}
+
+	var data []models.FullOrderAnalytics
+	query := fmt.Sprintf(`SELECT id, user_id, manager_id, number, date, status,	(SELECT company FROM "%s" WHERE "%s".id=user_id) as user_company,
+		(SELECT name FROM "%s" WHERE "%s".id=user_id) as user_name,
+		(SELECT name FROM "%s" WHERE id="%s".manager_id) as manager FROM "%s" WHERE date!='' %s
+		ORDER BY manager_id, user_id, number`,
+		UserTable, UserTable, UserTable, UserTable, UserTable, OrderTable, OrderTable, condition,
+	)
+
+	if err := r.db.Select(&data, query, params...); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for i, foa := range data {
+		if i == 0 || orders[len(orders)-1].Id != foa.ManagerId {
+			orders = append(orders, &analytic_model.FullOrder{
+				Id:      foa.ManagerId,
+				Manager: foa.Manager,
+				Clients: []*analytic_model.Client{{
+					Id:      foa.UserId,
+					Company: foa.Company,
+					Name:    foa.Name,
+					Orders: []*analytic_model.ClientOrder{{
+						Id:     foa.Id,
+						Number: foa.Number,
+						Date:   foa.Date,
+						Status: foa.Status,
+					}},
+				}},
+			})
+		} else {
+			if orders[len(orders)-1].Clients[len(orders[len(orders)-1].Clients)-1].Id != foa.UserId {
+				orders[len(orders)-1].Clients = append(orders[len(orders)-1].Clients, &analytic_model.Client{
+					Id:      foa.UserId,
+					Company: foa.Company,
+					Name:    foa.Name,
+					Orders: []*analytic_model.ClientOrder{{
+						Id:     foa.Id,
+						Number: foa.Number,
+						Date:   foa.Date,
+						Status: foa.Status,
+					}},
+				})
+			} else {
+				orders[len(orders)-1].Clients[len(orders[len(orders)-1].Clients)-1].Orders =
+					append(orders[len(orders)-1].Clients[len(orders[len(orders)-1].Clients)-1].Orders, &analytic_model.ClientOrder{
+						Id:     foa.Id,
+						Number: foa.Number,
+						Date:   foa.Date,
+						Status: foa.Status,
+					})
+			}
+		}
+	}
+
+	return orders, nil
+}
+
 func (r *OrderRepo) Create(ctx context.Context, order *order_api.CreateOrder, date string) error {
 	query := fmt.Sprintf(`INSERT INTO "%s" (id, user_id, date, count_position, manager_id, info) VALUES ($1, $2, $3, $4, $5, $6)`, OrderTable)
 

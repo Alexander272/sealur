@@ -65,7 +65,7 @@ func (m *Middleware) AccessForManager(c *gin.Context) {
 		return
 	}
 
-	if role != "manager" {
+	if role != "manager" && role != "cco" && role != "root" {
 		models.NewErrorResponse(c, http.StatusForbidden, role.(string), "access not allowed")
 		logger.Error(userId)
 		return

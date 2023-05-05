@@ -8,12 +8,14 @@
 #### шаблон файла config.yaml
 
     http:
-    serviceName: "api-service"
-    host: "http://localhost"
-    port: "port"
-    maxHeaderBytes: 1
-    readTimeout: 10s
-    writeTimeout: 10s
+        serviceName: 'api-service'
+        host: localhost
+        port: 8080
+        maxHeaderBytes: 1
+        readTimeout: 10s
+        writeTimeout: 10s
+        domain: localhost
+        link: http://localhost
 
     cache:
         ttl: 3600s
@@ -21,6 +23,10 @@
     auth:
         accessTokenTTL: ttl
         refreshTokenTTL: ttl
+        limitAuthTTL: ttl
+        countAttempt: 5
+        confirmTTL: ttl
+        secure: true
 
     redis:
         host: "host"
