@@ -39,7 +39,10 @@ func (h *Handler) initPutgRoutes(api *gin.RouterGroup) {
 }
 
 func (h *PutgHandler) getBase(c *gin.Context) {
-	putg, err := h.putgApi.GetBase(c, &putg_api.GetPutgBase{})
+	standardId := c.Query("standardId")
+	typeFlangeId := c.Query("typeFlangeId")
+
+	putg, err := h.putgApi.GetBase(c, &putg_api.GetPutgBase{StandardId: standardId, FlangeTypeId: typeFlangeId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -60,14 +63,20 @@ func (h *PutgHandler) getData(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty param constructionId", "конструкция не задана")
 		return
 	}
+	baseConstructionId := c.Query("baseConstructionId")
+	if constructionId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param base constructionId", "конструкция не задана")
+		return
+	}
 	// fillerId := c.Query("fillerId")
 	configuration := c.Query("configuration")
 	// changeStandard := c.Query("changeStandard")
 
 	data, err := h.putgApi.GetData(c, &putg_api.GetPutgData{
-		StandardId:     standardId,
-		ConstructionId: constructionId,
-		Configuration:  configuration,
+		StandardId:         standardId,
+		ConstructionId:     constructionId,
+		BaseConstructionId: baseConstructionId,
+		Configuration:      configuration,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")

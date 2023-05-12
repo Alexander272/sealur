@@ -26,3 +26,24 @@ func (s *PutgFillerService) Get(ctx context.Context, req *putg_filler_api.GetPut
 	}
 	return fillers, nil
 }
+
+func (s *PutgFillerService) Create(ctx context.Context, filler *putg_filler_api.CreatePutgFiller) error {
+	if err := s.repo.Create(ctx, filler); err != nil {
+		return fmt.Errorf("failed to create putg filler. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PutgFillerService) Update(ctx context.Context, filler *putg_filler_api.UpdatePutgFiller) error {
+	if err := s.repo.Update(ctx, filler); err != nil {
+		return fmt.Errorf("failed to update putg filler. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PutgFillerService) Delete(ctx context.Context, filler *putg_filler_api.DeletePutgFiller) error {
+	if err := s.repo.Delete(ctx, filler); err != nil {
+		return fmt.Errorf("failed to delete putg filler. error: %w", err)
+	}
+	return nil
+}

@@ -27,8 +27,6 @@ func (s *PutgMaterialService) Get(ctx context.Context, req *putg_material_api.Ge
 	return materials, nil
 }
 
-//TODO добавить создание материалов (которые в MaterialId идут)
-
 func (s *PutgMaterialService) Create(ctx context.Context, material *putg_material_api.CreatePutgMaterial) error {
 	if err := s.repo.Create(ctx, material); err != nil {
 		return fmt.Errorf("failed to create putg material. error: %w", err)

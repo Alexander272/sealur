@@ -27,10 +27,23 @@ func (s *PutgDataService) Get(ctx context.Context, req *putg_data_api.GetPutgDat
 	return putgData, nil
 }
 
-func (s *PutgDataService) GetByConstruction(ctx context.Context, req *putg_data_api.GetPutgData) ([]*putg_data_model.PutgData, error) {
-	putgData, err := s.repo.GetByConstruction(ctx, req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get putg data. error: %w", err)
+func (s *PutgDataService) Create(ctx context.Context, data *putg_data_api.CreatePutgData) error {
+	if err := s.repo.Create(ctx, data); err != nil {
+		return fmt.Errorf("failed to create putg data. error: %w", err)
 	}
-	return putgData, nil
+	return nil
+}
+
+func (s *PutgDataService) Update(ctx context.Context, data *putg_data_api.UpdatePutgData) error {
+	if err := s.repo.Update(ctx, data); err != nil {
+		return fmt.Errorf("failed to update putg data. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PutgDataService) Delete(ctx context.Context, data *putg_data_api.DeletePutgData) error {
+	if err := s.repo.Delete(ctx, data); err != nil {
+		return fmt.Errorf("failed to delete putg data. error: %w", err)
+	}
+	return nil
 }

@@ -53,15 +53,16 @@ type Analytics struct {
 }
 
 type UserAnalytics struct {
-	Id        string `db:"id"`
-	Company   string `db:"company"`
-	Position  string `db:"position"`
-	Phone     string `db:"phone"`
-	Email     string `db:"email"`
-	Date      string `db:"date"`
-	Name      string `db:"name"`
-	ManagerId string `db:"manager_id"`
-	UseLink   bool   `db:"use_link"`
-	Manager   string `db:"manager"`
-	HasOrder  bool   `db:"has_order"`
+	Id          string `db:"id"`
+	Company     string `db:"company"`
+	Position    string `db:"position"`
+	Phone       string `db:"phone"`
+	Email       string `db:"email"`
+	Date        string `db:"date"`
+	Name        string `db:"name"`
+	ManagerId   string `db:"manager_id"`
+	UseLink     bool   `db:"use_link"`
+	Manager     string `db:"manager"`
+	OrdersCount int64  `db:"orders_count"`
+	// HasOrder  bool   `db:"has_order"`
 }

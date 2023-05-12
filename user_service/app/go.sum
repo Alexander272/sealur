@@ -56,6 +56,8 @@ github.com/Alexander272/sealur_proto/api v0.0.0-20230504093903-c8f3647098ec h1:M
 github.com/Alexander272/sealur_proto/api v0.0.0-20230504093903-c8f3647098ec/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230505055700-31d01a4a8dba h1:b/XkaMyajFi2Sv0KkHLm9dgjzCmZLXukhdXz9Q4511M=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230505055700-31d01a4a8dba/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230505105254-847a4af67f41 h1:vJwb/ikPuTMQ+6Su5HpDlT7nTOXIILVoIf0PfohtGNw=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230505105254-847a4af67f41/go.mod h1:glP8RHHuyBCDWb2WHpnrrI9c54BOENLVH9/nsQvfGLU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=

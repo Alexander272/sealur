@@ -145,11 +145,11 @@ func (r *UserRepo) GetFullAnalytics(ctx context.Context, req *user_api.GetUsersB
 	var params []interface{}
 
 	if !req.Empty {
-		if req.HasOrder {
-			condition += " AND has_order=true"
-		} else {
-			condition += fmt.Sprintf(" AND use_link=%t", req.UseLink)
-		}
+		// if req.HasOrder {
+		// 	это не работает
+		// 	condition += " AND has_order=true"
+		// }
+		condition += fmt.Sprintf(" AND use_link=%t", req.UseLink)
 	}
 	if req.PeriodAt != "" {
 		condition += " AND date>=$1 AND date<=$2"
@@ -159,7 +159,7 @@ func (r *UserRepo) GetFullAnalytics(ctx context.Context, req *user_api.GetUsersB
 	var data []models.UserAnalytics
 	query := fmt.Sprintf(`SELECT id, company, "position", phone, email, date, name, manager_id, use_link,
 		(SELECT name FROM "%s" as u WHERE id="%s".manager_id) as manager,
-		(SELECT count(id)>0 FROM "%s" WHERE date!='' AND user_id="%s".id) as has_order
+		(SELECT count(id) FROM "%s" WHERE date!='' AND user_id="%s".id) as orders_count
 		FROM "%s" WHERE is_inner=false %s ORDER BY manager_id`,
 		UserTable, UserTable, OrderTable, UserTable, UserTable, condition,
 	)
@@ -169,35 +169,41 @@ func (r *UserRepo) GetFullAnalytics(ctx context.Context, req *user_api.GetUsersB
 	}
 
 	for i, ua := range data {
+		userData := &user_model.UserData{
+			Id:       ua.Id,
+			Company:  ua.Company,
+			Position: ua.Position,
+			Phone:    ua.Phone,
+			Email:    ua.Email,
+			// Date: ua.Date,
+			Name:        ua.Name,
+			UseLink:     ua.UseLink,
+			OrdersCount: ua.OrdersCount,
+			HasOrders:   ua.OrdersCount > 0,
+		}
+
 		if i == 0 || users[len(users)-1].Id != ua.ManagerId {
 			users = append(users, &user_model.AnalyticUsers{
 				Id:      ua.ManagerId,
 				Manager: ua.Manager,
-				Users: []*user_model.User{{
-					Id:       ua.Id,
-					Company:  ua.Company,
-					Position: ua.Position,
-					Phone:    ua.Phone,
-					Email:    ua.Email,
-					// Date: ua.Date,
-					Name:    ua.Name,
-					UseLink: ua.UseLink,
-					// HasOrder: ua.HasOrder,
-				}},
-			})
-		} else {
-			users[len(users)-1].Users = append(users[len(users)-1].Users, &user_model.User{
-				Id:       ua.Id,
-				Company:  ua.Company,
-				Position: ua.Position,
-				Phone:    ua.Phone,
-				Email:    ua.Email,
-				// Date: ua.Date,
-				Name:    ua.Name,
-				UseLink: ua.UseLink,
-				// HasOrder: ua.HasOrder,
+				Users:   []*user_model.UserData{},
 			})
 		}
+		// else {
+		// 	users[len(users)-1].Users = append(users[len(users)-1].Users, userData)
+		// }
+
+		if req.HasOrder {
+			if userData.HasOrders {
+				users[len(users)-1].Users = append(users[len(users)-1].Users, userData)
+			}
+		} else {
+			users[len(users)-1].Users = append(users[len(users)-1].Users, userData)
+		}
+
+		// if req.Empty || (req.HasOrder && userData.HasOrders) {
+		// 	users[len(users)-1].Users = append(users[len(users)-1].Users, userData)
+		// }
 	}
 
 	return users, nil

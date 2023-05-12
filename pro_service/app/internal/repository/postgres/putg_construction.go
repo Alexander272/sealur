@@ -24,17 +24,19 @@ func NewPutgConstructionRepo(db *sqlx.DB) *PutgConstructionRepo {
 func (r *PutgConstructionRepo) Get(ctx context.Context, req *putg_construction_api.GetPutgConstruction,
 ) (constructions []*putg_construction_type_model.PutgConstruction, err error) {
 	var data []models.PutgConstruction
-	query := fmt.Sprintf(`SELECT id, title, code, has_d4, has_d3, has_d2, has_d1, has_rotary_plug, has_inner_ring, has_outer_ring FROM %s ORDER BY code`,
-		PutgConstructionTable,
+	query := fmt.Sprintf(`SELECT %s.id, construction_id, title, code, has_d4, has_d3, has_d2, has_d1, has_rotary_plug, has_inner_ring, has_outer_ring FROM %s 
+		INNER JOIN %s ON construction_id=%s.id WHERE putg_flange_type_id=$1 ORDER BY code`,
+		PutgConstructionTable, PutgConstructionTable, PutgConstructionBaseTable, PutgConstructionBaseTable,
 	)
 
-	if err := r.db.Select(&data, query); err != nil {
+	if err := r.db.Select(&data, query, req.FlangeTypeId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
 	for _, c := range data {
 		constructions = append(constructions, &putg_construction_type_model.PutgConstruction{
 			Id:            c.Id,
+			BaseId:        c.ConstructionId,
 			Title:         c.Title,
 			Code:          c.Code,
 			HasD4:         c.HasD4,
@@ -51,12 +53,12 @@ func (r *PutgConstructionRepo) Get(ctx context.Context, req *putg_construction_a
 }
 
 func (r *PutgConstructionRepo) Create(ctx context.Context, c *putg_construction_api.CreatePutgConstruction) error {
-	query := fmt.Sprintf(`INSERT INTO %s(id, title, code, has_d4, has_d3, has_d2, has_d1, has_rotary_plug, has_inner_ring, has_outer_ring)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, PutgConstructionTable,
+	query := fmt.Sprintf(`INSERT INTO %s (id, construction_id, putg_standard_id, putg_flange_type_id)
+		VALUES ($1, $2, $3, $4)`, PutgConstructionTable,
 	)
 	id := uuid.New()
 
-	_, err := r.db.Exec(query, id, c.Title, c.Code, c.HasD4, c.HasD3, c.HasD2, c.HasD1, c.HasRotaryPlug, c.HasInnerRing, c.HasOuterRing)
+	_, err := r.db.Exec(query, id, c.ConstructionId, c.StandardId, c.FlangeTypeId)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -65,11 +67,9 @@ func (r *PutgConstructionRepo) Create(ctx context.Context, c *putg_construction_
 }
 
 func (r *PutgConstructionRepo) Update(ctx context.Context, c *putg_construction_api.UpdatePutgConstruction) error {
-	query := fmt.Sprintf(`UPDATE %s SET title=$1, code=$2, has_d4=$3, has_d3=$4, has_d2=$5, has_d1=$6, has_rotary=$7, has_inner_ring=$8,
-		has_outer_ring=$9 WHERE id=$10`, PutgConstructionTable,
-	)
+	query := fmt.Sprintf(`UPDATE %s SET construction_id=$1, putg_standard_id=$2, putg_flange_type_id=$3 WHERE id=$4`, PutgConstructionTable)
 
-	_, err := r.db.Exec(query, c.Title, c.Code, c.HasD4, c.HasD3, c.HasD2, c.HasD1, c.HasRotaryPlug, c.HasInnerRing, c.HasOuterRing)
+	_, err := r.db.Exec(query, c.ConstructionId, c.StandardId, c.FlangeTypeId, c.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

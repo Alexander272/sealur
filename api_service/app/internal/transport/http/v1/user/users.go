@@ -87,7 +87,7 @@ func (h *UserHandler) getByParam(c *gin.Context) {
 
 	empty, link, order := false, false, false
 	var err error
-	if useLink == "" && hasOrder == "" {
+	if useLink == "" {
 		empty = true
 	}
 	if useLink != "" {

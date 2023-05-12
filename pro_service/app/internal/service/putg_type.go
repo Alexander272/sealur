@@ -26,3 +26,24 @@ func (s *PutgTypeService) Get(ctx context.Context, req *putg_type_api.GetPutgTyp
 	}
 	return types, nil
 }
+
+func (s *PutgTypeService) Create(ctx context.Context, t *putg_type_api.CreatePutgType) error {
+	if err := s.repo.Create(ctx, t); err != nil {
+		return fmt.Errorf("failed to create putg type. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PutgTypeService) Update(ctx context.Context, t *putg_type_api.UpdatePutgType) error {
+	if err := s.repo.Update(ctx, t); err != nil {
+		return fmt.Errorf("failed to update putg type. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PutgTypeService) Delete(ctx context.Context, t *putg_type_api.DeletePutgType) error {
+	if err := s.repo.Delete(ctx, t); err != nil {
+		return fmt.Errorf("failed to delete putg type. error: %w", err)
+	}
+	return nil
+}

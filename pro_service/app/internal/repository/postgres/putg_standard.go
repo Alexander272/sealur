@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
+	"github.com/Alexander272/sealur_proto/api/pro/models/flange_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_standard_model"
+	"github.com/Alexander272/sealur_proto/api/pro/models/standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -23,8 +25,14 @@ func NewPutgStandardRepo(db *sqlx.DB) *PutgStandardRepo {
 
 func (r *PutgStandardRepo) Get(ctx context.Context, req *putg_standard_api.GetPutgStandard) (standards []*putg_standard_model.PutgStandard, err error) {
 	var data []models.PutgStandard
-	query := fmt.Sprintf(`SELECT %s.id, title, code, dn_title, pn_title	FROM %s INNER JOIN %s ON flange_standard_id=%s.id ORDER BY count`,
-		PutgStandardTable, PutgStandardTable, FlangeStandardTable, FlangeStandardTable,
+	// query := fmt.Sprintf(`SELECT %s.id, title, code, dn_title, pn_title	FROM %s INNER JOIN %s ON flange_standard_id=%s.id ORDER BY count`,
+	// 	PutgStandardTable, PutgStandardTable, FlangeStandardTable, FlangeStandardTable,
+	// )
+	query := fmt.Sprintf(`SELECT %s.id, dn_title, pn_title, standard_id, flange_standard_id, %s.title as flange_title, 
+		%s.code as flange_code, %s.title as standard_title
+		FROM %s INNER JOIN %s ON flange_standard_id=%s.id INNER JOIN %s ON %s.id=standard_id ORDER BY count`,
+		PutgStandardTable, FlangeStandardTable, FlangeStandardTable, StandardTable,
+		PutgStandardTable, FlangeStandardTable, FlangeStandardTable, StandardTable, StandardTable,
 	)
 
 	if err := r.db.Select(&data, query); err != nil {
@@ -34,10 +42,17 @@ func (r *PutgStandardRepo) Get(ctx context.Context, req *putg_standard_api.GetPu
 	for _, ps := range data {
 		standards = append(standards, &putg_standard_model.PutgStandard{
 			Id:      ps.Id,
-			Title:   ps.Title,
-			Code:    ps.Code,
 			DnTitle: ps.DnTitle,
 			PnTitle: ps.PnTitle,
+			FlangeStandard: &flange_standard_model.FlangeStandard{
+				Id:    ps.FlangeId,
+				Title: ps.FlangeTitle,
+				Code:  ps.FlangeCode,
+			},
+			Standard: &standard_model.Standard{
+				Id:    ps.StandardId,
+				Title: ps.StandardTitle,
+			},
 		})
 	}
 

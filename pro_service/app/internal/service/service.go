@@ -41,10 +41,12 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_base_construction_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_conf_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_construction_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_filler_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_filler_base_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_flange_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
@@ -250,6 +252,13 @@ type PutgConfiguration interface {
 	Delete(context.Context, *putg_conf_api.DeletePutgConfiguration) error
 }
 
+type PutgBaseConstruction interface {
+	Get(context.Context, *putg_base_construction_api.GetPutgBaseConstruction) ([]*putg_construction_type_model.PutgConstruction, error)
+	Create(context.Context, *putg_base_construction_api.CreatePutgBaseConstruction) error
+	Update(context.Context, *putg_base_construction_api.UpdatePutgBaseConstruction) error
+	Delete(context.Context, *putg_base_construction_api.DeletePutgBaseConstruction) error
+}
+
 type PutgConstruction interface {
 	Get(context.Context, *putg_construction_api.GetPutgConstruction) ([]*putg_construction_type_model.PutgConstruction, error)
 	Create(context.Context, *putg_construction_api.CreatePutgConstruction) error
@@ -257,8 +266,18 @@ type PutgConstruction interface {
 	Delete(context.Context, *putg_construction_api.DeletePutgConstruction) error
 }
 
+type PutgBaseFiller interface {
+	Get(context.Context, *putg_filler_base_api.GetPutgBaseFiller) ([]*putg_filler_model.PutgFiller, error)
+	Create(context.Context, *putg_filler_base_api.CreatePutgBaseFiller) error
+	Update(context.Context, *putg_filler_base_api.UpdatePutgBaseFiller) error
+	Delete(context.Context, *putg_filler_base_api.DeletePutgBaseFiller) error
+}
+
 type PutgFiller interface {
 	Get(context.Context, *putg_filler_api.GetPutgFiller) ([]*putg_filler_model.PutgFiller, error)
+	Create(context.Context, *putg_filler_api.CreatePutgFiller) error
+	Update(context.Context, *putg_filler_api.UpdatePutgFiller) error
+	Delete(context.Context, *putg_filler_api.DeletePutgFiller) error
 }
 
 type PutgFlangeType interface {
@@ -284,15 +303,24 @@ type PutgMaterial interface {
 
 type PutgData interface {
 	Get(context.Context, *putg_data_api.GetPutgData) (*putg_data_model.PutgData, error)
-	GetByConstruction(context.Context, *putg_data_api.GetPutgData) ([]*putg_data_model.PutgData, error)
+	Create(context.Context, *putg_data_api.CreatePutgData) error
+	Update(context.Context, *putg_data_api.UpdatePutgData) error
+	Delete(context.Context, *putg_data_api.DeletePutgData) error
 }
 
 type PutgSize interface {
 	Get(context.Context, *putg_size_api.GetPutgSize) ([]*putg_size_model.PutgSize, error)
+	Create(context.Context, *putg_size_api.CreatePutgSize) error
+	CreateSeveral(context.Context, *putg_size_api.CreateSeveralPutgSize) error
+	Update(context.Context, *putg_size_api.UpdatePutgSize) error
+	Delete(context.Context, *putg_size_api.DeletePutgSize) error
 }
 
 type PutgType interface {
 	Get(context.Context, *putg_type_api.GetPutgType) ([]*putg_type_model.PutgType, error)
+	Create(context.Context, *putg_type_api.CreatePutgType) error
+	Update(context.Context, *putg_type_api.UpdatePutgType) error
+	Delete(context.Context, *putg_type_api.DeletePutgType) error
 }
 
 type Putg interface {
@@ -371,6 +399,7 @@ type Services struct {
 	Snp
 
 	PutgConfiguration
+	PutgBaseConstruction
 	PutgConstruction
 	PutgFiller
 	PutgFlangeType
@@ -400,6 +429,7 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 	snpSize := NewSnpSizeService(repos.SnpSize)
 
 	putgConfiguration := NewPutgConfigurationService(repos.PutgConfiguration)
+	putgBaseConstruction := NewPutgBaseConstructionService(repos.PutgBaseConstruction)
 	putgConstruction := NewPutgConstructionService(repos.PutgConstruction)
 	putgFiller := NewPutgFillerService(repos.PutgFiller)
 	putgFlangeType := NewPutgFlangeTypeService(repos.PutgFlangeType)
@@ -453,16 +483,17 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		SnpSize:       snpSize,
 		Snp:           NewSnpService(filler, snpMaterial, snpType, mounting, standard, snpData, snpStandard, snpSize),
 
-		PutgConfiguration: putgConfiguration,
-		PutgConstruction:  putgConstruction,
-		PutgFiller:        putgFiller,
-		PutgFlangeType:    putgFlangeType,
-		PutgStandard:      putgStandard,
-		PutgMaterial:      putgMaterial,
-		PutgData:          putgData,
-		PutgSize:          putgSize,
-		PutgType:          putgType,
-		Putg:              putg,
+		PutgConfiguration:    putgConfiguration,
+		PutgBaseConstruction: putgBaseConstruction,
+		PutgConstruction:     putgConstruction,
+		PutgFiller:           putgFiller,
+		PutgFlangeType:       putgFlangeType,
+		PutgStandard:         putgStandard,
+		PutgMaterial:         putgMaterial,
+		PutgData:             putgData,
+		PutgSize:             putgSize,
+		PutgType:             putgType,
+		Putg:                 putg,
 
 		PositionSnp: positionSnp,
 		Position:    position,
