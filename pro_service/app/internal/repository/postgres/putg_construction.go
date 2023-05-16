@@ -24,8 +24,8 @@ func NewPutgConstructionRepo(db *sqlx.DB) *PutgConstructionRepo {
 func (r *PutgConstructionRepo) Get(ctx context.Context, req *putg_construction_api.GetPutgConstruction,
 ) (constructions []*putg_construction_type_model.PutgConstruction, err error) {
 	var data []models.PutgConstruction
-	query := fmt.Sprintf(`SELECT %s.id, construction_id, title, code, has_d4, has_d3, has_d2, has_d1, has_rotary_plug, has_inner_ring, has_outer_ring FROM %s 
-		INNER JOIN %s ON construction_id=%s.id WHERE putg_flange_type_id=$1 ORDER BY code`,
+	query := fmt.Sprintf(`SELECT %s.id, construction_id, title, code, has_d4, has_d3, has_d2, has_d1, has_rotary_plug, has_inner_ring, has_outer_ring, description
+	 	FROM %s INNER JOIN %s ON construction_id=%s.id WHERE putg_flange_type_id=$1 ORDER BY code`,
 		PutgConstructionTable, PutgConstructionTable, PutgConstructionBaseTable, PutgConstructionBaseTable,
 	)
 
@@ -46,6 +46,7 @@ func (r *PutgConstructionRepo) Get(ctx context.Context, req *putg_construction_a
 			HasRotaryPlug: c.HasRotaryPlug,
 			HasInnerRing:  c.HasInnerRing,
 			HasOuterRing:  c.HasOuterRing,
+			Description:   c.Description,
 		})
 	}
 

@@ -12,4 +12,5 @@ type PutgConstruction struct {
 	HasRotaryPlug  bool   `db:"has_rotary_plug"`
 	HasInnerRing   bool   `db:"has_inner_ring"`
 	HasOuterRing   bool   `db:"has_outer_ring"`
+	Description    string `db:"description"`
 }

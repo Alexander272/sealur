@@ -21,6 +21,7 @@ func NewPutgConstructionBaseRepo(db *sqlx.DB) *PutgConstructionBaseRepo {
 	}
 }
 
+// TODO добавить description
 func (r *PutgConstructionBaseRepo) Get(ctx context.Context, req *putg_base_construction_api.GetPutgBaseConstruction,
 ) (constructions []*putg_construction_type_model.PutgConstruction, err error) {
 	var data []models.PutgConstruction
@@ -50,6 +51,7 @@ func (r *PutgConstructionBaseRepo) Get(ctx context.Context, req *putg_base_const
 	return constructions, nil
 }
 
+// TODO добавить description
 func (r *PutgConstructionBaseRepo) Create(ctx context.Context, c *putg_base_construction_api.CreatePutgBaseConstruction) error {
 	query := fmt.Sprintf(`INSERT INTO %s(id, title, code, has_d4, has_d3, has_d2, has_d1, has_rotary_plug, has_inner_ring, has_outer_ring)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, PutgConstructionTable,
@@ -64,6 +66,7 @@ func (r *PutgConstructionBaseRepo) Create(ctx context.Context, c *putg_base_cons
 	return nil
 }
 
+// TODO добавить description
 func (r *PutgConstructionBaseRepo) Update(ctx context.Context, c *putg_base_construction_api.UpdatePutgBaseConstruction) error {
 	query := fmt.Sprintf(`UPDATE %s SET title=$1, code=$2, has_d4=$3, has_d3=$4, has_d2=$5, has_d1=$6, has_rotary=$7, has_inner_ring=$8,
 		has_outer_ring=$9 WHERE id=$10`, PutgConstructionTable,
