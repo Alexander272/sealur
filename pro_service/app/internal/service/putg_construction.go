@@ -27,6 +27,15 @@ func (s *PutgConstructionService) Get(ctx context.Context, req *putg_constructio
 	return constructions, nil
 }
 
+func (s *PutgConstructionService) GetNew(ctx context.Context, req *putg_construction_api.GetPutgConstruction_New,
+) ([]*putg_construction_type_model.PutgConstruction, error) {
+	constructions, err := s.repo.GetNew(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get putg construction. error: %w", err)
+	}
+	return constructions, nil
+}
+
 func (s *PutgConstructionService) Create(ctx context.Context, construction *putg_construction_api.CreatePutgConstruction) error {
 	if err := s.repo.Create(ctx, construction); err != nil {
 		return fmt.Errorf("failed to create putg construction. error: %w", err)

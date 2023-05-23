@@ -31,6 +31,27 @@ type User struct {
 	Confirmed bool   `db:"confirmed"`
 }
 
+type FullUser struct {
+	Id         string `db:"id"`
+	Company    string `db:"company"`
+	Address    string `db:"address"`
+	Inn        string `db:"inn"`
+	Kpp        string `db:"kpp"`
+	Region     string `db:"region"`
+	City       string `db:"city"`
+	Name       string `db:"name"`
+	Position   string `db:"position"`
+	Email      string `db:"email"`
+	Phone      string `db:"phone"`
+	RoleCode   string `db:"role_code"`
+	Manager    string `db:"manager"`
+	Confirmed  bool   `db:"confirmed"`
+	UseLink    bool   `db:"use_link"`
+	Date       string `db:"date"`
+	UseLanding bool   `db:"use_landing"`
+	LastVisit  string `db:"last_visit"`
+}
+
 type ConfirmUser struct {
 	Name  string `db:"name"`
 	Email string `db:"email"`

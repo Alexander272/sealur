@@ -261,6 +261,7 @@ type PutgBaseConstruction interface {
 
 type PutgConstruction interface {
 	Get(context.Context, *putg_construction_api.GetPutgConstruction) ([]*putg_construction_type_model.PutgConstruction, error)
+	GetNew(context.Context, *putg_construction_api.GetPutgConstruction_New) ([]*putg_construction_type_model.PutgConstruction, error)
 	Create(context.Context, *putg_construction_api.CreatePutgConstruction) error
 	Update(context.Context, *putg_construction_api.UpdatePutgConstruction) error
 	Delete(context.Context, *putg_construction_api.DeletePutgConstruction) error
@@ -275,6 +276,7 @@ type PutgBaseFiller interface {
 
 type PutgFiller interface {
 	Get(context.Context, *putg_filler_api.GetPutgFiller) ([]*putg_filler_model.PutgFiller, error)
+	GetNew(context.Context, *putg_filler_api.GetPutgFiller_New) ([]*putg_filler_model.PutgFiller, error)
 	Create(context.Context, *putg_filler_api.CreatePutgFiller) error
 	Update(context.Context, *putg_filler_api.UpdatePutgFiller) error
 	Delete(context.Context, *putg_filler_api.DeletePutgFiller) error
@@ -310,6 +312,7 @@ type PutgData interface {
 
 type PutgSize interface {
 	Get(context.Context, *putg_size_api.GetPutgSize) ([]*putg_size_model.PutgSize, error)
+	GetNew(context.Context, *putg_size_api.GetPutgSize_New) ([]*putg_size_model.PutgSize, error)
 	Create(context.Context, *putg_size_api.CreatePutgSize) error
 	CreateSeveral(context.Context, *putg_size_api.CreateSeveralPutgSize) error
 	Update(context.Context, *putg_size_api.UpdatePutgSize) error
@@ -401,6 +404,7 @@ type Services struct {
 	PutgConfiguration
 	PutgBaseConstruction
 	PutgConstruction
+	PutgBaseFiller
 	PutgFiller
 	PutgFlangeType
 	PutgStandard
@@ -431,6 +435,7 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 	putgConfiguration := NewPutgConfigurationService(repos.PutgConfiguration)
 	putgBaseConstruction := NewPutgBaseConstructionService(repos.PutgBaseConstruction)
 	putgConstruction := NewPutgConstructionService(repos.PutgConstruction)
+	putgBaseFiller := NewPutgBaseFillerService(repos.PutgBaseFiller)
 	putgFiller := NewPutgFillerService(repos.PutgFiller)
 	putgFlangeType := NewPutgFlangeTypeService(repos.PutgFlangeType)
 	putgStandard := NewPutgStandardService(repos.PutgStandard)
@@ -486,6 +491,7 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		PutgConfiguration:    putgConfiguration,
 		PutgBaseConstruction: putgBaseConstruction,
 		PutgConstruction:     putgConstruction,
+		PutgBaseFiller:       putgBaseFiller,
 		PutgFiller:           putgFiller,
 		PutgFlangeType:       putgFlangeType,
 		PutgStandard:         putgStandard,

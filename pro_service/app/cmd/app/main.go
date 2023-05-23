@@ -22,6 +22,15 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_base_construction_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_construction_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_data_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_filler_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_filler_base_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_flange_type_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -165,6 +174,15 @@ func main() {
 	snp_api.RegisterSnpDataServiceServer(server, handlers.Snp)
 
 	putg_api.RegisterPutgDataServiceServer(server, handlers.Putg)
+	putg_size_api.RegisterPutgSizeServiceServer(server, handlers.PutgSize)
+	putg_base_construction_api.RegisterPutgBaseConstructionServiceServer(server, handlers.PutgBaseConstruction)
+	putg_construction_api.RegisterPutgConstructionServiceServer(server, handlers.PutgConstruction)
+	putg_data_api.RegisterPutgDataServiceServer(server, handlers.PutgData)
+	putg_filler_base_api.RegisterPutgBaseFillerServiceServer(server, handlers.PutgBaseFiller)
+	putg_filler_api.RegisterPutgFillerServiceServer(server, handlers.PutgFiller)
+	putg_flange_type_api.RegisterPutgFlangeTypeServiceServer(server, handlers.PutgFlangeType)
+	putg_standard_api.RegisterPutgStandardServiceServer(server, handlers.PutgStandard)
+	putg_type_api.RegisterPutgTypeServiceServer(server, handlers.PutgType)
 
 	order_api.RegisterOrderServiceServer(server, handlers.Order)
 	position_api.RegisterPositionServiceServer(server, handlers.Position)

@@ -3,13 +3,13 @@ module github.com/Alexander272/sealur/pro_service
 go 1.19
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230515084943-8caf5d41b8e8
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230522083114-0ac4fb6ec137
 	github.com/google/uuid v1.3.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.9
-	github.com/lukasjarosch/go-docx v0.4.5
-	github.com/sirupsen/logrus v1.9.0
+	github.com/lukasjarosch/go-docx v0.4.6
+	github.com/sirupsen/logrus v1.9.2
 	github.com/spf13/viper v1.15.0
 	github.com/xuri/excelize/v2 v2.7.1
 	google.golang.org/grpc v1.55.0

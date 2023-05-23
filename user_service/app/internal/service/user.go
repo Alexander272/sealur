@@ -40,6 +40,14 @@ func (s *UserService) Get(ctx context.Context, req *user_api.GetUser) (*user_mod
 	return user, nil
 }
 
+func (s *UserService) GetFull(ctx context.Context, req *user_api.GetUser) (*user_model.FullUser, error) {
+	user, err := s.repo.GetFull(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get full user. error: %w", err)
+	}
+	return user, nil
+}
+
 func (s *UserService) GetByEmail(ctx context.Context, req *user_api.GetUserByEmail) (*user_model.User, error) {
 	user, password, err := s.repo.GetByEmail(ctx, req)
 	if err != nil {

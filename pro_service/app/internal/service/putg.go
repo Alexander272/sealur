@@ -5,8 +5,6 @@ import (
 
 	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_configuration_model"
-	"github.com/Alexander272/sealur_proto/api/pro/models/putg_flange_type_model"
-	"github.com/Alexander272/sealur_proto/api/pro/models/putg_material_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_standard_model"
 	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
@@ -85,35 +83,40 @@ func (s *PutgService) GetBase(ctx context.Context, req *putg_api.GetPutgBase) (*
 		req.StandardId = standards[0].Id
 	}
 
-	var flangeTypes []*putg_flange_type_model.PutgFlangeType
-	var materials *putg_material_model.PutgMaterials
+	// var flangeTypes []*putg_flange_type_model.PutgFlangeType
+	// var materials *putg_material_model.PutgMaterials
 
-	if req.FlangeTypeId == "" {
-		var err error
-		flangeTypes, err = s.flangeType.Get(ctx, &putg_flange_type_api.GetPutgFlangeType{StandardId: req.StandardId})
-		if err != nil {
-			return nil, err
-		}
-		materials, err = s.materials.Get(ctx, &putg_material_api.GetPutgMaterial{StandardId: req.StandardId})
-		if err != nil {
-			return nil, err
-		}
-
-		req.FlangeTypeId = flangeTypes[0].Id
-	}
-
-	constructions, err := s.construction.Get(ctx, &putg_construction_api.GetPutgConstruction{StandardId: req.StandardId, FlangeTypeId: req.FlangeTypeId})
+	// if req.FlangeTypeId == "" {
+	// 	var err error
+	flangeTypes, err := s.flangeType.Get(ctx, &putg_flange_type_api.GetPutgFlangeType{StandardId: req.StandardId})
 	if err != nil {
 		return nil, err
 	}
+	materials, err := s.materials.Get(ctx, &putg_material_api.GetPutgMaterial{StandardId: req.StandardId})
+	if err != nil {
+		return nil, err
+	}
+	fillers, err := s.filler.GetNew(ctx, &putg_filler_api.GetPutgFiller_New{StandardId: req.StandardId})
+	if err != nil {
+		return nil, err
+	}
+
+	// req.FlangeTypeId = flangeTypes[0].Id
+	// }
+
+	// constructions, err := s.construction.Get(ctx, &putg_construction_api.GetPutgConstruction{StandardId: req.StandardId, FlangeTypeId: req.FlangeTypeId})
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	putgBase := &putg_api.PutgBase{
 		Configurations: configurations,
 		Standards:      standards,
 		Mounting:       mounting,
-		Constructions:  constructions,
-		FlangeTypes:    flangeTypes,
-		Materials:      materials,
+		// Constructions:  constructions,
+		FlangeTypes: flangeTypes,
+		Materials:   materials,
+		Fillers:     fillers,
 	}
 
 	return putgBase, nil
@@ -129,16 +132,17 @@ func (s *PutgService) GetData(ctx context.Context, req *putg_api.GetPutgData) (*
 	// 	return nil, err
 	// }
 	// TODO нужно свои размеры отдавать овальным и прямоугольным прокладкам
-	// TODO получение по стандарту неправильно, нужно тип указывать
 	sizes, err := s.sizes.Get(ctx, &putg_size_api.GetPutgSize{PutgStandardId: req.StandardId, ConstructionId: req.ConstructionId})
 	if err != nil {
 		return nil, err
 	}
 
-	fillers, err := s.filler.Get(ctx, &putg_filler_api.GetPutgFiller{ConstructionId: req.BaseConstructionId})
-	if err != nil {
-		return nil, err
-	}
+	//TODO привязать к стандарту
+	// fillers, err := s.filler.Get(ctx, &putg_filler_api.GetPutgFiller{ConstructionId: req.BaseConstructionId})
+	// if err != nil {
+	// 	return nil, err
+	// }
+
 	// data, err := s.data.GetByConstruction(ctx, &putg_data_api.GetPutgData{ConstructionId: req.ConstructionId})
 	// if err != nil {
 	// 	return nil, err
@@ -147,8 +151,8 @@ func (s *PutgService) GetData(ctx context.Context, req *putg_api.GetPutgData) (*
 	putgData := &putg_api.PutgData{
 		// FlangeTypes: flangeTypes,
 		// Materials:   materials,
-		Sizes:   sizes,
-		Fillers: fillers,
+		Sizes: sizes,
+		// Fillers: fillers,
 		// Data:        data,
 	}
 
@@ -164,10 +168,15 @@ func (s *PutgService) Get(ctx context.Context, req *putg_api.GetPutg) (*putg_api
 	if err != nil {
 		return nil, err
 	}
+	constructions, err := s.construction.GetNew(ctx, &putg_construction_api.GetPutgConstruction_New{FillerId: req.BaseId, FlangeTypeId: req.FlangeTypeId})
+	if err != nil {
+		return nil, err
+	}
 
 	putg := &putg_api.Putg{
-		PutgTypes: types,
-		Data:      data,
+		PutgTypes:     types,
+		Data:          data,
+		Constructions: constructions,
 	}
 
 	return putg, nil

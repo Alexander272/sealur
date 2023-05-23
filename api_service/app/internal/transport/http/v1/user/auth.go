@@ -114,6 +114,7 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 		return
 	}
+	logger.Info(user.Company, " ", user.Name)
 
 	// _, err = h.userClient.AddIp(c, &user_api.AddIpRequest{
 	// 	UserId: user.User.Id,
@@ -227,6 +228,7 @@ func (h *AuthHandler) refresh(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
 	}
+	logger.Info(user.Company, " ", user.Name)
 
 	c.SetCookie(h.cookieName, newToken, int(h.auth.RefreshTokenTTL.Seconds()), "/", c.Request.Host, h.auth.Secure, true)
 	c.JSON(http.StatusOK, models.DataResponse{Data: user})

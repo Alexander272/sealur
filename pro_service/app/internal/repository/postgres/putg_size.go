@@ -73,6 +73,56 @@ func (r *PutgSizeRepo) Get(ctx context.Context, req *putg_size_api.GetPutgSize) 
 	return sizes, nil
 }
 
+func (r *PutgSizeRepo) GetNew(ctx context.Context, req *putg_size_api.GetPutgSize_New) (sizes []*putg_size_model.PutgSize, err error) {
+	var data []models.PutgSize
+	query := fmt.Sprintf(`SELECT id, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h FROM %s
+		WHERE putg_flange_type_id=$1 AND base_construction_id=$2 ORDER BY count`, PutgSizeTableTest,
+	)
+
+	if err := r.db.Select(&data, query, req.FlangeTypeId, req.BaseConstructionId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for i, ps := range data {
+		Pn := []*putg_size_model.Pn{}
+		for _, v := range ps.PnMpa {
+			Pn = append(Pn, &putg_size_model.Pn{
+				Mpa: v,
+			})
+		}
+		for j, v := range ps.PnKg {
+			Pn[j].Kg = v
+		}
+
+		if i > 0 && ps.Dn == sizes[len(sizes)-1].Dn {
+			sizes[len(sizes)-1].Sizes = append(sizes[len(sizes)-1].Sizes, &putg_size_model.Size{
+				Pn: Pn,
+				D4: ps.D4,
+				D3: ps.D3,
+				D2: ps.D2,
+				D1: ps.D1,
+				H:  ps.H,
+			})
+		} else {
+			sizes = append(sizes, &putg_size_model.PutgSize{
+				Id:   ps.Id,
+				Dn:   ps.Dn,
+				DnMm: ps.DnMm,
+				Sizes: []*putg_size_model.Size{{
+					Pn: Pn,
+					D4: ps.D4,
+					D3: ps.D3,
+					D2: ps.D2,
+					D1: ps.D1,
+					H:  ps.H,
+				}},
+			})
+		}
+	}
+
+	return sizes, nil
+}
+
 func (r *PutgSizeRepo) Create(ctx context.Context, size *putg_size_api.CreatePutgSize) error {
 	query := fmt.Sprintf(`INSERT INTO %s(id, putg_standard_id, construction_id, count, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`, PutgSizeTable)

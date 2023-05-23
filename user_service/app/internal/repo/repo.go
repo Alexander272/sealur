@@ -13,6 +13,7 @@ import (
 
 type Users interface {
 	Get(context.Context, *user_api.GetUser) (*user_model.User, error)
+	GetFull(context.Context, *user_api.GetUser) (*user_model.FullUser, error)
 	GetByEmail(context.Context, *user_api.GetUserByEmail) (*user_model.User, string, error)
 	GetManagers(context.Context, *user_api.GetNewUser) ([]*user_model.User, error)
 	GetAnalytics(context.Context, *user_api.GetUserAnalytics) (*user_api.Analytics, error)

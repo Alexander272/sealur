@@ -27,6 +27,14 @@ func (s *PutgFillerService) Get(ctx context.Context, req *putg_filler_api.GetPut
 	return fillers, nil
 }
 
+func (s *PutgFillerService) GetNew(ctx context.Context, req *putg_filler_api.GetPutgFiller_New) ([]*putg_filler_model.PutgFiller, error) {
+	fillers, err := s.repo.GetNew(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get putg fillers. error: %w", err)
+	}
+	return fillers, nil
+}
+
 func (s *PutgFillerService) Create(ctx context.Context, filler *putg_filler_api.CreatePutgFiller) error {
 	if err := s.repo.Create(ctx, filler); err != nil {
 		return fmt.Errorf("failed to create putg filler. error: %w", err)

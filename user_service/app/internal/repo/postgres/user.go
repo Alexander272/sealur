@@ -53,6 +53,42 @@ func (r *UserRepo) Get(ctx context.Context, req *user_api.GetUser) (*user_model.
 	return user, nil
 }
 
+func (r *UserRepo) GetFull(ctx context.Context, req *user_api.GetUser) (*user_model.FullUser, error) {
+	var data models.FullUser
+	query := fmt.Sprintf(`SELECT "%s".id, company, inn, kpp, region, city, "position", phone, email, %s.code as role_code, name, address, date,
+		confirmed, use_link, use_landing, last_visit, (SELECT name FROM "%s" as u WHERE id="%s".manager_id) as manager
+		FROM "%s" INNER JOIN %s on %s.id=role_id WHERE "%s".id=$1`,
+		UserTable, RoleTable, UserTable, UserTable, UserTable, RoleTable, RoleTable, UserTable,
+	)
+
+	if err := r.db.Get(&data, query, req.Id); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	user := &user_model.FullUser{
+		Id:         data.Id,
+		Company:    data.Company,
+		Inn:        data.Inn,
+		Kpp:        data.Kpp,
+		Region:     data.Region,
+		City:       data.City,
+		Position:   data.Position,
+		Phone:      data.Phone,
+		Email:      data.Email,
+		RoleCode:   data.RoleCode,
+		Name:       data.Name,
+		Address:    data.Address,
+		Manager:    data.Manager,
+		Date:       data.Date,
+		Confirmed:  data.Confirmed,
+		UseLink:    data.UseLink,
+		UseLanding: data.UseLanding,
+		LastVisit:  data.LastVisit,
+	}
+
+	return user, nil
+}
+
 func (r *UserRepo) GetByEmail(ctx context.Context, req *user_api.GetUserByEmail) (*user_model.User, string, error) {
 	var data models.User
 	query := fmt.Sprintf(`SELECT "%s".id, confirmed, company, inn, kpp, region, city, "position", phone, password, email, %s.code as role_code, name, address

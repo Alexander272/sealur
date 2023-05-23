@@ -234,6 +234,7 @@ type PutgBaseConstruction interface {
 
 type PutgConstruction interface {
 	Get(context.Context, *putg_construction_api.GetPutgConstruction) ([]*putg_construction_type_model.PutgConstruction, error)
+	GetNew(context.Context, *putg_construction_api.GetPutgConstruction_New) ([]*putg_construction_type_model.PutgConstruction, error)
 	Create(context.Context, *putg_construction_api.CreatePutgConstruction) error
 	Update(context.Context, *putg_construction_api.UpdatePutgConstruction) error
 	Delete(context.Context, *putg_construction_api.DeletePutgConstruction) error
@@ -248,6 +249,7 @@ type PutgBaseFiller interface {
 
 type PutgFiller interface {
 	Get(context.Context, *putg_filler_api.GetPutgFiller) ([]*putg_filler_model.PutgFiller, error)
+	GetNew(context.Context, *putg_filler_api.GetPutgFiller_New) ([]*putg_filler_model.PutgFiller, error)
 	Create(context.Context, *putg_filler_api.CreatePutgFiller) error
 	Update(context.Context, *putg_filler_api.UpdatePutgFiller) error
 	Delete(context.Context, *putg_filler_api.DeletePutgFiller) error
@@ -277,6 +279,7 @@ type PutgData interface {
 
 type PutgSize interface {
 	Get(context.Context, *putg_size_api.GetPutgSize) ([]*putg_size_model.PutgSize, error)
+	GetNew(context.Context, *putg_size_api.GetPutgSize_New) ([]*putg_size_model.PutgSize, error)
 	Create(context.Context, *putg_size_api.CreatePutgSize) error
 	CreateSeveral(context.Context, *putg_size_api.CreateSeveralPutgSize) error
 	Update(context.Context, *putg_size_api.UpdatePutgSize) error
@@ -360,6 +363,7 @@ type Repositories struct {
 	PutgConfiguration
 	PutgBaseConstruction
 	PutgConstruction
+	PutgBaseFiller
 	PutgFiller
 	PutgFlangeType
 	PutgStandard
@@ -400,6 +404,7 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		PutgConfiguration:    postgres.NewPutgConfigurationRepo(db),
 		PutgBaseConstruction: postgres.NewPutgConstructionBaseRepo(db),
 		PutgConstruction:     postgres.NewPutgConstructionRepo(db),
+		PutgBaseFiller:       postgres.NewPutgBaseFillerRepo(db),
 		PutgFiller:           postgres.NewPutgFillerRepo(db),
 		PutgFlangeType:       postgres.NewPutgFlangeTypeRepo(db),
 		PutgStandard:         postgres.NewPutgStandardRepo(db),

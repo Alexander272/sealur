@@ -24,7 +24,7 @@ func NewPutgTypeRepo(db *sqlx.DB) *PutgTypeRepo {
 
 func (r *PutgTypeRepo) Get(ctx context.Context, req *putg_type_api.GetPutgType) (types []*putg_type_model.PutgType, err error) {
 	var data []models.PutgType
-	query := fmt.Sprintf(`SELECT id, title, code, min_thickness, max_thickness, description FROM %s WHERE filler_id=$1 ORDER BY code`, PutgTypeTable)
+	query := fmt.Sprintf(`SELECT id, title, code, min_thickness, max_thickness, description, type_code FROM %s WHERE filler_id=$1 ORDER BY code`, PutgTypeTable)
 
 	if err := r.db.Select(&data, query, req.BaseId); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -38,13 +38,14 @@ func (r *PutgTypeRepo) Get(ctx context.Context, req *putg_type_api.GetPutgType) 
 			MinThickness: math.Round(pt.MinThickness*1000) / 1000,
 			MaxThickness: math.Round(pt.MaxThickness*1000) / 1000,
 			Description:  pt.Description,
+			TypeCode:     pt.TypeCode,
 		})
 	}
 
 	return types, nil
 }
 
-// TODO добавить Description
+// TODO добавить Description and type_code
 func (r *PutgTypeRepo) Create(ctx context.Context, t *putg_type_api.CreatePutgType) error {
 	query := fmt.Sprintf(`INSERT INTO %s(id, title, code, filler_id, min_thickness, max_thickness) VALUES ($1, $2, $3, $4, $5, $6)`, PutgTypeTable)
 	id := uuid.New()
@@ -57,7 +58,7 @@ func (r *PutgTypeRepo) Create(ctx context.Context, t *putg_type_api.CreatePutgTy
 	return nil
 }
 
-// TODO добавить Description
+// TODO добавить Description and type_code
 func (r *PutgTypeRepo) Update(ctx context.Context, t *putg_type_api.UpdatePutgType) error {
 	query := fmt.Sprintf(`UPDATE %s SET title=$1, code=$2, filler_id=$3, min_thickness=$4, max_thickness=$5 WHERE id=$6`, PutgTypeTable)
 

@@ -64,10 +64,10 @@ func (h *PutgHandler) getData(c *gin.Context) {
 		return
 	}
 	baseConstructionId := c.Query("baseConstructionId")
-	if constructionId == "" {
-		models.NewErrorResponse(c, http.StatusBadRequest, "empty param base constructionId", "конструкция не задана")
-		return
-	}
+	// if constructionId == "" {
+	// 	models.NewErrorResponse(c, http.StatusBadRequest, "empty param base constructionId", "конструкция не задана")
+	// 	return
+	// }
 	// fillerId := c.Query("fillerId")
 	configuration := c.Query("configuration")
 	// changeStandard := c.Query("changeStandard")
@@ -97,8 +97,13 @@ func (h *PutgHandler) get(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusBadRequest, "empty param baseId", "материал прокладки не задан")
 		return
 	}
+	flangeTypeId := c.Query("flangeTypeId")
+	if flangeTypeId == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, "empty param flangeTypeId", "тип фланца не задан")
+		return
+	}
 
-	data, err := h.putgApi.Get(c, &putg_api.GetPutg{FillerId: fillerId, BaseId: baseId})
+	data, err := h.putgApi.Get(c, &putg_api.GetPutg{FillerId: fillerId, BaseId: baseId, FlangeTypeId: flangeTypeId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return

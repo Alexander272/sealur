@@ -31,6 +31,14 @@ func (h *UserHandler) Get(ctx context.Context, req *user_api.GetUser) (*user_mod
 	return user, nil
 }
 
+func (h *UserHandler) GetFull(ctx context.Context, req *user_api.GetUser) (*user_model.FullUser, error) {
+	user, err := h.service.GetFull(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (h *UserHandler) GetByEmail(ctx context.Context, req *user_api.GetUserByEmail) (*user_model.User, error) {
 	user, err := h.service.GetByEmail(ctx, req)
 	if err != nil {

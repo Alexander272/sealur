@@ -11,6 +11,17 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_base_construction_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_conf_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_construction_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_data_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_filler_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_filler_base_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_flange_type_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
+	"github.com/Alexander272/sealur_proto/api/pro/putg_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -37,6 +48,7 @@ type Material interface {
 type Mounting interface {
 	mounting_api.MountingServiceServer
 }
+
 type SnpData interface {
 	snp_data_api.SnpDataServiceServer
 }
@@ -64,9 +76,44 @@ type SnpSize interface {
 type Snp interface {
 	snp_api.SnpDataServiceServer
 }
+
 type Putg interface {
 	putg_api.PutgDataServiceServer
 }
+type PutgConfiguration interface {
+	putg_conf_api.PutgConfigurationServiceServer
+}
+type PutgConstruction interface {
+	putg_construction_api.PutgConstructionServiceServer
+}
+type PutgBaseConstruction interface {
+	putg_base_construction_api.PutgBaseConstructionServiceServer
+}
+type PutgData interface {
+	putg_data_api.PutgDataServiceServer
+}
+type PutgBaseFiller interface {
+	putg_filler_base_api.PutgBaseFillerServiceServer
+}
+type PutgFiller interface {
+	putg_filler_api.PutgFillerServiceServer
+}
+type PutgFlangeType interface {
+	putg_flange_type_api.PutgFlangeTypeServiceServer
+}
+type PutgMaterial interface {
+	putg_material_api.PutgMaterialServiceServer
+}
+type PutgStandard interface {
+	putg_standard_api.PutgStandardServiceServer
+}
+type PutgSize interface {
+	putg_size_api.PutgSizeServiceServer
+}
+type PutgType interface {
+	putg_type_api.PutgTypeServiceServer
+}
+
 type Order interface {
 	order_api.OrderServiceServer
 }
@@ -92,7 +139,20 @@ type Handler struct {
 	Temperature
 	SnpSize
 	Snp
+
 	Putg
+	PutgConfiguration
+	PutgBaseConstruction
+	PutgConstruction
+	PutgData
+	PutgBaseFiller
+	PutgFiller
+	PutgFlangeType
+	PutgMaterial
+	PutgStandard
+	PutgSize
+	PutgType
+
 	Order
 	Position
 }
@@ -116,9 +176,22 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		Temperature:    NewTemperatureHandlers(service.Temperature),
 		SnpSize:        NewSnpSizeHandlers(service.SnpSize),
 		Snp:            NewSnpHandlers(service.Snp),
-		Putg:           NewPutgHandlers(service.Putg),
-		Order:          NewOrderHandlers(service.OrderNew),
-		Position:       NewPositionHandlers(service.Position),
+
+		Putg:                 NewPutgHandlers(service.Putg),
+		PutgConfiguration:    NewPutgConfigurationHandlers(service.PutgConfiguration),
+		PutgBaseConstruction: NewPutgBaseConstructionHandlers(service.PutgBaseConstruction),
+		PutgConstruction:     NewPutgConstructionHandlers(service.PutgConstruction),
+		PutgData:             NewPutgDataHandlers(service.PutgData),
+		PutgBaseFiller:       NewPutgBaseFillerHandlers(service.PutgBaseFiller),
+		PutgFiller:           NewPutgFillerHandlers(service.PutgFiller),
+		PutgFlangeType:       NewPutgFlangeTypeHandlers(service.PutgFlangeType),
+		PutgMaterial:         NewPutgMaterialHandlers(service.PutgMaterial),
+		PutgStandard:         NewPutgStandardHandlers(service.PutgStandard),
+		PutgSize:             NewPutgSizeHandlers(service.PutgSize),
+		PutgType:             NewPutgTypeHandlers(service.PutgType),
+
+		Order:    NewOrderHandlers(service.OrderNew),
+		Position: NewPositionHandlers(service.Position),
 	}
 }
 
