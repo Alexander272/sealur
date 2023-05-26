@@ -24,7 +24,7 @@ func (h *Handler) initPutgSizeRoutes(api *gin.RouterGroup) {
 	// TODO проверять авторизацию
 	sizes := api.Group("/putg/sizes")
 	{
-		sizes.GET("/", handler.get)
+		sizes.GET("", handler.get)
 		// TODO только для админа
 		// sizes.POST("/", handler.create)
 		// sizes.POST("/several", handler.createSeveral)

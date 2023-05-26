@@ -163,6 +163,8 @@ func (h *UserHandler) confirm(c *gin.Context) {
 		return
 	}
 
+	go h.userApi.Visit(c, &user_api.GetUser{Id: data.UserId})
+
 	c.SetCookie(h.cookieName, token, int(h.auth.RefreshTokenTTL.Seconds()), "/", c.Request.Host, h.auth.Secure, true)
 	c.JSON(http.StatusOK, models.DataResponse{Data: user})
 }

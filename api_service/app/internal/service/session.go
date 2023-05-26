@@ -50,6 +50,8 @@ func (s *SessionService) SignIn(ctx context.Context, user *user_model.User) (str
 
 	refreshData := repository.SessionData{
 		UserId:       user.Id,
+		Name:         user.Name,
+		Company:      user.Company,
 		RoleCode:     user.RoleCode,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
@@ -115,8 +117,10 @@ func (s *SessionService) TokenParse(token string) (user *user_model.User, err er
 	// }
 
 	user = &user_model.User{
-		Id:    claims["userId"].(string),
-		Email: claims["email"].(string),
+		Id:      claims["userId"].(string),
+		Email:   claims["email"].(string),
+		Name:    claims["name"].(string),
+		Company: claims["company"].(string),
 		// Roles: roles,
 		RoleCode: claims["roleCode"].(string),
 	}

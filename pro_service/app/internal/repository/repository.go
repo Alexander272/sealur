@@ -307,6 +307,7 @@ type OrderNew interface {
 	GetNumber(ctx context.Context, order *order_api.CreateOrder, date string) (int64, error)
 	GetOpen(ctx context.Context, managerId string) ([]*order_model.ManagerOrder, error)
 	GetAnalytics(context.Context, *order_api.GetOrderAnalytics) ([]*analytic_model.Order, error)
+	GetOrdersCount(context.Context, *order_api.GetOrderCountAnalytics) ([]*analytic_model.OrderCount, error)
 	GetFullAnalytics(context.Context, *order_api.GetFullOrderAnalytics) ([]*analytic_model.FullOrder, error)
 	Create(ctx context.Context, order *order_api.CreateOrder, date string) error
 	SetInfo(context.Context, *order_api.Info) error
@@ -333,6 +334,10 @@ type PositionSnp interface {
 	CreateSeveral(context.Context, []*position_model.FullPosition) error
 	Update(ctx context.Context, position *position_model.FullPosition) error
 	Copy(ctx context.Context, targetPositionId string, position *position_api.CopyPosition) (string, error)
+	Delete(ctx context.Context, positionId string) error
+}
+type PositionPutg interface {
+	Create(context.Context, *position_model.FullPosition) error
 	Delete(ctx context.Context, positionId string) error
 }
 

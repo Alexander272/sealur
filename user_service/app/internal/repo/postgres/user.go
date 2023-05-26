@@ -362,3 +362,13 @@ func (r *UserRepo) Update(ctx context.Context, user *user_api.UpdateUser) error 
 
 	return nil
 }
+
+func (r *UserRepo) Visit(ctx context.Context, user *user_api.GetUser) error {
+	query := fmt.Sprintf(`UPDATE "%s" SET last_visit=$1 WHERE id=$2`, UserTable)
+
+	_, err := r.db.Exec(query, fmt.Sprintf("%d", time.Now().UnixMilli()), user.Id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}

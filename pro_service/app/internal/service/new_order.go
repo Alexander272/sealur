@@ -318,6 +318,14 @@ func (s *OrderServiceNew) GetAnalytics(ctx context.Context, req *order_api.GetOr
 	return analytics, nil
 }
 
+func (s *OrderServiceNew) GetOrdersCount(ctx context.Context, req *order_api.GetOrderCountAnalytics) ([]*analytic_model.OrderCount, error) {
+	orders, err := s.repo.GetOrdersCount(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get orders count. error: %w", err)
+	}
+	return orders, nil
+}
+
 func (s *OrderServiceNew) GetFullAnalytics(ctx context.Context, req *order_api.GetFullOrderAnalytics) ([]*analytic_model.FullOrder, error) {
 	data, err := s.repo.GetFullAnalytics(ctx, req)
 	if err != nil {

@@ -12,6 +12,8 @@ import (
 
 type SessionData struct {
 	UserId       string
+	Name         string
+	Company      string
 	AccessToken  string
 	RefreshToken string
 	RoleCode     string

@@ -339,6 +339,7 @@ type OrderNew interface {
 	GetFile(context.Context, *order_api.GetOrder) (*bytes.Buffer, string, error)
 	GetOpen(context.Context, *order_api.GetManagerOrders) ([]*order_model.ManagerOrder, error)
 	GetAnalytics(context.Context, *order_api.GetOrderAnalytics) (*order_api.Analytics, error)
+	GetOrdersCount(context.Context, *order_api.GetOrderCountAnalytics) ([]*analytic_model.OrderCount, error)
 	GetFullAnalytics(context.Context, *order_api.GetFullOrderAnalytics) ([]*analytic_model.FullOrder, error)
 	Save(context.Context, *order_api.CreateOrder) (*order_api.OrderNumber, error)
 	Copy(context.Context, *order_api.CopyOrder) error

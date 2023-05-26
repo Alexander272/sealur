@@ -42,6 +42,14 @@ type OrderAnalytics struct {
 	PositionSnpCount int64  `db:"position_snp_count"`
 }
 
+type OrderCount struct {
+	UserId  string `db:"user_id"`
+	Company string `db:"company"`
+	Name    string `db:"name"`
+	Inn     string `db:"inn"`
+	Count   int64  `db:"count"`
+}
+
 type FullOrderAnalytics struct {
 	Id        string `db:"id"`
 	UserId    string `db:"user_id"`

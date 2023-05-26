@@ -33,12 +33,17 @@ const (
 	PutgMaterialTable         = "putg_material"
 	PutgTypeTable             = "putg_type"
 
-	OrderTable               = "order"
-	PositionTable            = "position"
-	PositionMainSnpTable     = "position_snp_main"
-	PositionSizeSnpTable     = "position_snp_size"
-	PositionMaterialSnpTable = "position_snp_material"
-	PositionDesignSnpTable   = "position_snp_design"
+	OrderTable                = "order"
+	PositionTable             = "position"
+	PositionMainSnpTable      = "position_snp_main"
+	PositionSizeSnpTable      = "position_snp_size"
+	PositionMaterialSnpTable  = "position_snp_material"
+	PositionDesignSnpTable    = "position_snp_design"
+	PositionMainPutgTable     = "position_putg_main"
+	PositionSizePutgTable     = "position_putg_size"
+	PositionMaterialPutgTable = "position_putg_material"
+	PositionDesignPutgTable   = "position_putg_design"
 
+	//? можно попробовать всю аналитику вынести в отдельный сервис или даже в представление
 	UserTable = "user"
 )

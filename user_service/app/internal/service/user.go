@@ -152,7 +152,10 @@ func (s *UserService) Create(ctx context.Context, user *user_api.CreateUser) (st
 	if user.ManagerId == "dynamic" {
 		user.UseLink = true
 	}
-	if user.ManagerId == "" || user.ManagerId == uuid.Nil.String() || user.ManagerId == "dynamic" {
+	if user.ManagerId == "landing" {
+		user.UseLanding = true
+	}
+	if user.ManagerId == "" || user.ManagerId == uuid.Nil.String() || user.ManagerId == "dynamic" || user.ManagerId == "landing" {
 		manager, err := s.region.GetManagerByRegion(ctx, user.Region)
 		if err != nil {
 			return "", err
@@ -205,6 +208,13 @@ func (s *UserService) Update(ctx context.Context, user *user_api.UpdateUser) err
 		return fmt.Errorf("failed to update user. error: %w", err)
 	}
 
+	return nil
+}
+
+func (s *UserService) Visit(ctx context.Context, user *user_api.GetUser) error {
+	if err := s.repo.Visit(ctx, user); err != nil {
+		return fmt.Errorf("failed to update visit. error: %w", err)
+	}
 	return nil
 }
 

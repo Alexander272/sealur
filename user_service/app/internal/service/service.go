@@ -23,6 +23,7 @@ type User interface {
 	Confirm(context.Context, *user_api.ConfirmUser) (*user_model.User, error)
 	SetManager(context.Context, *user_api.UserManager) error
 	Update(context.Context, *user_api.UpdateUser) error
+	Visit(context.Context, *user_api.GetUser) error
 	// Get(context.Context, *user_api.GetUserRequest) (*user_api.User, error)
 	// GetAll(context.Context, *user_api.GetAllUserRequest) ([]*user_api.User, int, error)
 	// GetNew(context.Context, *user_api.GetNewUserRequest) ([]*user_api.User, error)

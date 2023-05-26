@@ -48,6 +48,7 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 		// order.GET("/open", handler.getOpen)
 		order.GET("/:id/заявка.zip", handler.getFile)
 		order.GET("/analytics", handler.getAnalytics)
+		order.GET("/analytics/count", handler.getCountAnalytics)
 		order.GET("/analytics/full", handler.getFullAnalytics)
 		order.POST("/", handler.create)
 		order.POST("/copy", handler.copy)
@@ -227,6 +228,16 @@ func (h *OrderHandler) getAnalytics(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, models.DataResponse{Data: analytics})
+}
+
+func (h *OrderHandler) getCountAnalytics(c *gin.Context) {
+	orders, err := h.orderApi.GetOrderCount(c, &order_api.GetOrderCountAnalytics{})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: orders.OrderCount})
 }
 
 func (h *OrderHandler) getFullAnalytics(c *gin.Context) {

@@ -76,10 +76,10 @@ func (r *PutgSizeRepo) Get(ctx context.Context, req *putg_size_api.GetPutgSize) 
 func (r *PutgSizeRepo) GetNew(ctx context.Context, req *putg_size_api.GetPutgSize_New) (sizes []*putg_size_model.PutgSize, err error) {
 	var data []models.PutgSize
 	query := fmt.Sprintf(`SELECT id, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h FROM %s
-		WHERE putg_flange_type_id=$1 AND base_construction_id=$2 ORDER BY count`, PutgSizeTableTest,
+		WHERE putg_flange_type_id=$1 AND base_construction_id=$2 AND base_fillers_id @> $3::uuid[] ORDER BY count`, PutgSizeTableTest,
 	)
 
-	if err := r.db.Select(&data, query, req.FlangeTypeId, req.BaseConstructionId); err != nil {
+	if err := r.db.Select(&data, query, req.FlangeTypeId, req.BaseConstructionId, pq.Array([]string{req.BaseFillerId})); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 

@@ -124,6 +124,8 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 	// 	logger.Error(err)
 	// }
 
+	go h.userApi.Visit(c, &user_api.GetUser{Id: user.Id})
+
 	c.SetCookie(h.cookieName, token, int(h.auth.RefreshTokenTTL.Seconds()), "/", c.Request.Host, h.auth.Secure, true)
 	c.JSON(http.StatusOK, models.DataResponse{Data: user})
 }
@@ -229,6 +231,9 @@ func (h *AuthHandler) refresh(c *gin.Context) {
 		return
 	}
 	logger.Info(user.Company, " ", user.Name)
+	// logger.Info(user.Id)
+
+	go h.userApi.Visit(c, &user_api.GetUser{Id: user.Id})
 
 	c.SetCookie(h.cookieName, newToken, int(h.auth.RefreshTokenTTL.Seconds()), "/", c.Request.Host, h.auth.Secure, true)
 	c.JSON(http.StatusOK, models.DataResponse{Data: user})

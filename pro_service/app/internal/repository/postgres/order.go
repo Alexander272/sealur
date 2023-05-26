@@ -205,6 +205,36 @@ func (r *OrderRepo) GetAnalytics(ctx context.Context, req *order_api.GetOrderAna
 	return orders, nil
 }
 
+/*
+SELECT user_id, name,company, inn, count("number")
+	FROM public."order"
+	left join "user" on "user".id=user_id
+	WHERE "order".date != '' group by user_id, name, company, inn order by count desc
+*/
+// количество заявок по пользователям
+func (r *OrderRepo) GetOrdersCount(ctx context.Context, req *order_api.GetOrderCountAnalytics) (orders []*analytic_model.OrderCount, err error) {
+	var data []models.OrderCount
+	query := fmt.Sprintf(`SELECT user_id, name, company, inn, count("number") FROM "%s"
+		LEFT JOIN "%s" ON "%s".id=user_id WHERE "%s".date != '' GROUP BY user_id, name, company, inn ORDER BY count DESC`,
+		OrderTable, UserTable, UserTable, OrderTable,
+	)
+
+	if err := r.db.Select(&data, query); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for _, oc := range data {
+		orders = append(orders, &analytic_model.OrderCount{
+			Id:         oc.UserId,
+			Name:       oc.Name,
+			Company:    oc.Company,
+			OrderCount: oc.Count,
+		})
+	}
+
+	return orders, nil
+}
+
 func (r *OrderRepo) GetFullAnalytics(ctx context.Context, req *order_api.GetFullOrderAnalytics) (orders []*analytic_model.FullOrder, err error) {
 	var condition string
 	var params []interface{}

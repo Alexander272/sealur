@@ -117,6 +117,13 @@ func (h *UserHandler) Update(ctx context.Context, user *user_api.UpdateUser) (*r
 	return &response_model.Response{}, nil
 }
 
+func (h *UserHandler) Visit(ctx context.Context, user *user_api.GetUser) (*response_model.Response, error) {
+	if err := h.service.Visit(ctx, user); err != nil {
+		return nil, err
+	}
+	return &response_model.Response{}, nil
+}
+
 // func (h *Handler) GetUser(ctx context.Context, req *user_api.GetUserRequest) (*user_api.UserResponse, error) {
 // 	user, err := h.service.User.Get(ctx, req)
 // 	if err != nil {

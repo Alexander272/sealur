@@ -25,6 +25,7 @@ type Users interface {
 	Confirm(context.Context, *user_api.ConfirmUser) error
 	SetManager(context.Context, *user_api.UserManager) error
 	Update(context.Context, *user_api.UpdateUser) error
+	Visit(context.Context, *user_api.GetUser) error
 	// Update(context.Context, *user_api.UpdateUser) error
 	// Delete(context.Context, *user_api.DeleteUser) error
 }
