@@ -69,15 +69,15 @@ type PutgImage interface {
 	Delete(image *pro_api.DeletePutgImageRequest) error
 }
 
-type Putg interface {
-	Get(req *pro_api.GetPutgRequest) ([]models.Putg, error)
-	Create(putg models.PutgDTO) (id string, err error)
-	Update(putg models.PutgDTO) error
-	Delete(putg *pro_api.DeletePutgRequest) error
+// type Putg interface {
+// 	Get(req *pro_api.GetPutgRequest) ([]models.Putg, error)
+// 	Create(putg models.PutgDTO) (id string, err error)
+// 	Update(putg models.PutgDTO) error
+// 	Delete(putg *pro_api.DeletePutgRequest) error
 
-	GetByCondition(cond string) ([]models.Putg, error)
-	// UpdateAddit(putg models.UpdateAdditDTO) error
-}
+// 	GetByCondition(cond string) ([]models.Putg, error)
+// 	// UpdateAddit(putg models.UpdateAdditDTO) error
+// }
 
 type PutgmImage interface {
 	Get(req *pro_api.GetPutgmImageRequest) ([]*pro_api.PutgmImage, error)
@@ -234,7 +234,6 @@ type PutgBaseConstruction interface {
 
 type PutgConstruction interface {
 	Get(context.Context, *putg_construction_api.GetPutgConstruction) ([]*putg_construction_type_model.PutgConstruction, error)
-	GetNew(context.Context, *putg_construction_api.GetPutgConstruction_New) ([]*putg_construction_type_model.PutgConstruction, error)
 	Create(context.Context, *putg_construction_api.CreatePutgConstruction) error
 	Update(context.Context, *putg_construction_api.UpdatePutgConstruction) error
 	Delete(context.Context, *putg_construction_api.DeletePutgConstruction) error
@@ -249,7 +248,6 @@ type PutgBaseFiller interface {
 
 type PutgFiller interface {
 	Get(context.Context, *putg_filler_api.GetPutgFiller) ([]*putg_filler_model.PutgFiller, error)
-	GetNew(context.Context, *putg_filler_api.GetPutgFiller_New) ([]*putg_filler_model.PutgFiller, error)
 	Create(context.Context, *putg_filler_api.CreatePutgFiller) error
 	Update(context.Context, *putg_filler_api.UpdatePutgFiller) error
 	Delete(context.Context, *putg_filler_api.DeletePutgFiller) error
@@ -279,7 +277,6 @@ type PutgData interface {
 
 type PutgSize interface {
 	Get(context.Context, *putg_size_api.GetPutgSize) ([]*putg_size_model.PutgSize, error)
-	GetNew(context.Context, *putg_size_api.GetPutgSize_New) ([]*putg_size_model.PutgSize, error)
 	Create(context.Context, *putg_size_api.CreatePutgSize) error
 	CreateSeveral(context.Context, *putg_size_api.CreateSeveralPutgSize) error
 	Update(context.Context, *putg_size_api.UpdatePutgSize) error
@@ -337,13 +334,17 @@ type PositionSnp interface {
 	Delete(ctx context.Context, positionId string) error
 }
 type PositionPutg interface {
+	Get(ctx context.Context, orderId string) ([]*position_model.FullPosition, error)
+	GetFull(ctx context.Context, positionsId []string) ([]*position_model.OrderPositionPutg, error)
 	Create(context.Context, *position_model.FullPosition) error
+	Update(context.Context, *position_model.FullPosition) error
+	Copy(ctx context.Context, targetPositionId string, position *position_api.CopyPosition) (string, error)
 	Delete(ctx context.Context, positionId string) error
 }
 
 type Repositories struct {
 	PutgImage
-	Putg
+	// Putg
 	PutgmImage
 	Putgm
 	BoltMaterials
@@ -380,6 +381,7 @@ type Repositories struct {
 	OrderNew
 	Position
 	PositionSnp
+	PositionPutg
 }
 
 func NewRepo(db *sqlx.DB) *Repositories {
@@ -418,8 +420,9 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		PutgSize:             postgres.NewPutgSizeRepo(db),
 		PutgType:             postgres.NewPutgTypeRepo(db),
 
-		OrderNew:    postgres.NewOrderRepo(db),
-		Position:    postgres.NewPositionRepo(db),
-		PositionSnp: postgres.NewPositionSnpRepo(db),
+		OrderNew:     postgres.NewOrderRepo(db),
+		Position:     postgres.NewPositionRepo(db),
+		PositionSnp:  postgres.NewPositionSnpRepo(db),
+		PositionPutg: postgres.NewPositionPutgRepo(db),
 	}
 }

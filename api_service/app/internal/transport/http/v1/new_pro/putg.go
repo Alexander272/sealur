@@ -2,8 +2,10 @@ package new_pro
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
+	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
 	"github.com/gin-gonic/gin"
 )
@@ -40,9 +42,15 @@ func (h *Handler) initPutgRoutes(api *gin.RouterGroup) {
 
 func (h *PutgHandler) getBase(c *gin.Context) {
 	standardId := c.Query("standardId")
-	typeFlangeId := c.Query("typeFlangeId")
+	emptyReq := c.Query("empty")
+	empty, err := strconv.ParseBool(emptyReq)
+	if err != nil {
+		logger.Error("failed to parse empty. error: %w", err)
+		empty = true
+	}
+	// typeFlangeId := c.Query("typeFlangeId")
 
-	putg, err := h.putgApi.GetBase(c, &putg_api.GetPutgBase{StandardId: standardId, FlangeTypeId: typeFlangeId})
+	putg, err := h.putgApi.GetBase(c, &putg_api.GetPutgBase{StandardId: standardId, Empty: empty})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 		return
@@ -69,14 +77,14 @@ func (h *PutgHandler) getData(c *gin.Context) {
 	// 	return
 	// }
 	// fillerId := c.Query("fillerId")
-	configuration := c.Query("configuration")
+	// configuration := c.Query("configuration")
 	// changeStandard := c.Query("changeStandard")
 
 	data, err := h.putgApi.GetData(c, &putg_api.GetPutgData{
 		StandardId:         standardId,
 		ConstructionId:     constructionId,
 		BaseConstructionId: baseConstructionId,
-		Configuration:      configuration,
+		// Configuration:      configuration,
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")

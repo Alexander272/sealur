@@ -55,12 +55,13 @@ func (r *PositionRepo) Get(ctx context.Context, orderId string) (positions []*po
 	for _, p := range data {
 		positionType := position_model.PositionType_value[p.Type]
 		positions = append(positions, &position_model.OrderPosition{
-			Id:     p.Id,
-			Title:  p.Title,
-			Count:  p.Count,
-			Amount: p.Amount,
-			Info:   p.Info,
-			Type:   position_model.PositionType(positionType),
+			Id:       p.Id,
+			Title:    p.Title,
+			Count:    p.Count,
+			Amount:   p.Amount,
+			Info:     p.Info,
+			Type:     p.Type,
+			TypeCode: position_model.PositionType(positionType),
 		})
 	}
 

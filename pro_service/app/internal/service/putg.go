@@ -14,7 +14,6 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/putg_filler_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_flange_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_material_api"
-	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_type_api"
 )
@@ -65,7 +64,7 @@ func (s *PutgService) GetBase(ctx context.Context, req *putg_api.GetPutgBase) (*
 	var mounting []*mounting_model.Mounting
 	var configurations []*putg_configuration_model.PutgConfiguration
 
-	if req.StandardId == "" {
+	if req.Empty {
 		var err error
 		standards, err = s.standard.Get(ctx, &putg_standard_api.GetPutgStandard{})
 		if err != nil {
@@ -80,7 +79,9 @@ func (s *PutgService) GetBase(ctx context.Context, req *putg_api.GetPutgBase) (*
 			return nil, err
 		}
 
-		req.StandardId = standards[0].Id
+		if req.StandardId == "" {
+			req.StandardId = standards[0].Id
+		}
 	}
 
 	// var flangeTypes []*putg_flange_type_model.PutgFlangeType
@@ -96,7 +97,7 @@ func (s *PutgService) GetBase(ctx context.Context, req *putg_api.GetPutgBase) (*
 	if err != nil {
 		return nil, err
 	}
-	fillers, err := s.filler.GetNew(ctx, &putg_filler_api.GetPutgFiller_New{StandardId: req.StandardId})
+	fillers, err := s.filler.Get(ctx, &putg_filler_api.GetPutgFiller{StandardId: req.StandardId})
 	if err != nil {
 		return nil, err
 	}
@@ -132,10 +133,10 @@ func (s *PutgService) GetData(ctx context.Context, req *putg_api.GetPutgData) (*
 	// 	return nil, err
 	// }
 	// TODO нужно свои размеры отдавать овальным и прямоугольным прокладкам
-	sizes, err := s.sizes.Get(ctx, &putg_size_api.GetPutgSize{PutgStandardId: req.StandardId, ConstructionId: req.ConstructionId})
-	if err != nil {
-		return nil, err
-	}
+	// sizes, err := s.sizes.Get(ctx, &putg_size_api.GetPutgSize{PutgStandardId: req.StandardId, ConstructionId: req.ConstructionId})
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	//TODO привязать к стандарту
 	// fillers, err := s.filler.Get(ctx, &putg_filler_api.GetPutgFiller{ConstructionId: req.BaseConstructionId})
@@ -151,7 +152,7 @@ func (s *PutgService) GetData(ctx context.Context, req *putg_api.GetPutgData) (*
 	putgData := &putg_api.PutgData{
 		// FlangeTypes: flangeTypes,
 		// Materials:   materials,
-		Sizes: sizes,
+		// Sizes: sizes,
 		// Fillers: fillers,
 		// Data:        data,
 	}
@@ -168,7 +169,7 @@ func (s *PutgService) Get(ctx context.Context, req *putg_api.GetPutg) (*putg_api
 	if err != nil {
 		return nil, err
 	}
-	constructions, err := s.construction.GetNew(ctx, &putg_construction_api.GetPutgConstruction_New{FillerId: req.BaseId, FlangeTypeId: req.FlangeTypeId})
+	constructions, err := s.construction.Get(ctx, &putg_construction_api.GetPutgConstruction{FillerId: req.BaseId, FlangeTypeId: req.FlangeTypeId})
 	if err != nil {
 		return nil, err
 	}

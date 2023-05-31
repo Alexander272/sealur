@@ -27,14 +27,6 @@ func (s *PutgSizeService) Get(ctx context.Context, req *putg_size_api.GetPutgSiz
 	return sizes, nil
 }
 
-func (s *PutgSizeService) GetNew(ctx context.Context, req *putg_size_api.GetPutgSize_New) ([]*putg_size_model.PutgSize, error) {
-	sizes, err := s.repo.GetNew(ctx, req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get putg sizes. error: %w", err)
-	}
-	return sizes, nil
-}
-
 func (s *PutgSizeService) Create(ctx context.Context, size *putg_size_api.CreatePutgSize) error {
 	if err := s.repo.Create(ctx, size); err != nil {
 		return fmt.Errorf("failed to create putg size. error: %w", err)

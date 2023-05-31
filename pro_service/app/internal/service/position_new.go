@@ -19,13 +19,15 @@ import (
 type PositionServiceNew struct {
 	repo    repository.Position
 	snp     PositionSnp
+	putg    PositionPutg
 	fileApi file_api.FileServiceClient
 }
 
-func NewPositionService_New(repo repository.Position, snp PositionSnp, fileApi file_api.FileServiceClient) *PositionServiceNew {
+func NewPositionService_New(repo repository.Position, snp PositionSnp, putg PositionPutg, fileApi file_api.FileServiceClient) *PositionServiceNew {
 	return &PositionServiceNew{
 		repo:    repo,
 		snp:     snp,
+		putg:    putg,
 		fileApi: fileApi,
 	}
 }
@@ -35,8 +37,13 @@ func (s *PositionServiceNew) Get(ctx context.Context, orderId string) (positions
 	if err != nil {
 		return nil, err
 	}
+	putgPosition, err := s.putg.Get(ctx, orderId)
+	if err != nil {
+		return nil, err
+	}
 
 	positions = append(positions, snpPosition...)
+	positions = append(positions, putgPosition...)
 
 	return positions, nil
 }
@@ -58,10 +65,17 @@ func (s *PositionServiceNew) GetFull(ctx context.Context, orderId string) ([]*po
 	snpId := make([]string, 0, len(positions))
 	snpIndex := make(map[string]int, 0)
 
-	for i, op := range positions {
-		if op.Type == position_model.PositionType_Snp {
-			snpId = append(snpId, op.Id)
-			snpIndex[op.Id] = i
+	putgId := make([]string, 0, len(positions))
+	putgIndex := make(map[string]int, 0)
+
+	for i, p := range positions {
+		if p.TypeCode == position_model.PositionType_Snp {
+			snpId = append(snpId, p.Id)
+			snpIndex[p.Id] = i
+		}
+		if p.TypeCode == position_model.PositionType_Putg {
+			putgId = append(putgId, p.Id)
+			putgIndex[p.Id] = i
 		}
 	}
 
@@ -69,10 +83,18 @@ func (s *PositionServiceNew) GetFull(ctx context.Context, orderId string) ([]*po
 	if err != nil {
 		return nil, err
 	}
-
 	for _, ops := range snpPositions {
 		index := snpIndex[ops.Main.PositionId]
 		positions[index].SnpData = ops
+	}
+
+	putgPositions, err := s.putg.GetFull(ctx, putgId)
+	if err != nil {
+		return nil, err
+	}
+	for _, opp := range putgPositions {
+		index := putgIndex[opp.Main.PositionId]
+		positions[index].PutgData = opp
 	}
 
 	return positions, nil
@@ -105,6 +127,11 @@ func (s *PositionServiceNew) Create(ctx context.Context, position *position_mode
 	position.Id = id
 	if position.Type == position_model.PositionType_Snp {
 		if err := s.snp.Create(ctx, position); err != nil {
+			return "", err
+		}
+	}
+	if position.Type == position_model.PositionType_Putg {
+		if err := s.putg.Create(ctx, position); err != nil {
 			return "", err
 		}
 	}
@@ -145,6 +172,11 @@ func (s *PositionServiceNew) Update(ctx context.Context, position *position_mode
 			return err
 		}
 	}
+	if position.Type == position_model.PositionType_Putg {
+		if err := s.putg.Update(ctx, position); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -179,9 +211,18 @@ func (s *PositionServiceNew) Copy(ctx context.Context, position *position_api.Co
 	// }
 
 	// По сути я могу возвращать drawing и из него вырезать id файла, а id заявки (старой и новой) буду принимать с клиента
-	drawing, err := s.snp.Copy(ctx, id, position)
-	if err != nil {
-		return "", err
+	var drawing string
+	if curPosition.Type == position_model.PositionType_Snp {
+		drawing, err = s.snp.Copy(ctx, id, position)
+		if err != nil {
+			return "", err
+		}
+	}
+	if curPosition.Type == position_model.PositionType_Putg {
+		drawing, err = s.putg.Copy(ctx, id, position)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	if drawing != "" {
@@ -213,6 +254,9 @@ func (s *PositionServiceNew) Delete(ctx context.Context, positionId string) erro
 	if err := s.snp.Delete(ctx, positionId); err != nil {
 		return err
 	}
+	// if err := s.putg.Delete(ctx, positionId); err != nil {
+	// 	return err
+	// }
 
 	//TODO удалять чертеж
 

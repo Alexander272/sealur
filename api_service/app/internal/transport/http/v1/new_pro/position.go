@@ -7,6 +7,7 @@ import (
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/gin-gonic/gin"
@@ -44,6 +45,8 @@ func (h *PositionHandler) create(c *gin.Context) {
 	}
 
 	position := dto.Parse()
+
+	logger.Debug(position.PutgData)
 
 	res, err := h.positionApi.Create(c, &position_api.CreatePosition{Position: position})
 	if err != nil {

@@ -30,16 +30,16 @@ func NewPositionSnpRepo(db *sqlx.DB) *PositionSnpRepo {
 
 func (r *PositionSnpRepo) Get(ctx context.Context, orderId string) (positions []*position_model.FullPosition, err error) {
 	//? можно не делать запрос в position, а в этом запросе забрать данные из всех 5 таблиц через inner join
-	var data []models.FullPosition
+	var data []models.SnpPosition
 	query := fmt.Sprintf(`SELECT %s.id, title, amount, info, type, count, filler_code, frame_code, inner_ring_code, outer_ring_code, d4, d3, d2, d1, h, another, 
 		has_jumper, jumper_code, jumper_width, has_hole, has_mounting, mounting_code, drawing
 		FROM %s	INNER JOIN %s ON %s.position_id=%s.id INNER JOIN %s ON %s.position_id=%s.id INNER JOIN %s ON %s.position_id=%s.id
-		WHERE order_id=$1 ORDER BY count`,
+		WHERE order_id=$1 AND type=$2 ORDER BY count`,
 		PositionTable, PositionTable, PositionMaterialSnpTable, PositionMaterialSnpTable, PositionTable,
 		PositionSizeSnpTable, PositionSizeSnpTable, PositionTable, PositionDesignSnpTable, PositionDesignSnpTable, PositionTable,
 	)
 
-	if err := r.db.Select(&data, query, orderId); err != nil {
+	if err := r.db.Select(&data, query, orderId, position_model.PositionType_Snp.String()); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
@@ -426,13 +426,17 @@ func (r *PositionSnpRepo) CreateSeveral(ctx context.Context, positions []*positi
 
 func (r *PositionSnpRepo) Update(ctx context.Context, position *position_model.FullPosition) error {
 	mainQuery := fmt.Sprintf(`UPDATE %s SET snp_standard_id=$1, snp_type_id=$2, flange_type_code=$3, flange_type_title=$4 WHERE position_id=$5`,
-		PositionMainSnpTable)
+		PositionMainSnpTable,
+	)
 	sizeQuery := fmt.Sprintf(`UPDATE %s	SET dn=$1, dn_mm=$2, pn_mpa=$3, pn_kg=$4, d4=$5, d3=$6, d2=$7, d1=$8, h=$9, s2=$10, s3=$11, another=$12
-		WHERE position_id=$13`, PositionSizeSnpTable)
+		WHERE position_id=$13`, PositionSizeSnpTable,
+	)
 	materialQuery := fmt.Sprintf(`UPDATE %s SET filler_id=$1, frame_id=$2, inner_ring_id=$3, outer_ring_id=$4, filler_code=$5, 
-		frame_code=$6, inner_ring_code=$7, outer_ring_code=$8, frame_title=$9, inner_ring_title=$10, outer_ring_title=$11 WHERE position_id=$12`, PositionMaterialSnpTable)
+		frame_code=$6, inner_ring_code=$7, outer_ring_code=$8, frame_title=$9, inner_ring_title=$10, outer_ring_title=$11 WHERE position_id=$12`, PositionMaterialSnpTable,
+	)
 	designQuery := fmt.Sprintf(`UPDATE %s SET has_jumper=$1, jumper_code=$2, jumper_width=$3, has_hole=$4, has_mounting=$5, mounting_code=$6, drawing=$7
-		WHERE position_id=$8`, PositionDesignSnpTable)
+		WHERE position_id=$8`, PositionDesignSnpTable,
+	)
 
 	tx, err := r.db.Begin()
 	if err != nil {

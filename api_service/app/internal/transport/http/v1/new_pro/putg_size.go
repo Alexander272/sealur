@@ -50,7 +50,7 @@ func (h *PutgSizeHandler) get(c *gin.Context) {
 		return
 	}
 
-	sizes, err := h.sizeApi.GetNew(c, &putg_size_api.GetPutgSize_New{FlangeTypeId: flangeTypeId, BaseConstructionId: baseConstructionId, BaseFillerId: baseFillerId})
+	sizes, err := h.sizeApi.Get(c, &putg_size_api.GetPutgSize{FlangeTypeId: flangeTypeId, BaseConstructionId: baseConstructionId, BaseFillerId: baseFillerId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Не удалось получить размеры")
 		return

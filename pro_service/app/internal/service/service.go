@@ -261,7 +261,6 @@ type PutgBaseConstruction interface {
 
 type PutgConstruction interface {
 	Get(context.Context, *putg_construction_api.GetPutgConstruction) ([]*putg_construction_type_model.PutgConstruction, error)
-	GetNew(context.Context, *putg_construction_api.GetPutgConstruction_New) ([]*putg_construction_type_model.PutgConstruction, error)
 	Create(context.Context, *putg_construction_api.CreatePutgConstruction) error
 	Update(context.Context, *putg_construction_api.UpdatePutgConstruction) error
 	Delete(context.Context, *putg_construction_api.DeletePutgConstruction) error
@@ -276,7 +275,6 @@ type PutgBaseFiller interface {
 
 type PutgFiller interface {
 	Get(context.Context, *putg_filler_api.GetPutgFiller) ([]*putg_filler_model.PutgFiller, error)
-	GetNew(context.Context, *putg_filler_api.GetPutgFiller_New) ([]*putg_filler_model.PutgFiller, error)
 	Create(context.Context, *putg_filler_api.CreatePutgFiller) error
 	Update(context.Context, *putg_filler_api.UpdatePutgFiller) error
 	Delete(context.Context, *putg_filler_api.DeletePutgFiller) error
@@ -312,7 +310,6 @@ type PutgData interface {
 
 type PutgSize interface {
 	Get(context.Context, *putg_size_api.GetPutgSize) ([]*putg_size_model.PutgSize, error)
-	GetNew(context.Context, *putg_size_api.GetPutgSize_New) ([]*putg_size_model.PutgSize, error)
 	Create(context.Context, *putg_size_api.CreatePutgSize) error
 	CreateSeveral(context.Context, *putg_size_api.CreateSeveralPutgSize) error
 	Update(context.Context, *putg_size_api.UpdatePutgSize) error
@@ -371,6 +368,15 @@ type PositionSnp interface {
 	Delete(ctx context.Context, positionId string) error
 }
 
+type PositionPutg interface {
+	Get(ctx context.Context, orderId string) ([]*position_model.FullPosition, error)
+	GetFull(ctx context.Context, positionsId []string) ([]*position_model.OrderPositionPutg, error)
+	Create(context.Context, *position_model.FullPosition) error
+	Update(context.Context, *position_model.FullPosition) error
+	Copy(ctx context.Context, targetId string, position *position_api.CopyPosition) (string, error)
+	Delete(ctx context.Context, positionId string) error
+}
+
 type Zip interface {
 	Create(fileName string, excel *excelize.File) (*bytes.Buffer, error)
 	InsertDrawings(file bytes.Buffer, drawings []string, buffer *bytes.Buffer) (*bytes.Buffer, error)
@@ -418,6 +424,7 @@ type Services struct {
 	OrderNew
 	Position
 	PositionSnp
+	PositionPutg
 	Zip
 }
 
@@ -461,7 +468,8 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 	zip := NewZipService()
 
 	positionSnp := NewPositionSnpService(repos.PositionSnp)
-	position := NewPositionService_New(repos.Position, positionSnp, file)
+	positionPutg := NewPositionPutgService(repos.PositionPutg)
+	position := NewPositionService_New(repos.Position, positionSnp, positionPutg, file)
 	order := NewOrderService_New(repos.OrderNew, position, zip, user, file)
 
 	return &Services{

@@ -40,6 +40,8 @@ func (s *SessionService) SignIn(ctx context.Context, user *user_model.User) (str
 
 	accessData := repository.SessionData{
 		UserId:      user.Id,
+		Name:        user.Name,
+		Company:     user.Company,
 		RoleCode:    user.RoleCode,
 		AccessToken: accessToken,
 		Exp:         s.accessTokenTTL,
@@ -117,12 +119,27 @@ func (s *SessionService) TokenParse(token string) (user *user_model.User, err er
 	// }
 
 	user = &user_model.User{
-		Id:      claims["userId"].(string),
-		Email:   claims["email"].(string),
-		Name:    claims["name"].(string),
-		Company: claims["company"].(string),
-		// Roles: roles,
-		RoleCode: claims["roleCode"].(string),
+		// Id:      claims["userId"].(string),
+		// Email:   claims["email"].(string),
+		// Name:    claims["name"].(string),
+		// Company: claims["company"].(string),
+		// // Roles: roles,
+		// RoleCode: claims["roleCode"].(string),
+	}
+
+	for k, v := range claims {
+		switch k {
+		case "userId":
+			user.Id = v.(string)
+		case "email":
+			user.Email = v.(string)
+		case "name":
+			user.Name = v.(string)
+		case "company":
+			user.Company = v.(string)
+		case "roleCode":
+			user.RoleCode = v.(string)
+		}
 	}
 
 	return user, nil

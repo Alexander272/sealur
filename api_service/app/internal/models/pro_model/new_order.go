@@ -10,13 +10,14 @@ type Order struct {
 }
 
 type Position struct {
-	OrderId string  `json:"orderId"`
-	Count   int64   `json:"count"`
-	Title   string  `json:"title"`
-	Amount  string  `json:"amount"`
-	Info    string  `json:"info"`
-	Type    string  `json:"type"`
-	SnpData SnpData `json:"snpData"`
+	OrderId  string   `json:"orderId"`
+	Count    int64    `json:"count"`
+	Title    string   `json:"title"`
+	Amount   string   `json:"amount"`
+	Info     string   `json:"info"`
+	Type     string   `json:"type"`
+	SnpData  SnpData  `json:"snpData"`
+	PutgData PutgData `json:"putgData"`
 }
 
 func (p *Position) Parse() *position_model.FullPosition {
@@ -24,12 +25,13 @@ func (p *Position) Parse() *position_model.FullPosition {
 
 	return &position_model.FullPosition{
 		// Id: p.,
-		OrderId: p.OrderId,
-		Count:   p.Count,
-		Title:   p.Title,
-		Amount:  p.Amount,
-		Info:    p.Info,
-		Type:    position_model.PositionType(positionType),
-		SnpData: p.SnpData.Parse(),
+		OrderId:  p.OrderId,
+		Count:    p.Count,
+		Title:    p.Title,
+		Amount:   p.Amount,
+		Info:     p.Info,
+		Type:     position_model.PositionType(positionType),
+		SnpData:  p.SnpData.Parse(),
+		PutgData: p.PutgData.Parse(),
 	}
 }

@@ -161,7 +161,7 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *pro_api.SendI
 			Name:   req.Drawing.OrigName,
 		})
 		if err != nil {
-			logger.Errorf("failed to download drawing. err :%w", err)
+			logger.Errorf("failed to download drawing. err :%s", err.Error())
 			return fmt.Errorf("failed to download drawing. err :%w", err)
 		}
 
@@ -198,7 +198,7 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *pro_api.SendI
 		w := zip.NewWriter(buf)
 		f, err := w.Create(names[0])
 		if err != nil {
-			logger.Errorf("failed to create docx in zip. err %w", err)
+			logger.Errorf("failed to create docx in zip. err %s", err.Error())
 			return fmt.Errorf("failed to create docx in zip. err %w", err)
 		}
 
@@ -210,19 +210,19 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *pro_api.SendI
 
 		_, err = f.Write(doc)
 		if err != nil {
-			logger.Errorf("failed to write docx in zip. err %w", err)
+			logger.Errorf("failed to write docx in zip. err %s", err.Error())
 			return fmt.Errorf("failed to write docx in zip. err %w", err)
 		}
 
 		f, err = w.Create(names[1])
 		if err != nil {
-			logger.Errorf("failed to create image in zip. err %w", err)
+			logger.Errorf("failed to create image in zip. err %s", err.Error())
 			return fmt.Errorf("failed to create image in zip. err %w", err)
 		}
 
 		_, err = f.Write(imageData.Bytes())
 		if err != nil {
-			logger.Errorf("failed to write image in zip. err %w", err)
+			logger.Errorf("failed to write image in zip. err %s", err.Error())
 			return fmt.Errorf("failed to write image in zip. err %w", err)
 		}
 
@@ -260,7 +260,7 @@ func (s *InterviewService) SendInterview(ctx context.Context, req *pro_api.SendI
 
 	err = stream.Send(data)
 	if err != nil {
-		logger.Errorf("cannot send docx info to server: %w %w", err, stream.RecvMsg(nil))
+		logger.Errorf("cannot send docx info to server: %s %s", err.Error(), stream.RecvMsg(nil).Error())
 		return fmt.Errorf("cannot send docx info to server. err: %w", err)
 	}
 
@@ -293,7 +293,7 @@ func (s *InterviewService) sendDoc(stream email_api.EmailService_SendInterviewCl
 			break
 		}
 		if err != nil {
-			logger.Errorf("cannot read chunk to buffer: %w", err)
+			logger.Errorf("cannot read chunk to buffer: %s", err.Error())
 			return fmt.Errorf("cannot read chunk to buffer: %w", err)
 		}
 
@@ -307,14 +307,14 @@ func (s *InterviewService) sendDoc(stream email_api.EmailService_SendInterviewCl
 
 		err = stream.Send(reqChunk)
 		if err != nil {
-			logger.Errorf("cannot send chunk to server: %w", err)
+			logger.Errorf("cannot send chunk to server: %s", err.Error())
 			return fmt.Errorf("cannot send chunk to server: %w", err)
 		}
 	}
 
 	_, err = stream.CloseAndRecv()
 	if err != nil {
-		logger.Errorf("cannot receive response: %w", err)
+		logger.Errorf("cannot receive response: %s", err.Error())
 		return fmt.Errorf("cannot receive response: %w", err)
 	}
 
@@ -331,7 +331,7 @@ func (s *InterviewService) sendZip(stream email_api.EmailService_SendInterviewCl
 			break
 		}
 		if err != nil {
-			logger.Errorf("cannot read chunk to buffer: %w", err)
+			logger.Errorf("cannot read chunk to buffer: %s", err.Error())
 			return fmt.Errorf("cannot read chunk to buffer: %w", err)
 		}
 
@@ -345,14 +345,14 @@ func (s *InterviewService) sendZip(stream email_api.EmailService_SendInterviewCl
 
 		err = stream.Send(reqChunk)
 		if err != nil {
-			logger.Errorf("cannot send chunk to server: %w", err)
+			logger.Errorf("cannot send chunk to server: %s", err.Error())
 			return fmt.Errorf("cannot send chunk to server: %w", err)
 		}
 	}
 
 	_, err := stream.CloseAndRecv()
 	if err != nil {
-		logger.Errorf("cannot receive response: %w", err)
+		logger.Errorf("cannot receive response: %s", err.Error())
 		return fmt.Errorf("cannot receive response: %w", err)
 	}
 
