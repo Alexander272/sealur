@@ -3,10 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/Alexander272/sealur_proto/api/pro/models/mounting_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_configuration_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_standard_model"
-	"github.com/Alexander272/sealur_proto/api/pro/mounting_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_conf_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_construction_api"
@@ -61,7 +59,7 @@ func NewPutgService(deps PutgDeps) *PutgService {
 
 func (s *PutgService) GetBase(ctx context.Context, req *putg_api.GetPutgBase) (*putg_api.PutgBase, error) {
 	var standards []*putg_standard_model.PutgStandard
-	var mounting []*mounting_model.Mounting
+	// var mounting []*mounting_model.Mounting
 	var configurations []*putg_configuration_model.PutgConfiguration
 
 	if req.Empty {
@@ -70,10 +68,10 @@ func (s *PutgService) GetBase(ctx context.Context, req *putg_api.GetPutgBase) (*
 		if err != nil {
 			return nil, err
 		}
-		mounting, err = s.mounting.GetAll(ctx, &mounting_api.GetAllMountings{})
-		if err != nil {
-			return nil, err
-		}
+		// mounting, err = s.mounting.GetAll(ctx, &mounting_api.GetAllMountings{})
+		// if err != nil {
+		// 	return nil, err
+		// }
 		configurations, err = s.configuration.Get(ctx, &putg_conf_api.GetPutgConfiguration{})
 		if err != nil {
 			return nil, err
@@ -113,7 +111,7 @@ func (s *PutgService) GetBase(ctx context.Context, req *putg_api.GetPutgBase) (*
 	putgBase := &putg_api.PutgBase{
 		Configurations: configurations,
 		Standards:      standards,
-		Mounting:       mounting,
+		// Mounting:       mounting,
 		// Constructions:  constructions,
 		FlangeTypes: flangeTypes,
 		Materials:   materials,

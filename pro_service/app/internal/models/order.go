@@ -43,11 +43,20 @@ type OrderAnalytics struct {
 }
 
 type OrderCount struct {
-	UserId  string `db:"user_id"`
-	Company string `db:"company"`
-	Name    string `db:"name"`
-	Inn     string `db:"inn"`
-	Count   int64  `db:"count"`
+	UserId              string `db:"user_id"`
+	Company             string `db:"company"`
+	Name                string `db:"name"`
+	Inn                 string `db:"inn"`
+	Count               int64  `db:"count"`
+	OrderCount          int64  `db:"order_count"`
+	SnpOrderCount       int64  `db:"order_snp_count"`
+	PutgOrderCount      int64  `db:"order_putg_count"`
+	PositionCount       int64  `db:"position_count"`
+	PositionSnpCount    int64  `db:"position_snp_count"`
+	PositionPutgCount   int64  `db:"position_putg_count"`
+	AveragePosition     int64  `db:"average_position"`
+	AverageSnpPosition  int64  `db:"average_snp_position"`
+	AveragePutgPosition int64  `db:"average_putg_position"`
 }
 
 type FullOrderAnalytics struct {

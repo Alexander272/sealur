@@ -491,8 +491,9 @@ func (r *PositionSnpRepo) Copy(ctx context.Context, targetPositionId string, pos
 		SELECT $1, $2, snp_standard_id, snp_type_id, flange_type_code, flange_type_title FROM %s WHERE position_id=$3`, PositionMainSnpTable, PositionMainSnpTable,
 	)
 	materialQuery := fmt.Sprintf(`INSERT INTO %s (id, position_id, filler_id, frame_id, inner_ring_id, outer_ring_id, 
-		filler_code, frame_code, inner_ring_code, outer_ring_code) SELECT $1, $2, filler_id, frame_id, inner_ring_id, outer_ring_id, 
-		filler_code, frame_code, inner_ring_code, outer_ring_code FROM %s WHERE position_id=$3`,
+		filler_code, frame_code, inner_ring_code, outer_ring_code, frame_title, inner_ring_title, outer_ring_title) 
+		SELECT $1, $2, filler_id, frame_id, inner_ring_id, outer_ring_id, filler_code, frame_code, inner_ring_code, 
+		outer_ring_code, frame_title, inner_ring_title, outer_ring_title FROM %s WHERE position_id=$3`,
 		PositionMaterialSnpTable, PositionMaterialSnpTable,
 	)
 	sizeQuery := fmt.Sprintf(`INSERT INTO %s (id, position_id, dn, dn_mm, pn_mpa, pn_kg, d4, d3, d2, d1, h, s2, s3, another)

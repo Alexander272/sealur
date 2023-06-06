@@ -117,6 +117,7 @@ type MaterialPutg struct {
 	Filler       PutgFiller       `json:"filler"`
 	Type         PutgType         `json:"putgType"`
 	Construction PutgConstruction `json:"construction"`
+	Reinforce    PutgMaterial     `json:"reinforce"`
 	RotaryPlug   PutgMaterial     `json:"rotaryPlug"`
 	InnerRing    PutgMaterial     `json:"innerRing"`
 	OuterRing    PutgMaterial     `json:"outerRing"`
@@ -130,6 +131,9 @@ func (s *MaterialPutg) Parse() *position_model.PositionPutg_Material {
 		TypeCode:         s.Type.Code,
 		ConstructionId:   s.Construction.Id,
 		ConstructionCode: s.Construction.Code,
+		ReinforceId:      s.Reinforce.Id,
+		ReinforceCode:    s.Reinforce.Code,
+		ReinforceTitle:   s.Reinforce.Title,
 		RotaryPlugId:     s.RotaryPlug.Id,
 		RotaryPlugCode:   s.RotaryPlug.Code,
 		RotaryPlugTitle:  s.RotaryPlug.Title,
@@ -144,6 +148,7 @@ func (s *MaterialPutg) Parse() *position_model.PositionPutg_Material {
 
 type DesignPutg struct {
 	HasHole      bool     `json:"hasHole"`
+	HasCoating   bool     `json:"hasCoating"`
 	HasRemovable bool     `json:"hasRemovable"`
 	Jumper       Jumper   `json:"jumper"`
 	Mounting     Mounting `json:"mounting"`
@@ -156,6 +161,7 @@ func (s *DesignPutg) Parse() *position_model.PositionPutg_Design {
 		JumperCode:   s.Jumper.Code,
 		JumperWidth:  s.Jumper.Width,
 		HasHole:      s.HasHole,
+		HasCoating:   s.HasCoating,
 		HasRemovable: s.HasRemovable,
 		HasMounting:  s.Mounting.HasMounting,
 		MountingCode: s.Mounting.Code,

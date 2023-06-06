@@ -55,7 +55,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	// connect, err := grpc.Dial(conf.UserService.Url, opts...)
 	connect, err := grpc.Dial(conf.UserService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatalf("failed connection to user service. error: %w", err)
+		logger.Fatalf("failed connection to user service. error: %s", err.Error())
 	}
 
 	// userClient := user_api.NewUserServiceClient(connect)
@@ -76,7 +76,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	// connectEmail, err := grpc.Dial(conf.EmailService.Url, optsEmail...)
 	connectEmail, err := grpc.Dial(conf.EmailService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatalf("failed connection to email service. error: %w", err)
+		logger.Fatalf("failed connection to email service. error: %s", err.Error())
 	}
 
 	// emailClient := email_api.NewEmailServiceClient(connectEmail)

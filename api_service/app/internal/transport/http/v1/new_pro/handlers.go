@@ -87,26 +87,26 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 
 	userConnect, err := grpc.Dial(conf.UserService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatalf("failed connection to user service. error: %w", err)
+		logger.Fatalf("failed connection to user service. error: %s", err.Error())
 	}
 	h.userApi = user_api.NewUserServiceClient(userConnect)
 
 	emailConnect, err := grpc.Dial(conf.EmailService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatalf("failed connection to email service. error: %w", err)
+		logger.Fatalf("failed connection to email service. error: %s", err.Error())
 	}
 	h.emailApi = email_api.NewEmailServiceClient(emailConnect)
 
 	fileConnect, err := grpc.Dial(conf.FileService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatalf("failed connection to file service. error: %w", err)
+		logger.Fatalf("failed connection to file service. error: %s", err.Error())
 	}
 	h.fileApi = file_api.NewFileServiceClient(fileConnect)
 
 	//* подключение к сервису
 	connect, err := grpc.Dial(conf.ProService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatalf("failed connection to new pro service. error: %w", err)
+		logger.Fatalf("failed connection to new pro service. error: %s", err.Error())
 	}
 
 	h.snpApi = snp_api.NewSnpDataServiceClient(connect)

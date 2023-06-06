@@ -32,10 +32,8 @@ func (r *PutgMaterialRepo) Get(ctx context.Context, req *putg_material_api.GetPu
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	var rotaryPlug []*putg_material_model.Material
-	var innerRing []*putg_material_model.Material
-	var outerRing []*putg_material_model.Material
-	var plugDefIndex, innerDefIndex, outerDefIndex int64
+	var reinforce, rotaryPlug, innerRing, outerRing []*putg_material_model.Material
+	var reinforceDefIndex, plugDefIndex, innerDefIndex, outerDefIndex int64
 
 	for _, m := range data {
 		currentMaterial := &putg_material_model.Material{
@@ -48,6 +46,9 @@ func (r *PutgMaterialRepo) Get(ctx context.Context, req *putg_material_api.GetPu
 			Title:      m.Title,
 		}
 
+		if m.Type == "reinforce" {
+			reinforce = append(reinforce, currentMaterial)
+		}
 		if m.Type == "rotaryPlug" {
 			rotaryPlug = append(rotaryPlug, currentMaterial)
 		}
@@ -59,6 +60,12 @@ func (r *PutgMaterialRepo) Get(ctx context.Context, req *putg_material_api.GetPu
 		}
 	}
 
+	for i, m := range reinforce {
+		if m.IsDefault {
+			reinforceDefIndex = int64(i)
+			break
+		}
+	}
 	for i, m := range rotaryPlug {
 		if m.IsDefault {
 			plugDefIndex = int64(i)
@@ -79,9 +86,11 @@ func (r *PutgMaterialRepo) Get(ctx context.Context, req *putg_material_api.GetPu
 	}
 
 	material := &putg_material_model.PutgMaterials{
+		Reinforce:              reinforce,
 		RotaryPlug:             rotaryPlug,
 		InnerRing:              innerRing,
 		OuterRing:              outerRing,
+		ReinforceDefaultIndex:  reinforceDefIndex,
 		RotaryPlugDefaultIndex: plugDefIndex,
 		InnerRingDefaultIndex:  innerDefIndex,
 		OuterRingDefaultIndex:  outerDefIndex,

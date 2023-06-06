@@ -135,7 +135,7 @@ func (r *SNPTypeRepo) Update(ctx context.Context, snp *snp_type_api.UpdateSnpTyp
 }
 
 func (r *SNPTypeRepo) Delete(ctx context.Context, snp *snp_type_api.DeleteSnpType) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", SnpTypeTable)
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id=$1`, SnpTypeTable)
 
 	if _, err := r.db.Exec(query, snp.Id); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)

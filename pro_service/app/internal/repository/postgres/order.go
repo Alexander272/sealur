@@ -212,11 +212,51 @@ SELECT user_id, name,company, inn, count("number")
 	WHERE "order".date != '' group by user_id, name, company, inn order by count desc
 */
 // количество заявок по пользователям
+
+/*
+количество заявок по пользователям + количество позиций (всего и снп)
+добавил среднее число позиций в заявке (думаю норм идея)
+добавил число заявок в которых есть снп
+
+SELECT user_id, company, name, count(DISTINCT o.id) as order_count,
+
+		count(DISTINCT case when type = 'Snp' then o.id end) as order_snp_count,
+		count(DISTINCT case when type = 'Putg' then o.id end) as order_putg_count,
+
+		SUM(amount::integer) as position_count,
+		COALESCE(SUM(case when type = 'Snp' then amount::integer end),0) as position_snp_count,
+		COALESCE(SUM(case when type = 'Putg' then amount::integer end),0) as position_putg_count,
+
+		(SUM(amount::integer)/count(DISTINCT o.id))::real as average_position,
+		COALESCE((SUM(case when type = 'Snp' then amount::integer end)/count(DISTINCT case when type = 'Snp' then o.id end))::real,0) as average_snp_position,
+		COALESCE((SUM(case when type = 'Putg' then amount::integer end)/count(DISTINCT case when type = 'Putg' then o.id end))::real,0) as average_putg_position
+	FROM "order" AS o
+	INNER JOIN "position" ON order_id=o.id
+	INNER JOIN "user" AS u ON user_id=u.id
+	WHERE o.date != '' GROUP BY user_id, company, name ORDER BY position_count DESC
+*/
 func (r *OrderRepo) GetOrdersCount(ctx context.Context, req *order_api.GetOrderCountAnalytics) (orders []*analytic_model.OrderCount, err error) {
 	var data []models.OrderCount
-	query := fmt.Sprintf(`SELECT user_id, name, company, inn, count("number") FROM "%s"
-		LEFT JOIN "%s" ON "%s".id=user_id WHERE "%s".date != '' GROUP BY user_id, name, company, inn ORDER BY count DESC`,
-		OrderTable, UserTable, UserTable, OrderTable,
+	// query := fmt.Sprintf(`SELECT user_id, name, company, inn, count("number") FROM "%s"
+	// 	LEFT JOIN "%s" ON "%s".id=user_id WHERE "%s".date != '' GROUP BY user_id, name, company, inn ORDER BY count DESC`,
+	// 	OrderTable, UserTable, UserTable, OrderTable,
+	// )
+	query := fmt.Sprintf(`SELECT user_id, company, name, count(DISTINCT o.id) as order_count, 
+		count(DISTINCT case when type = 'Snp' then o.id end) as order_snp_count,
+		count(DISTINCT case when type = 'Putg' then o.id end) as order_putg_count,
+
+		SUM(amount::integer) as position_count,	
+		COALESCE(SUM(case when type = 'Snp' then amount::integer end),0) as position_snp_count,
+		COALESCE(SUM(case when type = 'Putg' then amount::integer end),0) as position_putg_count,
+		
+		(SUM(amount::integer)/count(DISTINCT o.id))::real as average_position,
+		COALESCE((SUM(case when type = 'Snp' then amount::integer end)/count(DISTINCT case when type = 'Snp' then o.id end))::real,0) as average_snp_position,
+		COALESCE((SUM(case when type = 'Putg' then amount::integer end)/count(DISTINCT case when type = 'Putg' then o.id end))::real,0) as average_putg_position
+		FROM "%s" AS o
+		INNER JOIN "%s" ON order_id=o.id
+		INNER JOIN "%s" AS u ON user_id=u.id
+		WHERE o.date != '' GROUP BY user_id, company, name ORDER BY position_count DESC`,
+		OrderTable, PositionTable, UserTable,
 	)
 
 	if err := r.db.Select(&data, query); err != nil {
@@ -225,10 +265,18 @@ func (r *OrderRepo) GetOrdersCount(ctx context.Context, req *order_api.GetOrderC
 
 	for _, oc := range data {
 		orders = append(orders, &analytic_model.OrderCount{
-			Id:         oc.UserId,
-			Name:       oc.Name,
-			Company:    oc.Company,
-			OrderCount: oc.Count,
+			Id:                  oc.UserId,
+			Name:                oc.Name,
+			Company:             oc.Company,
+			OrderCount:          oc.OrderCount,
+			SnpOrderCount:       oc.SnpOrderCount,
+			PutgOrderCount:      oc.PutgOrderCount,
+			PositionCount:       oc.PositionCount,
+			SnpPositionCount:    oc.PositionSnpCount,
+			PutgPositionCount:   oc.PositionPutgCount,
+			AveragePosition:     oc.AveragePosition,
+			AverageSnpPosition:  oc.AverageSnpPosition,
+			AveragePutgPosition: oc.AveragePutgPosition,
 		})
 	}
 

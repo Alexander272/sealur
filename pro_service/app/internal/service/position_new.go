@@ -237,7 +237,7 @@ func (s *PositionServiceNew) Copy(ctx context.Context, position *position_api.Co
 			NewGroup: position.OrderId,
 		})
 		if err != nil {
-			return "", fmt.Errorf("failed to copy drawing. error: %w", err)
+			return "", fmt.Errorf("failed to copy drawing from orderId=%s target orderId=%s. error: %w", position.FromOrderId, position.OrderId, err)
 		}
 	}
 

@@ -72,6 +72,7 @@ type PutgPosition struct {
 	FillerCode       string `db:"filler_code"`
 	TypeCode         string `db:"type_code"`
 	ConstructionCode string `db:"construction_code"`
+	ReinforceCode    string `db:"reinforce_code"`
 	RotaryPlugCode   string `db:"rotary_plug_code"`
 	InnerRingCode    string `db:"inner_ring_code"`
 	OuterRingCode    string `db:"outer_ring_code"`
@@ -90,6 +91,7 @@ type PutgPosition struct {
 	JumperCode   string `db:"jumper_code"`
 	JumperWidth  string `db:"jumper_width"`
 	HasHole      bool   `db:"has_hole"`
+	HasCoating   bool   `db:"has_coating"`
 	HasRemovable bool   `db:"has_removable"`
 	HasMounting  bool   `db:"has_mounting"`
 	MountingCode string `db:"mounting_code"`

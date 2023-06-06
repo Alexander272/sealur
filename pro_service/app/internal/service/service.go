@@ -73,22 +73,6 @@ type PutgImage interface {
 	Delete(image *pro_api.DeletePutgImageRequest) error
 }
 
-// type Putg interface {
-// 	Get(*pro_api.GetPutgRequest) ([]*pro_api.Putg, error)
-// 	Create(*pro_api.CreatePutgRequest) (*pro_api.IdResponse, error)
-// 	Update(*pro_api.UpdatePutgRequest) error
-// 	Delete(*pro_api.DeletePutgRequest) error
-
-// 	DeleteGrap(id string) error
-// 	DeleteTemp(id string) error
-// 	DeleteMod(id string) error
-// 	DeleteMat(id string, materials []*pro_api.AddMaterials) error
-// 	DeleteCon(id string) error
-// 	DeleteObt(id string) error
-// 	DeleteMoun(id string) error
-// 	DeleteCoating(id string) error
-// }
-
 type PutgmImage interface {
 	Get(req *pro_api.GetPutgmImageRequest) ([]*pro_api.PutgmImage, error)
 	Create(image *pro_api.CreatePutgmImageRequest) (*pro_api.IdResponse, error)
