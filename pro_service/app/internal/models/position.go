@@ -72,7 +72,6 @@ type PutgPosition struct {
 	FillerCode       string `db:"filler_code"`
 	TypeCode         string `db:"type_code"`
 	ConstructionCode string `db:"construction_code"`
-	ReinforceCode    string `db:"reinforce_code"`
 	RotaryPlugCode   string `db:"rotary_plug_code"`
 	InnerRingCode    string `db:"inner_ring_code"`
 	OuterRingCode    string `db:"outer_ring_code"`

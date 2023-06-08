@@ -9,5 +9,4 @@ type PutgType struct {
 	MaxThickness float64 `db:"max_thickness"`
 	Description  string  `db:"description"`
 	TypeCode     string  `db:"type_code"`
-	HasReinforce bool    `db:"has_reinforce"`
 }

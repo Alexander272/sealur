@@ -220,16 +220,17 @@ SELECT user_id, name,company, inn, count("number")
 
 SELECT user_id, company, name, count(DISTINCT o.id) as order_count,
 
-		count(DISTINCT case when type = 'Snp' then o.id end) as order_snp_count,
-		count(DISTINCT case when type = 'Putg' then o.id end) as order_putg_count,
+	count(DISTINCT case when type = 'Snp' then o.id end) as order_snp_count,
+	count(DISTINCT case when type = 'Putg' then o.id end) as order_putg_count,
 
-		SUM(amount::integer) as position_count,
-		COALESCE(SUM(case when type = 'Snp' then amount::integer end),0) as position_snp_count,
-		COALESCE(SUM(case when type = 'Putg' then amount::integer end),0) as position_putg_count,
+	SUM(amount::integer) as position_count,
+	COALESCE(SUM(case when type = 'Snp' then amount::integer end),0) as position_snp_count,
+	COALESCE(SUM(case when type = 'Putg' then amount::integer end),0) as position_putg_count,
 
-		(SUM(amount::integer)/count(DISTINCT o.id))::real as average_position,
-		COALESCE((SUM(case when type = 'Snp' then amount::integer end)/count(DISTINCT case when type = 'Snp' then o.id end))::real,0) as average_snp_position,
-		COALESCE((SUM(case when type = 'Putg' then amount::integer end)/count(DISTINCT case when type = 'Putg' then o.id end))::real,0) as average_putg_position
+	(SUM(amount::integer)/count(DISTINCT o.id))::real as average_position,
+	COALESCE((SUM(case when type = 'Snp' then amount::integer end)/count(DISTINCT case when type = 'Snp' then o.id end))::real,0) as average_snp_position,
+	COALESCE((SUM(case when type = 'Putg' then amount::integer end)/count(DISTINCT case when type = 'Putg' then o.id end))::real,0) as average_putg_position
+
 	FROM "order" AS o
 	INNER JOIN "position" ON order_id=o.id
 	INNER JOIN "user" AS u ON user_id=u.id

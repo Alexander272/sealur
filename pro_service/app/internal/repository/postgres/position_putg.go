@@ -36,7 +36,7 @@ func (r *PositionPutgRepo) Get(ctx context.Context, orderId string) (positions [
 	var data []models.PutgPosition
 	query := fmt.Sprintf(`SELECT p.id, title, amount, type, count, info,
 		configuration_id, configuration_code,
-		filler_code, type_code, construction_code, reinforce_code, rotary_plug_code, inner_ring_code, outer_ring_code,
+		filler_code, type_code, construction_code, rotary_plug_code, inner_ring_code, outer_ring_code,
 		d4, d3, d2, d1, h, use_dimensions,
 		has_jumper, jumper_code, jumper_width, has_hole, has_coating, has_removable, has_mounting, mounting_code, drawing
 		FROM %s AS p 
@@ -69,7 +69,6 @@ func (r *PositionPutgRepo) Get(ctx context.Context, orderId string) (positions [
 					FillerCode:       pp.FillerCode,
 					TypeCode:         pp.TypeCode,
 					ConstructionCode: pp.ConstructionCode,
-					ReinforceCode:    pp.ReinforceCode,
 					RotaryPlugCode:   pp.RotaryPlugCode,
 					InnerRindCode:    pp.InnerRingCode,
 					OuterRingCode:    pp.OuterRingCode,
@@ -125,12 +124,10 @@ func (r *PositionPutgRepo) GetFull(ctx context.Context, positionsId []string) ([
 	materialQuery := fmt.Sprintf(`SELECT pm.id, position_id, 
 		pm.filler_id, pf.base_filler_id as f_base_id, f.code as f_code, f.title as f_title, f.description as f_description, f.designation as f_designation,
 		type_id, t.title as t_title, t.code as t_code, t.description as t_description, t.min_thickness as t_min, t.max_thickness as t_max, 
-		t.type_code as t_type_code, t.has_reinforce as t_has_reinforce,
+		t.type_code as t_type_code, 
 		pm.construction_id, construction_code, pc.construction_id as c_base_id, c.title as c_title, c.description as c_description, c.has_d4 as c_has_d4, 
 		c.has_d3 as c_has_d3, c.has_d2 as c_has_d2, c.has_d1 as c_has_d1, c.has_rotary_plug as c_has_rotary_plug, 
 		c.has_inner_ring as c_has_inner_ring, c.has_outer_ring as c_has_outer_ring,
-		reinforce_id, reinforce_code, reinforce_title, r.code as r_code, r.material_id as r_material_id, r.type as r_type,
-		r.is_default as r_is_default,
 		rotary_plug_id, rotary_plug_code, rotary_plug_title, rp.code as rp_code, rp.material_id as rp_material_id, rp.type as rp_type, 
 		rp.is_default as rp_is_default,  
 		inner_ring_id, inner_ring_code, inner_ring_title, ir.code as ir_code, ir.material_id as ir_material_id, ir.type as ir_type, 
@@ -143,13 +140,12 @@ func (r *PositionPutgRepo) GetFull(ctx context.Context, positionsId []string) ([
 		LEFT JOIN %s AS t ON type_id=t.id
 		LEFT JOIN %s AS pc ON pm.construction_id=pc.id
 		LEFT JOIN %s AS c ON pc.construction_id=c.id 
-		LEFT JOIN %s as r ON r.id=reinforce_id
 		LEFT JOIN %s as rp ON rp.id=rotary_plug_id
 		LEFT JOIN %s as ir ON ir.id=inner_ring_id
 		LEFT JOIN %s as our ON our.id=outer_ring_id
 		WHERE array[position_id] <@ $1 ORDER BY position_id`,
 		PositionMaterialPutgTable, PutgFillerTable, PutgFillerBaseTable, PutgTypeTable, PutgConstructionTable, PutgConstructionBaseTable,
-		PutgMaterialTable, PutgMaterialTable, PutgMaterialTable, PutgMaterialTable,
+		PutgMaterialTable, PutgMaterialTable, PutgMaterialTable,
 	)
 	if err := r.db.Select(&materialData, materialQuery, pq.Array(positionsId)); err != nil {
 		return nil, fmt.Errorf("failed to complete material query. error: %w", err)
@@ -179,15 +175,6 @@ func (r *PositionPutgRepo) GetFull(ctx context.Context, positionsId []string) ([
 		s := sizeData[i]
 		d := designData[i]
 
-		reinforce := &putg_material_model.Material{Id: mat.ReinforceId, BaseCode: mat.ReinforceBaseCode, Title: mat.ReinforceTitle}
-		if mat.ReinforceId != uuid.Nil.String() {
-			reinforce.Code = *mat.ReinforceCode
-			reinforce.MaterialId = *mat.ReinforceMaterialId
-			reinforce.Type = *mat.ReinforceType
-			reinforce.IsDefault = *mat.ReinforceIsDefault
-		} else {
-			reinforce = nil
-		}
 		rotary := &putg_material_model.Material{Id: mat.RotaryPlugId, BaseCode: mat.RotaryPlugBaseCode, Title: mat.RotaryPlugTitle}
 		if mat.RotaryPlugId != uuid.Nil.String() {
 			rotary.Code = *mat.RotaryPlugCode
@@ -250,7 +237,6 @@ func (r *PositionPutgRepo) GetFull(ctx context.Context, positionsId []string) ([
 			Material: &position_model.OrderPositionPutg_Material{
 				Id:         mat.Id,
 				PositionId: mat.PositionId,
-				Reinforce:  reinforce,
 				RotaryPlug: rotary,
 				InnerRing:  innerRing,
 				OuterRing:  outerRing,
@@ -270,7 +256,6 @@ func (r *PositionPutgRepo) GetFull(ctx context.Context, positionsId []string) ([
 					Description:  mat.TypeDescription,
 					MinThickness: mat.TypeMinThickness,
 					MaxThickness: mat.TypeMaxThickness,
-					HasReinforce: mat.TypeHasReinforce,
 				},
 				Construction: &putg_construction_type_model.PutgConstruction{
 					Id:            mat.ConstructionId,
@@ -336,8 +321,8 @@ func (r *PositionPutgRepo) Create(ctx context.Context, position *position_model.
 	)
 	materialQuery := fmt.Sprintf(`INSERT INTO %s (id, position_id, filler_id, filler_code, type_id, type_code, construction_id, 
 		construction_code, rotary_plug_id, rotary_plug_code, inner_ring_id, inner_ring_code, outer_ring_id, outer_ring_code, 
-		rotary_plug_title, inner_ring_title, outer_ring_title, reinforce_id, reinforce_code, reinforce_title)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`,
+		rotary_plug_title, inner_ring_title, outer_ring_title)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
 		PositionMaterialPutgTable,
 	)
 	designQuery := fmt.Sprintf(`INSERT INTO %s (id, position_id, has_jumper, jumper_code, jumper_width, has_hole, has_coating, has_removable, 
@@ -355,9 +340,6 @@ func (r *PositionPutgRepo) Create(ctx context.Context, position *position_model.
 	material := position.PutgData.Material
 	design := position.PutgData.Design
 
-	if material.ReinforceId == "" {
-		material.ReinforceId = uuid.Nil.String()
-	}
 	if material.RotaryPlugId == "" {
 		material.RotaryPlugId = uuid.Nil.String()
 	}
@@ -385,7 +367,7 @@ func (r *PositionPutgRepo) Create(ctx context.Context, position *position_model.
 	_, err = tx.Exec(materialQuery, id, position.Id, material.FillerId, material.FillerCode, material.TypeId, material.TypeCode,
 		material.ConstructionId, material.ConstructionCode, material.RotaryPlugId, material.RotaryPlugCode,
 		material.InnerRingId, material.InnerRindCode, material.OuterRingId, material.OuterRingCode,
-		material.RotaryPlugTitle, material.InnerRingTitle, material.OuterRingTitle, material.ReinforceId, material.ReinforceCode, material.ReinforceTitle,
+		material.RotaryPlugTitle, material.InnerRingTitle, material.OuterRingTitle,
 	)
 	if err != nil {
 		tx.Rollback()
@@ -419,8 +401,8 @@ func (r *PositionPutgRepo) Update(ctx context.Context, position *position_model.
 	)
 	materialQuery := fmt.Sprintf(`UPDATE %s SET filler_id=$1, filler_code=$2, type_id=$3, type_code=$4, construction_id=$5, construction_code=$6, 
 		rotary_plug_id=$7, rotary_plug_code=$8, inner_ring_id=$9, inner_ring_code=$10, outer_ring_id=$11, outer_ring_code=$12,
-		rotary_plug_title=$13, inner_ring_title=$14, outer_ring_title=$15, reinforce_id=$16, reinforce_code=$17, reinforce_title=$18
-		WHERE position_id=$19`,
+		rotary_plug_title=$13, inner_ring_title=$14, outer_ring_title=$15
+		WHERE position_id=$16`,
 		PositionMaterialPutgTable,
 	)
 	designQuery := fmt.Sprintf(`UPDATE %s SET has_jumper=$1, jumper_code=$2, jumper_width=$3, has_hole=$4, has_coating=$5, has_removable=$6, 
@@ -438,9 +420,6 @@ func (r *PositionPutgRepo) Update(ctx context.Context, position *position_model.
 	material := position.PutgData.Material
 	design := position.PutgData.Design
 
-	if material.ReinforceId == "" {
-		material.ReinforceId = uuid.Nil.String()
-	}
 	if material.RotaryPlugId == "" {
 		material.RotaryPlugId = uuid.Nil.String()
 	}
@@ -468,8 +447,7 @@ func (r *PositionPutgRepo) Update(ctx context.Context, position *position_model.
 	_, err = tx.Exec(materialQuery, material.FillerId, material.FillerCode, material.TypeId, material.TypeCode,
 		material.ConstructionId, material.ConstructionCode,
 		material.RotaryPlugId, material.RotaryPlugCode, material.InnerRingId, material.InnerRindCode, material.OuterRingId, material.OuterRingCode,
-		material.RotaryPlugTitle, material.InnerRingTitle, material.OuterRingTitle, material.ReinforceId, material.ReinforceCode,
-		material.ReinforceTitle, position.Id,
+		material.RotaryPlugTitle, material.InnerRingTitle, material.OuterRingTitle, position.Id,
 	)
 	if err != nil {
 		tx.Rollback()
@@ -502,10 +480,10 @@ func (r *PositionPutgRepo) Copy(ctx context.Context, targetPositionId string, po
 	)
 	materialQuery := fmt.Sprintf(`INSERT INTO %s (id, position_id, filler_id, filler_code, type_id, type_code, construction_id, construction_code,
 		rotary_plug_id, rotary_plug_code, inner_ring_id, inner_ring_code, outer_ring_id, outer_ring_code, rotary_plug_title,
-		inner_ring_title, outer_ring_title, reinforce_id, reinforce_code, reinforce_title)
+		inner_ring_title, outer_ring_title)
 		SELECT $1, $2, filler_id, filler_code, type_id, type_code, construction_id, construction_code,
 		rotary_plug_id, rotary_plug_code, inner_ring_id, inner_ring_code, outer_ring_id, outer_ring_code, rotary_plug_title,
-		inner_ring_title, outer_ring_title, reinforce_id, reinforce_code, reinforce_title FROM %s WHERE position_id=$3`,
+		inner_ring_title, outer_ring_title FROM %s WHERE position_id=$3`,
 		PositionMaterialPutgTable, PositionMaterialPutgTable,
 	)
 	designQuery := fmt.Sprintf(`INSERT INTO %s (id, position_id, has_jumper, jumper_code, jumper_width, has_hole, has_coating, has_removable,

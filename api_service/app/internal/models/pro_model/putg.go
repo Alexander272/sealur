@@ -117,7 +117,6 @@ type MaterialPutg struct {
 	Filler       PutgFiller       `json:"filler"`
 	Type         PutgType         `json:"putgType"`
 	Construction PutgConstruction `json:"construction"`
-	Reinforce    PutgMaterial     `json:"reinforce"`
 	RotaryPlug   PutgMaterial     `json:"rotaryPlug"`
 	InnerRing    PutgMaterial     `json:"innerRing"`
 	OuterRing    PutgMaterial     `json:"outerRing"`
@@ -131,9 +130,6 @@ func (s *MaterialPutg) Parse() *position_model.PositionPutg_Material {
 		TypeCode:         s.Type.Code,
 		ConstructionId:   s.Construction.Id,
 		ConstructionCode: s.Construction.Code,
-		ReinforceId:      s.Reinforce.Id,
-		ReinforceCode:    s.Reinforce.Code,
-		ReinforceTitle:   s.Reinforce.Title,
 		RotaryPlugId:     s.RotaryPlug.Id,
 		RotaryPlugCode:   s.RotaryPlug.Code,
 		RotaryPlugTitle:  s.RotaryPlug.Title,

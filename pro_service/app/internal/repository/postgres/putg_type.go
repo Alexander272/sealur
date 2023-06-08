@@ -24,7 +24,7 @@ func NewPutgTypeRepo(db *sqlx.DB) *PutgTypeRepo {
 
 func (r *PutgTypeRepo) Get(ctx context.Context, req *putg_type_api.GetPutgType) (types []*putg_type_model.PutgType, err error) {
 	var data []models.PutgType
-	query := fmt.Sprintf(`SELECT id, title, code, min_thickness, max_thickness, description, type_code, has_reinforce FROM %s 
+	query := fmt.Sprintf(`SELECT id, title, code, min_thickness, max_thickness, description, type_code FROM %s 
 		WHERE filler_id=$1 ORDER BY code`, PutgTypeTable,
 	)
 
@@ -41,7 +41,6 @@ func (r *PutgTypeRepo) Get(ctx context.Context, req *putg_type_api.GetPutgType) 
 			MaxThickness: math.Round(pt.MaxThickness*1000) / 1000,
 			Description:  pt.Description,
 			TypeCode:     pt.TypeCode,
-			HasReinforce: pt.HasReinforce,
 		})
 	}
 
@@ -49,13 +48,13 @@ func (r *PutgTypeRepo) Get(ctx context.Context, req *putg_type_api.GetPutgType) 
 }
 
 func (r *PutgTypeRepo) Create(ctx context.Context, t *putg_type_api.CreatePutgType) error {
-	query := fmt.Sprintf(`INSERT INTO %s(id, title, code, filler_id, min_thickness, max_thickness, description, type_code, has_reinforce) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+	query := fmt.Sprintf(`INSERT INTO %s(id, title, code, filler_id, min_thickness, max_thickness, description, type_code) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
 		PutgTypeTable,
 	)
 	id := uuid.New()
 
-	_, err := r.db.Exec(query, id, t.Title, t.Code, t.FillerId, t.MinThickness, t.MaxThickness, t.Description, t.TypeCode, t.HasReinforce)
+	_, err := r.db.Exec(query, id, t.Title, t.Code, t.FillerId, t.MinThickness, t.MaxThickness, t.Description, t.TypeCode)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -65,11 +64,11 @@ func (r *PutgTypeRepo) Create(ctx context.Context, t *putg_type_api.CreatePutgTy
 
 func (r *PutgTypeRepo) Update(ctx context.Context, t *putg_type_api.UpdatePutgType) error {
 	query := fmt.Sprintf(`UPDATE %s SET title=$1, code=$2, filler_id=$3, min_thickness=$4, max_thickness=$5, description=$6, 
-		type_code=$7, has_reinforce=$8 WHERE id=$9`,
+		type_code=$7 WHERE id=$8`,
 		PutgTypeTable,
 	)
 
-	_, err := r.db.Exec(query, t.Title, t.Code, t.FillerId, t.MinThickness, t.MaxThickness, t.Description, t.TypeCode, t.HasReinforce, t.Id)
+	_, err := r.db.Exec(query, t.Title, t.Code, t.FillerId, t.MinThickness, t.MaxThickness, t.Description, t.TypeCode, t.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

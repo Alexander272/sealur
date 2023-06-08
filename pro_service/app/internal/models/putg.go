@@ -81,7 +81,6 @@ type PutgMaterialBlock struct {
 	TypeMaxThickness float64 `db:"t_max"`
 	TypeDescription  string  `db:"t_description"`
 	TypeBaseCode     string  `db:"t_type_code"`
-	TypeHasReinforce bool    `db:"t_has_reinforce"`
 
 	// construction
 	ConstructionId            string `db:"construction_id"`
@@ -96,15 +95,6 @@ type PutgMaterialBlock struct {
 	ConstructionHasRotaryPlug bool   `db:"c_has_rotary_plug"`
 	ConstructionHasInnerRing  bool   `db:"c_has_inner_ring"`
 	ConstructionHasOuterRing  bool   `db:"c_has_outer_ring"`
-
-	// reinforce
-	ReinforceId         string  `db:"reinforce_id"`
-	ReinforceBaseCode   string  `db:"reinforce_code"`
-	ReinforceTitle      string  `db:"reinforce_title"`
-	ReinforceCode       *string `db:"r_code"`
-	ReinforceMaterialId *string `db:"r_material_id"`
-	ReinforceType       *string `db:"r_type"`
-	ReinforceIsDefault  *bool   `db:"r_is_default"`
 
 	// rotaryPlug
 	RotaryPlugId         string  `db:"rotary_plug_id"`
