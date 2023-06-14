@@ -128,6 +128,8 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 
 	mainColumn := []interface{}{"№", "Наименование", "Доп. информация", "Количество", "Цена", "Сумма", "Себестоимость", "Шаблон"}
 
+	tempColumn := []interface{}{"№", "Наименование", "Доп. информация", "Количество", "Ед. изм.", "Цена", "Сумма", "Шаблон"}
+
 	snpColumn := []interface{}{
 		"№", "Наименование", "Д4", "Д3", "Д2", "Д1", "h", "материал внутр. кольца", "материал каркаса", "материал наполнителя", "материал нар. кольца", "Перемычка", "Отверстие", "Крепление", "Чертеж", "Себестоимость", "Цена", "Шаблон",
 	}
@@ -151,10 +153,17 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 	snpCount := snpStart
 	putgCount := putgStart
 
+	units := "шт"
+
 	file := excelize.NewFile()
 	//TODO сделать 2 лист, а первый переименовать в заявку
-	// file.
 	orderSheet := file.GetSheetName(file.GetActiveSheetIndex())
+
+	tempSheetIdx, err := file.NewSheet("для1С")
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to create new sheet. error: %w", err)
+	}
+	tempSheet := file.GetSheetName(tempSheetIdx)
 
 	headerStyle, err := file.NewStyle(&excelize.Style{
 		Fill: excelize.Fill{
@@ -215,25 +224,43 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 	}
 
+	// добавление заголовков для основной таблицы
 	if err = file.SetSheetRow(orderSheet, cell, &mainColumn); err != nil {
 		return nil, "", fmt.Errorf("failed to create header table. error: %w", err)
+	}
+
+	// добавление заголовков для таблицы на листе для 1с
+	if err = file.SetSheetRow(tempSheet, cell, &tempColumn); err != nil {
+		return nil, "", fmt.Errorf("failed to create temp header table. error: %w", err)
 	}
 
 	endCell, err := excelize.CoordinatesToCellName(startMain+len(mainColumn)-1, 1)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
 	}
-
+	// добавление стилей для основной таблицы
 	err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
 	}
 
+	endCell, err = excelize.CoordinatesToCellName(startMain+len(tempColumn)-1, 1)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+	}
+	// добавление стилей для таблицы на листе для 1с
+	err = file.SetCellStyle(tempSheet, cell, endCell, headerStyle)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+	}
+
+	// snp
 	cell, err = excelize.CoordinatesToCellName(startAside, snpStart)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 	}
 
+	// добавление заголовков для таблицы снп
 	if err = file.SetSheetRow(orderSheet, cell, &snpColumn); err != nil {
 		return nil, "", fmt.Errorf("failed to create snp header table. error: %w", err)
 	}
@@ -243,6 +270,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
 	}
 
+	// добавление стилей
 	err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
@@ -262,11 +290,13 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		}
 	}
 
+	// путг
 	cell, err = excelize.CoordinatesToCellName(startAside, putgStart)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 	}
 
+	// добавление заголовков для таблицы путг (основная)
 	if err = file.SetSheetRow(orderSheet, cell, &putgColumnBase); err != nil {
 		return nil, "", fmt.Errorf("failed to create putg base header table. error: %w", err)
 	}
@@ -276,6 +306,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
 	}
 
+	// добавление стилей
 	err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
@@ -287,6 +318,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 		}
+		// добавление заголовков для таблицы путг (с кольцами)
 		if err = file.SetSheetRow(orderSheet, cell, &putgColumnRings); err != nil {
 			return nil, "", fmt.Errorf("failed to create putg ring header table. error: %w", err)
 		}
@@ -296,6 +328,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
 		}
 
+		// добавление стилей
 		err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
@@ -310,6 +343,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 		}
+		// добавление заголовков для таблицы путг (формы отличные от круглой)
 		if err = file.SetSheetRow(orderSheet, cell, &putgColumnForms); err != nil {
 			return nil, "", fmt.Errorf("failed to create putg form header table. error: %w", err)
 		}
@@ -319,6 +353,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
 		}
 
+		// добавление стилей
 		err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
@@ -350,6 +385,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		return nil, "", fmt.Errorf("failed to set column width. error: %w", err)
 	}
 
+	// получение колонок для вставки формул
 	countColumn, err := excelize.ColumnNumberToName(startMain + 3)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
@@ -371,6 +407,20 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
 	}
 
+	// получение колонок для вставки формул на листе 1с
+	tempPriceColumn, err := excelize.ColumnNumberToName(startMain + 5)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+	}
+	tempSumColumn, err := excelize.ColumnNumberToName(startMain + 6)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+	}
+	tempTemplateColumn, err := excelize.ColumnNumberToName(startMain + 7)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+	}
+
 	for i, p := range order.Positions {
 		mainLine := []interface{}{p.Count, p.Title, p.Info, p.Amount}
 
@@ -378,6 +428,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 		}
+		// добавление основных данных
 		if err = file.SetSheetRow(orderSheet, cell, &mainLine); err != nil {
 			return nil, "", fmt.Errorf("failed to create main line. error: %w", err)
 		}
@@ -387,10 +438,12 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
 		}
 
+		// добавление стилей
 		err = file.SetCellStyle(orderSheet, cell, endCell, cellStyle)
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
 		}
+		// добавление стилей для наименования
 		err = file.SetCellStyle(orderSheet, fmt.Sprintf("%s%d", mainTitle, 2+i), fmt.Sprintf("%s%d", mainTitle, 2+i), titleStyle)
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
@@ -454,6 +507,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 			if err != nil {
 				return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 			}
+			// добавление данных для снп
 			if err = file.SetSheetRow(orderSheet, cell, &snpLine); err != nil {
 				return nil, "", fmt.Errorf("failed to create snp line. error: %w", err)
 			}
@@ -463,6 +517,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 				return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
 			}
 
+			// добавление стилей
 			err = file.SetCellStyle(orderSheet, cell, endCell, cellStyle)
 			if err != nil {
 				return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
@@ -619,6 +674,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 				return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
 			}
 
+			// добавление данных для путг
 			if err = file.SetSheetRow(orderSheet, cell, &putgLine); err != nil {
 				return nil, "", fmt.Errorf("failed to create putg line. error: %w", err)
 			}
@@ -628,6 +684,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 				return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
 			}
 
+			// добавление стилей
 			err = file.SetCellStyle(orderSheet, cell, endCell, cellStyle)
 			if err != nil {
 				return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
@@ -649,6 +706,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 			line = lineCount + 1
 		}
 
+		// добавление стилей для наименований
 		err = file.SetCellStyle(orderSheet, fmt.Sprintf("%s%d", asideTitle, line), fmt.Sprintf("%s%d", asideTitle, line), titleStyle)
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
@@ -667,6 +725,42 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
 		}
 
+		// строка для 1с
+		tempLine := []interface{}{p.Count, p.Title, p.Info, p.Amount, units}
+
+		cell, err = excelize.CoordinatesToCellName(startMain, 2+i)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+		}
+		// добавление данных для таблицы на листе для 1с
+		if err = file.SetSheetRow(tempSheet, cell, &tempLine); err != nil {
+			return nil, "", fmt.Errorf("failed to create main line. error: %w", err)
+		}
+
+		endCell, err = excelize.CoordinatesToCellName(startMain+len(tempColumn)-1, 2+i)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+		}
+
+		// добавление стилей для таблицы на листе для 1с
+		err = file.SetCellStyle(tempSheet, cell, endCell, cellStyle)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+		}
+
+		// добавление формул на листе 1с
+		err = file.SetCellFormula(tempSheet, fmt.Sprintf("%s%d", tempPriceColumn, i+2), fmt.Sprintf("=%s!%s%d", orderSheet, priceColumn, i+2))
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
+		}
+		err = file.SetCellFormula(tempSheet, fmt.Sprintf("%s%d", tempSumColumn, i+2), fmt.Sprintf("=%s!%s%d", orderSheet, sumColumn, i+2))
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
+		}
+		err = file.SetCellFormula(tempSheet, fmt.Sprintf("%s%d", tempTemplateColumn, i+2), fmt.Sprintf("=%s!%s%d", orderSheet, templateColumn, i+2))
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
+		}
 	}
 
 	fileName := fmt.Sprintf("Заявка %d", order.Number)
