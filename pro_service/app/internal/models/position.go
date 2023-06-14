@@ -7,13 +7,18 @@ type PositionAnalytics struct {
 	PositionSnpCount int64 `db:"position_snp_count"`
 }
 
-type PositionNew struct {
+type Position struct {
 	Id     string `db:"id"`
 	Title  string `db:"title"`
 	Amount string `db:"amount"`
 	Type   string `db:"type"`
 	Count  int64  `db:"count"`
 	Info   string `db:"info"`
+}
+
+type PositionCount struct {
+	SnpCount  int
+	PutgCount int
 }
 
 type SnpPosition struct {

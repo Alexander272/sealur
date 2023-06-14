@@ -58,9 +58,10 @@ type MainPutg struct {
 
 func (m *MainPutg) Parse() *position_model.PositionPutg_Main {
 	return &position_model.PositionPutg_Main{
-		PutgStandardId:  m.Standard.Id,
-		FlangeTypeId:    m.FlangeType.Id,
-		ConfigurationId: m.Configuration.Id,
+		PutgStandardId:    m.Standard.Id,
+		FlangeTypeId:      m.FlangeType.Id,
+		ConfigurationId:   m.Configuration.Id,
+		ConfigurationCode: m.Configuration.Code,
 	}
 }
 

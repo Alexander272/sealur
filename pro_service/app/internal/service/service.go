@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/file_api"
@@ -331,7 +332,7 @@ type OrderNew interface {
 }
 
 type Position interface {
-	Get(ctx context.Context, orderId string) (positions []*position_model.FullPosition, err error)
+	Get(ctx context.Context, orderId string) (count *models.PositionCount, positions []*position_model.FullPosition, err error)
 	GetAll(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error)
 	GetFull(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error)
 	GetAnalytics(context.Context, *order_api.GetOrderAnalytics) (*order_api.Analytics, error)

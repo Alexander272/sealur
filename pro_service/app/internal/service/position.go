@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 
+	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur/pro_service/internal/repository"
 	"github.com/Alexander272/sealur/pro_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/file_api"
@@ -32,20 +34,36 @@ func NewPositionService_New(repo repository.Position, snp PositionSnp, putg Posi
 	}
 }
 
-func (s *PositionServiceNew) Get(ctx context.Context, orderId string) (positions []*position_model.FullPosition, err error) {
+func (s *PositionServiceNew) Get(ctx context.Context, orderId string) (count *models.PositionCount, positions []*position_model.FullPosition, err error) {
 	snpPosition, err := s.snp.Get(ctx, orderId)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	putgPosition, err := s.putg.Get(ctx, orderId)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+
+	// похоже тут надо сделать запрос в таблицу с позициями и соединить эти данные с теме что уже запрашиваются
+	// вместо это можно просто отсортировать массив по полю Count
+
+	count = &models.PositionCount{
+		SnpCount:  len(snpPosition),
+		PutgCount: len(putgPosition),
 	}
 
 	positions = append(positions, snpPosition...)
 	positions = append(positions, putgPosition...)
 
-	return positions, nil
+	sort.Slice(positions, func(i, j int) bool {
+		return positions[i].Count < positions[j].Count
+	})
+
+	for i := range positions {
+		positions[i].Count = int64(i + 1)
+	}
+
+	return count, positions, nil
 }
 
 func (s *PositionServiceNew) GetAll(ctx context.Context, orderId string) ([]*position_model.OrderPosition, error) {
@@ -201,6 +219,7 @@ func (s *PositionServiceNew) Copy(ctx context.Context, position *position_api.Co
 	if position.Amount != "" {
 		curPosition.Amount = position.Amount
 	}
+	// Поскольку я для проверки получаю позицию я могу просто создать новую заменив данные
 	id, err := s.repo.Create(ctx, curPosition)
 	if err != nil {
 		return "", fmt.Errorf("failed to create position. error: %w", err)

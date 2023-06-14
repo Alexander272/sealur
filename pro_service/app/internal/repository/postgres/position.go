@@ -24,7 +24,7 @@ func NewPositionRepo(db *sqlx.DB) *PositionRepo {
 }
 
 func (r *PositionRepo) GetById(ctx context.Context, positionId string) (position *position_model.FullPosition, err error) {
-	var data models.PositionNew
+	var data models.Position
 	query := fmt.Sprintf(`SELECT id, title, amount, type, count, info FROM %s WHERE id=$1`, PositionTable)
 
 	if err := r.db.Get(&data, query, positionId); err != nil {
@@ -45,7 +45,7 @@ func (r *PositionRepo) GetById(ctx context.Context, positionId string) (position
 }
 
 func (r *PositionRepo) Get(ctx context.Context, orderId string) (positions []*position_model.OrderPosition, err error) {
-	var data []models.PositionNew
+	var data []models.Position
 	query := fmt.Sprintf(`SELECT id, title, amount, type, count, info FROM %s WHERE order_id=$1 ORDER BY count`, PositionTable)
 
 	if err := r.db.Select(&data, query, orderId); err != nil {
@@ -69,7 +69,7 @@ func (r *PositionRepo) Get(ctx context.Context, orderId string) (positions []*po
 }
 
 func (r *PositionRepo) GetByTitle(ctx context.Context, title, orderId string) (string, error) {
-	var data models.PositionNew
+	var data models.Position
 	query := fmt.Sprintf(`SELECT id FROM %s WHERE order_id=$1 AND title=$2`, PositionTable)
 
 	if err := r.db.Get(&data, query, orderId, title); err != nil {

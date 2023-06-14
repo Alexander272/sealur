@@ -40,10 +40,10 @@ func (r *PositionPutgRepo) Get(ctx context.Context, orderId string) (positions [
 		d4, d3, d2, d1, h, use_dimensions,
 		has_jumper, jumper_code, jumper_width, has_hole, has_coating, has_removable, has_mounting, mounting_code, drawing
 		FROM %s AS p 
-		INNER JOIN %s AS pm ON p.id=pm.position_id
-		INNER JOIN %s AS pmt ON p.id=pmt.position_id
-		INNER JOIN %s AS ps ON p.id=pmt.position_id
-		INNER JOIN %s AS pd ON p.id=pd.position_id
+		LEFT JOIN %s AS pm ON p.id=pm.position_id
+		LEFT JOIN %s AS pmt ON p.id=pmt.position_id
+		LEFT JOIN %s AS ps ON p.id=ps.position_id
+		LEFT JOIN %s AS pd ON p.id=pd.position_id
 		WHERE order_id=$1 AND type=$2 ORDER BY count`,
 		PositionTable, PositionMainPutgTable, PositionMaterialPutgTable, PositionSizePutgTable, PositionDesignPutgTable,
 	)
