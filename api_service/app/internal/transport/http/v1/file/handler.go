@@ -47,7 +47,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	// connect, err := grpc.Dial(conf.FileService.Url, opts...)
 	connect, err := grpc.Dial(conf.FileService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatalf("failed connection to file service. error: %w", err)
+		logger.Fatalf("failed connection to file service. error: %s", err.Error())
 	}
 
 	fileClient := file_api.NewFileServiceClient(connect)

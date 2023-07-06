@@ -31,7 +31,7 @@ func (h *Handler) Download(req *file_api.FileDownloadRequest, stream file_api.Fi
 	}
 	err = stream.Send(reqMeta)
 	if err != nil {
-		logger.Errorf("cannot send metadata to client: %w", err)
+		logger.Errorf("cannot send metadata to client: %s", err.Error())
 		return fmt.Errorf("cannot send metadata to client %w", err)
 	}
 
@@ -45,7 +45,7 @@ func (h *Handler) Download(req *file_api.FileDownloadRequest, stream file_api.Fi
 			break
 		}
 		if err != nil {
-			logger.Errorf("cannot read chunk to buffer: %w", err)
+			logger.Errorf("cannot read chunk to buffer: %s", err.Error())
 			return fmt.Errorf("cannot read chunk to buffer %w", err)
 		}
 
@@ -57,7 +57,7 @@ func (h *Handler) Download(req *file_api.FileDownloadRequest, stream file_api.Fi
 
 		err = stream.Send(reqChunk)
 		if err != nil {
-			logger.Errorf("cannot send chunk to client: %w", err)
+			logger.Errorf("cannot send chunk to client: %s", err.Error())
 			return fmt.Errorf("cannot send chunk to client %w", err)
 		}
 	}
@@ -101,7 +101,7 @@ func (h *Handler) GroupDownload(req *file_api.GroupDownloadRequest, stream file_
 	}
 	err = stream.Send(reqMeta)
 	if err != nil {
-		logger.Errorf("cannot send metadata to client: %w", err)
+		logger.Errorf("cannot send metadata to client: %s", err.Error())
 		return fmt.Errorf("cannot send metadata to client %w", err)
 	}
 
@@ -114,7 +114,7 @@ func (h *Handler) GroupDownload(req *file_api.GroupDownloadRequest, stream file_
 			break
 		}
 		if err != nil {
-			logger.Errorf("cannot read chunk to buffer: %w", err)
+			logger.Errorf("cannot read chunk to buffer: %s", err.Error())
 			return fmt.Errorf("cannot read chunk to buffer %w", err)
 		}
 
@@ -126,7 +126,7 @@ func (h *Handler) GroupDownload(req *file_api.GroupDownloadRequest, stream file_
 
 		err = stream.Send(reqChunk)
 		if err != nil {
-			logger.Errorf("cannot send chunk to client: %w", err)
+			logger.Errorf("cannot send chunk to client: %s", err.Error())
 			return fmt.Errorf("cannot send chunk to client %w", err)
 		}
 	}

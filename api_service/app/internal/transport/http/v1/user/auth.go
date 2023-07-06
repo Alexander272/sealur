@@ -97,13 +97,13 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 			)
 			return
 		}
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error()+". email: "+req.Email, "Произошла ошибка")
 		return
 	}
 
 	if user == nil {
 		h.services.Limit.AddAttempt(c, c.ClientIP())
-		models.NewErrorResponse(c, http.StatusBadRequest, "invalid credentials", "Введены некорректные данные")
+		models.NewErrorResponse(c, http.StatusBadRequest, "invalid credentials. email: "+req.Email, "Введены некорректные данные")
 		return
 	}
 	h.services.Limit.Remove(c, c.ClientIP())

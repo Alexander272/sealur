@@ -20,7 +20,7 @@ services:
     api_service:
         restart: on-failure:5
         # image: sealur/api_service:1.8.7
-        image: sealur/api_service:1.10.27d
+        image: sealur/api_service:1.10.30d
         container_name: dev-api_service
         volumes:
             - ./build/image:/bin/images

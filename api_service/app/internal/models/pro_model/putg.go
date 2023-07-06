@@ -160,8 +160,8 @@ func (s *DesignPutg) Parse() *position_model.PositionPutg_Design {
 		HasHole:      s.HasHole,
 		HasCoating:   s.HasCoating,
 		HasRemovable: s.HasRemovable,
-		HasMounting:  s.Mounting.HasMounting,
-		MountingCode: s.Mounting.Code,
-		Drawing:      s.Drawing,
+		// HasMounting:  s.Mounting.HasMounting,
+		// MountingCode: s.Mounting.Code,
+		Drawing: s.Drawing,
 	}
 }

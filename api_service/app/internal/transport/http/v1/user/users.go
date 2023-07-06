@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
@@ -193,7 +194,11 @@ func (h *UserHandler) recoveryPassword(c *gin.Context) {
 
 	user, err := h.userApi.GetByEmail(c, dto)
 	if err != nil {
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		if strings.Contains(err.Error(), "invalid credentials") {
+			models.NewErrorResponse(c, http.StatusBadRequest, "invalid credentials. email"+dto.Email, "Введены некорректные данные")
+			return
+		}
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error()+". email"+dto.Email, "Произошла ошибка")
 		return
 	}
 

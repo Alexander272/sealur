@@ -208,7 +208,7 @@ func (h *Handler) createDrawing(c *gin.Context) {
 
 	err = stream.Send(reqMeta)
 	if err != nil {
-		logger.Errorf("cannot send image info to server: %w %w", err, stream.RecvMsg(nil))
+		logger.Errorf("cannot send image info to server: %s %s", err.Error(), stream.RecvMsg(nil).Error())
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "cannot send image info to server")
 		return
 	}
@@ -222,7 +222,7 @@ func (h *Handler) createDrawing(c *gin.Context) {
 			break
 		}
 		if err != nil {
-			logger.Errorf("cannot read chunk to buffer: %w", err)
+			logger.Errorf("cannot read chunk to buffer: %s", err.Error())
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "cannot send image to server")
 			return
 		}
@@ -237,7 +237,7 @@ func (h *Handler) createDrawing(c *gin.Context) {
 
 		err = stream.Send(reqChunk)
 		if err != nil {
-			logger.Errorf("cannot send chunk to server: %w", err)
+			logger.Errorf("cannot send chunk to server: %s", err.Error())
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "cannot send image to server")
 			return
 		}
@@ -245,7 +245,7 @@ func (h *Handler) createDrawing(c *gin.Context) {
 
 	res, err := stream.CloseAndRecv()
 	if err != nil {
-		logger.Errorf("cannot receive response: %w", err)
+		logger.Errorf("cannot receive response: %s", err.Error())
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "cannot receive response")
 		return
 	}

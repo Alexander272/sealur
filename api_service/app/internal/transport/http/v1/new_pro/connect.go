@@ -21,7 +21,7 @@ func NewConnectHandler(emailApi email_api.EmailServiceClient) *ConnectHandler {
 func (h *Handler) initConnectRoutes(api *gin.RouterGroup) {
 	handler := NewConnectHandler(h.emailApi)
 
-	connect := api.Group("/connect", h.middleware.UserIdentity)
+	connect := api.Group("/connect")
 	{
 		connect.POST("/feedback", handler.feedback)
 	}
