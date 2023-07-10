@@ -1,12 +1,14 @@
 package new_pro
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/pro_model"
+	"github.com/Alexander272/sealur/api_service/internal/transport/api"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/file_api"
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
@@ -16,17 +18,19 @@ import (
 type PositionHandler struct {
 	positionApi position_api.PositionServiceClient
 	fileApi     file_api.FileServiceClient
+	botApi      api.MostBotApi
 }
 
-func NewPositionHandler(positionApi position_api.PositionServiceClient, fileApi file_api.FileServiceClient) *PositionHandler {
+func NewPositionHandler(positionApi position_api.PositionServiceClient, fileApi file_api.FileServiceClient, botApi api.MostBotApi) *PositionHandler {
 	return &PositionHandler{
 		positionApi: positionApi,
 		fileApi:     fileApi,
+		botApi:      botApi,
 	}
 }
 
 func (h *Handler) initPositionRoutes(api *gin.RouterGroup) {
-	handler := NewPositionHandler(h.positionApi, h.fileApi)
+	handler := NewPositionHandler(h.positionApi, h.fileApi, h.botApi)
 
 	positions := api.Group("/positions", h.middleware.UserIdentity)
 	{
@@ -55,6 +59,13 @@ func (h *PositionHandler) create(c *gin.Context) {
 			return
 		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
@@ -83,6 +94,13 @@ func (h *PositionHandler) copy(c *gin.Context) {
 			return
 		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
@@ -98,6 +116,13 @@ func (h *PositionHandler) copy(c *gin.Context) {
 		_, err := h.fileApi.Copy(c, req)
 		if err != nil {
 			models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка при копировании чертежа")
+
+			body, err := json.Marshal(req)
+			if err != nil {
+				logger.Error("body error: ", err)
+			}
+			h.botApi.SendError(c, err.Error(), string(body))
+
 			return
 		}
 	}
@@ -123,6 +148,13 @@ func (h *PositionHandler) update(c *gin.Context) {
 
 	if _, err := h.positionApi.Update(c, &position_api.UpdatePosition{Position: position}); err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
@@ -138,6 +170,7 @@ func (h *PositionHandler) delete(c *gin.Context) {
 
 	if _, err := h.positionApi.Delete(c, &position_api.DeletePosition{Id: id}); err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "id": "%s" }`, id))
 		return
 	}
 

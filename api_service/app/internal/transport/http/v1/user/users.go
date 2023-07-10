@@ -1,6 +1,7 @@
 package user
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -9,6 +10,8 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/service"
+	"github.com/Alexander272/sealur/api_service/internal/transport/api"
+	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
 	"github.com/gin-gonic/gin"
@@ -17,6 +20,7 @@ import (
 type UserHandler struct {
 	userApi    user_api.UserServiceClient
 	emailApi   email_api.EmailServiceClient
+	botApi     api.MostBotApi
 	http       config.HttpConfig
 	auth       config.AuthConfig
 	services   *service.Services
@@ -24,7 +28,7 @@ type UserHandler struct {
 }
 
 func NewUserHandler(
-	userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient,
+	userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient, botApi api.MostBotApi,
 	http config.HttpConfig, auth config.AuthConfig,
 	services *service.Services,
 	cookieName string,
@@ -32,6 +36,7 @@ func NewUserHandler(
 	return &UserHandler{
 		userApi:    userApi,
 		emailApi:   emailApi,
+		botApi:     botApi,
 		http:       http,
 		auth:       auth,
 		services:   services,
@@ -40,7 +45,7 @@ func NewUserHandler(
 }
 
 func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
-	handler := NewUserHandler(h.userApi, h.emailApi, h.conf.Http, h.conf.Auth, h.services, h.cookieName)
+	handler := NewUserHandler(h.userApi, h.emailApi, h.botApi, h.conf.Http, h.conf.Auth, h.services, h.cookieName)
 
 	users := api.Group("/users")
 	{
@@ -59,6 +64,7 @@ func (h *UserHandler) getManagers(c *gin.Context) {
 	users, err := h.userApi.GetManagers(c, &user_api.GetNewUser{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), "")
 		return
 	}
 
@@ -75,6 +81,7 @@ func (h *UserHandler) getUser(c *gin.Context) {
 	user, err := h.userApi.Get(c, &user_api.GetUser{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "email": "%s" }`, id))
 		return
 	}
 
@@ -91,6 +98,7 @@ func (h *UserHandler) getFullUser(c *gin.Context) {
 	user, err := h.userApi.GetFull(c, &user_api.GetUser{Id: id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "email": "%s" }`, id))
 		return
 	}
 
@@ -132,6 +140,7 @@ func (h *UserHandler) getByParam(c *gin.Context) {
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), "")
 		return
 	}
 
@@ -154,6 +163,7 @@ func (h *UserHandler) confirm(c *gin.Context) {
 	user, err := h.userApi.Confirm(c, &user_api.ConfirmUser{Id: data.UserId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "email": "%s" }`, data.UserId))
 		return
 	}
 
@@ -161,6 +171,7 @@ func (h *UserHandler) confirm(c *gin.Context) {
 	token, err := h.services.SignIn(c, user)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "email": "%s" }`, data.UserId))
 		return
 	}
 
@@ -180,6 +191,13 @@ func (h *UserHandler) setManager(c *gin.Context) {
 	_, err := h.userApi.SetManager(c, dto)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated manager successfully"})
@@ -195,10 +213,17 @@ func (h *UserHandler) recoveryPassword(c *gin.Context) {
 	user, err := h.userApi.GetByEmail(c, dto)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid credentials") {
-			models.NewErrorResponse(c, http.StatusBadRequest, "invalid credentials. email"+dto.Email, "Введены некорректные данные")
+			models.NewErrorResponse(c, http.StatusBadRequest, "invalid credentials. email: "+dto.Email, "Введены некорректные данные")
 			return
 		}
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error()+". email"+dto.Email, "Произошла ошибка")
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error()+". email: "+dto.Email, "Произошла ошибка")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
@@ -217,6 +242,7 @@ func (h *UserHandler) recoveryPassword(c *gin.Context) {
 	_, err = h.emailApi.Recovery(c, data)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка при отправлении письма")
+		h.botApi.SendError(c, err.Error(), data.String())
 		return
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Reset completed successfully"})
@@ -238,18 +264,27 @@ func (h *UserHandler) recoveryPasswordCode(c *gin.Context) {
 	data, err := h.services.Confirm.Get(c, code)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
 	user, err := h.userApi.Get(c, &user_api.GetUser{Id: data.UserId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "email": "%s" }`, data.UserId))
 		return
 	}
 
 	_, err = h.userApi.Update(c, &user_api.UpdateUser{Id: user.Id, Password: dto.Password})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "email": "%s" }`, data.UserId))
 		return
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated password successfully"})

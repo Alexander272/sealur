@@ -10,8 +10,10 @@ import (
 )
 
 const (
-	UserIdCtx    = "userId"
-	UserRolesCtx = "roles"
+	UserIdCtx      = "userId"
+	UserNameCtx    = "userName"
+	UserCompanyCtx = "company"
+	UserRolesCtx   = "roles"
 )
 
 func (m *Middleware) UserIdentity(c *gin.Context) {
@@ -55,6 +57,8 @@ func (m *Middleware) UserIdentity(c *gin.Context) {
 	// 	c.Set(fmt.Sprintf("%s_%s", userRolesCtx, r.Service), r.Role)
 	// }
 	c.Set(UserRolesCtx, user.RoleCode)
+	c.Set(UserNameCtx, user.Name)
+	c.Set(UserCompanyCtx, user.Company)
 }
 
 func (m *Middleware) AccessForManager(c *gin.Context) {

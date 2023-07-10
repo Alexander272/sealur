@@ -1,26 +1,31 @@
 package new_pro
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
+	"github.com/Alexander272/sealur/api_service/internal/transport/api"
+	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/gin-gonic/gin"
 )
 
 type SnpHandler struct {
 	snpApi snp_api.SnpDataServiceClient
+	botApi api.MostBotApi
 }
 
-func NewSnpHandler(snpApi snp_api.SnpDataServiceClient) *SnpHandler {
+func NewSnpHandler(snpApi snp_api.SnpDataServiceClient, botApi api.MostBotApi) *SnpHandler {
 	return &SnpHandler{
 		snpApi: snpApi,
+		botApi: botApi,
 	}
 }
 
 func (h *Handler) initSNPRoutes(api *gin.RouterGroup) {
-	handler := NewSnpHandler(h.snpApi)
+	handler := NewSnpHandler(h.snpApi, h.botApi)
 
 	// snp := api.Group("/snp", h.middleware.UserIdentity)
 	snp := api.Group("/snp-new")
@@ -79,6 +84,13 @@ func (h *SnpHandler) get(c *gin.Context) {
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+
+		body, err := json.Marshal(snp)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
@@ -99,6 +111,13 @@ func (h *SnpHandler) getData(c *gin.Context) {
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+
+		body, err := json.Marshal(snp)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 

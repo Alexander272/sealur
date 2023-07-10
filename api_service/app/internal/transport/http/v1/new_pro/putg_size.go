@@ -4,22 +4,24 @@ import (
 	"net/http"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
+	"github.com/Alexander272/sealur/api_service/internal/transport/api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
 	"github.com/gin-gonic/gin"
 )
 
 type PutgSizeHandler struct {
 	sizeApi putg_size_api.PutgSizeServiceClient
+	botApi  api.MostBotApi
 }
 
-func NewPutgSizeHandler(sizeApi putg_size_api.PutgSizeServiceClient) *PutgSizeHandler {
+func NewPutgSizeHandler(sizeApi putg_size_api.PutgSizeServiceClient, botApi api.MostBotApi) *PutgSizeHandler {
 	return &PutgSizeHandler{
 		sizeApi: sizeApi,
 	}
 }
 
 func (h *Handler) initPutgSizeRoutes(api *gin.RouterGroup) {
-	handler := NewPutgSizeHandler(h.putgSizeApi)
+	handler := NewPutgSizeHandler(h.putgSizeApi, h.botApi)
 
 	// TODO проверять авторизацию
 	sizes := api.Group("/putg/sizes")
@@ -53,6 +55,7 @@ func (h *PutgSizeHandler) get(c *gin.Context) {
 	sizes, err := h.sizeApi.Get(c, &putg_size_api.GetPutgSize{FlangeTypeId: flangeTypeId, BaseConstructionId: baseConstructionId, BaseFillerId: baseFillerId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Не удалось получить размеры")
+		h.botApi.SendError(c, err.Error(), "")
 		return
 	}
 	c.JSON(http.StatusOK, models.DataResponse{Data: sizes})

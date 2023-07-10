@@ -2,6 +2,7 @@ package new_pro
 
 import (
 	"github.com/Alexander272/sealur/api_service/internal/config"
+	"github.com/Alexander272/sealur/api_service/internal/transport/api"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
@@ -28,6 +29,8 @@ import (
 
 type Handler struct {
 	middleware *middleware.Middleware
+
+	botApi api.MostBotApi
 
 	snpApi         snp_api.SnpDataServiceClient
 	snpStandardApi snp_standard_api.SnpStandardServiceClient
@@ -57,8 +60,9 @@ type Handler struct {
 	// calcClient      calc_api.CalcServiceClient
 }
 
-func NewHandler(middleware *middleware.Middleware) *Handler {
+func NewHandler(botApi api.MostBotApi, middleware *middleware.Middleware) *Handler {
 	return &Handler{
+		botApi:     botApi,
 		middleware: middleware,
 	}
 }

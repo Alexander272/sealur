@@ -19,7 +19,9 @@ type Handler struct {
 }
 
 func NewHandler(middleware *middleware.Middleware) *Handler {
-	return &Handler{middleware: middleware}
+	return &Handler{
+		middleware: middleware,
+	}
 }
 
 func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
@@ -47,7 +49,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	//* подключение к сервису
 	connect, err := grpc.Dial(conf.ProService.Url, opts...)
 	if err != nil {
-		logger.Fatalf("failed connection to pro service. error: %w", err)
+		logger.Fatalf("failed connection to pro service. error: %s", err.Error())
 	}
 	proClient := pro_api.NewProServiceClient(connect)
 	h.proClient = proClient

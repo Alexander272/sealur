@@ -91,7 +91,7 @@ func main() {
 	//* подключение к сервису
 	connectEmail, err := grpc.Dial(conf.Services.EmailService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatalf("failed connection to email service. error: %w", err)
+		logger.Fatalf("failed connection to email service. error: %s", err.Error())
 	}
 	emailClient := email_api.NewEmailServiceClient(connectEmail)
 
@@ -111,7 +111,7 @@ func main() {
 	//* подключение к сервису
 	connectFile, err := grpc.Dial(conf.Services.FileService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatalf("failed connection to file service. error: %w", err)
+		logger.Fatalf("failed connection to file service. error: %s", err.Error())
 	}
 	fileClient := file_api.NewFileServiceClient(connectFile)
 
@@ -131,7 +131,7 @@ func main() {
 	//* подключение к сервису
 	connectUser, err := grpc.Dial(conf.Services.UserService.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatalf("failed connection to user service. error: %w", err)
+		logger.Fatalf("failed connection to user service. error: %s", err.Error())
 	}
 	userClient := user_api.NewUserServiceClient(connectUser)
 
@@ -189,12 +189,12 @@ func main() {
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {
-		logger.Fatalf("failed to create grpc listener:", err)
+		logger.Fatalf("failed to create grpc listener: %s", err.Error())
 	}
 
 	go func() {
 		if err = server.Serve(listener); err != nil {
-			logger.Fatalf("failed to start server:", err)
+			logger.Fatalf("failed to start server: %s", err.Error())
 		}
 	}()
 	logger.Infof("Application started on port: %s", conf.Http.Port)

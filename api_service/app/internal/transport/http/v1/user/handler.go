@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/Alexander272/sealur/api_service/internal/config"
 	"github.com/Alexander272/sealur/api_service/internal/service"
+	"github.com/Alexander272/sealur/api_service/internal/transport/api"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
@@ -15,15 +16,17 @@ import (
 type Handler struct {
 	userApi    user_api.UserServiceClient
 	emailApi   email_api.EmailServiceClient
+	botApi     api.MostBotApi
 	conf       *config.Config
 	services   *service.Services
 	middleware *middleware.Middleware
 	cookieName string
 }
 
-func NewHandler(conf *config.Config, services *service.Services, middleware *middleware.Middleware, cookieName string) *Handler {
+func NewHandler(conf *config.Config, botApi api.MostBotApi, services *service.Services, middleware *middleware.Middleware, cookieName string) *Handler {
 	return &Handler{
 		conf:       conf,
+		botApi:     botApi,
 		services:   services,
 		middleware: middleware,
 		cookieName: cookieName,

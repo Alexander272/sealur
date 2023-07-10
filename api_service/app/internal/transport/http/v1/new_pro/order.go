@@ -2,6 +2,7 @@ package new_pro
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
+	"github.com/Alexander272/sealur/api_service/internal/transport/api"
 	"github.com/Alexander272/sealur/api_service/internal/transport/http/middleware"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
@@ -24,21 +26,23 @@ type OrderHandler struct {
 	userApi  user_api.UserServiceClient
 	emailApi email_api.EmailServiceClient
 	fileApi  file_api.FileServiceClient
+	botApi   api.MostBotApi
 }
 
 func NewOrderHandler(orderApi order_api.OrderServiceClient, userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient,
-	fileApi file_api.FileServiceClient,
+	fileApi file_api.FileServiceClient, botApi api.MostBotApi,
 ) *OrderHandler {
 	return &OrderHandler{
 		orderApi: orderApi,
 		userApi:  userApi,
 		emailApi: emailApi,
 		fileApi:  fileApi,
+		botApi:   botApi,
 	}
 }
 
 func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
-	handler := NewOrderHandler(h.orderApi, h.userApi, h.emailApi, h.fileApi)
+	handler := NewOrderHandler(h.orderApi, h.userApi, h.emailApi, h.fileApi, h.botApi)
 
 	order := api.Group("/orders", h.middleware.UserIdentity)
 	{
@@ -80,12 +84,14 @@ func (h *OrderHandler) get(c *gin.Context) {
 			return
 		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "id": "%s" }`, id))
 		return
 	}
 
 	user, err := h.userApi.Get(c, &user_api.GetUser{Id: order.Order.UserId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "userId": "%s" }`, order.Order.UserId))
 		return
 	}
 	order.User = user
@@ -103,12 +109,14 @@ func (h *OrderHandler) getCurrent(c *gin.Context) {
 	user, err := h.userApi.Get(c, &user_api.GetUser{Id: userId.(string)})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "userId": "%s" }`, userId))
 		return
 	}
 
 	order, err := h.orderApi.GetCurrent(c, &order_api.GetCurrentOrder{UserId: user.Id, ManagerId: user.ManagerId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "userId": "%s", "managerId": "%s" }`, user.Id, user.ManagerId))
 		return
 	}
 
@@ -125,6 +133,7 @@ func (h *OrderHandler) getAll(c *gin.Context) {
 	orders, err := h.orderApi.GetAll(c, &order_api.GetAllOrders{UserId: userId.(string)})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "userId": "%s" }`, userId))
 		return
 	}
 
@@ -141,6 +150,7 @@ func (h *OrderHandler) getOpen(c *gin.Context) {
 	orders, err := h.orderApi.GetOpen(c, &order_api.GetManagerOrders{ManagerId: userId.(string)})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "managerId": "%s" }`, userId))
 		return
 	}
 
@@ -159,6 +169,7 @@ func (h *OrderHandler) getFile(c *gin.Context) {
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "orderId": "%s" }`, orderId))
 		return
 	}
 
@@ -182,6 +193,7 @@ func (h *OrderHandler) getFile(c *gin.Context) {
 
 		if err != nil {
 			models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+			h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "orderId": "%s" }`, orderId))
 			return
 		}
 
@@ -190,6 +202,7 @@ func (h *OrderHandler) getFile(c *gin.Context) {
 		_, err = fileData.Write(chunk)
 		if err != nil {
 			models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+			h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "orderId": "%s" }`, orderId))
 			return
 		}
 	}
@@ -197,6 +210,7 @@ func (h *OrderHandler) getFile(c *gin.Context) {
 	f, err := os.Create(meta.Name)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "failed to create file")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "orderId": "%s" }`, orderId))
 		return
 	}
 	f.Write(fileData.Bytes())
@@ -224,6 +238,7 @@ func (h *OrderHandler) getAnalytics(c *gin.Context) {
 	analytics, err := h.orderApi.GetAnalytics(c, &order_api.GetOrderAnalytics{PeriodAt: periodAt, PeriodEnd: periodEnd})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "periodAt": "%s", "periodEnd": "%s" }`, periodAt, periodEnd))
 		return
 	}
 
@@ -234,6 +249,7 @@ func (h *OrderHandler) getCountAnalytics(c *gin.Context) {
 	orders, err := h.orderApi.GetOrderCount(c, &order_api.GetOrderCountAnalytics{})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		h.botApi.SendError(c, err.Error(), "")
 		return
 	}
 
@@ -248,6 +264,7 @@ func (h *OrderHandler) getFullAnalytics(c *gin.Context) {
 	data, err := h.orderApi.GetBidAnalytics(c, &order_api.GetFullOrderAnalytics{PeriodAt: periodAt, PeriodEnd: periodEnd, UserId: userId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "periodAt": "%s", "periodEnd": "%s", "userId": "%s" }`, periodAt, periodEnd, userId))
 		return
 	}
 
@@ -279,6 +296,13 @@ func (h *OrderHandler) create(c *gin.Context) {
 	_, err := h.orderApi.Create(c, dto)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
@@ -300,6 +324,13 @@ func (h *OrderHandler) copy(c *gin.Context) {
 			return
 		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка во время копирования")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
@@ -310,6 +341,13 @@ func (h *OrderHandler) copy(c *gin.Context) {
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка во время копирования чертежей")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
@@ -334,18 +372,27 @@ func (h *OrderHandler) save(c *gin.Context) {
 	_, err := h.orderApi.Save(c, dto)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
 	data, err := h.userApi.GetManagerEmail(c, &user_api.GetUser{Id: dto.UserId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "managerId": "%s" }`, userId))
 		return
 	}
 
 	_, err = h.emailApi.SendNotification(c, &email_api.NotificationData{Email: data.Email, User: data.User, OrderId: dto.Id})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "failed to send email")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "Email": "%s" }`, data.Email))
 		return
 	}
 
@@ -363,6 +410,13 @@ func (h *OrderHandler) setInfo(c *gin.Context) {
 	_, err := h.orderApi.SetInfo(c, dto)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated"})
@@ -379,6 +433,13 @@ func (h *OrderHandler) finish(c *gin.Context) {
 	_, err := h.orderApi.SetStatus(c, dto)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 	c.JSON(http.StatusOK, models.IdResponse{Message: "Updated status successfully"})
@@ -394,12 +455,14 @@ func (h *OrderHandler) setManager(c *gin.Context) {
 	user, err := h.userApi.Get(c, &user_api.GetUser{Id: dto.UserId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "userId": "%s" }`, dto.UserId))
 		return
 	}
 
 	manager, err := h.userApi.Get(c, &user_api.GetUser{Id: dto.OldManagerId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "oldManagerId": "%s" }`, dto.OldManagerId))
 		return
 	}
 
@@ -408,12 +471,20 @@ func (h *OrderHandler) setManager(c *gin.Context) {
 	_, err = h.orderApi.SetManager(c, dto)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
 	_, err = h.emailApi.SendRedirect(c, &email_api.RedirectData{Email: dto.ManagerEmail, OrderId: dto.OrderId, User: user, Manager: manager})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Не удалось отправить email: "+err.Error())
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "Email": "%s" }`, dto.ManagerEmail))
 		return
 	}
 

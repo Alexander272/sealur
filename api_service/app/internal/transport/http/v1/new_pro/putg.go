@@ -1,10 +1,13 @@
 package new_pro
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/Alexander272/sealur/api_service/internal/models"
+	"github.com/Alexander272/sealur/api_service/internal/transport/api"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
 	"github.com/gin-gonic/gin"
@@ -12,16 +15,18 @@ import (
 
 type PutgHandler struct {
 	putgApi putg_api.PutgDataServiceClient
+	botApi  api.MostBotApi
 }
 
-func NewPutgHandler(putgApi putg_api.PutgDataServiceClient) *PutgHandler {
+func NewPutgHandler(putgApi putg_api.PutgDataServiceClient, botApi api.MostBotApi) *PutgHandler {
 	return &PutgHandler{
 		putgApi: putgApi,
+		botApi:  botApi,
 	}
 }
 
 func (h *Handler) initPutgRoutes(api *gin.RouterGroup) {
-	handler := NewPutgHandler(h.putgApi)
+	handler := NewPutgHandler(h.putgApi, h.botApi)
 
 	// snp := api.Group("/snp", h.middleware.UserIdentity)
 	putg := api.Group("/putg")
@@ -53,6 +58,7 @@ func (h *PutgHandler) getBase(c *gin.Context) {
 	putg, err := h.putgApi.GetBase(c, &putg_api.GetPutgBase{StandardId: standardId, Empty: empty})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "standardId": "%s" }`, standardId))
 		return
 	}
 
@@ -88,6 +94,13 @@ func (h *PutgHandler) getData(c *gin.Context) {
 	})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+
+		body, err := json.Marshal(data)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
@@ -114,6 +127,13 @@ func (h *PutgHandler) get(c *gin.Context) {
 	data, err := h.putgApi.Get(c, &putg_api.GetPutg{FillerId: fillerId, BaseId: baseId, FlangeTypeId: flangeTypeId})
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+
+		body, err := json.Marshal(data)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 

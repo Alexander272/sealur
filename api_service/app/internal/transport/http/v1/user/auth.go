@@ -1,6 +1,7 @@
 package user
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"github.com/Alexander272/sealur/api_service/internal/models"
 	"github.com/Alexander272/sealur/api_service/internal/models/user_model"
 	"github.com/Alexander272/sealur/api_service/internal/service"
+	"github.com/Alexander272/sealur/api_service/internal/transport/api"
 	"github.com/Alexander272/sealur/api_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/email_api"
 	"github.com/Alexander272/sealur_proto/api/user/user_api"
@@ -19,6 +21,7 @@ import (
 type AuthHandler struct {
 	userApi    user_api.UserServiceClient
 	emailApi   email_api.EmailServiceClient
+	botApi     api.MostBotApi
 	auth       config.AuthConfig
 	http       config.HttpConfig
 	services   *service.Services
@@ -26,7 +29,7 @@ type AuthHandler struct {
 }
 
 func NewAuthHandler(
-	userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient,
+	userApi user_api.UserServiceClient, emailApi email_api.EmailServiceClient, botApi api.MostBotApi,
 	auth config.AuthConfig, http config.HttpConfig,
 	services *service.Services,
 	cookieName string,
@@ -34,6 +37,7 @@ func NewAuthHandler(
 	return &AuthHandler{
 		userApi:    userApi,
 		emailApi:   emailApi,
+		botApi:     botApi,
 		auth:       auth,
 		http:       http,
 		services:   services,
@@ -42,7 +46,7 @@ func NewAuthHandler(
 }
 
 func (h *Handler) initAuthRoutes(api *gin.RouterGroup) {
-	handler := NewAuthHandler(h.userApi, h.emailApi, h.conf.Auth, h.conf.Http, h.services, h.cookieName)
+	handler := NewAuthHandler(h.userApi, h.emailApi, h.botApi, h.conf.Auth, h.conf.Http, h.services, h.cookieName)
 
 	auth := api.Group("/auth")
 	{
@@ -68,6 +72,7 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 	limit, err := h.services.Limit.Get(c, c.ClientIP())
 	if err != nil && !errors.Is(err, models.ErrClientIPNotFound) {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error()+" user email: "+dto.Email, "Произошла ошибка")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "email": "%s" }`, req.Email))
 		return
 	}
 	if errors.Is(err, models.ErrClientIPNotFound) {
@@ -98,6 +103,7 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 			return
 		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error()+". email: "+req.Email, "Произошла ошибка")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "email": "%s" }`, req.Email))
 		return
 	}
 
@@ -112,6 +118,7 @@ func (h *AuthHandler) signIn(c *gin.Context) {
 	token, err := h.services.Session.SignIn(c, user)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "email": "%s" }`, req.Email))
 		return
 	}
 	logger.Info(user.Company, " ", user.Name)
@@ -145,6 +152,13 @@ func (h *AuthHandler) singUp(c *gin.Context) {
 			return
 		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
@@ -152,6 +166,13 @@ func (h *AuthHandler) singUp(c *gin.Context) {
 	code, err := h.services.Confirm.Create(c, id.Id)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
+
+		body, err := json.Marshal(dto)
+		if err != nil {
+			logger.Error("body error: ", err)
+		}
+		h.botApi.SendError(c, err.Error(), string(body))
+
 		return
 	}
 
@@ -165,6 +186,7 @@ func (h *AuthHandler) singUp(c *gin.Context) {
 	_, err = h.emailApi.ConfirmUser(c, data)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка при отправлении письма")
+		h.botApi.SendError(c, err.Error(), data.String())
 		return
 	}
 
@@ -186,6 +208,7 @@ func (h *AuthHandler) signOut(c *gin.Context) {
 
 	if err := h.services.Session.SingOut(c, user.Id); err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), "")
 		return
 	}
 
@@ -221,6 +244,7 @@ func (h *AuthHandler) refresh(c *gin.Context) {
 	// удаление записей из редиса
 	if err := h.services.Session.SingOut(c, user.Id); err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "userId": "%s" }`, user.Id))
 		return
 	}
 
@@ -228,6 +252,7 @@ func (h *AuthHandler) refresh(c *gin.Context) {
 	newToken, err := h.services.SignIn(c, user)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "userId": "%s" }`, user.Id))
 		return
 	}
 	logger.Info(user.Company, " ", user.Name)
