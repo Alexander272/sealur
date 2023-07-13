@@ -67,9 +67,9 @@ func (h *SnpMaterialHandler) create(c *gin.Context) {
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Не удалось создать материал")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 
@@ -89,9 +89,9 @@ func (h *SnpMaterialHandler) update(c *gin.Context) {
 	if err := c.BindJSON(&dto); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "отправлены некорректные данные")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 

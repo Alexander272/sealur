@@ -65,9 +65,9 @@ func (h *SnpDataHandler) create(c *gin.Context) {
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Не удалось добавить данные о прокладке")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 
@@ -94,9 +94,9 @@ func (h *SnpDataHandler) update(c *gin.Context) {
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Не удалось обновить данные о прокладке")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 

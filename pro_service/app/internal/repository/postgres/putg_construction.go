@@ -3,6 +3,8 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/pro/models/putg_construction_type_model"
@@ -24,7 +26,8 @@ func NewPutgConstructionRepo(db *sqlx.DB) *PutgConstructionRepo {
 func (r *PutgConstructionRepo) Get(ctx context.Context, req *putg_construction_api.GetPutgConstruction,
 ) (constructions []*putg_construction_type_model.PutgConstruction, err error) {
 	var data []models.PutgConstruction
-	query := fmt.Sprintf(`SELECT %s.id, construction_id, title, code, has_d4, has_d3, has_d2, has_d1, has_rotary_plug, has_inner_ring, has_outer_ring, description
+	query := fmt.Sprintf(`SELECT %s.id, construction_id, title, code, has_d4, has_d3, has_d2, has_d1, has_rotary_plug, has_inner_ring, has_outer_ring, 
+		description, min_width, jumper_width_range, width_range
 	 	FROM %s INNER JOIN %s ON construction_id=%s.id WHERE putg_flange_type_id=$1 AND filler_id=$2 ORDER BY code`,
 		PutgConstructionTable, PutgConstructionTable, PutgConstructionBaseTable, PutgConstructionBaseTable,
 	)
@@ -34,6 +37,26 @@ func (r *PutgConstructionRepo) Get(ctx context.Context, req *putg_construction_a
 	}
 
 	for _, c := range data {
+		widthRange := make([]*putg_construction_type_model.WidthRange, 0)
+
+		for _, v := range c.WidthRange {
+			parts := strings.Split(v, "->")
+
+			max, err := strconv.ParseFloat(parts[0], 64)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse max. error: %w", err)
+			}
+			width, err := strconv.ParseFloat(parts[1], 64)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse width. error: %w", err)
+			}
+
+			widthRange = append(widthRange, &putg_construction_type_model.WidthRange{
+				MaxD3: max,
+				Width: width,
+			})
+		}
+
 		constructions = append(constructions, &putg_construction_type_model.PutgConstruction{
 			Id:            c.Id,
 			BaseId:        c.ConstructionId,
@@ -47,6 +70,9 @@ func (r *PutgConstructionRepo) Get(ctx context.Context, req *putg_construction_a
 			HasInnerRing:  c.HasInnerRing,
 			HasOuterRing:  c.HasOuterRing,
 			Description:   c.Description,
+			MinWidth:      c.MinWidth,
+			JumperRange:   c.JumperWidthRange,
+			WidthRange:    widthRange,
 		})
 	}
 

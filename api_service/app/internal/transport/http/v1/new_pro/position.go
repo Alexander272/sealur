@@ -60,9 +60,9 @@ func (h *PositionHandler) create(c *gin.Context) {
 		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 
@@ -95,9 +95,9 @@ func (h *PositionHandler) copy(c *gin.Context) {
 		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 
@@ -117,9 +117,9 @@ func (h *PositionHandler) copy(c *gin.Context) {
 		if err != nil {
 			models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка при копировании чертежа")
 
-			body, err := json.Marshal(req)
-			if err != nil {
-				logger.Error("body error: ", err)
+			body, bodyErr := json.Marshal(req)
+			if bodyErr != nil {
+				logger.Error("body error: ", bodyErr)
 			}
 			h.botApi.SendError(c, err.Error(), string(body))
 
@@ -149,9 +149,9 @@ func (h *PositionHandler) update(c *gin.Context) {
 	if _, err := h.positionApi.Update(c, &position_api.UpdatePosition{Position: position}); err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 

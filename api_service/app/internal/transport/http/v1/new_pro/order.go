@@ -297,9 +297,9 @@ func (h *OrderHandler) create(c *gin.Context) {
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 
@@ -325,9 +325,9 @@ func (h *OrderHandler) copy(c *gin.Context) {
 		}
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка во время копирования")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 
@@ -342,9 +342,9 @@ func (h *OrderHandler) copy(c *gin.Context) {
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "произошла ошибка во время копирования чертежей")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 
@@ -373,9 +373,9 @@ func (h *OrderHandler) save(c *gin.Context) {
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 
@@ -411,9 +411,9 @@ func (h *OrderHandler) setInfo(c *gin.Context) {
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 
@@ -434,9 +434,9 @@ func (h *OrderHandler) finish(c *gin.Context) {
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 
@@ -472,9 +472,9 @@ func (h *OrderHandler) setManager(c *gin.Context) {
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 
-		body, err := json.Marshal(dto)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(dto)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 

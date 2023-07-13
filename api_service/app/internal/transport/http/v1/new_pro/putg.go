@@ -95,9 +95,9 @@ func (h *PutgHandler) getData(c *gin.Context) {
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 
-		body, err := json.Marshal(data)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(data)
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 
@@ -128,9 +128,9 @@ func (h *PutgHandler) get(c *gin.Context) {
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
 
-		body, err := json.Marshal(data)
-		if err != nil {
-			logger.Error("body error: ", err)
+		body, bodyErr := json.Marshal(putg_api.GetPutg{FillerId: fillerId, BaseId: baseId, FlangeTypeId: flangeTypeId})
+		if bodyErr != nil {
+			logger.Error("body error: ", bodyErr)
 		}
 		h.botApi.SendError(c, err.Error(), string(body))
 

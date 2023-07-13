@@ -17,6 +17,7 @@ type PutgSizeHandler struct {
 func NewPutgSizeHandler(sizeApi putg_size_api.PutgSizeServiceClient, botApi api.MostBotApi) *PutgSizeHandler {
 	return &PutgSizeHandler{
 		sizeApi: sizeApi,
+		botApi:  botApi,
 	}
 }
 
