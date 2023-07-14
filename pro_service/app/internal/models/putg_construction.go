@@ -18,4 +18,5 @@ type PutgConstruction struct {
 	MinWidth         float64        `db:"min_width"`
 	JumperWidthRange pq.Int64Array  `db:"jumper_width_range"`
 	WidthRange       pq.StringArray `db:"width_range"`
+	MinSize          int64          `db:"min_size"`
 }

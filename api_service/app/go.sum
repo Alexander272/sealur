@@ -38,6 +38,8 @@ cloud.google.com/go/storage v1.14.0/go.mod h1:GrKmX003DSIwi9o29oFT7YDnHYwZoctc3f
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230711112524-6f058d3440d3 h1:1rDHs94Gd/PDTXlN2Bh1G3Nea6WaJa3DmmWBnekN44s=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230711112524-6f058d3440d3/go.mod h1:UyWdApZeg0exyS4/8mzFNa0y+CAhmLZPq1xtzWj/SSM=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230713085439-82a4620b6639 h1:JefS5WYGQFJNRozvY0CaWbTEhlPuJO0ksvUiTnY8Hjk=
+github.com/Alexander272/sealur_proto/api v0.0.0-20230713085439-82a4620b6639/go.mod h1:UyWdApZeg0exyS4/8mzFNa0y+CAhmLZPq1xtzWj/SSM=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=

@@ -27,7 +27,7 @@ func (r *PutgConstructionRepo) Get(ctx context.Context, req *putg_construction_a
 ) (constructions []*putg_construction_type_model.PutgConstruction, err error) {
 	var data []models.PutgConstruction
 	query := fmt.Sprintf(`SELECT %s.id, construction_id, title, code, has_d4, has_d3, has_d2, has_d1, has_rotary_plug, has_inner_ring, has_outer_ring, 
-		description, min_width, jumper_width_range, width_range
+		description, min_width, jumper_width_range, width_range, min_size
 	 	FROM %s INNER JOIN %s ON construction_id=%s.id WHERE putg_flange_type_id=$1 AND filler_id=$2 ORDER BY code`,
 		PutgConstructionTable, PutgConstructionTable, PutgConstructionBaseTable, PutgConstructionBaseTable,
 	)
@@ -73,6 +73,7 @@ func (r *PutgConstructionRepo) Get(ctx context.Context, req *putg_construction_a
 			MinWidth:      c.MinWidth,
 			JumperRange:   c.JumperWidthRange,
 			WidthRange:    widthRange,
+			MinSize:       c.MinSize,
 		})
 	}
 
