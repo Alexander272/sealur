@@ -156,7 +156,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 	units := "шт"
 
 	file := excelize.NewFile()
-	//TODO сделать 2 лист, а первый переименовать в заявку
+	// сделать 2 лист, а первый переименовать в заявку
 	orderSheet := file.GetSheetName(file.GetActiveSheetIndex())
 
 	tempSheetIdx, err := file.NewSheet("для1С")

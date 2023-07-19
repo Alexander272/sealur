@@ -3,6 +3,8 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/Alexander272/sealur/pro_service/internal/models"
 	"github.com/Alexander272/sealur_proto/api/pro/models/flange_standard_model"
@@ -127,7 +129,7 @@ func (r *PositionPutgRepo) GetFull(ctx context.Context, positionsId []string) ([
 		t.type_code as t_type_code, 
 		pm.construction_id, construction_code, pc.construction_id as c_base_id, c.title as c_title, c.description as c_description, c.has_d4 as c_has_d4, 
 		c.has_d3 as c_has_d3, c.has_d2 as c_has_d2, c.has_d1 as c_has_d1, c.has_rotary_plug as c_has_rotary_plug, 
-		c.has_inner_ring as c_has_inner_ring, c.has_outer_ring as c_has_outer_ring,
+		c.has_inner_ring as c_has_inner_ring, c.has_outer_ring as c_has_outer_ring, c.jumper_width_range, c.width_range, c.min_size,
 		rotary_plug_id, rotary_plug_code, rotary_plug_title, rp.code as rp_code, rp.material_id as rp_material_id, rp.type as rp_type, 
 		rp.is_default as rp_is_default,  
 		inner_ring_id, inner_ring_code, inner_ring_title, ir.code as ir_code, ir.material_id as ir_material_id, ir.type as ir_type, 
@@ -203,6 +205,25 @@ func (r *PositionPutgRepo) GetFull(ctx context.Context, positionsId []string) ([
 			outerRing = nil
 		}
 
+		widthRange := make([]*putg_construction_type_model.WidthRange, 0)
+		for _, v := range mat.ConstructionWidthRange {
+			parts := strings.Split(v, "->")
+
+			max, err := strconv.ParseFloat(parts[0], 64)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse max. error: %w", err)
+			}
+			width, err := strconv.ParseFloat(parts[1], 64)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse width. error: %w", err)
+			}
+
+			widthRange = append(widthRange, &putg_construction_type_model.WidthRange{
+				MaxD3: max,
+				Width: width,
+			})
+		}
+
 		positions = append(positions, &position_model.OrderPositionPutg{
 			Main: &position_model.OrderPositionPutg_Main{
 				Id:         m.Id,
@@ -270,6 +291,9 @@ func (r *PositionPutgRepo) GetFull(ctx context.Context, positionsId []string) ([
 					HasRotaryPlug: mat.ConstructionHasRotaryPlug,
 					HasInnerRing:  mat.ConstructionHasInnerRing,
 					HasOuterRing:  mat.ConstructionHasOuterRing,
+					JumperRange:   mat.ConstructionJumperWidthRange,
+					WidthRange:    widthRange,
+					MinSize:       mat.ConstructionMinSize,
 				},
 			},
 			Size: &position_model.OrderPositionPutg_Size{

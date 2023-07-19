@@ -1,5 +1,7 @@
 package models
 
+import "github.com/lib/pq"
+
 //* old
 // type Putg struct {
 // 	Id           string `db:"id"`
@@ -83,18 +85,21 @@ type PutgMaterialBlock struct {
 	TypeBaseCode     string  `db:"t_type_code"`
 
 	// construction
-	ConstructionId            string `db:"construction_id"`
-	ConstructionCode          string `db:"construction_code"`
-	ConstructionTitle         string `db:"c_title"`
-	ConstructionBaseId        string `db:"c_base_id"`
-	ConstructionDescription   string `db:"c_description"`
-	ConstructionHasD4         bool   `db:"c_has_d4"`
-	ConstructionHasD3         bool   `db:"c_has_d3"`
-	ConstructionHasD2         bool   `db:"c_has_d2"`
-	ConstructionHasD1         bool   `db:"c_has_d1"`
-	ConstructionHasRotaryPlug bool   `db:"c_has_rotary_plug"`
-	ConstructionHasInnerRing  bool   `db:"c_has_inner_ring"`
-	ConstructionHasOuterRing  bool   `db:"c_has_outer_ring"`
+	ConstructionId               string         `db:"construction_id"`
+	ConstructionCode             string         `db:"construction_code"`
+	ConstructionTitle            string         `db:"c_title"`
+	ConstructionBaseId           string         `db:"c_base_id"`
+	ConstructionDescription      string         `db:"c_description"`
+	ConstructionHasD4            bool           `db:"c_has_d4"`
+	ConstructionHasD3            bool           `db:"c_has_d3"`
+	ConstructionHasD2            bool           `db:"c_has_d2"`
+	ConstructionHasD1            bool           `db:"c_has_d1"`
+	ConstructionHasRotaryPlug    bool           `db:"c_has_rotary_plug"`
+	ConstructionHasInnerRing     bool           `db:"c_has_inner_ring"`
+	ConstructionHasOuterRing     bool           `db:"c_has_outer_ring"`
+	ConstructionJumperWidthRange pq.Int64Array  `db:"jumper_width_range"`
+	ConstructionWidthRange       pq.StringArray `db:"width_range"`
+	ConstructionMinSize          int64          `db:"min_size"`
 
 	// rotaryPlug
 	RotaryPlugId         string  `db:"rotary_plug_id"`
