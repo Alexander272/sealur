@@ -833,6 +833,22 @@ func (s *OrderServiceNew) GetOpen(ctx context.Context, req *order_api.GetManager
 	return orders, nil
 }
 
+func (s *OrderServiceNew) GetByNumber(ctx context.Context, req *order_api.GetOrderByNumber) (*analytic_model.FullOrder, error) {
+	order, err := s.repo.GetByNumber(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get order by number. error: %w", err)
+	}
+	return order, nil
+}
+
+func (s *OrderServiceNew) GetLast(ctx context.Context, req *order_api.GetLastOrders) ([]*analytic_model.FullOrder, error) {
+	orders, err := s.repo.GetLast(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get last orders. error: %w", err)
+	}
+	return orders, nil
+}
+
 func (s *OrderServiceNew) GetAnalytics(ctx context.Context, req *order_api.GetOrderAnalytics) (*order_api.Analytics, error) {
 	data, err := s.repo.GetAnalytics(ctx, req)
 	if err != nil {

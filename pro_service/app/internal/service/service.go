@@ -320,6 +320,8 @@ type OrderNew interface {
 	GetAll(context.Context, *order_api.GetAllOrders) ([]*order_model.Order, error)
 	GetFile(context.Context, *order_api.GetOrder) (*bytes.Buffer, string, error)
 	GetOpen(context.Context, *order_api.GetManagerOrders) ([]*order_model.ManagerOrder, error)
+	GetByNumber(context.Context, *order_api.GetOrderByNumber) (*analytic_model.FullOrder, error)
+	GetLast(context.Context, *order_api.GetLastOrders) ([]*analytic_model.FullOrder, error)
 	GetAnalytics(context.Context, *order_api.GetOrderAnalytics) (*order_api.Analytics, error)
 	GetOrdersCount(context.Context, *order_api.GetOrderCountAnalytics) ([]*analytic_model.OrderCount, error)
 	GetFullAnalytics(context.Context, *order_api.GetFullOrderAnalytics) ([]*analytic_model.FullOrder, error)

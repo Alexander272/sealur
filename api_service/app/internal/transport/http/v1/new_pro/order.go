@@ -64,6 +64,9 @@ func (h *Handler) initOrderRoutes(api *gin.RouterGroup) {
 			manager.GET("/open", handler.getOpen)
 			manager.POST("/finish", handler.finish)
 			manager.POST("/manager", handler.setManager)
+
+			manager.GET("/last", handler.getLast)
+			manager.GET("/number/:number", handler.getByNumber)
 		}
 		// order.POST("/finish", handler.finish)
 		// order.POST("/manager", handler.setManager)
@@ -221,6 +224,30 @@ func (h *OrderHandler) getFile(c *gin.Context) {
 	c.Header("Content-Length", fmt.Sprintf("%d", meta.Size))
 	c.Header("Content-Disposition", "attachment; filename="+meta.GetName())
 	c.File(meta.Name)
+}
+
+func (h *OrderHandler) getByNumber(c *gin.Context) {
+	number := c.Param("number")
+
+	order, err := h.orderApi.GetByNumber(c, &order_api.GetOrderByNumber{Number: number})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "number": "%s" }`, number))
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: order})
+}
+
+func (h *OrderHandler) getLast(c *gin.Context) {
+	orders, err := h.orderApi.GetLast(c, &order_api.GetLastOrders{})
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		h.botApi.SendError(c, err.Error(), "")
+		return
+	}
+
+	c.JSON(http.StatusOK, models.DataResponse{Data: orders})
 }
 
 func (h *OrderHandler) getAnalytics(c *gin.Context) {

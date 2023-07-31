@@ -157,6 +157,7 @@ func (h *UserHandler) confirm(c *gin.Context) {
 	data, err := h.services.Confirm.Get(c, code)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "something went wrong")
+		h.botApi.SendError(c, err.Error(), fmt.Sprintf(`{ "email": "%s" }`, data.UserId))
 		return
 	}
 

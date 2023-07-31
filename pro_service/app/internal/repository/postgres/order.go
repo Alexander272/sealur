@@ -102,6 +102,38 @@ func (r *OrderRepo) GetAll(ctx context.Context, req *order_api.GetAllOrders) (or
 	return orders, nil
 }
 
+func (r *OrderRepo) GetByNumber(ctx context.Context, order *order_api.GetOrderByNumber) (o *analytic_model.FullOrder, err error) {
+	var data models.FullOrderAnalytics
+	query := fmt.Sprintf(`SELECT id, user_id, manager_id, number, date, status,	(SELECT company FROM "%s" WHERE "%s".id=user_id) as user_company,
+		(SELECT name FROM "%s" WHERE "%s".id=user_id) as user_name,
+		(SELECT name FROM "%s" WHERE id="%s".manager_id) as manager FROM "%s" WHERE date!='' AND number=$1
+		ORDER BY manager_id, user_id LIMIT 1`,
+		UserTable, UserTable, UserTable, UserTable, UserTable, OrderTable, OrderTable,
+	)
+
+	if err := r.db.Get(&data, query, order.Number); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	o = &analytic_model.FullOrder{
+		Id:      data.ManagerId,
+		Manager: data.Manager,
+		Clients: []*analytic_model.Client{{
+			Id:      data.UserId,
+			Company: data.Company,
+			Name:    data.Name,
+			Orders: []*analytic_model.ClientOrder{{
+				Id:     data.Id,
+				Number: data.Number,
+				Date:   data.Date,
+				Status: data.Status,
+			}},
+		}},
+	}
+
+	return o, nil
+}
+
 func (r *OrderRepo) GetNumber(ctx context.Context, order *order_api.CreateOrder, date string) (int64, error) {
 	query := fmt.Sprintf(`UPDATE "%s" SET date=$1, count_position=$2 WHERE id=$3 RETURNING number`, OrderTable)
 
@@ -199,6 +231,64 @@ func (r *OrderRepo) GetAnalytics(ctx context.Context, req *order_api.GetOrderAna
 				PositionCount:    oa.PositionCount,
 				SnpPositionCount: oa.PositionSnpCount,
 			})
+		}
+	}
+
+	return orders, nil
+}
+
+func (r *OrderRepo) GetLast(ctx context.Context, order *order_api.GetLastOrders) (orders []*analytic_model.FullOrder, err error) {
+	var data []models.FullOrderAnalytics
+	query := fmt.Sprintf(`SELECT id, user_id, manager_id, number, date, status,	(SELECT company FROM "%s" WHERE "%s".id=user_id) as user_company,
+		(SELECT name FROM "%s" WHERE "%s".id=user_id) as user_name,
+		(SELECT name FROM "%s" WHERE id="%s".manager_id) as manager FROM "%s" WHERE date!=''
+		ORDER BY date DESC LIMIT 20`,
+		UserTable, UserTable, UserTable, UserTable, UserTable, OrderTable, OrderTable,
+	)
+
+	if err := r.db.Select(&data, query); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	for i, foa := range data {
+		if i == 0 || orders[len(orders)-1].Id != foa.ManagerId {
+			orders = append(orders, &analytic_model.FullOrder{
+				Id:      foa.ManagerId,
+				Manager: foa.Manager,
+				Clients: []*analytic_model.Client{{
+					Id:      foa.UserId,
+					Company: foa.Company,
+					Name:    foa.Name,
+					Orders: []*analytic_model.ClientOrder{{
+						Id:     foa.Id,
+						Number: foa.Number,
+						Date:   foa.Date,
+						Status: foa.Status,
+					}},
+				}},
+			})
+		} else {
+			if orders[len(orders)-1].Clients[len(orders[len(orders)-1].Clients)-1].Id != foa.UserId {
+				orders[len(orders)-1].Clients = append(orders[len(orders)-1].Clients, &analytic_model.Client{
+					Id:      foa.UserId,
+					Company: foa.Company,
+					Name:    foa.Name,
+					Orders: []*analytic_model.ClientOrder{{
+						Id:     foa.Id,
+						Number: foa.Number,
+						Date:   foa.Date,
+						Status: foa.Status,
+					}},
+				})
+			} else {
+				orders[len(orders)-1].Clients[len(orders[len(orders)-1].Clients)-1].Orders =
+					append(orders[len(orders)-1].Clients[len(orders[len(orders)-1].Clients)-1].Orders, &analytic_model.ClientOrder{
+						Id:     foa.Id,
+						Number: foa.Number,
+						Date:   foa.Date,
+						Status: foa.Status,
+					})
+			}
 		}
 	}
 

@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"github.com/Alexander272/sealur/pro_service/internal/service"
+	"github.com/Alexander272/sealur_proto/api/pro/models/analytic_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/order_model"
 	"github.com/Alexander272/sealur_proto/api/pro/models/response_model"
 	"github.com/Alexander272/sealur_proto/api/pro/order_api"
@@ -100,6 +101,22 @@ func (h *OrderHandlers) GetFile(req *order_api.GetOrder, stream order_api.OrderS
 	}
 
 	return nil
+}
+
+func (h *OrderHandlers) GetByNumber(ctx context.Context, req *order_api.GetOrderByNumber) (*analytic_model.FullOrder, error) {
+	order, err := h.service.GetByNumber(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return order, nil
+}
+
+func (h *OrderHandlers) GetLast(ctx context.Context, req *order_api.GetLastOrders) (*order_api.OrderAnalytics, error) {
+	analytics, err := h.service.GetLast(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &order_api.OrderAnalytics{Orders: analytics}, nil
 }
 
 func (h *OrderHandlers) GetAnalytics(ctx context.Context, req *order_api.GetOrderAnalytics) (*order_api.Analytics, error) {
