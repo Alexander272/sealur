@@ -22,6 +22,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_type_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -114,6 +115,14 @@ type PutgType interface {
 	putg_type_api.PutgTypeServiceServer
 }
 
+type Ring interface {
+	ring_api.RingServiceServer
+}
+
+// type RingType interface {
+// 	ring_type_api.server
+// }
+
 type Order interface {
 	order_api.OrderServiceServer
 }
@@ -153,6 +162,8 @@ type Handler struct {
 	PutgSize
 	PutgType
 
+	Ring
+
 	Order
 	Position
 }
@@ -189,6 +200,8 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		PutgStandard:         NewPutgStandardHandlers(service.PutgStandard),
 		PutgSize:             NewPutgSizeHandlers(service.PutgSize),
 		PutgType:             NewPutgTypeHandlers(service.PutgType),
+
+		Ring: NewRingHandlers(service.Ring),
 
 		Order:    NewOrderHandlers(service.OrderNew),
 		Position: NewPositionHandlers(service.Position),

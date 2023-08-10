@@ -13,6 +13,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/position_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -47,6 +48,8 @@ type Handler struct {
 
 	putgApi     putg_api.PutgDataServiceClient
 	putgSizeApi putg_size_api.PutgSizeServiceClient
+
+	ringApi ring_api.RingServiceClient
 
 	userApi  user_api.UserServiceClient
 	emailApi email_api.EmailServiceClient
@@ -129,6 +132,8 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.putgApi = putg_api.NewPutgDataServiceClient(connect)
 	h.putgSizeApi = putg_size_api.NewPutgSizeServiceClient(connect)
 
+	h.ringApi = ring_api.NewRingServiceClient(connect)
+
 	pro := api.Group("/sealur-pro")
 	{
 		// pro.GET("/ping", h.ping)
@@ -149,6 +154,8 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 
 	h.initPutgRoutes(pro)
 	h.initPutgSizeRoutes(pro)
+
+	h.initRingsRoutes(pro)
 }
 
 // func (h *Handler) ping(c *gin.Context) {

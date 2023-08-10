@@ -30,6 +30,10 @@ const (
 	PutgMaterialTable         = "putg_material"
 	PutgTypeTable             = "putg_type"
 
+	RingTypeTable         = "ring_type"
+	RingDensityTable      = "ring_density"
+	RingConstructionTable = "ring_construction"
+
 	OrderTable                = "order"
 	PositionTable             = "position"
 	PositionMainSnpTable      = "position_snp_main"

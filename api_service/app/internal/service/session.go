@@ -29,6 +29,7 @@ func NewSessionService(repo repository.Session, manager auth.TokenManager, acces
 }
 
 func (s *SessionService) SignIn(ctx context.Context, user *user_model.User) (string, error) {
+	//TODO я не записываю в токен имя и компанию пользователя -> достать их из токена я не могу
 	_, accessToken, err := s.tokenManager.NewJWT(user.Id, user.Email, user.RoleCode, s.accessTokenTTL)
 	if err != nil {
 		return "", err

@@ -297,6 +297,18 @@ type PutgType interface {
 	Delete(context.Context, *putg_type_api.DeletePutgType) error
 }
 
+type RingType interface {
+	postgres.RingType
+}
+
+type RingDensity interface {
+	postgres.RingDensity
+}
+
+type RingConstruction interface {
+	postgres.RingConstruction
+}
+
 type OrderNew interface {
 	Get(context.Context, *order_api.GetOrder) (*order_model.FullOrder, error)
 	GetCurrent(context.Context, *order_api.GetCurrentOrder) (*order_model.CurrentOrder, error)
@@ -380,6 +392,10 @@ type Repositories struct {
 	PutgSize
 	PutgType
 
+	RingType
+	RingDensity
+	RingConstruction
+
 	OrderNew
 	Position
 	PositionSnp
@@ -421,6 +437,10 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		PutgData:             postgres.NewPutgDataRepo(db),
 		PutgSize:             postgres.NewPutgSizeRepo(db),
 		PutgType:             postgres.NewPutgTypeRepo(db),
+
+		RingType:         postgres.NewRingTypeRepo(db),
+		RingDensity:      postgres.NewRingDensityRepo(db),
+		RingConstruction: postgres.NewRingConstructionRepo(db),
 
 		OrderNew:     postgres.NewOrderRepo(db),
 		Position:     postgres.NewPositionRepo(db),

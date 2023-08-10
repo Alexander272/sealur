@@ -408,6 +408,11 @@ type Services struct {
 	PutgType
 	Putg
 
+	Ring
+	RingType
+	RingDensity
+	RingConstruction
+
 	OrderNew
 	Position
 	PositionSnp
@@ -451,6 +456,12 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		PutgType:      putgType,
 		Mounting:      mounting,
 	})
+
+	ringType := NewRingTypeService(repos.RingType)
+	ringConstruction := NewRingConstructionService(repos.RingConstruction)
+	ringDensity := NewRingDensityService(repos.RingDensity)
+
+	ring := NewRingService(ringConstruction, ringDensity, ringType)
 
 	zip := NewZipService()
 
@@ -496,6 +507,11 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		PutgSize:             putgSize,
 		PutgType:             putgType,
 		Putg:                 putg,
+
+		RingType:         ringType,
+		RingConstruction: ringConstruction,
+		RingDensity:      ringDensity,
+		Ring:             ring,
 
 		PositionSnp: positionSnp,
 		Position:    position,

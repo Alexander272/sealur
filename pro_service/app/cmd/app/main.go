@@ -31,6 +31,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_type_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -183,6 +184,8 @@ func main() {
 	putg_flange_type_api.RegisterPutgFlangeTypeServiceServer(server, handlers.PutgFlangeType)
 	putg_standard_api.RegisterPutgStandardServiceServer(server, handlers.PutgStandard)
 	putg_type_api.RegisterPutgTypeServiceServer(server, handlers.PutgType)
+
+	ring_api.RegisterRingServiceServer(server, handlers.Ring)
 
 	order_api.RegisterOrderServiceServer(server, handlers.Order)
 	position_api.RegisterPositionServiceServer(server, handlers.Position)
