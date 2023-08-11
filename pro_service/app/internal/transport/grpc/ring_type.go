@@ -10,7 +10,7 @@ import (
 
 type RingTypeHandlers struct {
 	service service.RingType
-	*ring_type_api.UnimplementedSnpMaterialServiceServer
+	*ring_type_api.UnimplementedRingTypeServiceServer
 }
 
 func NewRingTypeHandlers(service service.RingType) *RingTypeHandlers {

@@ -32,6 +32,11 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/ring_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_construction_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_density_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_modifying_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -185,6 +190,11 @@ func main() {
 	putg_standard_api.RegisterPutgStandardServiceServer(server, handlers.PutgStandard)
 	putg_type_api.RegisterPutgTypeServiceServer(server, handlers.PutgType)
 
+	ring_construction_api.RegisterRingConstructionServiceServer(server, handlers.RingConstruction)
+	ring_density_api.RegisterRingDensityServiceServer(server, handlers.RingDensity)
+	ring_type_api.RegisterRingTypeServiceServer(server, handlers.RingType)
+	ring_material_api.RegisterRingMaterialServiceServer(server, handlers.RingMaterial)
+	ring_modifying_api.RegisterRingModifyingServiceServer(server, handlers.RingModifying)
 	ring_api.RegisterRingServiceServer(server, handlers.Ring)
 
 	order_api.RegisterOrderServiceServer(server, handlers.Order)

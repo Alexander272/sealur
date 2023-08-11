@@ -33,6 +33,8 @@ const (
 	RingTypeTable         = "ring_type"
 	RingDensityTable      = "ring_density"
 	RingConstructionTable = "ring_construction"
+	RingMaterialTable     = "ring_material"
+	RingModifyingTable    = "ring_modifying"
 
 	OrderTable                = "order"
 	PositionTable             = "position"

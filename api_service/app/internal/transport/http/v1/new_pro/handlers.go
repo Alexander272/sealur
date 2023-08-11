@@ -14,6 +14,8 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/putg_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/ring_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_modifying_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -49,7 +51,9 @@ type Handler struct {
 	putgApi     putg_api.PutgDataServiceClient
 	putgSizeApi putg_size_api.PutgSizeServiceClient
 
-	ringApi ring_api.RingServiceClient
+	ringApi          ring_api.RingServiceClient
+	ringMaterialApi  ring_material_api.RingMaterialServiceClient
+	ringModifyingApi ring_modifying_api.RingModifyingServiceClient
 
 	userApi  user_api.UserServiceClient
 	emailApi email_api.EmailServiceClient
@@ -133,6 +137,8 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.putgSizeApi = putg_size_api.NewPutgSizeServiceClient(connect)
 
 	h.ringApi = ring_api.NewRingServiceClient(connect)
+	h.ringMaterialApi = ring_material_api.NewRingMaterialServiceClient(connect)
+	h.ringModifyingApi = ring_modifying_api.NewRingModifyingServiceClient(connect)
 
 	pro := api.Group("/sealur-pro")
 	{
@@ -156,6 +162,8 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.initPutgSizeRoutes(pro)
 
 	h.initRingsRoutes(pro)
+	h.initRingMaterialsRoutes(pro)
+	h.initRingModifyingRoutes(pro)
 }
 
 // func (h *Handler) ping(c *gin.Context) {

@@ -300,13 +300,17 @@ type PutgType interface {
 type RingType interface {
 	postgres.RingType
 }
-
 type RingDensity interface {
 	postgres.RingDensity
 }
-
 type RingConstruction interface {
 	postgres.RingConstruction
+}
+type RingMaterial interface {
+	postgres.RingMaterial
+}
+type RingModifying interface {
+	postgres.RingModifying
 }
 
 type OrderNew interface {
@@ -395,6 +399,8 @@ type Repositories struct {
 	RingType
 	RingDensity
 	RingConstruction
+	RingMaterial
+	RingModifying
 
 	OrderNew
 	Position
@@ -441,6 +447,8 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		RingType:         postgres.NewRingTypeRepo(db),
 		RingDensity:      postgres.NewRingDensityRepo(db),
 		RingConstruction: postgres.NewRingConstructionRepo(db),
+		RingMaterial:     postgres.NewRingMaterialRepo(db),
+		RingModifying:    postgres.NewRingModifyingRepo(db),
 
 		OrderNew:     postgres.NewOrderRepo(db),
 		Position:     postgres.NewPositionRepo(db),

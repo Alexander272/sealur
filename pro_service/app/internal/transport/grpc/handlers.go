@@ -23,6 +23,11 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/putg_standard_api"
 	"github.com/Alexander272/sealur_proto/api/pro/putg_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/ring_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_construction_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_density_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_material_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_modifying_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -115,13 +120,24 @@ type PutgType interface {
 	putg_type_api.PutgTypeServiceServer
 }
 
+type RingConstruction interface {
+	ring_construction_api.RingConstructionServiceServer
+}
+type RingDensity interface {
+	ring_density_api.RingDensityServiceServer
+}
+type RingMaterial interface {
+	ring_material_api.RingMaterialServiceServer
+}
+type RingModifying interface {
+	ring_modifying_api.RingModifyingServiceServer
+}
+type RingType interface {
+	ring_type_api.RingTypeServiceServer
+}
 type Ring interface {
 	ring_api.RingServiceServer
 }
-
-// type RingType interface {
-// 	ring_type_api.server
-// }
 
 type Order interface {
 	order_api.OrderServiceServer
@@ -162,6 +178,11 @@ type Handler struct {
 	PutgSize
 	PutgType
 
+	RingConstruction
+	RingDensity
+	RingType
+	RingMaterial
+	RingModifying
 	Ring
 
 	Order
@@ -201,7 +222,12 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		PutgSize:             NewPutgSizeHandlers(service.PutgSize),
 		PutgType:             NewPutgTypeHandlers(service.PutgType),
 
-		Ring: NewRingHandlers(service.Ring),
+		RingConstruction: NewRingConstructionHandlers(service.RingConstruction),
+		RingDensity:      NewRingDensityHandlers(service.RingDensity),
+		RingType:         NewRingTypeHandlers(service.RingType),
+		RingMaterial:     NewRingMaterialHandlers(service.RingMaterial),
+		RingModifying:    NewRingModifyingHandlers(service.RingModifying),
+		Ring:             NewRingHandlers(service.Ring),
 
 		Order:    NewOrderHandlers(service.OrderNew),
 		Position: NewPositionHandlers(service.Position),

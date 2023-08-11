@@ -23,7 +23,7 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/bytedance/sonic v1.10.0-rc3 // indirect
+	github.com/bytedance/sonic v1.10.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
@@ -63,7 +63,7 @@ require (
 )
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230809085558-c3d54375f3d1
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230810094054-dd3b821a3037
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/lib/pq v1.10.9
 	github.com/swaggo/swag v1.16.1

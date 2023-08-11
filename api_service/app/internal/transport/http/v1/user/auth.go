@@ -147,7 +147,7 @@ func (h *AuthHandler) singUp(c *gin.Context) {
 	id, err := h.userApi.Create(c, dto)
 	if err != nil {
 		// if errors.Is(err, models.ErrUserExist) {
-		if strings.Contains(err.Error(), models.ErrUserExist.Error()) {
+		if strings.Contains(err.Error(), models.ErrUserExist.Error()) || strings.Contains(err.Error(), models.ErrUserNotVerified.Error()) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Пользователь с таким email уже зарегистрирован")
 			return
 		}
