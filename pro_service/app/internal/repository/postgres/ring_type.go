@@ -49,7 +49,7 @@ func (r *RingTypeRepo) GetAll(ctx context.Context, req *ring_type_api.GetRingTyp
 			HasDensity:    rt.HasDensity,
 			HasThickness:  rt.HasThickness,
 			MaterialType:  rt.MaterialType,
-			// Image:         rt.Image,
+			Image:         rt.Image,
 		})
 	}
 
@@ -57,13 +57,13 @@ func (r *RingTypeRepo) GetAll(ctx context.Context, req *ring_type_api.GetRingTyp
 }
 
 func (r *RingTypeRepo) Create(ctx context.Context, ring *ring_type_api.CreateRingType) error {
-	query := fmt.Sprintf(`INSERT INTO %s(id, code, title, description, has_rotary_plug, has_density, has_thickness, material_type)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+	query := fmt.Sprintf(`INSERT INTO %s(id, code, title, description, has_rotary_plug, has_density, has_thickness, material_type, image)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
 		RingTypeTable,
 	)
 	id := uuid.New()
 
-	_, err := r.db.Exec(query, id, ring.Code, ring.Title, ring.Description, ring.HasRotaryPlug, ring.HasDensity, ring.HasThickness, ring.MaterialType)
+	_, err := r.db.Exec(query, id, ring.Code, ring.Title, ring.Description, ring.HasRotaryPlug, ring.HasDensity, ring.HasThickness, ring.MaterialType, ring.Image)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -71,12 +71,14 @@ func (r *RingTypeRepo) Create(ctx context.Context, ring *ring_type_api.CreateRin
 }
 
 func (r *RingTypeRepo) Update(ctx context.Context, ring *ring_type_api.UpdateRingType) error {
-	query := fmt.Sprintf(`UPDATE %s SET code=$1, title=$2, description=$3, has_rotary_plug=$4, has_density=$5, has_thickness=$6, material_type=$7
-		WHERE id=$8`,
+	query := fmt.Sprintf(`UPDATE %s SET code=$1, title=$2, description=$3, has_rotary_plug=$4, has_density=$5, has_thickness=$6, material_type=$7, image=$8
+		WHERE id=$9`,
 		RingTypeTable,
 	)
 
-	_, err := r.db.Exec(query, ring.Code, ring.Title, ring.Description, ring.HasRotaryPlug, ring.HasDensity, ring.HasThickness, ring.MaterialType, ring.Id)
+	_, err := r.db.Exec(query, ring.Code, ring.Title, ring.Description, ring.HasRotaryPlug, ring.HasDensity, ring.HasThickness, ring.MaterialType, ring.Image,
+		ring.Id,
+	)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

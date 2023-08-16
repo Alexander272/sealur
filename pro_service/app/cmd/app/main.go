@@ -36,6 +36,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/ring_density_api"
 	"github.com/Alexander272/sealur_proto/api/pro/ring_material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/ring_modifying_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/ring_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
@@ -195,6 +196,7 @@ func main() {
 	ring_type_api.RegisterRingTypeServiceServer(server, handlers.RingType)
 	ring_material_api.RegisterRingMaterialServiceServer(server, handlers.RingMaterial)
 	ring_modifying_api.RegisterRingModifyingServiceServer(server, handlers.RingModifying)
+	ring_size_api.RegisterRingSizeServiceServer(server, handlers.RingSize)
 	ring_api.RegisterRingServiceServer(server, handlers.Ring)
 
 	order_api.RegisterOrderServiceServer(server, handlers.Order)

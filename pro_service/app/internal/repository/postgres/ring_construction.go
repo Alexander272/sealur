@@ -31,7 +31,7 @@ type RingConstruction interface {
 func (r *RingConstructionRepo) GetAll(ctx context.Context, req *ring_construction_api.GetRingConstructions,
 ) (*ring_construction_model.RingConstructionMap, error) {
 	var data []models.RingConstruction
-	query := fmt.Sprintf(`SELECT id, type_id, code, title, description, image FROM %s ORDER BY count`, RingConstructionTable)
+	query := fmt.Sprintf(`SELECT id, type_id, code, title, description, image, without_rotary_plug FROM %s ORDER BY count`, RingConstructionTable)
 
 	if err := r.db.Select(&data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -41,11 +41,12 @@ func (r *RingConstructionRepo) GetAll(ctx context.Context, req *ring_constructio
 
 	for _, rd := range data {
 		c := &ring_construction_model.RingConstruction{
-			Id:          rd.Id,
-			Code:        rd.Code,
-			Title:       rd.Title,
-			Description: rd.Description,
-			Image:       rd.Image,
+			Id:                rd.Id,
+			Code:              rd.Code,
+			Title:             rd.Title,
+			Description:       rd.Description,
+			Image:             rd.Image,
+			WithoutRotaryPlug: rd.WithoutRotaryPlug,
 		}
 
 		if constructions[rd.TypeId] == nil {
@@ -59,13 +60,13 @@ func (r *RingConstructionRepo) GetAll(ctx context.Context, req *ring_constructio
 }
 
 func (r *RingConstructionRepo) Create(ctx context.Context, c *ring_construction_api.CreateRingConstruction) error {
-	query := fmt.Sprintf(`INSERT INTO %s(id, type_id, code, title, description, image, count) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+	query := fmt.Sprintf(`INSERT INTO %s(id, type_id, code, title, description, image, count, without_rotary_plug) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
 		RingConstructionTable,
 	)
 	id := uuid.New()
 
-	_, err := r.db.Exec(query, id, c.TypeId, c.Code, c.Title, c.Description, c.Image, c.Count)
+	_, err := r.db.Exec(query, id, c.TypeId, c.Code, c.Title, c.Description, c.Image, c.Count, c.WithoutRotaryPlug)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -73,9 +74,11 @@ func (r *RingConstructionRepo) Create(ctx context.Context, c *ring_construction_
 }
 
 func (r *RingConstructionRepo) Update(ctx context.Context, c *ring_construction_api.UpdateRingConstruction) error {
-	query := fmt.Sprintf(`UPDATE %s SET type_id=$1, code=$2, title=$3, description=$4, image=$5, count=$6 WHERE id=$7`, RingConstructionTable)
+	query := fmt.Sprintf(`UPDATE %s SET type_id=$1, code=$2, title=$3, description=$4, image=$5, count=$6, without_rotary_plug=$7 WHERE id=$8`,
+		RingConstructionTable,
+	)
 
-	_, err := r.db.Exec(query, c.TypeId, c.Code, c.Title, c.Description, c.Image, c.Count, c.Id)
+	_, err := r.db.Exec(query, c.TypeId, c.Code, c.Title, c.Description, c.Image, c.Count, c.WithoutRotaryPlug, c.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

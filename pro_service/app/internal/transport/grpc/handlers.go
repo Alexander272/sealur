@@ -27,6 +27,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/ring_density_api"
 	"github.com/Alexander272/sealur_proto/api/pro/ring_material_api"
 	"github.com/Alexander272/sealur_proto/api/pro/ring_modifying_api"
+	"github.com/Alexander272/sealur_proto/api/pro/ring_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/ring_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
@@ -135,6 +136,9 @@ type RingModifying interface {
 type RingType interface {
 	ring_type_api.RingTypeServiceServer
 }
+type RingSize interface {
+	ring_size_api.RingSizeServiceServer
+}
 type Ring interface {
 	ring_api.RingServiceServer
 }
@@ -183,6 +187,7 @@ type Handler struct {
 	RingType
 	RingMaterial
 	RingModifying
+	RingSize
 	Ring
 
 	Order
@@ -227,6 +232,7 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 		RingType:         NewRingTypeHandlers(service.RingType),
 		RingMaterial:     NewRingMaterialHandlers(service.RingMaterial),
 		RingModifying:    NewRingModifyingHandlers(service.RingModifying),
+		RingSize:         NewRingSizeHandlers(service.RingSize),
 		Ring:             NewRingHandlers(service.Ring),
 
 		Order:    NewOrderHandlers(service.OrderNew),

@@ -414,6 +414,7 @@ type Services struct {
 	RingConstruction
 	RingMaterial
 	RingModifying
+	RingSize
 
 	OrderNew
 	Position
@@ -464,6 +465,7 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 	ringDensity := NewRingDensityService(repos.RingDensity)
 	ringMaterial := NewRingMaterialService(repos.RingMaterial)
 	ringModifying := NewRingModifyingService(repos.RingModifying)
+	ringSize := NewRingSizeService(repos.RingSize)
 
 	ring := NewRingService(ringConstruction, ringDensity, ringType)
 
@@ -517,6 +519,7 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		RingDensity:      ringDensity,
 		RingMaterial:     ringMaterial,
 		RingModifying:    ringModifying,
+		RingSize:         ringSize,
 		Ring:             ring,
 
 		PositionSnp: positionSnp,
