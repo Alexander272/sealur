@@ -31,7 +31,7 @@ type RingSize interface {
 
 func (r *RingSizeRepo) GetAll(ctx context.Context, req *ring_size_api.GetRingSize) (sizes []*ring_size_model.RingSize, err error) {
 	var data []models.RingSize
-	query := fmt.Sprintf(`SELECT id, "outer", "inner" FROM %s`, RingSizeTable)
+	query := fmt.Sprintf(`SELECT id, "outer", "inner" FROM %s ORDER BY "outer", "inner"`, RingSizeTable)
 
 	if err := r.db.Select(&data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)

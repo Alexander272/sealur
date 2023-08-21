@@ -24,7 +24,7 @@ func (h *RingSizeHandlers) GetAll(ctx context.Context, req *ring_size_api.GetRin
 	if err != nil {
 		return nil, err
 	}
-	return &ring_size_api.RingSize{Size: sizes}, nil
+	return &ring_size_api.RingSize{Sizes: sizes}, nil
 }
 
 func (h *RingSizeHandlers) Create(ctx context.Context, size *ring_size_api.CreateRingSize) (*response_model.Response, error) {
