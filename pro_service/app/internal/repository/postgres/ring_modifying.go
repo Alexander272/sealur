@@ -30,7 +30,7 @@ type RingModifying interface {
 
 func (r *RingModifyingRepo) GetAll(ctx context.Context, req *ring_modifying_api.GetRingModifying) (m []*ring_modifying_model.RingModifying, err error) {
 	var data []models.RingModifying
-	query := fmt.Sprintf(`SELECT id, code, title, description FROM %s WHERE is_show=true`, RingModifyingTable)
+	query := fmt.Sprintf(`SELECT id, code, title, description, designation FROM %s WHERE is_show=true`, RingModifyingTable)
 
 	if err := r.db.Select(&data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -42,12 +42,14 @@ func (r *RingModifyingRepo) GetAll(ctx context.Context, req *ring_modifying_api.
 			Code:        rt.Code,
 			Title:       rt.Title,
 			Description: rt.Description,
+			Designation: rt.Designation,
 		})
 	}
 
 	return m, nil
 }
 
+// TODO добавить оставшиеся поля
 func (r *RingModifyingRepo) Create(ctx context.Context, m *ring_modifying_api.CreateRingModifying) error {
 	query := fmt.Sprintf(`INSERT INTO %s(id, code, description) VALUES ($1, $2, $3)`, RingModifyingTable)
 	id := uuid.New()

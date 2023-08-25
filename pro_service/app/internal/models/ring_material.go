@@ -6,4 +6,5 @@ type RingMaterial struct {
 	Title       string `db:"title"`
 	Description string `db:"description"`
 	IsDefault   bool   `db:"is_default"`
+	Designation string `db:"designation"`
 }

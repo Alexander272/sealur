@@ -30,8 +30,8 @@ type RingType interface {
 
 func (r *RingTypeRepo) GetAll(ctx context.Context, req *ring_type_api.GetRingTypes) (ringTypes []*ring_type_model.RingType, err error) {
 	var data []models.RingType
-	query := fmt.Sprintf(`SELECT id, code, title, description, has_rotary_plug, has_density, has_thickness, material_type, image FROM %s
-		ORDER BY count`,
+	query := fmt.Sprintf(`SELECT id, code, title, description, has_rotary_plug, has_density, has_thickness, material_type, image, designation
+		FROM %s ORDER BY count`,
 		RingTypeTable,
 	)
 
@@ -50,12 +50,14 @@ func (r *RingTypeRepo) GetAll(ctx context.Context, req *ring_type_api.GetRingTyp
 			HasThickness:  rt.HasThickness,
 			MaterialType:  rt.MaterialType,
 			Image:         rt.Image,
+			Designation:   rt.Designation,
 		})
 	}
 
 	return ringTypes, nil
 }
 
+// TODO добавить оставшиеся поля
 func (r *RingTypeRepo) Create(ctx context.Context, ring *ring_type_api.CreateRingType) error {
 	query := fmt.Sprintf(`INSERT INTO %s(id, code, title, description, has_rotary_plug, has_density, has_thickness, material_type, image)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,

@@ -3,8 +3,8 @@ module github.com/Alexander272/sealur/pro_service
 go 1.20
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230821052958-740af93b75c3
-	github.com/google/uuid v1.3.0
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230823101238-ab9bd31654df
+	github.com/google/uuid v1.3.1
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.9
@@ -36,7 +36,7 @@ require (
 	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/text v0.12.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230815205213-6bfd019c3878 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

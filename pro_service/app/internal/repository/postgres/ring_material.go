@@ -30,7 +30,7 @@ type RingMaterial interface {
 
 func (r *RingMaterialRepo) Get(ctx context.Context, req *ring_material_api.GetRingMaterial) (m []*ring_material_model.RingMaterial, err error) {
 	var data []models.RingMaterial
-	query := fmt.Sprintf(`SELECT id, type, title, description, is_default FROM %s WHERE type=$1 ORDER BY count`, RingMaterialTable)
+	query := fmt.Sprintf(`SELECT id, type, title, description, is_default, designation FROM %s WHERE type=$1 ORDER BY count`, RingMaterialTable)
 
 	if err := r.db.Select(&data, query, req.Type); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -43,12 +43,14 @@ func (r *RingMaterialRepo) Get(ctx context.Context, req *ring_material_api.GetRi
 			Type:        rt.Type,
 			Description: rt.Description,
 			IsDefault:   rt.IsDefault,
+			Designation: rt.Designation,
 		})
 	}
 
 	return m, nil
 }
 
+// TODO добавить оставшиеся поля
 func (r *RingMaterialRepo) Create(ctx context.Context, m *ring_material_api.CreateRingMaterial) error {
 	query := fmt.Sprintf(`INSERT INTO %s(id, type, title, is_default, count) VALUES ($1, $2, $3, $4, $5)`, RingMaterialTable)
 	id := uuid.New()

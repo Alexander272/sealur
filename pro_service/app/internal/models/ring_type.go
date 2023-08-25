@@ -10,4 +10,5 @@ type RingType struct {
 	HasThickness  bool   `db:"has_thickness"`
 	MaterialType  string `db:"material_type"`
 	Image         string `db:"image"`
+	Designation   string `db:"designation"`
 }

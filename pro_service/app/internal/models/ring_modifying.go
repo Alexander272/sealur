@@ -5,4 +5,5 @@ type RingModifying struct {
 	Code        string `db:"code"`
 	Title       string `db:"title"`
 	Description string `db:"description"`
+	Designation string `db:"designation"`
 }
