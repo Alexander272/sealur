@@ -3,15 +3,15 @@ module github.com/Alexander272/sealur/pro_service
 go 1.20
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230823101238-ab9bd31654df
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230831104554-636b316b0e8d
 	github.com/google/uuid v1.3.1
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.9
-	github.com/lukasjarosch/go-docx v0.4.6
+	github.com/lukasjarosch/go-docx v0.4.7
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.16.0
-	github.com/xuri/excelize/v2 v2.7.1
+	github.com/xuri/excelize/v2 v2.8.0
 	google.golang.org/grpc v1.57.0
 )
 
@@ -22,7 +22,7 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
-	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
+	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/spf13/afero v1.9.5 // indirect

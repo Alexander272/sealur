@@ -446,6 +446,10 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 		Pmax := Bolt.WorkCond.Y * Ab
 		// Максимальное напряжение на прокладке
 		Moment.Qmax = Pmax / (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
+		// if Moment.Qmax > d.Gasket.PermissiblePres {
+		// 	Pmax = d.Gasket.PermissiblePres * (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
+		// 	Moment.Qmax = d.Gasket.PermissiblePres
+		// }
 		if Moment.Qmax > d.Gasket.PermissiblePres {
 			Pmax = d.Gasket.PermissiblePres * (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
 			Moment.Qmax = d.Gasket.PermissiblePres

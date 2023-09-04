@@ -31,7 +31,7 @@ type RingConstruction interface {
 func (r *RingConstructionRepo) GetAll(ctx context.Context, req *ring_construction_api.GetRingConstructions,
 ) (*ring_construction_model.RingConstructionMap, error) {
 	var data []models.RingConstruction
-	query := fmt.Sprintf(`SELECT id, type_id, code, title, description, image, without_rotary_plug FROM %s ORDER BY count`, RingConstructionTable)
+	query := fmt.Sprintf(`SELECT id, type_id, code, base_code, title, description, image, without_rotary_plug FROM %s ORDER BY count`, RingConstructionTable)
 
 	if err := r.db.Select(&data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
@@ -47,6 +47,7 @@ func (r *RingConstructionRepo) GetAll(ctx context.Context, req *ring_constructio
 			Description:       rd.Description,
 			Image:             rd.Image,
 			WithoutRotaryPlug: rd.WithoutRotaryPlug,
+			BaseCode:          rd.BaseCode,
 		}
 
 		if constructions[rd.TypeId] == nil {

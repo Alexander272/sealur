@@ -116,44 +116,759 @@ func (s *OrderServiceNew) GetForFile(ctx context.Context, req *order_api.GetOrde
 }
 
 // TODO больно уж здоровая функция получается. надо бы подумать как уменьшить или разбить на куски
+// func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) (*bytes.Buffer, string, error) {
+// 	if err := s.SetStatus(ctx, &order_api.Status{Status: order_model.OrderStatus_work, OrderId: req.Id}); err != nil {
+// 		return nil, "", err
+// 	}
+
+// 	count, order, err := s.GetForFile(ctx, req)
+// 	if err != nil {
+// 		return nil, "", err
+// 	}
+
+// 	mainColumn := []interface{}{"№", "Наименование", "Доп. информация", "Количество", "Цена", "Сумма", "Себестоимость", "Шаблон"}
+
+// 	tempColumn := []interface{}{"№", "Наименование", "Доп. информация", "Количество", "Ед. изм.", "Цена", "Сумма", "Шаблон"}
+
+// 	snpColumn := []interface{}{
+// 		"№", "Наименование", "Д4", "Д3", "Д2", "Д1", "h", "материал внутр. кольца", "материал каркаса", "материал наполнителя",
+// 		"материал нар. кольца", "Перемычка", "Отверстие", "Крепление", "Чертеж", "Себестоимость", "Цена", "Шаблон",
+// 	}
+
+// 	putgColumnBase := []interface{}{
+// 		"№", "Наименование", "D нар.", "D вн.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал обтюраторов", "Слюда",
+// 		"Ингибитор", "Разъемная прокладка", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон",
+// 	}
+// 	putgColumnRings := []interface{}{
+// 		"№", "Наименование", "D нар. огр.", "D нар.", "D вн.", "D вн. огр.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации",
+// 		"Материал нар. огр. кольца", "Материал обтюраторов", "Материал вн. огр. кольца", "Слюда", "Ингибитор", "Разъемная прокладка", "Перемычка",
+// 		"Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон",
+// 	}
+// 	putgColumnForms := []interface{}{
+// 		"№", "Наименование", "D нар.", "D вн.", "Поле", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал обтюраторов",
+// 		"Слюда", "Ингибитор", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон",
+// 	}
+
+// 	// ringColumn := []interface{}{
+// 	// 	"№", "Наименование", "Тип кольца", "Д нар.", "Д вн.", "Высота", "Плотность", "Вид обтюратора", "Мод. добавка",
+// 	// 	"Чертеж", "Себестоимость", "Цена", "Шаблон",
+// 	// }
+
+// 	startMain := 1
+// 	startAside := 11
+
+// 	snpStart := 1
+// 	putgStart := 4 + count.SnpCount
+
+// 	snpCount := snpStart
+// 	putgCount := putgStart
+
+// 	units := "шт"
+
+// 	file := excelize.NewFile()
+// 	// сделать 2 лист, а первый переименовать в заявку
+// 	orderSheet := file.GetSheetName(file.GetActiveSheetIndex())
+
+// 	tempSheetIdx, err := file.NewSheet("для1С")
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to create new sheet. error: %w", err)
+// 	}
+// 	tempSheet := file.GetSheetName(tempSheetIdx)
+
+// 	headerStyle, err := file.NewStyle(&excelize.Style{
+// 		Fill: excelize.Fill{
+// 			Type:    "pattern",
+// 			Pattern: 1,
+// 			Color:   []string{"d9d9d9"},
+// 		},
+// 		Alignment: &excelize.Alignment{
+// 			Horizontal:     "center",
+// 			Vertical:       "center",
+// 			RelativeIndent: 1,
+// 			ShrinkToFit:    true,
+// 			Indent:         1,
+// 			ReadingOrder:   0,
+// 			WrapText:       true,
+// 		},
+// 		Border: []excelize.Border{
+// 			{Type: "left", Color: "000000", Style: 7},
+// 			{Type: "top", Color: "000000", Style: 7},
+// 			{Type: "bottom", Color: "000000", Style: 7},
+// 			{Type: "right", Color: "000000", Style: 7},
+// 		},
+// 	})
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to create header style. error: %w", err)
+// 	}
+
+// 	// стиль для наименования прокладки (и для доп. инфы)
+// 	titleStyle, err := file.NewStyle(&excelize.Style{
+// 		Border: []excelize.Border{
+// 			{Type: "left", Color: "000000", Style: 7},
+// 			{Type: "top", Color: "000000", Style: 7},
+// 			{Type: "bottom", Color: "000000", Style: 7},
+// 			{Type: "right", Color: "000000", Style: 7},
+// 		},
+// 	})
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to create title style. error: %w", err)
+// 	}
+
+// 	cellStyle, err := file.NewStyle(&excelize.Style{
+// 		Alignment: &excelize.Alignment{
+// 			Horizontal: "center",
+// 		},
+// 		Border: []excelize.Border{
+// 			{Type: "left", Color: "000000", Style: 7},
+// 			{Type: "top", Color: "000000", Style: 7},
+// 			{Type: "bottom", Color: "000000", Style: 7},
+// 			{Type: "right", Color: "000000", Style: 7},
+// 		},
+// 	})
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to create cell style. error: %w", err)
+// 	}
+
+// 	cell, err := excelize.CoordinatesToCellName(startMain, 1)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+// 	}
+
+// 	// добавление заголовков для основной таблицы
+// 	if err = file.SetSheetRow(orderSheet, cell, &mainColumn); err != nil {
+// 		return nil, "", fmt.Errorf("failed to create header table. error: %w", err)
+// 	}
+
+// 	// добавление заголовков для таблицы на листе для 1с
+// 	if err = file.SetSheetRow(tempSheet, cell, &tempColumn); err != nil {
+// 		return nil, "", fmt.Errorf("failed to create temp header table. error: %w", err)
+// 	}
+
+// 	endCell, err := excelize.CoordinatesToCellName(startMain+len(mainColumn)-1, 1)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+// 	}
+// 	// добавление стилей для основной таблицы
+// 	err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 	}
+
+// 	endCell, err = excelize.CoordinatesToCellName(startMain+len(tempColumn)-1, 1)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+// 	}
+// 	// добавление стилей для таблицы на листе для 1с
+// 	err = file.SetCellStyle(tempSheet, cell, endCell, headerStyle)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 	}
+
+// 	// snp
+// 	cell, err = excelize.CoordinatesToCellName(startAside, snpStart)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+// 	}
+
+// 	// добавление заголовков для таблицы снп
+// 	if err = file.SetSheetRow(orderSheet, cell, &snpColumn); err != nil {
+// 		return nil, "", fmt.Errorf("failed to create snp header table. error: %w", err)
+// 	}
+
+// 	endCell, err = excelize.CoordinatesToCellName(startAside+len(snpColumn)-1, snpStart)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+// 	}
+
+// 	// добавление стилей
+// 	err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 	}
+
+// 	putgRingCount := 0
+// 	putgFormCount := 0
+
+// 	for _, fp := range order.Positions {
+// 		if fp.Type == position_model.PositionType_Putg {
+// 			if fp.PutgData.Main.ConfigurationCode != "round" {
+// 				putgFormCount++
+// 			}
+// 			if utf8.RuneCountInString(fp.PutgData.Material.ConstructionCode) == 3 {
+// 				putgRingCount++
+// 			}
+// 		}
+// 	}
+
+// 	// путг
+// 	cell, err = excelize.CoordinatesToCellName(startAside, putgStart)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+// 	}
+
+// 	// добавление заголовков для таблицы путг (основная)
+// 	if err = file.SetSheetRow(orderSheet, cell, &putgColumnBase); err != nil {
+// 		return nil, "", fmt.Errorf("failed to create putg base header table. error: %w", err)
+// 	}
+
+// 	endCell, err = excelize.CoordinatesToCellName(startAside+len(putgColumnBase)-1, putgStart)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+// 	}
+
+// 	// добавление стилей
+// 	err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 	}
+
+// 	if putgRingCount != 0 {
+// 		start := putgStart + count.PutgCount - putgRingCount - putgFormCount + 3
+// 		cell, err = excelize.CoordinatesToCellName(startAside, start)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+// 		}
+// 		// добавление заголовков для таблицы путг (с кольцами)
+// 		if err = file.SetSheetRow(orderSheet, cell, &putgColumnRings); err != nil {
+// 			return nil, "", fmt.Errorf("failed to create putg ring header table. error: %w", err)
+// 		}
+
+// 		endCell, err = excelize.CoordinatesToCellName(startAside+len(putgColumnRings)-1, start)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+// 		}
+
+// 		// добавление стилей
+// 		err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 		}
+
+// 		count.PutgCount += 3
+// 		putgRingCount = start
+// 	}
+// 	if putgFormCount != 0 {
+// 		start := putgStart + count.PutgCount - putgFormCount + 3
+// 		cell, err = excelize.CoordinatesToCellName(startAside, start)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+// 		}
+// 		// добавление заголовков для таблицы путг (формы отличные от круглой)
+// 		if err = file.SetSheetRow(orderSheet, cell, &putgColumnForms); err != nil {
+// 			return nil, "", fmt.Errorf("failed to create putg form header table. error: %w", err)
+// 		}
+
+// 		endCell, err = excelize.CoordinatesToCellName(startAside+len(putgColumnForms)-1, start)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+// 		}
+
+// 		// добавление стилей
+// 		err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 		}
+
+// 		count.PutgCount += 3
+// 		putgFormCount = start
+// 	}
+
+// 	drawings := []string{}
+
+// 	mainTitle, err := excelize.ColumnNumberToName(startMain + 1)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 	}
+
+// 	asideTitle, err := excelize.ColumnNumberToName(startAside + 1)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 	}
+
+// 	err = file.SetColWidth(orderSheet, mainTitle, mainTitle, 30)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to set column width. error: %w", err)
+// 	}
+
+// 	err = file.SetColWidth(orderSheet, asideTitle, asideTitle, 30)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to set column width. error: %w", err)
+// 	}
+
+// 	// получение колонок для вставки формул
+// 	countColumn, err := excelize.ColumnNumberToName(startMain + 3)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 	}
+// 	priceColumn, err := excelize.ColumnNumberToName(startMain + 4)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 	}
+// 	costColumn, err := excelize.ColumnNumberToName(startMain + 6)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 	}
+// 	sumColumn, err := excelize.ColumnNumberToName(startMain + 5)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 	}
+// 	templateColumn, err := excelize.ColumnNumberToName(startMain + 7)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 	}
+
+// 	// получение колонок для вставки формул на листе 1с
+// 	tempPriceColumn, err := excelize.ColumnNumberToName(startMain + 5)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 	}
+// 	tempSumColumn, err := excelize.ColumnNumberToName(startMain + 6)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 	}
+// 	tempTemplateColumn, err := excelize.ColumnNumberToName(startMain + 7)
+// 	if err != nil {
+// 		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 	}
+
+// 	for i, p := range order.Positions {
+// 		mainLine := []interface{}{p.Count, p.Title, p.Info, p.Amount}
+
+// 		cell, err := excelize.CoordinatesToCellName(startMain, 2+i)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+// 		}
+// 		// добавление основных данных
+// 		if err = file.SetSheetRow(orderSheet, cell, &mainLine); err != nil {
+// 			return nil, "", fmt.Errorf("failed to create main line. error: %w", err)
+// 		}
+
+// 		endCell, err := excelize.CoordinatesToCellName(startMain+len(mainColumn)-1, 2+i)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+// 		}
+
+// 		// добавление стилей
+// 		err = file.SetCellStyle(orderSheet, cell, endCell, cellStyle)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 		}
+// 		// добавление стилей для наименования
+// 		err = file.SetCellStyle(orderSheet, fmt.Sprintf("%s%d", mainTitle, 2+i), fmt.Sprintf("%s%d", mainTitle, 2+i), titleStyle)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 		}
+
+// 		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", sumColumn, i+2), fmt.Sprintf("=%s%d*%s%d", countColumn, i+2, priceColumn, i+2))
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
+// 		}
+
+// 		var cost, price, template string
+// 		var line int
+
+// 		// SNP position
+// 		if p.Type == position_model.PositionType_Snp {
+// 			snpData := p.SnpData
+// 			snpThickness := snpData.Size.H
+// 			if snpThickness == "" {
+// 				snpThickness = snpData.Size.Another
+// 			}
+// 			jumper := ""
+// 			if snpData.Design.HasJumper {
+// 				jumper = fmt.Sprintf("%s/%s", snpData.Design.JumperCode, snpData.Design.JumperWidth)
+// 			}
+// 			hole := ""
+// 			if snpData.Design.HasHole {
+// 				hole = "есть"
+// 			}
+// 			mounting := ""
+// 			if snpData.Design.HasMounting {
+// 				mounting = snpData.Design.MountingCode
+// 			}
+// 			drawing := ""
+// 			if snpData.Design.Drawing != "" {
+// 				drawing = "есть"
+// 				parts := strings.Split(snpData.Design.Drawing, "/")
+// 				drawings = append(drawings, fmt.Sprintf("%d_%s", p.Count, parts[len(parts)-1]))
+// 			}
+
+// 			var d4, d1 interface{}
+
+// 			if snpData.Size.D4 != "" {
+// 				d4 = snpData.Size.D4
+// 			} else {
+// 				d4 = nil
+// 			}
+// 			if snpData.Size.D1 != "" {
+// 				d1 = snpData.Size.D1
+// 			} else {
+// 				d1 = nil
+// 			}
+
+// 			snpLine := []interface{}{
+// 				p.Count, p.Title,
+// 				d4, snpData.Size.D3, snpData.Size.D2, d1, snpThickness,
+// 				snpData.Material.InnerRingCode, snpData.Material.FrameCode, snpData.Material.FillerCode, snpData.Material.OuterRingCode,
+// 				jumper, hole, mounting, drawing,
+// 			}
+
+// 			cell, err = excelize.CoordinatesToCellName(startAside, int(1+snpCount))
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+// 			}
+// 			// добавление данных для снп
+// 			if err = file.SetSheetRow(orderSheet, cell, &snpLine); err != nil {
+// 				return nil, "", fmt.Errorf("failed to create snp line. error: %w", err)
+// 			}
+
+// 			endCell, err := excelize.CoordinatesToCellName(startAside+len(snpLine)+2, int(1+snpCount))
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+// 			}
+
+// 			// добавление стилей
+// 			err = file.SetCellStyle(orderSheet, cell, endCell, cellStyle)
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 			}
+
+// 			template, err = excelize.ColumnNumberToName(startAside + len(snpLine) + 2)
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 			}
+// 			price, err = excelize.ColumnNumberToName(startAside + len(snpLine) + 1)
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 			}
+// 			cost, err = excelize.ColumnNumberToName(startAside + len(snpLine))
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 			}
+
+// 			line = snpCount + 1
+// 			snpCount++
+// 		}
+
+// 		// Putg position
+// 		if p.Type == position_model.PositionType_Putg {
+// 			putgData := p.PutgData
+// 			lineCount := putgCount
+// 			columnCount := len(putgColumnBase) - 1
+
+// 			jumper := ""
+// 			if putgData.Design.HasJumper {
+// 				jumper = fmt.Sprintf("%s/%s", putgData.Design.JumperCode, putgData.Design.JumperWidth)
+// 			}
+// 			hole := ""
+// 			if putgData.Design.HasHole {
+// 				hole = "есть"
+// 			}
+// 			drawing := ""
+// 			if putgData.Design.Drawing != "" {
+// 				drawing = "есть"
+// 				parts := strings.Split(putgData.Design.Drawing, "/")
+// 				drawings = append(drawings, fmt.Sprintf("%d_%s", p.Count, parts[len(parts)-1]))
+// 			}
+
+// 			// TODO возможно стоит еще выводить форму прокладки
+
+// 			// "Слюда", "Ингибитор", "Разъемная прокладка",
+// 			mica := 0
+// 			inhibitor := 0
+// 			if strings.HasSuffix(putgData.Material.TypeCode, "5") {
+// 				inhibitor = 1
+// 			}
+// 			removable := 0
+// 			if putgData.Design.HasRemovable {
+// 				removable = 1
+// 			}
+
+// 			reinforce := 1
+// 			if strings.HasSuffix(putgData.Material.TypeCode, "05") || strings.HasSuffix(putgData.Material.TypeCode, "00") {
+// 				reinforce = 0
+// 			}
+// 			construction := strings.TrimLeft(putgData.Material.ConstructionCode, "0")
+
+// 			var field interface{}
+// 			if putgData.Main.ConfigurationCode != "round" {
+// 				lineCount = putgFormCount
+// 				columnCount = len(putgColumnForms) - 1
+// 				putgFormCount++
+
+// 				if putgData.Size.UseDimensions {
+// 					d4, err := strconv.ParseFloat(putgData.Size.D4, 64)
+// 					if err != nil {
+// 						return nil, "", fmt.Errorf("failed to parse d4. error: %w", err)
+// 					}
+// 					d3, err := strconv.ParseFloat(putgData.Size.D3, 64)
+// 					if err != nil {
+// 						return nil, "", fmt.Errorf("failed to parse d3. error: %w", err)
+// 					}
+// 					d2, err := strconv.ParseFloat(putgData.Size.D2, 64)
+// 					if err != nil {
+// 						return nil, "", fmt.Errorf("failed to parse d2. error: %w", err)
+// 					}
+// 					d1, err := strconv.ParseFloat(putgData.Size.D1, 64)
+// 					if err != nil {
+// 						return nil, "", fmt.Errorf("failed to parse d1. error: %w", err)
+// 					}
+
+// 					field = math.Max(d4-d3, d2-d1)
+// 					putgData.Size.D3 = putgData.Size.D4
+// 				} else {
+// 					field = putgData.Size.D1
+// 				}
+
+// 				putgData.Size.D4 = ""
+// 				putgData.Size.D1 = ""
+// 			} else {
+// 				field = nil
+
+// 				if utf8.RuneCountInString(putgData.Material.ConstructionCode) == 3 {
+// 					lineCount = putgRingCount
+// 					columnCount = len(putgColumnRings) - 1
+// 					putgRingCount++
+// 				} else {
+// 					putgCount++
+// 				}
+// 			}
+
+// 			var d4, d1 interface{}
+// 			if putgData.Size.D4 != "" {
+// 				d4 = putgData.Size.D4
+// 			} else {
+// 				d4 = nil
+// 			}
+// 			if putgData.Size.D1 != "" {
+// 				d1 = putgData.Size.D1
+// 			} else {
+// 				d1 = nil
+// 			}
+
+// 			putgData.Size.H = strings.ReplaceAll(putgData.Size.H, ".", ",")
+
+// 			//"№", "Наименование", "D нар.", "D вн.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал обтюраторов", "Слюда", "Ингибитор", "Разъемная прокладка", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена"
+
+// 			putgLine := []interface{}{
+// 				p.Count, p.Title,
+// 				putgData.Size.D3, putgData.Size.D2, putgData.Size.H,
+// 				construction, reinforce, putgData.Material.RotaryPlugCode,
+// 				mica, inhibitor, removable, jumper, hole, drawing,
+// 			}
+
+// 			if utf8.RuneCountInString(putgData.Material.ConstructionCode) == 3 {
+// 				//"№", "Наименование", "D нар. огр.", "D нар.", "D вн.", "D вн. огр.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал нар. огр. кольца", "Материал обтюраторов", "Материал вн. огр. кольца", "Слюда", "Ингибитор", "Разъемная прокладка", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена",
+
+// 				putgLine = []interface{}{
+// 					p.Count, p.Title,
+// 					d4, putgData.Size.D3, putgData.Size.D2, d1, putgData.Size.H, construction, reinforce,
+// 					putgData.Material.InnerRindCode, putgData.Material.RotaryPlugCode, putgData.Material.OuterRingCode,
+// 					mica, inhibitor, removable, jumper, hole, drawing,
+// 				}
+// 			}
+
+// 			if putgData.Main.ConfigurationCode != "round" {
+// 				// "№", "Наименование", "D нар.", "D вн.", "Поле", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал обтюраторов", "Слюда", "Ингибитор", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена",
+
+// 				putgLine = []interface{}{
+// 					p.Count, p.Title,
+// 					putgData.Size.D3, putgData.Size.D2, field, putgData.Size.H, construction,
+// 					reinforce, putgData.Material.RotaryPlugCode,
+// 					mica, inhibitor, jumper, hole, drawing,
+// 				}
+// 			}
+
+// 			cell, err = excelize.CoordinatesToCellName(startAside, int(1+lineCount))
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+// 			}
+
+// 			// добавление данных для путг
+// 			if err = file.SetSheetRow(orderSheet, cell, &putgLine); err != nil {
+// 				return nil, "", fmt.Errorf("failed to create putg line. error: %w", err)
+// 			}
+
+// 			endCell, err := excelize.CoordinatesToCellName(startAside+columnCount, int(1+lineCount))
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+// 			}
+
+// 			// добавление стилей
+// 			err = file.SetCellStyle(orderSheet, cell, endCell, cellStyle)
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 			}
+
+// 			template, err = excelize.ColumnNumberToName(startAside + columnCount)
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 			}
+// 			price, err = excelize.ColumnNumberToName(startAside + columnCount - 1)
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 			}
+// 			cost, err = excelize.ColumnNumberToName(startAside + columnCount - 2)
+// 			if err != nil {
+// 				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+// 			}
+
+// 			line = lineCount + 1
+// 		}
+
+// 		// добавление стилей для наименований
+// 		err = file.SetCellStyle(orderSheet, fmt.Sprintf("%s%d", asideTitle, line), fmt.Sprintf("%s%d", asideTitle, line), titleStyle)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 		}
+
+// 		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", costColumn, i+2), fmt.Sprintf("=%s%d", cost, line))
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
+// 		}
+// 		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", priceColumn, i+2), fmt.Sprintf("=%s%d", price, line))
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
+// 		}
+// 		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", templateColumn, i+2), fmt.Sprintf("=%s%d", template, line))
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
+// 		}
+
+// 		// строка для 1с
+// 		tempLine := []interface{}{p.Count, p.Title, p.Info, p.Amount, units}
+
+// 		cell, err = excelize.CoordinatesToCellName(startMain, 2+i)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
+// 		}
+// 		// добавление данных для таблицы на листе для 1с
+// 		if err = file.SetSheetRow(tempSheet, cell, &tempLine); err != nil {
+// 			return nil, "", fmt.Errorf("failed to create main line. error: %w", err)
+// 		}
+
+// 		endCell, err = excelize.CoordinatesToCellName(startMain+len(tempColumn)-1, 2+i)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
+// 		}
+
+// 		// добавление стилей для таблицы на листе для 1с
+// 		err = file.SetCellStyle(tempSheet, cell, endCell, cellStyle)
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+// 		}
+
+// 		// добавление формул на листе 1с
+// 		err = file.SetCellFormula(tempSheet, fmt.Sprintf("%s%d", tempPriceColumn, i+2), fmt.Sprintf("=%s!%s%d", orderSheet, priceColumn, i+2))
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
+// 		}
+// 		err = file.SetCellFormula(tempSheet, fmt.Sprintf("%s%d", tempSumColumn, i+2), fmt.Sprintf("=%s!%s%d", orderSheet, sumColumn, i+2))
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
+// 		}
+// 		err = file.SetCellFormula(tempSheet, fmt.Sprintf("%s%d", tempTemplateColumn, i+2), fmt.Sprintf("=%s!%s%d", orderSheet, templateColumn, i+2))
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
+// 		}
+// 	}
+
+// 	fileName := fmt.Sprintf("Заявка %d", order.Number)
+// 	var buffer *bytes.Buffer
+
+// 	if len(drawings) > 0 {
+// 		stream, err := s.fileApi.GroupDownload(ctx, &file_api.GroupDownloadRequest{
+// 			Bucket: "pro",
+// 			Group:  order.Id,
+// 		})
+// 		if err != nil {
+// 			return nil, "", fmt.Errorf("failed to download drawing. err :%w", err)
+// 		}
+
+// 		res, err := stream.Recv()
+// 		if err != nil && !strings.Contains(err.Error(), "file not found") {
+// 			return nil, "", fmt.Errorf("failed to get data. err: %w", err)
+// 		}
+// 		meta := res.GetMetadata()
+// 		fileData := bytes.Buffer{}
+
+// 		if meta != nil {
+// 			for {
+// 				logger.Debug("waiting to receive more data")
+
+// 				req, err := stream.Recv()
+// 				if err == io.EOF {
+// 					logger.Debug("no more data")
+// 					break
+// 				}
+// 				if err != nil {
+// 					return nil, "", fmt.Errorf("failed to get chunk. err %w", err)
+// 				}
+
+// 				chunk := req.GetFile().Content
+// 				_, err = fileData.Write(chunk)
+// 				if err != nil {
+// 					return nil, "", fmt.Errorf("failed to write chunk. err %w", err)
+// 				}
+// 			}
+// 		}
+
+// 		buffer, err = s.zip.CreateWithDrawings(fileName+".xlsx", file, fileData, drawings)
+// 		if err != nil {
+// 			return nil, "", err
+// 		}
+// 	} else {
+// 		buffer, err = s.zip.Create(fileName+".xlsx", file)
+// 		if err != nil {
+// 			return nil, "", err
+// 		}
+// 	}
+
+//		return buffer, fileName, nil
+//	}
 func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) (*bytes.Buffer, string, error) {
 	if err := s.SetStatus(ctx, &order_api.Status{Status: order_model.OrderStatus_work, OrderId: req.Id}); err != nil {
 		return nil, "", err
 	}
 
-	count, order, err := s.GetForFile(ctx, req)
+	_, order, err := s.GetForFile(ctx, req)
 	if err != nil {
 		return nil, "", err
 	}
 
-	mainColumn := []interface{}{"№", "Наименование", "Доп. информация", "Количество", "Цена", "Сумма", "Себестоимость", "Шаблон"}
+	mainColumns := []interface{}{"№", "Наименование", "Доп. информация", "Количество", "Цена", "Сумма", "Себестоимость", "Шаблон"}
+	templateColumns := []interface{}{"№", "Наименование", "Доп. информация", "Количество", "Ед. изм.", "Цена", "Сумма", "Шаблон"}
 
-	tempColumn := []interface{}{"№", "Наименование", "Доп. информация", "Количество", "Ед. изм.", "Цена", "Сумма", "Шаблон"}
-
-	snpColumn := []interface{}{
-		"№", "Наименование", "Д4", "Д3", "Д2", "Д1", "h", "материал внутр. кольца", "материал каркаса", "материал наполнителя", "материал нар. кольца", "Перемычка", "Отверстие", "Крепление", "Чертеж", "Себестоимость", "Цена", "Шаблон",
+	snpColumns := []interface{}{
+		"№", "Наименование", "Д4", "Д3", "Д2", "Д1", "h", "материал внутр. кольца", "материал каркаса", "материал наполнителя",
+		"материал нар. кольца", "Перемычка", "Отверстие", "Крепление", "Чертеж", "Себестоимость", "Цена", "Шаблон",
 	}
 
-	putgColumnBase := []interface{}{
-		"№", "Наименование", "D нар.", "D вн.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал обтюраторов", "Слюда", "Ингибитор", "Разъемная прокладка", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон",
+	putgColumns := []interface{}{
+		"№", "Наименование", "D нар.", "D вн.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал обтюраторов", "Слюда",
+		"Ингибитор", "Разъемная прокладка", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон",
 	}
-	putgColumnRings := []interface{}{
-		"№", "Наименование", "D нар. огр.", "D нар.", "D вн.", "D вн. огр.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал нар. огр. кольца", "Материал обтюраторов", "Материал вн. огр. кольца", "Слюда", "Ингибитор", "Разъемная прокладка", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон",
+	putgWithRingsColumns := []interface{}{
+		"№", "Наименование", "D нар. огр.", "D нар.", "D вн.", "D вн. огр.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации",
+		"Материал нар. огр. кольца", "Материал обтюраторов", "Материал вн. огр. кольца", "Слюда", "Ингибитор", "Разъемная прокладка", "Перемычка",
+		"Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон",
 	}
-	putgColumnForms := []interface{}{
-		"№", "Наименование", "D нар.", "D вн.", "Поле", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал обтюраторов", "Слюда", "Ингибитор", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон",
+	putgNotRoundColumns := []interface{}{
+		"№", "Наименование", "D нар.", "D вн.", "Поле", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал обтюраторов",
+		"Слюда", "Ингибитор", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон",
 	}
 
-	startMain := 1
-	startAside := 11
-
-	snpStart := 1
-	putgStart := 4 + count.SnpCount
-
-	snpCount := snpStart
-	putgCount := putgStart
-
-	units := "шт"
+	ringTwistedColumns := []interface{}{
+		"№", "Наименование", "Тип кольца", "Д нар.", "Д вн.", "Высота", "Плотность", "Вид обтюратора", "Мод. добавка",
+		"Чертеж", "Себестоимость", "Цена", "Шаблон",
+	}
+	ringPuffColumns := []interface{}{
+		"№", "Наименование", "Тип кольца", "Д нар.", "Д вн.", "Высота", "Мод. добавка", "Чертеж", "Себестоимость", "Цена", "Шаблон",
+	}
+	ringWickerColumns := []interface{}{
+		"№", "Наименование", "Тип кольца", "Д нар.", "Д вн.", "Высота", "Подпрессовка", "Наименование набивки", "Чертеж", "Себестоимость", "Цена", "Шаблон",
+	}
+	ringCompositeColumns := []interface{}{"№", "Наименование", "Тип кольца"}
 
 	file := excelize.NewFile()
 	// сделать 2 лист, а первый переименовать в заявку
@@ -163,7 +878,7 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to create new sheet. error: %w", err)
 	}
-	tempSheet := file.GetSheetName(tempSheetIdx)
+	templateSheet := file.GetSheetName(tempSheetIdx)
 
 	headerStyle, err := file.NewStyle(&excelize.Style{
 		Fill: excelize.Fill{
@@ -219,246 +934,38 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		return nil, "", fmt.Errorf("failed to create cell style. error: %w", err)
 	}
 
-	cell, err := excelize.CoordinatesToCellName(startMain, 1)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
-	}
-
-	// добавление заголовков для основной таблицы
-	if err = file.SetSheetRow(orderSheet, cell, &mainColumn); err != nil {
-		return nil, "", fmt.Errorf("failed to create header table. error: %w", err)
-	}
-
-	// добавление заголовков для таблицы на листе для 1с
-	if err = file.SetSheetRow(tempSheet, cell, &tempColumn); err != nil {
-		return nil, "", fmt.Errorf("failed to create temp header table. error: %w", err)
-	}
-
-	endCell, err := excelize.CoordinatesToCellName(startMain+len(mainColumn)-1, 1)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
-	}
-	// добавление стилей для основной таблицы
-	err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
-	}
-
-	endCell, err = excelize.CoordinatesToCellName(startMain+len(tempColumn)-1, 1)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
-	}
-	// добавление стилей для таблицы на листе для 1с
-	err = file.SetCellStyle(tempSheet, cell, endCell, headerStyle)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
-	}
-
-	// snp
-	cell, err = excelize.CoordinatesToCellName(startAside, snpStart)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
-	}
-
-	// добавление заголовков для таблицы снп
-	if err = file.SetSheetRow(orderSheet, cell, &snpColumn); err != nil {
-		return nil, "", fmt.Errorf("failed to create snp header table. error: %w", err)
-	}
-
-	endCell, err = excelize.CoordinatesToCellName(startAside+len(snpColumn)-1, snpStart)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
-	}
-
-	// добавление стилей
-	err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
-	}
-
-	putgRingCount := 0
-	putgFormCount := 0
-
-	for _, fp := range order.Positions {
-		if fp.Type == position_model.PositionType_Putg {
-			if fp.PutgData.Main.ConfigurationCode != "round" {
-				putgFormCount++
-			}
-			if utf8.RuneCountInString(fp.PutgData.Material.ConstructionCode) == 3 {
-				putgRingCount++
-			}
-		}
-	}
-
-	// путг
-	cell, err = excelize.CoordinatesToCellName(startAside, putgStart)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
-	}
-
-	// добавление заголовков для таблицы путг (основная)
-	if err = file.SetSheetRow(orderSheet, cell, &putgColumnBase); err != nil {
-		return nil, "", fmt.Errorf("failed to create putg base header table. error: %w", err)
-	}
-
-	endCell, err = excelize.CoordinatesToCellName(startAside+len(putgColumnBase)-1, putgStart)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
-	}
-
-	// добавление стилей
-	err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
-	}
-
-	if putgRingCount != 0 {
-		start := putgStart + count.PutgCount - putgRingCount - putgFormCount + 3
-		cell, err = excelize.CoordinatesToCellName(startAside, start)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
-		}
-		// добавление заголовков для таблицы путг (с кольцами)
-		if err = file.SetSheetRow(orderSheet, cell, &putgColumnRings); err != nil {
-			return nil, "", fmt.Errorf("failed to create putg ring header table. error: %w", err)
-		}
-
-		endCell, err = excelize.CoordinatesToCellName(startAside+len(putgColumnRings)-1, start)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
-		}
-
-		// добавление стилей
-		err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
-		}
-
-		count.PutgCount += 3
-		putgRingCount = start
-	}
-	if putgFormCount != 0 {
-		start := putgStart + count.PutgCount - putgFormCount + 3
-		cell, err = excelize.CoordinatesToCellName(startAside, start)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
-		}
-		// добавление заголовков для таблицы путг (формы отличные от круглой)
-		if err = file.SetSheetRow(orderSheet, cell, &putgColumnForms); err != nil {
-			return nil, "", fmt.Errorf("failed to create putg form header table. error: %w", err)
-		}
-
-		endCell, err = excelize.CoordinatesToCellName(startAside+len(putgColumnForms)-1, start)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
-		}
-
-		// добавление стилей
-		err = file.SetCellStyle(orderSheet, cell, endCell, headerStyle)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
-		}
-
-		count.PutgCount += 3
-		putgFormCount = start
-	}
+	row := 1
+	col := 1
+	asideCol := col + len(mainColumns) + 2
+	asideRow := 1
 
 	drawings := []string{}
 
-	mainTitle, err := excelize.ColumnNumberToName(startMain + 1)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-	}
+	snp := make([]string, 0, 16)
 
-	asideTitle, err := excelize.ColumnNumberToName(startAside + 1)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-	}
+	putg := make([]string, 0, 16)
+	putgWithRings := make([]string, 0, 16)
+	putgNotRound := make([]string, 0, 16)
 
-	err = file.SetColWidth(orderSheet, mainTitle, mainTitle, 30)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to set column width. error: %w", err)
-	}
+	ringTwisted := make([]string, 0, 16)
+	ringPuff := make([]string, 0, 16)
+	ringWicker := make([]string, 0, 16)
+	ringComposite := make([]string, 0, 16)
 
-	err = file.SetColWidth(orderSheet, asideTitle, asideTitle, 30)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to set column width. error: %w", err)
+	type Line struct {
+		Index       int
+		Row         int
+		Line        []interface{}
+		CostCol     string
+		PriceCol    string
+		TemplateCol string
 	}
-
-	// получение колонок для вставки формул
-	countColumn, err := excelize.ColumnNumberToName(startMain + 3)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-	}
-	priceColumn, err := excelize.ColumnNumberToName(startMain + 4)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-	}
-	costColumn, err := excelize.ColumnNumberToName(startMain + 6)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-	}
-	sumColumn, err := excelize.ColumnNumberToName(startMain + 5)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-	}
-	templateColumn, err := excelize.ColumnNumberToName(startMain + 7)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-	}
-
-	// получение колонок для вставки формул на листе 1с
-	tempPriceColumn, err := excelize.ColumnNumberToName(startMain + 5)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-	}
-	tempSumColumn, err := excelize.ColumnNumberToName(startMain + 6)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-	}
-	tempTemplateColumn, err := excelize.ColumnNumberToName(startMain + 7)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-	}
+	lines := make(map[string]Line, 0)
 
 	for i, p := range order.Positions {
-		mainLine := []interface{}{p.Count, p.Title, p.Info, p.Amount}
-
-		cell, err := excelize.CoordinatesToCellName(startMain, 2+i)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
-		}
-		// добавление основных данных
-		if err = file.SetSheetRow(orderSheet, cell, &mainLine); err != nil {
-			return nil, "", fmt.Errorf("failed to create main line. error: %w", err)
-		}
-
-		endCell, err := excelize.CoordinatesToCellName(startMain+len(mainColumn)-1, 2+i)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
-		}
-
-		// добавление стилей
-		err = file.SetCellStyle(orderSheet, cell, endCell, cellStyle)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
-		}
-		// добавление стилей для наименования
-		err = file.SetCellStyle(orderSheet, fmt.Sprintf("%s%d", mainTitle, 2+i), fmt.Sprintf("%s%d", mainTitle, 2+i), titleStyle)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
-		}
-
-		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", sumColumn, i+2), fmt.Sprintf("=%s%d*%s%d", countColumn, i+2, priceColumn, i+2))
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
-		}
-
-		var cost, price, template string
-		var line int
-
-		// SNP position
 		if p.Type == position_model.PositionType_Snp {
+			snp = append(snp, p.Id)
+
 			snpData := p.SnpData
 			snpThickness := snpData.Size.H
 			if snpThickness == "" {
@@ -500,51 +1007,14 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 				p.Count, p.Title,
 				d4, snpData.Size.D3, snpData.Size.D2, d1, snpThickness,
 				snpData.Material.InnerRingCode, snpData.Material.FrameCode, snpData.Material.FillerCode, snpData.Material.OuterRingCode,
-				jumper, hole, mounting, drawing,
+				jumper, hole, mounting, drawing, 0, 0, "",
 			}
 
-			cell, err = excelize.CoordinatesToCellName(startAside, int(1+snpCount))
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
-			}
-			// добавление данных для снп
-			if err = file.SetSheetRow(orderSheet, cell, &snpLine); err != nil {
-				return nil, "", fmt.Errorf("failed to create snp line. error: %w", err)
-			}
-
-			endCell, err := excelize.CoordinatesToCellName(startAside+len(snpLine)+2, int(1+snpCount))
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
-			}
-
-			// добавление стилей
-			err = file.SetCellStyle(orderSheet, cell, endCell, cellStyle)
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
-			}
-
-			template, err = excelize.ColumnNumberToName(startAside + len(snpLine) + 2)
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-			}
-			price, err = excelize.ColumnNumberToName(startAside + len(snpLine) + 1)
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-			}
-			cost, err = excelize.ColumnNumberToName(startAside + len(snpLine))
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-			}
-
-			line = snpCount + 1
-			snpCount++
+			lines[p.Id] = Line{Index: i, Line: snpLine}
 		}
-
-		// Putg position
 		if p.Type == position_model.PositionType_Putg {
 			putgData := p.PutgData
-			lineCount := putgCount
-			columnCount := len(putgColumnBase) - 1
+			var line []interface{}
 
 			jumper := ""
 			if putgData.Design.HasJumper {
@@ -560,8 +1030,6 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 				parts := strings.Split(putgData.Design.Drawing, "/")
 				drawings = append(drawings, fmt.Sprintf("%d_%s", p.Count, parts[len(parts)-1]))
 			}
-
-			// TODO возможно стоит еще выводить форму прокладки
 
 			// "Слюда", "Ингибитор", "Разъемная прокладка",
 			mica := 0
@@ -582,10 +1050,6 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 
 			var field interface{}
 			if putgData.Main.ConfigurationCode != "round" {
-				lineCount = putgFormCount
-				columnCount = len(putgColumnForms) - 1
-				putgFormCount++
-
 				if putgData.Size.UseDimensions {
 					d4, err := strconv.ParseFloat(putgData.Size.D4, 64)
 					if err != nil {
@@ -614,14 +1078,6 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 				putgData.Size.D1 = ""
 			} else {
 				field = nil
-
-				if utf8.RuneCountInString(putgData.Material.ConstructionCode) == 3 {
-					lineCount = putgRingCount
-					columnCount = len(putgColumnRings) - 1
-					putgRingCount++
-				} else {
-					putgCount++
-				}
 			}
 
 			var d4, d1 interface{}
@@ -638,129 +1094,490 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 
 			putgData.Size.H = strings.ReplaceAll(putgData.Size.H, ".", ",")
 
-			//"№", "Наименование", "D нар.", "D вн.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал обтюраторов", "Слюда", "Ингибитор", "Разъемная прокладка", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена"
-
-			putgLine := []interface{}{
-				p.Count, p.Title,
-				putgData.Size.D3, putgData.Size.D2, putgData.Size.H,
-				construction, reinforce, putgData.Material.RotaryPlugCode,
-				mica, inhibitor, removable, jumper, hole, drawing,
-			}
-
-			if utf8.RuneCountInString(putgData.Material.ConstructionCode) == 3 {
-				//"№", "Наименование", "D нар. огр.", "D нар.", "D вн.", "D вн. огр.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал нар. огр. кольца", "Материал обтюраторов", "Материал вн. огр. кольца", "Слюда", "Ингибитор", "Разъемная прокладка", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена",
-
-				putgLine = []interface{}{
-					p.Count, p.Title,
-					d4, putgData.Size.D3, putgData.Size.D2, d1, putgData.Size.H, construction, reinforce,
-					putgData.Material.InnerRindCode, putgData.Material.RotaryPlugCode, putgData.Material.OuterRingCode,
-					mica, inhibitor, removable, jumper, hole, drawing,
-				}
-			}
-
 			if putgData.Main.ConfigurationCode != "round" {
-				// "№", "Наименование", "D нар.", "D вн.", "Поле", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал обтюраторов", "Слюда", "Ингибитор", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена",
+				// "№", "Наименование", "D нар.", "D вн.", "Поле", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации",
+				//"Материал обтюраторов", "Слюда", "Ингибитор", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон"
 
-				putgLine = []interface{}{
+				line = []interface{}{
 					p.Count, p.Title,
 					putgData.Size.D3, putgData.Size.D2, field, putgData.Size.H, construction,
 					reinforce, putgData.Material.RotaryPlugCode,
 					mica, inhibitor, jumper, hole, drawing,
+					0, 0, "",
 				}
+				putgNotRound = append(putgNotRound, p.Id)
+			} else if utf8.RuneCountInString(putgData.Material.ConstructionCode) == 3 {
+				//"№", "Наименование", "D нар. огр.", "D нар.", "D вн.", "D вн. огр.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации",
+				//"Материал нар. огр. кольца", "Материал обтюраторов", "Материал вн. огр. кольца", "Слюда", "Ингибитор", "Разъемная прокладка",
+				//"Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон"
+
+				line = []interface{}{
+					p.Count, p.Title,
+					d4, putgData.Size.D3, putgData.Size.D2, d1, putgData.Size.H, construction, reinforce,
+					putgData.Material.InnerRindCode, putgData.Material.RotaryPlugCode, putgData.Material.OuterRingCode,
+					mica, inhibitor, removable, jumper, hole, drawing,
+					0, 0, "",
+				}
+				putgWithRings = append(putgWithRings, p.Id)
+			} else {
+				//"№", "Наименование", "D нар.", "D вн.", "Толщина прокладки, мм", "Обтюраторы", "Материал перфорации", "Материал обтюраторов",
+				//"Слюда", "Ингибитор", "Разъемная прокладка", "Перемычка", "Отверстие", "Чертеж", "Себестоимость", "Цена", "Шаблон"
+
+				line = []interface{}{
+					p.Count, p.Title,
+					putgData.Size.D3, putgData.Size.D2, putgData.Size.H,
+					construction, reinforce, putgData.Material.RotaryPlugCode,
+					mica, inhibitor, removable, jumper, hole, drawing,
+					0, 0, "",
+				}
+				putg = append(putg, p.Id)
 			}
 
-			cell, err = excelize.CoordinatesToCellName(startAside, int(1+lineCount))
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
-			}
-
-			// добавление данных для путг
-			if err = file.SetSheetRow(orderSheet, cell, &putgLine); err != nil {
-				return nil, "", fmt.Errorf("failed to create putg line. error: %w", err)
-			}
-
-			endCell, err := excelize.CoordinatesToCellName(startAside+columnCount, int(1+lineCount))
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
-			}
-
-			// добавление стилей
-			err = file.SetCellStyle(orderSheet, cell, endCell, cellStyle)
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
-			}
-
-			template, err = excelize.ColumnNumberToName(startAside + columnCount)
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-			}
-			price, err = excelize.ColumnNumberToName(startAside + columnCount - 1)
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-			}
-			cost, err = excelize.ColumnNumberToName(startAside + columnCount - 2)
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
-			}
-
-			line = lineCount + 1
+			lines[p.Id] = Line{Index: i, Line: line}
 		}
+		if p.Type == position_model.PositionType_Ring {
+			ring := p.RingData
+			var line []interface{}
 
-		// добавление стилей для наименований
-		err = file.SetCellStyle(orderSheet, fmt.Sprintf("%s%d", asideTitle, line), fmt.Sprintf("%s%d", asideTitle, line), titleStyle)
+			parts := strings.Split(ring.Size, "×")
+
+			drawing := ""
+			if ring.Drawing != "" {
+				drawing = "есть"
+				parts := strings.Split(ring.Drawing, "/")
+				drawings = append(drawings, fmt.Sprintf("%d_%s", p.Count, parts[len(parts)-1]))
+			}
+			modifying := ring.Modifying
+			if modifying == "" {
+				modifying = "0"
+			}
+
+			if ring.TypeCode == "С" {
+				line = []interface{}{p.Count, p.Title, ring.TypeCode, parts[0], parts[1], ring.Thickness, modifying, drawing, 0, 0, ""}
+				ringPuff = append(ringPuff, p.Id)
+			} else if ring.TypeCode == "П" {
+				line = []interface{}{p.Count, p.Title, ring.TypeCode, parts[0], parts[1], ring.Thickness, 1, ring.Material, drawing, 0, 0, ""}
+				ringWicker = append(ringWicker, p.Id)
+			} else if ring.TypeCode == "К" {
+				line = []interface{}{p.Count, p.Title, ring.TypeCode}
+				ringComposite = append(ringComposite, p.Id)
+			} else {
+				density := ring.DensityCode
+				if ring.TypeCode == "ВА" {
+					density = "ВА-ГН"
+				}
+				line = []interface{}{
+					p.Count, p.Title, ring.TypeCode, parts[0], parts[1], ring.Thickness, density, ring.ConstructionBaseCode, modifying,
+					drawing, 0, 0, "",
+				}
+				ringTwisted = append(ringTwisted, p.Id)
+			}
+
+			lines[p.Id] = Line{Index: i, Line: line}
+		}
+	}
+
+	var cost, price, template string
+	if len(snp) > 0 {
+		// вставка заголовков для снп
+		if err := s.insertHeader(ctx, file, orderSheet, snpColumns, asideCol, asideRow, headerStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow++
+
+		template, err = excelize.ColumnNumberToName(asideCol + len(snpColumns) - 1)
 		if err != nil {
-			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		price, err = excelize.ColumnNumberToName(asideCol + len(snpColumns) - 2)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		cost, err = excelize.ColumnNumberToName(asideCol + len(snpColumns) - 3)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+	}
+	// вставка данных снп
+	for _, v := range snp {
+		l := lines[v]
+		if err := s.insertData(ctx, file, orderSheet, l.Line, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		lines[v] = Line{Index: l.Index, Row: asideRow, Line: l.Line, CostCol: cost, PriceCol: price, TemplateCol: template}
+		asideRow++
+	}
+
+	if len(putg) > 0 {
+		// отступ
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow += 2
+
+		// вставка заголовков для круглых путг без колец
+		if err := s.insertHeader(ctx, file, orderSheet, putgColumns, asideCol, asideRow, headerStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow++
+
+		template, err = excelize.ColumnNumberToName(asideCol + len(putgColumns) - 1)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		price, err = excelize.ColumnNumberToName(asideCol + len(putgColumns) - 2)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		cost, err = excelize.ColumnNumberToName(asideCol + len(putgColumns) - 3)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+	}
+	// вставка данных круглых путг без колец
+	for _, v := range putg {
+		l := lines[v]
+		if err := s.insertData(ctx, file, orderSheet, l.Line, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		lines[v] = Line{Index: l.Index, Row: asideRow, Line: l.Line, CostCol: cost, PriceCol: price, TemplateCol: template}
+		asideRow++
+	}
+
+	if len(putgWithRings) > 0 {
+		// отступ
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow += 2
+
+		// вставка заголовков для круглых путг с кольцами
+		if err := s.insertHeader(ctx, file, orderSheet, putgWithRingsColumns, asideCol, asideRow, headerStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow++
+
+		template, err = excelize.ColumnNumberToName(asideCol + len(putgWithRingsColumns) - 1)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		price, err = excelize.ColumnNumberToName(asideCol + len(putgWithRingsColumns) - 2)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		cost, err = excelize.ColumnNumberToName(asideCol + len(putgWithRingsColumns) - 3)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+	}
+	// вставка данных круглых путг с кольцами
+	for _, v := range putgWithRings {
+		l := lines[v]
+		if err := s.insertData(ctx, file, orderSheet, l.Line, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		lines[v] = Line{Index: l.Index, Row: asideRow, Line: l.Line, CostCol: cost, PriceCol: price, TemplateCol: template}
+		asideRow++
+	}
+
+	if len(putgNotRound) > 0 {
+		// отступ
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow += 2
+
+		// вставка заголовков для не круглых путг
+		if err := s.insertHeader(ctx, file, orderSheet, putgNotRoundColumns, asideCol, asideRow, headerStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow++
+
+		template, err = excelize.ColumnNumberToName(asideCol + len(putgNotRoundColumns) - 1)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		price, err = excelize.ColumnNumberToName(asideCol + len(putgNotRoundColumns) - 2)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		cost, err = excelize.ColumnNumberToName(asideCol + len(putgNotRoundColumns) - 3)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+	}
+	// вставка данных не круглых путг
+	for _, v := range putgNotRound {
+		l := lines[v]
+		if err := s.insertData(ctx, file, orderSheet, l.Line, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		lines[v] = Line{Index: l.Index, Row: asideRow, Line: l.Line, CostCol: cost, PriceCol: price, TemplateCol: template}
+		asideRow++
+	}
+
+	if len(ringTwisted) > 0 {
+		// отступ
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow += 2
+
+		// вставка заголовков для витых колец
+		if err := s.insertHeader(ctx, file, orderSheet, ringTwistedColumns, asideCol, asideRow, headerStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow++
+
+		template, err = excelize.ColumnNumberToName(asideCol + len(ringTwistedColumns) - 1)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		price, err = excelize.ColumnNumberToName(asideCol + len(ringTwistedColumns) - 2)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		cost, err = excelize.ColumnNumberToName(asideCol + len(ringTwistedColumns) - 3)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+	}
+	// вставка данных витых колец
+	for _, v := range ringTwisted {
+		l := lines[v]
+		if err := s.insertData(ctx, file, orderSheet, l.Line, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		lines[v] = Line{Index: l.Index, Row: asideRow, Line: l.Line, CostCol: cost, PriceCol: price, TemplateCol: template}
+		asideRow++
+	}
+
+	if len(ringPuff) > 0 {
+		// отступ
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow += 2
+
+		// вставка заголовков для слоенных колец
+		if err := s.insertHeader(ctx, file, orderSheet, ringPuffColumns, asideCol, asideRow, headerStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow++
+
+		template, err = excelize.ColumnNumberToName(asideCol + len(ringPuffColumns) - 1)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		price, err = excelize.ColumnNumberToName(asideCol + len(ringPuffColumns) - 2)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		cost, err = excelize.ColumnNumberToName(asideCol + len(ringPuffColumns) - 3)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+	}
+	// вставка данных слоенных колец
+	for _, v := range ringPuff {
+		l := lines[v]
+		if err := s.insertData(ctx, file, orderSheet, l.Line, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		lines[v] = Line{Index: l.Index, Row: asideRow, Line: l.Line, CostCol: cost, PriceCol: price, TemplateCol: template}
+		asideRow++
+	}
+
+	if len(ringWicker) > 0 {
+		// отступ
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow += 2
+
+		// вставка заголовков для плетенных колец
+		if err := s.insertHeader(ctx, file, orderSheet, ringWickerColumns, asideCol, asideRow, headerStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow++
+
+		template, err = excelize.ColumnNumberToName(asideCol + len(ringWickerColumns) - 1)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		price, err = excelize.ColumnNumberToName(asideCol + len(ringWickerColumns) - 2)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		cost, err = excelize.ColumnNumberToName(asideCol + len(ringWickerColumns) - 3)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+	}
+	// вставка данных плетенных колец
+	for _, v := range ringWicker {
+		l := lines[v]
+		if err := s.insertData(ctx, file, orderSheet, l.Line, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		lines[v] = Line{Index: l.Index, Row: asideRow, Line: l.Line, CostCol: cost, PriceCol: price, TemplateCol: template}
+		asideRow++
+	}
+
+	if len(ringComposite) > 0 {
+		// отступ
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow += 2
+
+		// вставка заголовков для композиционных колец
+		if err := s.insertHeader(ctx, file, orderSheet, ringCompositeColumns, asideCol, asideRow, headerStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow++
+
+		template, err = excelize.ColumnNumberToName(asideCol + len(ringCompositeColumns) - 1)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		price, err = excelize.ColumnNumberToName(asideCol + len(ringCompositeColumns) - 2)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		cost, err = excelize.ColumnNumberToName(asideCol + len(ringCompositeColumns) - 3)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+	}
+	// вставка данных композиционных колец
+	for _, v := range ringComposite {
+		l := lines[v]
+		if err := s.insertData(ctx, file, orderSheet, l.Line, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		lines[v] = Line{Index: l.Index, Row: asideRow, Line: l.Line, CostCol: cost, PriceCol: price, TemplateCol: template}
+		asideRow++
+	}
+
+	// добавление заголовков для таблицы
+	if err := s.insertHeader(ctx, file, orderSheet, mainColumns, col, row, headerStyle); err != nil {
+		return nil, "", err
+	}
+	// добавление заголовков для таблицы на листе для 1с
+	if err := s.insertHeader(ctx, file, templateSheet, templateColumns, col, row, headerStyle); err != nil {
+		return nil, "", err
+	}
+	row++
+
+	// получение колонок для вставки формул
+	countColumn, err := excelize.ColumnNumberToName(col + 3)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+	}
+	priceColumn, err := excelize.ColumnNumberToName(col + 4)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+	}
+	costColumn, err := excelize.ColumnNumberToName(col + 6)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+	}
+	sumColumn, err := excelize.ColumnNumberToName(col + 5)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+	}
+	templateColumn, err := excelize.ColumnNumberToName(col + 7)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+	}
+
+	// получение колонок для вставки формул на листе 1с
+	tempPriceColumn, err := excelize.ColumnNumberToName(col + 5)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+	}
+	tempSumColumn, err := excelize.ColumnNumberToName(col + 6)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+	}
+	tempTemplateColumn, err := excelize.ColumnNumberToName(col + 7)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+	}
+
+	units := "шт"
+
+	for _, p := range order.Positions {
+		mainLine := []interface{}{p.Count, p.Title, p.Info, p.Amount, "", "", "", ""}
+
+		// добавление данных для основной таблицы
+		if err := s.insertData(ctx, file, orderSheet, mainLine, col, row, cellStyle, titleStyle); err != nil {
+			return nil, "", err
 		}
 
-		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", costColumn, i+2), fmt.Sprintf("=%s%d", cost, line))
+		l := lines[p.Id]
+
+		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", sumColumn, row), fmt.Sprintf("=%s%d*%s%d", countColumn, row, priceColumn, row))
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
 		}
-		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", priceColumn, i+2), fmt.Sprintf("=%s%d", price, line))
+		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", costColumn, row), fmt.Sprintf("=%s%d", l.CostCol, l.Row))
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
 		}
-		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", templateColumn, i+2), fmt.Sprintf("=%s%d", template, line))
+		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", priceColumn, row), fmt.Sprintf("=%s%d", l.PriceCol, l.Row))
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
+		}
+		err = file.SetCellFormula(orderSheet, fmt.Sprintf("%s%d", templateColumn, row), fmt.Sprintf("=%s%d", l.TemplateCol, l.Row))
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
 		}
 
 		// строка для 1с
 		tempLine := []interface{}{p.Count, p.Title, p.Info, p.Amount, units}
-
-		cell, err = excelize.CoordinatesToCellName(startMain, 2+i)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to get cell. error: %w", err)
-		}
 		// добавление данных для таблицы на листе для 1с
-		if err = file.SetSheetRow(tempSheet, cell, &tempLine); err != nil {
-			return nil, "", fmt.Errorf("failed to create main line. error: %w", err)
-		}
-
-		endCell, err = excelize.CoordinatesToCellName(startMain+len(tempColumn)-1, 2+i)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to get end cell. error: %w", err)
-		}
-
-		// добавление стилей для таблицы на листе для 1с
-		err = file.SetCellStyle(tempSheet, cell, endCell, cellStyle)
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to set cell style. error: %w", err)
+		if err := s.insertData(ctx, file, templateSheet, tempLine, col, row, cellStyle, titleStyle); err != nil {
+			return nil, "", err
 		}
 
 		// добавление формул на листе 1с
-		err = file.SetCellFormula(tempSheet, fmt.Sprintf("%s%d", tempPriceColumn, i+2), fmt.Sprintf("=%s!%s%d", orderSheet, priceColumn, i+2))
+		err = file.SetCellFormula(templateSheet, fmt.Sprintf("%s%d", tempPriceColumn, row), fmt.Sprintf("=%s!%s%d", orderSheet, priceColumn, row))
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
 		}
-		err = file.SetCellFormula(tempSheet, fmt.Sprintf("%s%d", tempSumColumn, i+2), fmt.Sprintf("=%s!%s%d", orderSheet, sumColumn, i+2))
+		err = file.SetCellFormula(templateSheet, fmt.Sprintf("%s%d", tempSumColumn, row), fmt.Sprintf("=%s!%s%d", orderSheet, sumColumn, row))
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
 		}
-		err = file.SetCellFormula(tempSheet, fmt.Sprintf("%s%d", tempTemplateColumn, i+2), fmt.Sprintf("=%s!%s%d", orderSheet, templateColumn, i+2))
+		err = file.SetCellFormula(templateSheet, fmt.Sprintf("%s%d", tempTemplateColumn, row), fmt.Sprintf("=%s!%s%d", orderSheet, templateColumn, row))
 		if err != nil {
 			return nil, "", fmt.Errorf("failed to set cell formula. error: %w", err)
 		}
+
+		row++
 	}
 
 	fileName := fmt.Sprintf("Заявка %d", order.Number)
@@ -815,6 +1632,74 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 	}
 
 	return buffer, fileName, nil
+}
+func (s *OrderServiceNew) insertHeader(ctx context.Context, file *excelize.File, sheet string, columns []interface{}, col, row, style int) error {
+	// TODO
+
+	// получение координат ячейки
+	cell, err := excelize.CoordinatesToCellName(col, row)
+	if err != nil {
+		return fmt.Errorf("failed to get cell. error: %w", err)
+	}
+
+	// добавление заголовков таблицы
+	if err = file.SetSheetRow(sheet, cell, &columns); err != nil {
+		return fmt.Errorf("failed to create header table. error: %w", err)
+	}
+
+	// получение координат ячейки
+	endCell, err := excelize.CoordinatesToCellName(col+len(columns)-1, row)
+	if err != nil {
+		return fmt.Errorf("failed to get end cell. error: %w", err)
+	}
+
+	// добавление стилей для таблицы
+	err = file.SetCellStyle(sheet, cell, endCell, style)
+	if err != nil {
+		return fmt.Errorf("failed to set cell style. error: %w", err)
+	}
+
+	return nil
+}
+func (s *OrderServiceNew) insertData(ctx context.Context, file *excelize.File, sheet string, line []interface{}, col, row, style, titleStyle int) error {
+	// получение координат ячейки
+	cell, err := excelize.CoordinatesToCellName(col, row)
+	if err != nil {
+		return fmt.Errorf("failed to get cell. error: %w", err)
+	}
+
+	// добавление данных
+	if err = file.SetSheetRow(sheet, cell, &line); err != nil {
+		return fmt.Errorf("failed to create main line. error: %w", err)
+	}
+
+	if len(line) > 0 {
+		// получение координат ячейки
+		endCell, err := excelize.CoordinatesToCellName(col+len(line)-1, row)
+		if err != nil {
+			return fmt.Errorf("failed to get end cell. error: %w", err)
+		}
+
+		// добавление стилей
+		err = file.SetCellStyle(sheet, cell, endCell, style)
+		if err != nil {
+			return fmt.Errorf("failed to set cell style. error: %w", err)
+		}
+
+		// получение буквы ячейки
+		mainTitle, err := excelize.ColumnNumberToName(col + 1)
+		if err != nil {
+			return fmt.Errorf("failed to get column name. error: %w", err)
+		}
+
+		// добавление стилей для наименования
+		err = file.SetCellStyle(sheet, fmt.Sprintf("%s%d", mainTitle, row), fmt.Sprintf("%s%d", mainTitle, row), titleStyle)
+		if err != nil {
+			return fmt.Errorf("failed to set cell style. error: %w", err)
+		}
+	}
+
+	return nil
 }
 
 func (s *OrderServiceNew) GetAll(ctx context.Context, req *order_api.GetAllOrders) ([]*order_model.Order, error) {

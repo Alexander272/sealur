@@ -264,7 +264,11 @@ func (s *FlangeService) momentCalculate(
 		Pmax := DSigmaM * Ab
 		moment.Qmax = Pmax / (math.Pi * Dcp * data.Gasket.Width)
 
-		if data.TypeGasket == flange_model.GasketData_Soft && moment.Qmax > data.Gasket.PermissiblePres {
+		// if data.TypeGasket == flange_model.GasketData_Soft && moment.Qmax > data.Gasket.PermissiblePres {
+		// 	Pmax = float64(data.Gasket.PermissiblePres) * (math.Pi * Dcp * data.Gasket.Width)
+		// 	moment.Qmax = data.Gasket.PermissiblePres
+		// }
+		if moment.Qmax > data.Gasket.PermissiblePres {
 			Pmax = float64(data.Gasket.PermissiblePres) * (math.Pi * Dcp * data.Gasket.Width)
 			moment.Qmax = data.Gasket.PermissiblePres
 		}

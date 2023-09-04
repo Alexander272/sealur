@@ -22,14 +22,17 @@ type PositionServiceNew struct {
 	repo    repository.Position
 	snp     PositionSnp
 	putg    PositionPutg
+	ring    PositionRing
 	fileApi file_api.FileServiceClient
 }
 
-func NewPositionService_New(repo repository.Position, snp PositionSnp, putg PositionPutg, fileApi file_api.FileServiceClient) *PositionServiceNew {
+func NewPositionService_New(repo repository.Position, snp PositionSnp, putg PositionPutg, ring PositionRing, fileApi file_api.FileServiceClient,
+) *PositionServiceNew {
 	return &PositionServiceNew{
 		repo:    repo,
 		snp:     snp,
 		putg:    putg,
+		ring:    ring,
 		fileApi: fileApi,
 	}
 }
@@ -43,17 +46,23 @@ func (s *PositionServiceNew) Get(ctx context.Context, orderId string) (count *mo
 	if err != nil {
 		return nil, nil, err
 	}
+	ringPositions, err := s.ring.Get(ctx, orderId)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	// похоже тут надо сделать запрос в таблицу с позициями и соединить эти данные с теме что уже запрашиваются
-	// вместо это можно просто отсортировать массив по полю Count
+	//* вместо это можно просто отсортировать массив по полю Count
 
 	count = &models.PositionCount{
 		SnpCount:  len(snpPosition),
 		PutgCount: len(putgPosition),
+		RingCount: len(ringPositions),
 	}
 
 	positions = append(positions, snpPosition...)
 	positions = append(positions, putgPosition...)
+	positions = append(positions, ringPositions...)
 
 	sort.Slice(positions, func(i, j int) bool {
 		return positions[i].Count < positions[j].Count
@@ -86,6 +95,9 @@ func (s *PositionServiceNew) GetFull(ctx context.Context, orderId string) ([]*po
 	putgId := make([]string, 0, len(positions))
 	putgIndex := make(map[string]int, 0)
 
+	ringId := make([]string, 0, len(positions))
+	ringIndex := make(map[string]int, 0)
+
 	for i, p := range positions {
 		if p.TypeCode == position_model.PositionType_Snp {
 			snpId = append(snpId, p.Id)
@@ -94,6 +106,10 @@ func (s *PositionServiceNew) GetFull(ctx context.Context, orderId string) ([]*po
 		if p.TypeCode == position_model.PositionType_Putg {
 			putgId = append(putgId, p.Id)
 			putgIndex[p.Id] = i
+		}
+		if p.TypeCode == position_model.PositionType_Ring {
+			ringId = append(ringId, p.Id)
+			ringIndex[p.Id] = i
 		}
 	}
 
@@ -113,6 +129,15 @@ func (s *PositionServiceNew) GetFull(ctx context.Context, orderId string) ([]*po
 	for _, opp := range putgPositions {
 		index := putgIndex[opp.Main.PositionId]
 		positions[index].PutgData = opp
+	}
+
+	ringPosition, err := s.ring.GetFull(ctx, ringId)
+	if err != nil {
+		return nil, err
+	}
+	for _, opr := range ringPosition {
+		index := ringIndex[opr.PositionId]
+		positions[index].RingData = opr
 	}
 
 	return positions, nil
@@ -153,6 +178,12 @@ func (s *PositionServiceNew) Create(ctx context.Context, position *position_mode
 			return "", err
 		}
 	}
+	if position.Type == position_model.PositionType_Ring {
+		if err := s.ring.Create(ctx, position); err != nil {
+			return "", err
+		}
+	}
+
 	return id, nil
 }
 
@@ -192,6 +223,11 @@ func (s *PositionServiceNew) Update(ctx context.Context, position *position_mode
 	}
 	if position.Type == position_model.PositionType_Putg {
 		if err := s.putg.Update(ctx, position); err != nil {
+			return err
+		}
+	}
+	if position.Type == position_model.PositionType_Ring {
+		if err := s.ring.Update(ctx, position); err != nil {
 			return err
 		}
 	}
@@ -243,6 +279,12 @@ func (s *PositionServiceNew) Copy(ctx context.Context, position *position_api.Co
 			return "", err
 		}
 	}
+	if curPosition.Type == position_model.PositionType_Ring {
+		drawing, err = s.ring.Copy(ctx, id, position)
+		if err != nil {
+			return "", err
+		}
+	}
 
 	if drawing != "" {
 		parts := strings.Split(drawing, "/")
@@ -268,7 +310,7 @@ func (s *PositionServiceNew) Delete(ctx context.Context, positionId string) erro
 		return fmt.Errorf("failed to delete position. error: %w", err)
 	}
 
-	//? оно удаляется само (каскадом)
+	//? все удаляется само (каскадом)
 	// можно было бы тут получать чертеж, но оно ничего не удалит
 	if err := s.snp.Delete(ctx, positionId); err != nil {
 		return err

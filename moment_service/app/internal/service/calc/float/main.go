@@ -174,7 +174,11 @@ func (s *FloatService) CalculationFloat(ctx context.Context, data *calc_api.Floa
 		// Максимальное напряжение на прокладке
 		result.Calc.Qmax = Pmax / (math.Pi * d.Dcp * d.Gasket.Width)
 
-		if d.TypeGasket == "Soft" && result.Calc.Qmax > d.Gasket.PermissiblePres {
+		// if d.TypeGasket == "Soft" && result.Calc.Qmax > d.Gasket.PermissiblePres {
+		// 	Pmax = float64(d.Gasket.PermissiblePres) * (math.Pi * d.Dcp * d.Gasket.Width)
+		// 	result.Calc.Qmax = d.Gasket.PermissiblePres
+		// }
+		if result.Calc.Qmax > d.Gasket.PermissiblePres {
 			Pmax = float64(d.Gasket.PermissiblePres) * (math.Pi * d.Dcp * d.Gasket.Width)
 			result.Calc.Qmax = d.Gasket.PermissiblePres
 		}

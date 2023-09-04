@@ -175,7 +175,11 @@ func (s *CoolingService) CalcMoment(
 		Pmax := bolts.AllowableVoltage * forces.Area
 		moment.Qmax = Pmax / (2 * (aux.SizeLong + aux.SizeTrans) * data.Gasket.Width)
 
-		if data.TypeGasket == gas_cooling_model.GasketData_Soft && moment.Qmax > data.Gasket.PermissiblePres {
+		// if data.TypeGasket == gas_cooling_model.GasketData_Soft && moment.Qmax > data.Gasket.PermissiblePres {
+		// 	Pmax = data.Gasket.PermissiblePres * (2 * (aux.SizeLong + aux.SizeTrans) * data.Gasket.Width)
+		// 	moment.Qmax = data.Gasket.PermissiblePres
+		// }
+		if moment.Qmax > data.Gasket.PermissiblePres {
 			Pmax = data.Gasket.PermissiblePres * (2 * (aux.SizeLong + aux.SizeTrans) * data.Gasket.Width)
 			moment.Qmax = data.Gasket.PermissiblePres
 		}

@@ -19,6 +19,7 @@ type Position struct {
 type PositionCount struct {
 	SnpCount  int
 	PutgCount int
+	RingCount int
 }
 
 type SnpPosition struct {
@@ -100,4 +101,23 @@ type PutgPosition struct {
 	HasMounting  bool   `db:"has_mounting"`
 	MountingCode string `db:"mounting_code"`
 	Drawing      string `db:"drawing"`
+}
+
+type RingPosition struct {
+	Id     string `db:"id"`
+	Title  string `db:"title"`
+	Amount string `db:"amount"`
+	Type   string `db:"type"`
+	Count  int64  `db:"count"`
+	Info   string `db:"info"`
+
+	TypeCode             string `db:"type_code"`
+	DensityCode          string `db:"density_code"`
+	ConstructionCode     string `db:"construction_code"`
+	ConstructionBaseCode string `db:"construction_bc"`
+	Size                 string `db:"size"`
+	Thickness            string `db:"thickness"`
+	Material             string `db:"material"`
+	Modifying            string `db:"modifying"`
+	Drawing              string `db:"drawing"`
 }

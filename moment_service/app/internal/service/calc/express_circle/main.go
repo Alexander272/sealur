@@ -159,7 +159,11 @@ func (s *ExCircleService) CalculateExCircle(ctx context.Context, data *calc_api.
 		Pmax := Bolts.AllowableVoltage * ForcesInBolts.Area
 		Moment.Qmax = Pmax / (math.Pi * Deformation.Diameter * d.Gasket.Width)
 
-		if d.TypeGasket == express_circle_model.GasketData_Soft && Moment.Qmax > d.Gasket.PermissiblePres {
+		// if d.TypeGasket == express_circle_model.GasketData_Soft && Moment.Qmax > d.Gasket.PermissiblePres {
+		// 	Pmax = d.Gasket.PermissiblePres * (math.Pi * Deformation.Diameter * d.Gasket.Width)
+		// 	Moment.Qmax = d.Gasket.PermissiblePres
+		// }
+		if Moment.Qmax > d.Gasket.PermissiblePres {
 			Pmax = d.Gasket.PermissiblePres * (math.Pi * Deformation.Diameter * d.Gasket.Width)
 			Moment.Qmax = d.Gasket.PermissiblePres
 		}

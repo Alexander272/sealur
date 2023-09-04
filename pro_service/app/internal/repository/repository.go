@@ -362,6 +362,9 @@ type PositionPutg interface {
 	Copy(ctx context.Context, targetPositionId string, position *position_api.CopyPosition) (string, error)
 	Delete(ctx context.Context, positionId string) error
 }
+type PositionRing interface {
+	postgres.PositionRing
+}
 
 type Repositories struct {
 	PutgImage
@@ -410,6 +413,7 @@ type Repositories struct {
 	Position
 	PositionSnp
 	PositionPutg
+	PositionRing
 }
 
 func NewRepo(db *sqlx.DB) *Repositories {
@@ -459,5 +463,6 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		Position:     postgres.NewPositionRepo(db),
 		PositionSnp:  postgres.NewPositionSnpRepo(db),
 		PositionPutg: postgres.NewPositionPutgRepo(db),
+		PositionRing: postgres.NewPositionRingRepo(db),
 	}
 }

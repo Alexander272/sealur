@@ -45,6 +45,7 @@ func (r *PositionSnpRepo) Get(ctx context.Context, orderId string) (positions []
 
 	for _, fp := range data {
 		positions = append(positions, &position_model.FullPosition{
+			Id:     fp.Id,
 			Count:  fp.Count,
 			Title:  fp.Title,
 			Amount: fp.Amount,

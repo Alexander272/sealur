@@ -420,6 +420,7 @@ type Services struct {
 	Position
 	PositionSnp
 	PositionPutg
+	PositionRing
 	Zip
 }
 
@@ -473,7 +474,8 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 
 	positionSnp := NewPositionSnpService(repos.PositionSnp)
 	positionPutg := NewPositionPutgService(repos.PositionPutg)
-	position := NewPositionService_New(repos.Position, positionSnp, positionPutg, file)
+	positionRing := NewPositionRingService(repos.PositionRing)
+	position := NewPositionService_New(repos.Position, positionSnp, positionPutg, positionRing, file)
 	order := NewOrderService_New(repos.OrderNew, position, zip, user, file)
 
 	return &Services{

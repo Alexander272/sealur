@@ -137,7 +137,11 @@ func (s *ExRectService) CalculateExRect(ctx context.Context, data *calc_api.Expr
 		Pmax := Bolts.AllowableVoltage * ForcesInBolts.Area
 		Moment.Qmax = Pmax / (2 * (Auxiliary.SizeLong + Auxiliary.SizeTrans) * d.Gasket.Width)
 
-		if d.TypeGasket == express_rectangle_model.GasketData_Soft && Moment.Qmax > d.Gasket.PermissiblePres {
+		// if d.TypeGasket == express_rectangle_model.GasketData_Soft && Moment.Qmax > d.Gasket.PermissiblePres {
+		// 	Pmax = d.Gasket.PermissiblePres * (2 * (Auxiliary.SizeLong + Auxiliary.SizeTrans) * d.Gasket.Width)
+		// 	Moment.Qmax = d.Gasket.PermissiblePres
+		// }
+		if Moment.Qmax > d.Gasket.PermissiblePres {
 			Pmax = d.Gasket.PermissiblePres * (2 * (Auxiliary.SizeLong + Auxiliary.SizeTrans) * d.Gasket.Width)
 			Moment.Qmax = d.Gasket.PermissiblePres
 		}
