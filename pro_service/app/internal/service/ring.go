@@ -44,5 +44,11 @@ func (s *RingService) Get(ctx context.Context, req *ring_api.GetRings) (*ring_mo
 		return nil, err
 	}
 
-	return &ring_model.Ring{RingTypes: ringTypes, Constructions: constructions, Density: density}, nil
+	rings := &ring_model.Ring{
+		RingTypes:        ringTypes,
+		ConstructionsMap: constructions.Constructions,
+		DensityMap:       density.Density,
+	}
+
+	return rings, nil
 }

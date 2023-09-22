@@ -57,15 +57,16 @@ func (r *RingTypeRepo) GetAll(ctx context.Context, req *ring_type_api.GetRingTyp
 	return ringTypes, nil
 }
 
-// TODO добавить оставшиеся поля
 func (r *RingTypeRepo) Create(ctx context.Context, ring *ring_type_api.CreateRingType) error {
-	query := fmt.Sprintf(`INSERT INTO %s(id, code, title, description, has_rotary_plug, has_density, has_thickness, material_type, image)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+	query := fmt.Sprintf(`INSERT INTO %s(id, code, title, description, has_rotary_plug, has_density, has_thickness, material_type, image, designation)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
 		RingTypeTable,
 	)
 	id := uuid.New()
 
-	_, err := r.db.Exec(query, id, ring.Code, ring.Title, ring.Description, ring.HasRotaryPlug, ring.HasDensity, ring.HasThickness, ring.MaterialType, ring.Image)
+	_, err := r.db.Exec(query, id, ring.Code, ring.Title, ring.Description, ring.HasRotaryPlug, ring.HasDensity, ring.HasThickness, ring.MaterialType,
+		ring.Image, ring.Designation,
+	)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -73,13 +74,13 @@ func (r *RingTypeRepo) Create(ctx context.Context, ring *ring_type_api.CreateRin
 }
 
 func (r *RingTypeRepo) Update(ctx context.Context, ring *ring_type_api.UpdateRingType) error {
-	query := fmt.Sprintf(`UPDATE %s SET code=$1, title=$2, description=$3, has_rotary_plug=$4, has_density=$5, has_thickness=$6, material_type=$7, image=$8
-		WHERE id=$9`,
+	query := fmt.Sprintf(`UPDATE %s SET code=$1, title=$2, description=$3, has_rotary_plug=$4, has_density=$5, has_thickness=$6, material_type=$7, 
+		image=$8, designation=$9 WHERE id=$10`,
 		RingTypeTable,
 	)
 
 	_, err := r.db.Exec(query, ring.Code, ring.Title, ring.Description, ring.HasRotaryPlug, ring.HasDensity, ring.HasThickness, ring.MaterialType, ring.Image,
-		ring.Id,
+		ring.Designation, ring.Id,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)

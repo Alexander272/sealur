@@ -315,6 +315,12 @@ type RingModifying interface {
 type RingSize interface {
 	postgres.RingSize
 }
+type RingsKitType interface {
+	postgres.RingsKitType
+}
+type RingsKitConstruction interface {
+	postgres.RingsKitConstruction
+}
 
 type OrderNew interface {
 	Get(context.Context, *order_api.GetOrder) (*order_model.FullOrder, error)
@@ -409,6 +415,9 @@ type Repositories struct {
 	RingModifying
 	RingSize
 
+	RingsKitType
+	RingsKitConstruction
+
 	OrderNew
 	Position
 	PositionSnp
@@ -458,6 +467,9 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		RingMaterial:     postgres.NewRingMaterialRepo(db),
 		RingModifying:    postgres.NewRingModifyingRepo(db),
 		RingSize:         postgres.NewRingSizeRepo(db),
+
+		RingsKitType:         postgres.NewRingsKitTypeRepo(db),
+		RingsKitConstruction: postgres.NewRingsKitConstructionRepo(db),
 
 		OrderNew:     postgres.NewOrderRepo(db),
 		Position:     postgres.NewPositionRepo(db),
