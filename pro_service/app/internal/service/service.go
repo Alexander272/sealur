@@ -419,6 +419,7 @@ type Services struct {
 	RingsKit
 	RingsKitType
 	RingsKitConstruction
+	RingsKitSize
 
 	OrderNew
 	Position
@@ -476,6 +477,7 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 
 	kitConstruction := NewRingsKitConstructionService(repos.RingsKitConstruction)
 	kitTypes := NewRingsKitTypeService(repos.RingsKitType)
+	kitSize := NewRingsKitSizeService(repos.RingsKitSize)
 
 	ringsKit := NewRingsKitService(kitTypes, kitConstruction)
 
@@ -535,6 +537,7 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 
 		RingsKitType:         kitTypes,
 		RingsKitConstruction: kitConstruction,
+		RingsKitSize:         kitSize,
 		RingsKit:             ringsKit,
 
 		PositionSnp: positionSnp,

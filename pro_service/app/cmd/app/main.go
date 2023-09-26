@@ -40,6 +40,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/ring_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/rings_kit_api"
 	"github.com/Alexander272/sealur_proto/api/pro/rings_kit_construction_api"
+	"github.com/Alexander272/sealur_proto/api/pro/rings_kit_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/rings_kit_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
@@ -204,6 +205,7 @@ func main() {
 
 	rings_kit_construction_api.RegisterRingsKitConstructionServiceServer(server, handlers.RingsKitConstruction)
 	rings_kit_type_api.RegisterRingsKitTypeServiceServer(server, handlers.RingsKitType)
+	rings_kit_size_api.RegisterRingSizesKitServiceServer(server, handlers.RingsKitSize)
 	rings_kit_api.RegisterRingsKitServiceServer(server, handlers.RingsKit)
 
 	order_api.RegisterOrderServiceServer(server, handlers.Order)

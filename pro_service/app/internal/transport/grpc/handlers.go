@@ -31,6 +31,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/ring_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/rings_kit_api"
 	"github.com/Alexander272/sealur_proto/api/pro/rings_kit_construction_api"
+	"github.com/Alexander272/sealur_proto/api/pro/rings_kit_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/rings_kit_type_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
@@ -152,6 +153,9 @@ type RingsKitConstruction interface {
 type RingsKitType interface {
 	rings_kit_type_api.RingsKitTypeServiceServer
 }
+type RingsKitSize interface {
+	rings_kit_size_api.RingSizesKitServiceServer
+}
 type RingsKit interface {
 	rings_kit_api.RingsKitServiceServer
 }
@@ -205,6 +209,7 @@ type Handler struct {
 
 	RingsKitConstruction
 	RingsKitType
+	RingsKitSize
 	RingsKit
 
 	Order
@@ -254,6 +259,7 @@ func NewHandler(service *service.Services, conf config.ApiConfig) *Handler {
 
 		RingsKitConstruction: NewRingsKitConstructionHandlers(service.RingsKitConstruction),
 		RingsKitType:         NewRingsKitTypeHandlers(service.RingsKitType),
+		RingsKitSize:         NewRingsKitSizeHandlers(service.RingsKitSize),
 		RingsKit:             NewRingsKitHandlers(service.RingsKit),
 
 		Order:    NewOrderHandlers(service.OrderNew),

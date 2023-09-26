@@ -3,7 +3,7 @@ module github.com/Alexander272/sealur/pro_service
 go 1.20
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230922061711-d19c89a58207
+	github.com/Alexander272/sealur_proto/api v0.0.0-20230926054808-3fa990c021ca
 	github.com/google/uuid v1.3.1
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -25,7 +25,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
-	github.com/spf13/afero v1.9.5 // indirect
+	github.com/spf13/afero v1.10.0 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect

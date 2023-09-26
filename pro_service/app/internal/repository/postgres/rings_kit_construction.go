@@ -31,7 +31,7 @@ type RingsKitConstruction interface {
 func (r *RingsKitConstructionRepo) GetAll(ctx context.Context, req *rings_kit_construction_api.GetRingsKitConstructions,
 ) (*rings_kit_construction_model.RingsKitConstructionMap, error) {
 	var data []models.RingsKitConstruction
-	query := fmt.Sprintf(`SELECT id, type_id, code, title, image, same_rings, material_types, has_thickness, default_count, default_materials 
+	query := fmt.Sprintf(`SELECT id, type_id, code, title, image, same_rings, material_types, has_thickness, default_count, default_materials, enabled_materials 
 		FROM %s ORDER BY count`,
 		RingsKitConstructionTable,
 	)
@@ -53,6 +53,7 @@ func (r *RingsKitConstructionRepo) GetAll(ctx context.Context, req *rings_kit_co
 			HasThickness:     rd.HasThickness,
 			DefaultCount:     rd.DefaultCount,
 			DefaultMaterials: rd.DefaultMaterials,
+			EnabledMaterials: rd.EnabledMaterials,
 		}
 
 		if constructions[rd.TypeId] == nil {
@@ -65,6 +66,7 @@ func (r *RingsKitConstructionRepo) GetAll(ctx context.Context, req *rings_kit_co
 	return &rings_kit_construction_model.RingsKitConstructionMap{Constructions: constructions}, nil
 }
 
+// TODO добавить недостающие поля
 func (r *RingsKitConstructionRepo) Create(ctx context.Context, c *rings_kit_construction_api.CreateRingsKitConstruction) error {
 	query := fmt.Sprintf(`INSERT INTO %s(id, type_id, code, title, image, count, same_rings, material_types, has_thickness, default_count, default_materials)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,

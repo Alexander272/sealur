@@ -81,6 +81,7 @@ func (r *PositionRepo) GetByTitle(ctx context.Context, title, orderId string) (s
 	return data.Id, nil
 }
 
+// TODO добавить путг, кольца и комплекты
 func (r *PositionRepo) GetAnalytics(ctx context.Context, req *order_api.GetOrderAnalytics) (*order_api.Analytics, error) {
 	var data models.PositionAnalytics
 	query := fmt.Sprintf(`SELECT count(DISTINCT "%s".id) as order_count, COUNT(DISTINCT user_id) as user_count, SUM(amount::integer) as position_count, 

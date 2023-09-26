@@ -39,6 +39,7 @@ const (
 
 	RingsKitTypeTable         = "rings_kit_type"
 	RingsKitConstructionTable = "rings_kit_construction"
+	RingsKitSizeTable         = "rings_kit_size"
 
 	OrderTable                = "order"
 	PositionTable             = "position"

@@ -191,6 +191,7 @@ func (r *OrderRepo) GetAnalytics(ctx context.Context, req *order_api.GetOrderAna
 	// 	WHERE date>=$1 AND date<=$2 GROUP BY user_id, manager_id ORDER BY manager_id`,
 	// 	OrderTable, PositionTable, OrderTable,
 	// )
+	// TODO добавить кольца и комплекты
 	query := fmt.Sprintf(`SELECT distinct user_id, manager_id, COUNT(distinct number) as order_count, SUM(amount::integer) as position_count,
 		COALESCE(SUM(case when type = 'Snp' then amount::integer end),0) as position_snp_count,
 		COALESCE(SUM(case when type = 'Putg' then amount::integer end),0) as position_putg_count,
@@ -330,6 +331,7 @@ func (r *OrderRepo) GetOrdersCount(ctx context.Context, req *order_api.GetOrderC
 	// 	LEFT JOIN "%s" ON "%s".id=user_id WHERE "%s".date != '' GROUP BY user_id, name, company, inn ORDER BY count DESC`,
 	// 	OrderTable, UserTable, UserTable, OrderTable,
 	// )
+	// TODO добавить кольца и комплекты
 	query := fmt.Sprintf(`SELECT user_id, company, name, count(DISTINCT o.id) as order_count, 
 		count(DISTINCT case when type = 'Snp' then o.id end) as order_snp_count,
 		count(DISTINCT case when type = 'Putg' then o.id end) as order_putg_count,
@@ -341,6 +343,7 @@ func (r *OrderRepo) GetOrdersCount(ctx context.Context, req *order_api.GetOrderC
 		(SUM(amount::integer)/count(DISTINCT o.id))::real as average_position,
 		COALESCE((SUM(case when type = 'Snp' then amount::integer end)/count(DISTINCT case when type = 'Snp' then o.id end))::real,0) as average_snp_position,
 		COALESCE((SUM(case when type = 'Putg' then amount::integer end)/count(DISTINCT case when type = 'Putg' then o.id end))::real,0) as average_putg_position
+
 		FROM "%s" AS o
 		INNER JOIN "%s" ON order_id=o.id
 		INNER JOIN "%s" AS u ON user_id=u.id

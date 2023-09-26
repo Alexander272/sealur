@@ -18,6 +18,7 @@ import (
 	"github.com/Alexander272/sealur_proto/api/pro/ring_modifying_api"
 	"github.com/Alexander272/sealur_proto/api/pro/ring_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/rings_kit_api"
+	"github.com/Alexander272/sealur_proto/api/pro/rings_kit_size_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_data_api"
 	"github.com/Alexander272/sealur_proto/api/pro/snp_filler_api"
@@ -58,7 +59,8 @@ type Handler struct {
 	ringModifyingApi ring_modifying_api.RingModifyingServiceClient
 	ringSizeApi      ring_size_api.RingSizeServiceClient
 
-	ringsKitApi rings_kit_api.RingsKitServiceClient
+	ringsKitApi     rings_kit_api.RingsKitServiceClient
+	ringsKitSizeApi rings_kit_size_api.RingSizesKitServiceClient
 
 	userApi  user_api.UserServiceClient
 	emailApi email_api.EmailServiceClient
@@ -147,6 +149,7 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 	h.ringSizeApi = ring_size_api.NewRingSizeServiceClient(connect)
 
 	h.ringsKitApi = rings_kit_api.NewRingsKitServiceClient(connect)
+	h.ringsKitSizeApi = rings_kit_size_api.NewRingSizesKitServiceClient(connect)
 
 	pro := api.Group("/sealur-pro")
 	{
