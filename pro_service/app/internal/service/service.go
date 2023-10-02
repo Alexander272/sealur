@@ -423,9 +423,10 @@ type Services struct {
 
 	OrderNew
 	Position
-	PositionSnp
-	PositionPutg
-	PositionRing
+	// PositionSnp
+	// PositionPutg
+	// PositionRing
+	// PositionKit
 	Zip
 }
 
@@ -483,10 +484,13 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 
 	zip := NewZipService()
 
-	positionSnp := NewPositionSnpService(repos.PositionSnp)
-	positionPutg := NewPositionPutgService(repos.PositionPutg)
-	positionRing := NewPositionRingService(repos.PositionRing)
-	position := NewPositionService_New(repos.Position, positionSnp, positionPutg, positionRing, file)
+	positions := Positions{
+		snp:  NewPositionSnpService(repos.PositionSnp),
+		putg: NewPositionPutgService(repos.PositionPutg),
+		ring: NewPositionRingService(repos.PositionRing),
+		kit:  NewPositionKitService(repos.PositionKit),
+	}
+	position := NewPositionService_New(repos.Position, positions, file)
 	order := NewOrderService_New(repos.OrderNew, position, zip, user, file)
 
 	return &Services{
@@ -540,8 +544,8 @@ func NewServices(repos *repository.Repositories, email email_api.EmailServiceCli
 		RingsKitSize:         kitSize,
 		RingsKit:             ringsKit,
 
-		PositionSnp: positionSnp,
-		Position:    position,
-		OrderNew:    order,
+		// PositionSnp: positionSnp,
+		Position: position,
+		OrderNew: order,
 	}
 }

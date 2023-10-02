@@ -50,12 +50,13 @@ func (r *RingMaterialRepo) Get(ctx context.Context, req *ring_material_api.GetRi
 	return m, nil
 }
 
-// TODO добавить оставшиеся поля
 func (r *RingMaterialRepo) Create(ctx context.Context, m *ring_material_api.CreateRingMaterial) error {
-	query := fmt.Sprintf(`INSERT INTO %s(id, type, title, is_default, count) VALUES ($1, $2, $3, $4, $5)`, RingMaterialTable)
+	query := fmt.Sprintf(`INSERT INTO %s(id, type, title, description, designation, is_default, count) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+		RingMaterialTable,
+	)
 	id := uuid.New()
 
-	_, err := r.db.Exec(query, id, m.Type, m.Title, m.IsDefault, m.Count)
+	_, err := r.db.Exec(query, id, m.Type, m.Title, m.Description, m.Designation, m.IsDefault, m.Count)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -63,9 +64,9 @@ func (r *RingMaterialRepo) Create(ctx context.Context, m *ring_material_api.Crea
 }
 
 func (r *RingMaterialRepo) Update(ctx context.Context, m *ring_material_api.UpdateRingMaterial) error {
-	query := fmt.Sprintf(`UPDATE %s SET type=$1, title=$2, is_default=$3, count=$4 WHERE id=$5`, RingMaterialTable)
+	query := fmt.Sprintf(`UPDATE %s SET type=$1, title=$2, description=$3, designation=$4, is_default=$5, count=$6 WHERE id=$7`, RingMaterialTable)
 
-	_, err := r.db.Exec(query, m.Type, m.Title, m.IsDefault, m.Count, m.Id)
+	_, err := r.db.Exec(query, m.Type, m.Title, m.Description, m.Designation, m.IsDefault, m.Count, m.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

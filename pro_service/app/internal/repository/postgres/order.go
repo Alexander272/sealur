@@ -191,15 +191,29 @@ func (r *OrderRepo) GetAnalytics(ctx context.Context, req *order_api.GetOrderAna
 	// 	WHERE date>=$1 AND date<=$2 GROUP BY user_id, manager_id ORDER BY manager_id`,
 	// 	OrderTable, PositionTable, OrderTable,
 	// )
-	// TODO добавить кольца и комплекты
+
+	// ? Запрос с группировкой по менеджерам и названиям компаний (скорее всего надо добавить поле инн, тк названия могут одинаковые)
+	// SELECT distinct manager_id, COUNT(distinct number) as order_count, SUM(amount::integer) as position_count,
+	// 	COALESCE(SUM(case when type = 'Snp' then amount::integer end),0) as position_snp_count,
+	// 	COALESCE(SUM(case when type = 'Putg' then amount::integer end),0) as position_putg_count,
+	// 	COALESCE((SUM(case when type = 'Ring' then amount::integer end)),0) as position_ring_count,
+	// 	COALESCE((SUM(case when type = 'RingsKit' then amount::integer end)),0) as position_kit_count,
+	// 	(SELECT company FROM "user" as u WHERE u.id=user_id) as user_company,
+	// 	/*(SELECT inn FROM "user" as u WHERE u.id=user_id) as user_inn,*/
+	// 	(SELECT name FROM "user" as u WHERE u.id=o.manager_id) as manager
+	// 	FROM "order" as o INNER JOIN "position" ON order_id=o.id
+	// 	WHERE date>=$1 AND date<=$2 GROUP BY manager_id, user_company ORDER BY manager_id
+
 	query := fmt.Sprintf(`SELECT distinct user_id, manager_id, COUNT(distinct number) as order_count, SUM(amount::integer) as position_count,
 		COALESCE(SUM(case when type = 'Snp' then amount::integer end),0) as position_snp_count,
 		COALESCE(SUM(case when type = 'Putg' then amount::integer end),0) as position_putg_count,
-		(SELECT company FROM "%s" WHERE "%s".id=user_id) as user_company,
-		(SELECT name FROM "%s" WHERE "%s".id="%s".manager_id) as manager
-		FROM "%s" INNER JOIN "%s" ON order_id="%s".id
+		COALESCE((SUM(case when type = 'Ring' then amount::integer end)),0) as position_ring_count,
+		COALESCE((SUM(case when type = 'RingsKit' then amount::integer end)),0) as position_kit_count,
+		(SELECT company FROM "%s" AS u WHERE u.id=user_id) as user_company,
+		(SELECT name FROM "%s" AS u WHERE u.id=o.manager_id) as manager
+		FROM "%s" AS o INNER JOIN "%s" ON order_id=o.id
 		WHERE date>=$1 AND date<=$2 GROUP BY user_id, manager_id ORDER BY manager_id`,
-		UserTable, UserTable, UserTable, UserTable, OrderTable, OrderTable, PositionTable, OrderTable,
+		UserTable, UserTable, OrderTable, PositionTable,
 	)
 
 	if err := r.db.Select(&data, query, req.PeriodAt, req.PeriodEnd); err != nil {
@@ -208,10 +222,9 @@ func (r *OrderRepo) GetAnalytics(ctx context.Context, req *order_api.GetOrderAna
 
 	//? можно запихивать все id в map а потом передавать в user_api для получения пользователей
 	//? после пробегаться по массиву и подставлять данные в нужные места (не особо производительный вариант)
-	//* или по хрен сделать inner в таблицу с пользователями (не особо хорошая идея т.к. для пользователей создан отдельный сервис
+	//* или похрен сделать inner в таблицу с пользователями (не особо хорошая идея т.к. для пользователей создан отдельный сервис
 	//* и может быть будет отдельная бд)
 
-	// TODO
 	for i, oa := range data {
 		c := &analytic_model.Clients{
 			Id:                oa.UserId,
@@ -220,6 +233,8 @@ func (r *OrderRepo) GetAnalytics(ctx context.Context, req *order_api.GetOrderAna
 			PositionCount:     oa.PositionCount,
 			SnpPositionCount:  oa.PositionSnpCount,
 			PutgPositionCount: oa.PositionPutgCount,
+			RingPositionCount: oa.PositionRingCount,
+			KitPositionCount:  oa.PositionKitCount,
 		}
 
 		if i == 0 || orders[len(orders)-1].Id != oa.ManagerId {
@@ -331,7 +346,7 @@ func (r *OrderRepo) GetOrdersCount(ctx context.Context, req *order_api.GetOrderC
 	// 	LEFT JOIN "%s" ON "%s".id=user_id WHERE "%s".date != '' GROUP BY user_id, name, company, inn ORDER BY count DESC`,
 	// 	OrderTable, UserTable, UserTable, OrderTable,
 	// )
-	// TODO добавить кольца и комплекты
+
 	query := fmt.Sprintf(`SELECT user_id, company, name, count(DISTINCT o.id) as order_count, 
 		count(DISTINCT case when type = 'Snp' then o.id end) as order_snp_count,
 		count(DISTINCT case when type = 'Putg' then o.id end) as order_putg_count,
@@ -339,10 +354,14 @@ func (r *OrderRepo) GetOrdersCount(ctx context.Context, req *order_api.GetOrderC
 		SUM(amount::integer) as position_count,	
 		COALESCE(SUM(case when type = 'Snp' then amount::integer end),0) as position_snp_count,
 		COALESCE(SUM(case when type = 'Putg' then amount::integer end),0) as position_putg_count,
+		COALESCE(SUM(case when type = 'Ring' then amount::integer end),0) as position_ring_count,
+		COALESCE(SUM(case when type = 'RingsKit' then amount::integer end),0) as position_kit_count,
 		
 		(SUM(amount::integer)/count(DISTINCT o.id))::real as average_position,
 		COALESCE((SUM(case when type = 'Snp' then amount::integer end)/count(DISTINCT case when type = 'Snp' then o.id end))::real,0) as average_snp_position,
-		COALESCE((SUM(case when type = 'Putg' then amount::integer end)/count(DISTINCT case when type = 'Putg' then o.id end))::real,0) as average_putg_position
+		COALESCE((SUM(case when type = 'Putg' then amount::integer end)/count(DISTINCT case when type = 'Putg' then o.id end))::real,0) as average_putg_position,
+		COALESCE((SUM(case when type = 'Ring' then amount::integer end)/count(DISTINCT case when type = 'Ring' then o.id end))::real,0) as average_ring_position,
+		COALESCE((SUM(case when type = 'RingsKit' then amount::integer end)/count(DISTINCT case when type = 'RingsKit' then o.id end))::real,0) as average_kit_position
 
 		FROM "%s" AS o
 		INNER JOIN "%s" ON order_id=o.id
@@ -366,9 +385,13 @@ func (r *OrderRepo) GetOrdersCount(ctx context.Context, req *order_api.GetOrderC
 			PositionCount:       oc.PositionCount,
 			SnpPositionCount:    oc.PositionSnpCount,
 			PutgPositionCount:   oc.PositionPutgCount,
+			RingPositionCount:   oc.PositionRingCount,
+			KitPositionCount:    oc.PositionKitCount,
 			AveragePosition:     oc.AveragePosition,
 			AverageSnpPosition:  oc.AverageSnpPosition,
 			AveragePutgPosition: oc.AveragePutgPosition,
+			AverageRingPosition: oc.AverageRingPosition,
+			AverageKitPosition:  oc.AverageKitPosition,
 		})
 	}
 

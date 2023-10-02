@@ -60,6 +60,8 @@ github.com/Alexander272/sealur_proto/api v0.0.0-20230925113011-781600fa7a47 h1:Q
 github.com/Alexander272/sealur_proto/api v0.0.0-20230925113011-781600fa7a47/go.mod h1:WUcwst0qRA4Wgq9Pe8a6MH4fWZfK62ZtJMpI/yw72/M=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230926054808-3fa990c021ca h1:WOhxCFEqhATKX+R7EEw/lF/tn6Gsf5tR5OFon9AQLSg=
 github.com/Alexander272/sealur_proto/api v0.0.0-20230926054808-3fa990c021ca/go.mod h1:stg6Cg0S1tSkwz3zXq/7hGfX9plrgCDDAYrnl09JYw4=
+github.com/Alexander272/sealur_proto/api v0.0.0-20231002035543-b896aaa4dc96 h1:2IcP2QscJgiIQEvtsVDWUvCXNANcXiQL6zuWyN2c56Q=
+github.com/Alexander272/sealur_proto/api v0.0.0-20231002035543-b896aaa4dc96/go.mod h1:stg6Cg0S1tSkwz3zXq/7hGfX9plrgCDDAYrnl09JYw4=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=
@@ -140,6 +142,8 @@ github.com/go-playground/validator/v10 v10.15.3 h1:S+sSpunYjNPDuXkWbK+x+bA7iXiW2
 github.com/go-playground/validator/v10 v10.15.3/go.mod h1:9iXMNT7sEkjXb0I+enO7QXmzG6QCsPWY4zveKFVRSyU=
 github.com/go-playground/validator/v10 v10.15.4 h1:zMXza4EpOdooxPel5xDqXEdXG5r+WggpvnAKMsalBjs=
 github.com/go-playground/validator/v10 v10.15.4/go.mod h1:9iXMNT7sEkjXb0I+enO7QXmzG6QCsPWY4zveKFVRSyU=
+github.com/go-playground/validator/v10 v10.15.5 h1:LEBecTWb/1j5TNY1YYG2RcOUN3R7NLylN+x8TTueE24=
+github.com/go-playground/validator/v10 v10.15.5/go.mod h1:9iXMNT7sEkjXb0I+enO7QXmzG6QCsPWY4zveKFVRSyU=
 github.com/go-redis/redis/v8 v8.11.5 h1:AcZZR7igkdvfVmQTPnu9WE37LRrO/YrBH5zWyjDC0oI=
 github.com/go-redis/redis/v8 v8.11.5/go.mod h1:gREzHqY1hg6oD9ngVRbLStwAWKhA0FEgq8Jd4h5lpwo=
 github.com/goccy/go-json v0.10.2 h1:CrxCmQqYDkv1z7lO7Wbh2HN93uovUHgrECaO5ZrCXAU=

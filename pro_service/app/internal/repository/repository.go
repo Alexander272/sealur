@@ -374,6 +374,9 @@ type PositionPutg interface {
 type PositionRing interface {
 	postgres.PositionRing
 }
+type PositionKit interface {
+	postgres.PositionKit
+}
 
 type Repositories struct {
 	PutgImage
@@ -427,6 +430,7 @@ type Repositories struct {
 	PositionSnp
 	PositionPutg
 	PositionRing
+	PositionKit
 }
 
 func NewRepo(db *sqlx.DB) *Repositories {
@@ -481,5 +485,6 @@ func NewRepo(db *sqlx.DB) *Repositories {
 		PositionSnp:  postgres.NewPositionSnpRepo(db),
 		PositionPutg: postgres.NewPositionPutgRepo(db),
 		PositionRing: postgres.NewPositionRingRepo(db),
+		PositionKit:  postgres.NewPositionKitRepo(db),
 	}
 }

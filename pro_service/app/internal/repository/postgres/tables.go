@@ -52,6 +52,7 @@ const (
 	PositionMaterialPutgTable = "position_putg_material"
 	PositionDesignPutgTable   = "position_putg_design"
 	PositionRingTable         = "position_ring"
+	PositionRingsKitTable     = "position_rings_kit"
 
 	//? можно попробовать всю аналитику вынести в отдельный сервис или даже в представление
 	UserTable = "user"

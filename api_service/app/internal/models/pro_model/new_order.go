@@ -19,6 +19,7 @@ type Position struct {
 	SnpData  SnpData  `json:"snpData"`
 	PutgData PutgData `json:"putgData"`
 	RingData RingData `json:"ringData"`
+	KitData  KitData  `json:"kitData"`
 }
 
 func (p *Position) Parse() *position_model.FullPosition {
@@ -35,5 +36,6 @@ func (p *Position) Parse() *position_model.FullPosition {
 		SnpData:  p.SnpData.Parse(),
 		PutgData: p.PutgData.Parse(),
 		RingData: p.RingData.Parse(),
+		KitData:  p.KitData.Parse(),
 	}
 }

@@ -12,7 +12,7 @@ type CopyOrder struct {
 
 type PositionDTO struct {
 	Designation string `json:"designation"`
-	Descriprion string `json:"description"`
+	Description string `json:"description"`
 	Count       string `json:"count"`
 	Sizes       string `json:"sizes"`
 	Drawing     string `json:"drawing"`
@@ -20,7 +20,7 @@ type PositionDTO struct {
 
 type CopyPosition struct {
 	Designation string `json:"designation"`
-	Descriprion string `json:"description"`
+	Description string `json:"description"`
 	Count       string `json:"count"`
 	Sizes       string `json:"sizes"`
 	Drawing     string `json:"drawing"`

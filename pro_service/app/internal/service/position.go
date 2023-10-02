@@ -18,21 +18,30 @@ import (
 	"github.com/google/uuid"
 )
 
+type Positions struct {
+	snp  PositionSnp
+	putg PositionPutg
+	ring PositionRing
+	kit  PositionKit
+}
+
 type PositionServiceNew struct {
 	repo    repository.Position
 	snp     PositionSnp
 	putg    PositionPutg
 	ring    PositionRing
+	kit     PositionKit
 	fileApi file_api.FileServiceClient
 }
 
-func NewPositionService_New(repo repository.Position, snp PositionSnp, putg PositionPutg, ring PositionRing, fileApi file_api.FileServiceClient,
+func NewPositionService_New(repo repository.Position, positions Positions, fileApi file_api.FileServiceClient,
 ) *PositionServiceNew {
 	return &PositionServiceNew{
 		repo:    repo,
-		snp:     snp,
-		putg:    putg,
-		ring:    ring,
+		snp:     positions.snp,
+		putg:    positions.putg,
+		ring:    positions.ring,
+		kit:     positions.kit,
 		fileApi: fileApi,
 	}
 }
@@ -50,19 +59,25 @@ func (s *PositionServiceNew) Get(ctx context.Context, orderId string) (count *mo
 	if err != nil {
 		return nil, nil, err
 	}
+	kitPositions, err := s.kit.Get(ctx, orderId)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	// похоже тут надо сделать запрос в таблицу с позициями и соединить эти данные с теме что уже запрашиваются
+	// похоже тут надо сделать запрос в таблицу с позициями и соединить эти данные с теми что уже запрашиваются
 	//* вместо это можно просто отсортировать массив по полю Count
 
 	count = &models.PositionCount{
 		SnpCount:  len(snpPosition),
 		PutgCount: len(putgPosition),
 		RingCount: len(ringPositions),
+		KitCount:  len(kitPositions),
 	}
 
 	positions = append(positions, snpPosition...)
 	positions = append(positions, putgPosition...)
 	positions = append(positions, ringPositions...)
+	positions = append(positions, kitPositions...)
 
 	sort.Slice(positions, func(i, j int) bool {
 		return positions[i].Count < positions[j].Count
@@ -98,6 +113,9 @@ func (s *PositionServiceNew) GetFull(ctx context.Context, orderId string) ([]*po
 	ringId := make([]string, 0, len(positions))
 	ringIndex := make(map[string]int, 0)
 
+	kitId := make([]string, 0, len(positions))
+	kitIndex := make(map[string]int, 0)
+
 	for i, p := range positions {
 		if p.TypeCode == position_model.PositionType_Snp {
 			snpId = append(snpId, p.Id)
@@ -110,6 +128,10 @@ func (s *PositionServiceNew) GetFull(ctx context.Context, orderId string) ([]*po
 		if p.TypeCode == position_model.PositionType_Ring {
 			ringId = append(ringId, p.Id)
 			ringIndex[p.Id] = i
+		}
+		if p.TypeCode == position_model.PositionType_RingsKit {
+			kitId = append(kitId, p.Id)
+			kitIndex[p.Id] = i
 		}
 	}
 
@@ -138,6 +160,15 @@ func (s *PositionServiceNew) GetFull(ctx context.Context, orderId string) ([]*po
 	for _, opr := range ringPosition {
 		index := ringIndex[opr.PositionId]
 		positions[index].RingData = opr
+	}
+
+	kitPosition, err := s.kit.GetFull(ctx, kitId)
+	if err != nil {
+		return nil, err
+	}
+	for _, opk := range kitPosition {
+		index := kitIndex[opk.PositionId]
+		positions[index].KitData = opk
 	}
 
 	return positions, nil
@@ -180,6 +211,11 @@ func (s *PositionServiceNew) Create(ctx context.Context, position *position_mode
 	}
 	if position.Type == position_model.PositionType_Ring {
 		if err := s.ring.Create(ctx, position); err != nil {
+			return "", err
+		}
+	}
+	if position.Type == position_model.PositionType_RingsKit {
+		if err := s.kit.Create(ctx, position); err != nil {
 			return "", err
 		}
 	}
@@ -231,6 +267,11 @@ func (s *PositionServiceNew) Update(ctx context.Context, position *position_mode
 			return err
 		}
 	}
+	if position.Type == position_model.PositionType_RingsKit {
+		if err := s.kit.Update(ctx, position); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -269,21 +310,27 @@ func (s *PositionServiceNew) Copy(ctx context.Context, position *position_api.Co
 	var drawing string
 	if curPosition.Type == position_model.PositionType_Snp {
 		drawing, err = s.snp.Copy(ctx, id, position)
-		if err != nil {
-			return "", err
-		}
+		// if err != nil {
+		// 	return "", err
+		// }
 	}
 	if curPosition.Type == position_model.PositionType_Putg {
 		drawing, err = s.putg.Copy(ctx, id, position)
-		if err != nil {
-			return "", err
-		}
+		// if err != nil {
+		// 	return "", err
+		// }
 	}
 	if curPosition.Type == position_model.PositionType_Ring {
 		drawing, err = s.ring.Copy(ctx, id, position)
-		if err != nil {
-			return "", err
-		}
+		// if err != nil {
+		// 	return "", err
+		// }
+	}
+	if curPosition.Type == position_model.PositionType_RingsKit {
+		drawing, err = s.kit.Copy(ctx, id, position)
+	}
+	if err != nil {
+		return "", err
 	}
 
 	if drawing != "" {

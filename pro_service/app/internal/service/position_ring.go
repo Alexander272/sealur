@@ -60,7 +60,7 @@ func (s *PositionRingService) Update(ctx context.Context, position *position_mod
 func (s *PositionRingService) Copy(ctx context.Context, targetId string, position *position_api.CopyPosition) (string, error) {
 	drawing, err := s.repo.Copy(ctx, targetId, position)
 	if err != nil {
-		return "", fmt.Errorf("failed to copy putg position. error: %w", err)
+		return "", fmt.Errorf("failed to copy ring position. error: %w", err)
 	}
 	return drawing, nil
 }

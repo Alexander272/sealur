@@ -127,10 +127,11 @@ func (h *Handler) InitRoutes(conf config.ServicesConfig, api *gin.RouterGroup) {
 		logger.Fatalf("failed connection to new pro service. error: %s", err.Error())
 	}
 
-	h.snpApi = snp_api.NewSnpDataServiceClient(connect)
-	h.snpStandardApi = snp_standard_api.NewSnpStandardServiceClient(connect)
 	h.orderApi = order_api.NewOrderServiceClient(connect)
 	h.positionApi = position_api.NewPositionServiceClient(connect)
+
+	h.snpApi = snp_api.NewSnpDataServiceClient(connect)
+	h.snpStandardApi = snp_standard_api.NewSnpStandardServiceClient(connect)
 	h.materialApi = material_api.NewMaterialServiceClient(connect)
 	h.snpMaterialApi = snp_material_api.NewSnpMaterialServiceClient(connect)
 	h.snpFillerApi = snp_filler_api.NewSnpFillerServiceClient(connect)

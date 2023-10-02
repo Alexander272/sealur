@@ -1,10 +1,13 @@
 package models
 
 type PositionAnalytics struct {
-	OrderCount       int64 `db:"order_count"`
-	UserCount        int64 `db:"user_count"`
-	PositionCount    int64 `db:"position_count"`
-	PositionSnpCount int64 `db:"position_snp_count"`
+	OrderCount        int64 `db:"order_count"`
+	UserCount         int64 `db:"user_count"`
+	PositionCount     int64 `db:"position_count"`
+	PositionSnpCount  int64 `db:"position_snp_count"`
+	PositionPutgCount int64 `db:"position_putg_count"`
+	PositionRingCount int64 `db:"position_ring_count"`
+	PositionKitCount  int64 `db:"position_kit_count"`
 }
 
 type Position struct {
@@ -20,6 +23,7 @@ type PositionCount struct {
 	SnpCount  int
 	PutgCount int
 	RingCount int
+	KitCount  int
 }
 
 type SnpPosition struct {
@@ -120,4 +124,22 @@ type RingPosition struct {
 	Material             string `db:"material"`
 	Modifying            string `db:"modifying"`
 	Drawing              string `db:"drawing"`
+}
+
+type KitPosition struct {
+	Id     string `db:"id"`
+	Title  string `db:"title"`
+	Amount string `db:"amount"`
+	Type   string `db:"type"`
+	Count  int64  `db:"count"`
+	Info   string `db:"info"`
+
+	TypeCode         string `db:"type_code"`
+	ConstructionCode string `db:"construction_code"`
+	RingsCount       string `db:"rings_count"`
+	Size             string `db:"size"`
+	Thickness        string `db:"thickness"`
+	Material         string `db:"material"`
+	Modifying        string `db:"modifying"`
+	Drawing          string `db:"drawing"`
 }

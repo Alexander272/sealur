@@ -41,6 +41,8 @@ type OrderAnalytics struct {
 	PositionCount     int64  `db:"position_count"`
 	PositionSnpCount  int64  `db:"position_snp_count"`
 	PositionPutgCount int64  `db:"position_putg_count"`
+	PositionRingCount int64  `db:"position_ring_count"`
+	PositionKitCount  int64  `db:"position_kit_count"`
 }
 
 type OrderCount struct {
@@ -55,9 +57,13 @@ type OrderCount struct {
 	PositionCount       int64  `db:"position_count"`
 	PositionSnpCount    int64  `db:"position_snp_count"`
 	PositionPutgCount   int64  `db:"position_putg_count"`
+	PositionRingCount   int64  `db:"position_ring_count"`
+	PositionKitCount    int64  `db:"position_kit_count"`
 	AveragePosition     int64  `db:"average_position"`
 	AverageSnpPosition  int64  `db:"average_snp_position"`
 	AveragePutgPosition int64  `db:"average_putg_position"`
+	AverageRingPosition int64  `db:"average_ring_position"`
+	AverageKitPosition  int64  `db:"average_kit_position"`
 }
 
 type FullOrderAnalytics struct {

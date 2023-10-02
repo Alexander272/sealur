@@ -313,7 +313,7 @@ func (h *Handler) getPosition(c *gin.Context) {
 // @Summary Get Cur Position
 // @Tags Sealur Pro -> orders
 // @Security ApiKeyAuth
-// @Description получение позиций к несохранненому заказу
+// @Description получение позиций к несохраненному заказу
 // @ModuleID getCurPosition
 // @Accept json
 // @Produce json
@@ -376,7 +376,7 @@ func (h *Handler) addPosition(c *gin.Context) {
 	positions, err := h.proClient.AddPosition(c, &pro_api.AddPositionRequest{
 		OrderId:     orderId,
 		Designation: dto.Designation,
-		Description: dto.Descriprion,
+		Description: dto.Description,
 		Count:       int32(count),
 		Sizes:       dto.Sizes,
 		Drawing:     dto.Drawing,
@@ -424,7 +424,7 @@ func (h *Handler) copyPosition(c *gin.Context) {
 	positions, err := h.proClient.CopyPosition(c, &pro_api.CopyPositionRequest{
 		OrderId:     orderId,
 		Designation: dto.Designation,
-		Description: dto.Descriprion,
+		Description: dto.Description,
 		Count:       int32(count),
 		Sizes:       dto.Sizes,
 		Drawing:     dto.Drawing,

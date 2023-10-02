@@ -34,7 +34,7 @@ require (
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.15.4 // indirect
+	github.com/go-playground/validator/v10 v10.15.5 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
@@ -63,7 +63,7 @@ require (
 )
 
 require (
-	github.com/Alexander272/sealur_proto/api v0.0.0-20230926054808-3fa990c021ca
+	github.com/Alexander272/sealur_proto/api v0.0.0-20231002035543-b896aaa4dc96
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/lib/pq v1.10.9
 	github.com/swaggo/swag v1.16.2

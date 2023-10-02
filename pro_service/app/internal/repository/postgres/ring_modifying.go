@@ -49,12 +49,11 @@ func (r *RingModifyingRepo) GetAll(ctx context.Context, req *ring_modifying_api.
 	return m, nil
 }
 
-// TODO добавить оставшиеся поля
 func (r *RingModifyingRepo) Create(ctx context.Context, m *ring_modifying_api.CreateRingModifying) error {
-	query := fmt.Sprintf(`INSERT INTO %s(id, code, description) VALUES ($1, $2, $3)`, RingModifyingTable)
+	query := fmt.Sprintf(`INSERT INTO %s(id, code, description, designation) VALUES ($1, $2, $3, $4)`, RingModifyingTable)
 	id := uuid.New()
 
-	_, err := r.db.Exec(query, id, m.Code, m.Description)
+	_, err := r.db.Exec(query, id, m.Code, m.Description, m.Designation)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
@@ -62,9 +61,9 @@ func (r *RingModifyingRepo) Create(ctx context.Context, m *ring_modifying_api.Cr
 }
 
 func (r *RingModifyingRepo) Update(ctx context.Context, m *ring_modifying_api.UpdateRingModifying) error {
-	query := fmt.Sprintf(`UPDATE %s SET code=$1, description=$2 WHERE id=$3`, RingModifyingTable)
+	query := fmt.Sprintf(`UPDATE %s SET code=$1, description=$2, designation=$3 WHERE id=$4`, RingModifyingTable)
 
-	_, err := r.db.Exec(query, m.Code, m.Description, m.Id)
+	_, err := r.db.Exec(query, m.Code, m.Description, m.Designation, m.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

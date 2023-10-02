@@ -81,13 +81,16 @@ func (r *PositionRepo) GetByTitle(ctx context.Context, title, orderId string) (s
 	return data.Id, nil
 }
 
-// TODO добавить путг, кольца и комплекты
 func (r *PositionRepo) GetAnalytics(ctx context.Context, req *order_api.GetOrderAnalytics) (*order_api.Analytics, error) {
 	var data models.PositionAnalytics
-	query := fmt.Sprintf(`SELECT count(DISTINCT "%s".id) as order_count, COUNT(DISTINCT user_id) as user_count, SUM(amount::integer) as position_count, 
-		SUM(case when type = 'Snp' then amount::integer end) as position_snp_count	FROM "%s" 
-		INNER JOIN "%s" ON order_id="%s".id WHERE date != ''`,
-		OrderTable, OrderTable, PositionTable, OrderTable,
+	query := fmt.Sprintf(`SELECT count(DISTINCT o.id) as order_count, COUNT(DISTINCT user_id) as user_count, SUM(amount::integer) as position_count, 
+		COALESCE(SUM(case when type = 'Snp' then amount::integer end),0) as position_snp_count,
+		COALESCE(SUM(case when type = 'Putg' then amount::integer end),0) as position_putg_count,
+		COALESCE(SUM(case when type = 'Ring' then amount::integer end),0) as position_ring_count,
+		COALESCE(SUM(case when type = 'RingsKit' then amount::integer end),0) as position_kit_count
+		FROM "%s" as o
+		INNER JOIN "%s" ON order_id=o.id WHERE date != ''`,
+		OrderTable, PositionTable,
 	)
 
 	if err := r.db.Get(&data, query); err != nil {
@@ -95,10 +98,13 @@ func (r *PositionRepo) GetAnalytics(ctx context.Context, req *order_api.GetOrder
 	}
 
 	analytic := &order_api.Analytics{
-		OrdersCount:      data.OrderCount,
-		UserCount:        data.UserCount,
-		PositionCount:    data.PositionCount,
-		SnpPositionCount: data.PositionSnpCount,
+		OrdersCount:       data.OrderCount,
+		UserCount:         data.UserCount,
+		PositionCount:     data.PositionCount,
+		SnpPositionCount:  data.PositionSnpCount,
+		PutgPositionCount: data.PositionPutgCount,
+		RingPositionCount: data.PositionRingCount,
+		KitPositionCount:  data.PositionKitCount,
 	}
 
 	return analytic, nil
