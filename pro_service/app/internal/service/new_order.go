@@ -870,6 +870,8 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 	}
 	ringCompositeColumns := []interface{}{"№", "Наименование", "Тип кольца"}
 
+	ringsKitColumns := []interface{}{"№", "Наименование", "Д нар.", "Д вн.", "Высота комплекта", "Чертеж", "Себестоимость", "Цена", "Шаблон"}
+
 	file := excelize.NewFile()
 	// сделать 2 лист, а первый переименовать в заявку
 	orderSheet := file.GetSheetName(file.GetActiveSheetIndex())
@@ -951,6 +953,8 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 	ringPuff := make([]string, 0, 16)
 	ringWicker := make([]string, 0, 16)
 	ringComposite := make([]string, 0, 16)
+
+	ringsKit := make([]string, 0, 16)
 
 	type Line struct {
 		Index       int
@@ -1152,11 +1156,30 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 				modifying = "0"
 			}
 
+			thickness, mod, density, construction := "", "", "", ""
+			if ring.Thickness != "" {
+				thickness = "х" + ring.Thickness
+			}
+			if ring.Modifying != "" {
+				mod = "-" + ring.Modifying
+			}
+			if ring.DensityCode != "" {
+				density = "-" + ring.DensityCode
+			}
+			if ring.ConstructionCode != "" {
+				construction = "-" + ring.ConstructionCode
+			}
+
+			designation := fmt.Sprintf("%sх%s%s %s%s%s-%s%s", parts[0], parts[1], thickness, ring.TypeCode, density, construction, ring.Material, mod)
+			if ring.Drawing != "" {
+				designation += " (черт.)"
+			}
+
 			if ring.TypeCode == "С" {
-				line = []interface{}{p.Count, p.Title, ring.TypeCode, parts[0], parts[1], ring.Thickness, modifying, drawing, 0, 0, ""}
+				line = []interface{}{p.Count, p.Title, ring.TypeCode, parts[0], parts[1], ring.Thickness, modifying, drawing, 0, 0, designation}
 				ringPuff = append(ringPuff, p.Id)
 			} else if ring.TypeCode == "П" {
-				line = []interface{}{p.Count, p.Title, ring.TypeCode, parts[0], parts[1], ring.Thickness, 1, ring.Material, drawing, 0, 0, ""}
+				line = []interface{}{p.Count, p.Title, ring.TypeCode, parts[0], parts[1], ring.Thickness, 1, ring.Material, drawing, 0, 0, designation}
 				ringWicker = append(ringWicker, p.Id)
 			} else if ring.TypeCode == "К" {
 				line = []interface{}{p.Count, p.Title, ring.TypeCode}
@@ -1168,11 +1191,43 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 				}
 				line = []interface{}{
 					p.Count, p.Title, ring.TypeCode, parts[0], parts[1], ring.Thickness, density, ring.ConstructionBaseCode, modifying,
-					drawing, 0, 0, "",
+					drawing, 0, 0, designation,
 				}
 				ringTwisted = append(ringTwisted, p.Id)
 			}
 
+			lines[p.Id] = Line{Index: i, Line: line}
+		}
+		if p.Type == position_model.PositionType_RingsKit {
+			kit := p.KitData
+
+			ringsKit = append(ringsKit, p.Id)
+
+			parts := strings.Split(kit.Size, "×")
+
+			drawing := ""
+			if kit.Drawing != "" {
+				drawing = "есть"
+				parts := strings.Split(kit.Drawing, "/")
+				drawings = append(drawings, fmt.Sprintf("%d_%s", p.Count, parts[len(parts)-1]))
+			}
+
+			thickness, modifying := "", ""
+			if kit.Thickness != "" {
+				thickness = "х" + kit.Thickness
+			}
+			if kit.Modifying != "" {
+				modifying = "-" + kit.Modifying
+			}
+
+			designation := fmt.Sprintf("%sх%s%s %s-%s-%s-%s%s", parts[0], parts[1], thickness, kit.Type, kit.ConstructionCode,
+				strings.ReplaceAll(kit.Count, "×", "*"), kit.Material, modifying,
+			)
+			if kit.Drawing != "" {
+				designation += " (черт.)"
+			}
+
+			line := []interface{}{p.Count, p.Title, parts[0], parts[1], kit.Thickness, drawing, 0, 0, designation}
 			lines[p.Id] = Line{Index: i, Line: line}
 		}
 	}
@@ -1481,6 +1536,45 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 		asideRow++
 	}
 
+	if len(ringsKit) > 0 {
+		// отступ
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		if err := s.insertData(ctx, file, orderSheet, []interface{}{}, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow += 2
+
+		// вставка заголовков для комплектов колец
+		if err := s.insertHeader(ctx, file, orderSheet, ringsKitColumns, asideCol, asideRow, headerStyle); err != nil {
+			return nil, "", err
+		}
+		asideRow++
+
+		template, err = excelize.ColumnNumberToName(asideCol + len(ringsKitColumns) - 1)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		price, err = excelize.ColumnNumberToName(asideCol + len(ringsKitColumns) - 2)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+		cost, err = excelize.ColumnNumberToName(asideCol + len(ringsKitColumns) - 3)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to get column name. error: %w", err)
+		}
+	}
+	// вставка данных комплектов колец
+	for _, v := range ringsKit {
+		l := lines[v]
+		if err := s.insertData(ctx, file, orderSheet, l.Line, asideCol, asideRow, cellStyle, titleStyle); err != nil {
+			return nil, "", err
+		}
+		lines[v] = Line{Index: l.Index, Row: asideRow, Line: l.Line, CostCol: cost, PriceCol: price, TemplateCol: template}
+		asideRow++
+	}
+
 	// добавление заголовков для таблицы
 	if err := s.insertHeader(ctx, file, orderSheet, mainColumns, col, row, headerStyle); err != nil {
 		return nil, "", err
@@ -1750,6 +1844,7 @@ func (s *OrderServiceNew) GetAnalytics(ctx context.Context, req *order_api.GetOr
 		return nil, err
 	}
 
+	//TODO добавить путг и кольца
 	analytics := &order_api.Analytics{
 		OrdersCount:        a.OrdersCount,
 		UsersCountRegister: userAnalytics.UsersCountRegister,

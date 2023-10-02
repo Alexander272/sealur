@@ -33,8 +33,8 @@ type PositionKit interface {
 
 func (r *PositionKitRepo) Get(ctx context.Context, orderId string) (positions []*position_model.FullPosition, err error) {
 	var data []models.KitPosition
-	query := fmt.Sprintf(`SELECT p.id, title, amount, type, count, info,
-		type_code, construction_code, r.count as rings_count, size, thickness, material, modifying, drawing
+	query := fmt.Sprintf(`SELECT p.id, title, amount, type, p.count, info,
+		type_code, construction_code, r.count as rings_count, size, thickness, materials, modifying, drawing
 		FROM %s AS p LEFT JOIN %s as r ON p.id=position_id
 		WHERE order_id=$1 AND type=$2 ORDER BY count`,
 		PositionTable, PositionRingsKitTable,
@@ -51,7 +51,7 @@ func (r *PositionKitRepo) Get(ctx context.Context, orderId string) (positions []
 			Title:  rp.Title,
 			Amount: rp.Amount,
 			Info:   rp.Info,
-			Type:   position_model.PositionType_Ring,
+			Type:   position_model.PositionType_RingsKit,
 			KitData: &position_model.PositionRingsKit{
 				Type:             rp.TypeCode,
 				ConstructionCode: rp.ConstructionCode,

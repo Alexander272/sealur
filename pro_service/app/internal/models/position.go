@@ -139,7 +139,7 @@ type KitPosition struct {
 	RingsCount       string `db:"rings_count"`
 	Size             string `db:"size"`
 	Thickness        string `db:"thickness"`
-	Material         string `db:"material"`
+	Material         string `db:"materials"`
 	Modifying        string `db:"modifying"`
 	Drawing          string `db:"drawing"`
 }

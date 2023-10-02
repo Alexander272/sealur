@@ -52,7 +52,7 @@ services:
 
     pro_service:
         restart: on-failure:5
-        image: sealur/pro_service:1.6.14d
+        image: sealur/pro_service:1.6.15d
         container_name: dev-pro_service
         env_file:
             - .env
