@@ -150,16 +150,20 @@ func (r *UserRepo) GetManagers(ctx context.Context, req *user_api.GetNewUser) (u
 
 func (r *UserRepo) GetAnalytics(ctx context.Context, req *user_api.GetUserAnalytics) (*user_api.Analytics, error) {
 	var data models.Analytics
-	query := fmt.Sprintf(`SELECT COUNT(CASE WHEN is_inner=false THEN is_inner END) as user_count, 
-		COUNT(CASE WHEN use_link=true AND is_inner=false THEN use_link END) as link_count FROM "%s"`, UserTable,
+	query := fmt.Sprintf(`SELECT COUNT(distinct CASE WHEN is_inner=false THEN inn END) as company_count,
+		COUNT(CASE WHEN is_inner=false THEN is_inner END) as user_count, 
+		COUNT(CASE WHEN use_link=true AND is_inner=false THEN use_link END) as link_count FROM "%s"`,
+		UserTable,
 	)
 
 	if err := r.db.Get(&data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
-	query = fmt.Sprintf(`SELECT COUNT(id) as register_count, COUNT(case when use_link=true AND is_inner=false then use_link end) as register_link_count
-		FROM "%s" WHERE is_inner=false AND date>=$1 AND date<=$2`, UserTable,
+	query = fmt.Sprintf(`SELECT COUNT(distinct CASE WHEN is_inner=false THEN inn END) as new_company_count,
+		COUNT(id) as register_count, COUNT(case when use_link=true AND is_inner=false then use_link end) as register_link_count
+		FROM "%s" WHERE is_inner=false AND date>=$1 AND date<=$2`,
+		UserTable,
 	)
 
 	if err := r.db.Get(&data, query, req.PeriodAt, req.PeriodEnd); err != nil {
@@ -167,8 +171,10 @@ func (r *UserRepo) GetAnalytics(ctx context.Context, req *user_api.GetUserAnalyt
 	}
 
 	analytics := &user_api.Analytics{
+		CompanyCount:       data.CompanyCount,
 		UsersCountRegister: data.UserCount,
 		UserCountLink:      data.LinkCount,
+		NewCompanyCount:    data.NewCompanyCount,
 		NewUserCount:       data.RegisterCount,
 		NewUserCountLink:   data.RegisterLinkCount,
 	}

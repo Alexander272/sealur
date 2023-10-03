@@ -67,8 +67,10 @@ type Count struct {
 }
 
 type Analytics struct {
+	CompanyCount      int64 `db:"company_count"`
 	UserCount         int64 `db:"user_count"`
 	LinkCount         int64 `db:"link_count"`
+	NewCompanyCount   int64 `db:"new_company_count"`
 	RegisterCount     int64 `db:"register_count"`
 	RegisterLinkCount int64 `db:"register_link_count"`
 }

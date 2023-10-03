@@ -1728,8 +1728,6 @@ func (s *OrderServiceNew) GetFile(ctx context.Context, req *order_api.GetOrder) 
 	return buffer, fileName, nil
 }
 func (s *OrderServiceNew) insertHeader(ctx context.Context, file *excelize.File, sheet string, columns []interface{}, col, row, style int) error {
-	// TODO
-
 	// получение координат ячейки
 	cell, err := excelize.CoordinatesToCellName(col, row)
 	if err != nil {
@@ -1844,14 +1842,18 @@ func (s *OrderServiceNew) GetAnalytics(ctx context.Context, req *order_api.GetOr
 		return nil, err
 	}
 
-	//TODO добавить путг и кольца
 	analytics := &order_api.Analytics{
 		OrdersCount:        a.OrdersCount,
+		CompanyCount:       userAnalytics.CompanyCount,
 		UsersCountRegister: userAnalytics.UsersCountRegister,
 		UserCountLink:      userAnalytics.UserCountLink,
 		UserCount:          a.UserCount,
 		PositionCount:      a.PositionCount,
 		SnpPositionCount:   a.SnpPositionCount,
+		PutgPositionCount:  a.PutgPositionCount,
+		RingPositionCount:  a.RingPositionCount,
+		KitPositionCount:   a.KitPositionCount,
+		NewCompanyCount:    userAnalytics.NewCompanyCount,
 		NewUserCount:       userAnalytics.NewUserCount,
 		NewUserCountLink:   userAnalytics.NewUserCountLink,
 		Orders:             data,

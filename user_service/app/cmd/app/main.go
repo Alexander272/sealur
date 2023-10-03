@@ -99,12 +99,12 @@ func main() {
 
 	listener, err := net.Listen("tcp", ":"+conf.Http.Port)
 	if err != nil {
-		logger.Fatalf("failed to create grpc listener:", err)
+		logger.Fatalf("failed to create grpc listener: %s", err.Error())
 	}
 
 	go func() {
 		if err = server.Serve(listener); err != nil {
-			logger.Fatalf("failed to start server:", err)
+			logger.Fatalf("failed to start server: %s", err.Error())
 		}
 	}()
 	logger.Infof("Application started on port: %s", conf.Http.Port)

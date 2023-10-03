@@ -62,6 +62,10 @@ github.com/Alexander272/sealur_proto/api v0.0.0-20230926054808-3fa990c021ca h1:W
 github.com/Alexander272/sealur_proto/api v0.0.0-20230926054808-3fa990c021ca/go.mod h1:stg6Cg0S1tSkwz3zXq/7hGfX9plrgCDDAYrnl09JYw4=
 github.com/Alexander272/sealur_proto/api v0.0.0-20231002035543-b896aaa4dc96 h1:2IcP2QscJgiIQEvtsVDWUvCXNANcXiQL6zuWyN2c56Q=
 github.com/Alexander272/sealur_proto/api v0.0.0-20231002035543-b896aaa4dc96/go.mod h1:stg6Cg0S1tSkwz3zXq/7hGfX9plrgCDDAYrnl09JYw4=
+github.com/Alexander272/sealur_proto/api v0.0.0-20231002111125-a8c8f2fb78ef h1:IQp7lDWakA0w/POaZjvIaET7rHFr/LHVeaXXEZeQipk=
+github.com/Alexander272/sealur_proto/api v0.0.0-20231002111125-a8c8f2fb78ef/go.mod h1:stg6Cg0S1tSkwz3zXq/7hGfX9plrgCDDAYrnl09JYw4=
+github.com/Alexander272/sealur_proto/api v0.0.0-20231003045501-827506bcbc5c h1:4XtKoxq36IlChGxbWZDVfu0AhW4WtBQPDTeOZsRKZ9Y=
+github.com/Alexander272/sealur_proto/api v0.0.0-20231003045501-827506bcbc5c/go.mod h1:stg6Cg0S1tSkwz3zXq/7hGfX9plrgCDDAYrnl09JYw4=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=
@@ -670,6 +674,8 @@ google.golang.org/genproto/googleapis/rpc v0.0.0-20230913181813-007df8e322eb h1:
 google.golang.org/genproto/googleapis/rpc v0.0.0-20230913181813-007df8e322eb/go.mod h1:+Bk1OCOj40wS2hwAMA+aCW9ypzm63QTBBHp6lQ3p+9M=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20230920204549-e6e6cdab5c13 h1:N3bU/SQDCDyD6R528GJ/PwW9KjYcJA3dgyH+MovAkIM=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20230920204549-e6e6cdab5c13/go.mod h1:KSqppvjFjtoCI+KGd4PELB0qLNxdJHRGqRI09mB6pQA=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20231002182017-d307bd883b97 h1:6GQBEOdGkX6MMTLT9V+TjtIRZCw9VPD5Z+yHY9wMgS0=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20231002182017-d307bd883b97/go.mod h1:v7nGkzlmW8P3n/bKmWBn2WpBjpOEx8Q6gMueudAmKfY=
 google.golang.org/grpc v1.19.0/go.mod h1:mqu4LbDTu4XGKhr4mRzUsmM4RtVoemTSY81AxZiDr8c=
 google.golang.org/grpc v1.20.1/go.mod h1:10oTOabMzJvdu6/UiuZezV6QK5dSlG84ov/aaiqXj38=
 google.golang.org/grpc v1.21.1/go.mod h1:oYelfM1adQP15Ek0mdvEgi9Df8B9CZIaU1084ijfRaM=

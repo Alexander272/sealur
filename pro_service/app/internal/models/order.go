@@ -54,6 +54,8 @@ type OrderCount struct {
 	OrderCount          int64  `db:"order_count"`
 	SnpOrderCount       int64  `db:"order_snp_count"`
 	PutgOrderCount      int64  `db:"order_putg_count"`
+	RingOrderCount      int64  `db:"order_ring_count"`
+	KitOrderCount       int64  `db:"order_kit_count"`
 	PositionCount       int64  `db:"position_count"`
 	PositionSnpCount    int64  `db:"position_snp_count"`
 	PositionPutgCount   int64  `db:"position_putg_count"`

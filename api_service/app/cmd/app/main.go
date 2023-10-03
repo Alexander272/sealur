@@ -20,16 +20,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// @title Sealur
-// @version 0.14.0
-// @description API Service for Sealur
-
-// @host localhost:8080
-// @BasePath /api/v1
-
-// @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name Authorization
 func main() {
 	// if err := gotenv.Load("../../.env"); err != nil {
 	// 	logger.Fatalf("error loading env variables: %s", err.Error())

@@ -143,9 +143,9 @@ func (r *PositionKitRepo) Update(ctx context.Context, position *position_model.F
 
 func (r *PositionKitRepo) Copy(ctx context.Context, targetPositionId string, position *position_api.CopyPosition) (string, error) {
 	query := fmt.Sprintf(`INSERT INTO %s (id, position_id, type_id, type_code, construction_id, construction_code, count, size, thickness, 
-		material, modifying, drawing) 
+		materials, modifying, drawing) 
 		SELECT $1, $2, type_id, type_code, construction_id, construction_code, count, size, thickness, 
-		material, modifying, replace(drawing, $3, $4) FROM %s WHERE position_id=$5  RETURNING drawing`,
+		materials, modifying, replace(drawing, $3, $4) FROM %s WHERE position_id=$5  RETURNING drawing`,
 		PositionRingsKitTable, PositionRingsKitTable,
 	)
 	id := uuid.New()

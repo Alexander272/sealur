@@ -7,9 +7,9 @@ type KitData struct {
 	Type         string          `json:"type"`
 	Construction KitConstruction `json:"construction"`
 	Count        string          `json:"count"`
-	Size         string          `json:"sizes"`
+	Size         string          `json:"size"`
 	Thickness    string          `json:"thickness"`
-	Material     string          `json:"materials"`
+	Material     string          `json:"material"`
 	Modifying    string          `json:"modifying"`
 	Drawing      string          `json:"drawing"`
 }

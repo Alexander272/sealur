@@ -350,6 +350,8 @@ func (r *OrderRepo) GetOrdersCount(ctx context.Context, req *order_api.GetOrderC
 	query := fmt.Sprintf(`SELECT user_id, company, name, count(DISTINCT o.id) as order_count, 
 		count(DISTINCT case when type = 'Snp' then o.id end) as order_snp_count,
 		count(DISTINCT case when type = 'Putg' then o.id end) as order_putg_count,
+		count(DISTINCT case when type = 'Ring' then o.id end) as order_ring_count,
+		count(DISTINCT case when type = 'RingsKit' then o.id end) as order_kit_count,
 
 		SUM(amount::integer) as position_count,	
 		COALESCE(SUM(case when type = 'Snp' then amount::integer end),0) as position_snp_count,
@@ -382,6 +384,8 @@ func (r *OrderRepo) GetOrdersCount(ctx context.Context, req *order_api.GetOrderC
 			OrderCount:          oc.OrderCount,
 			SnpOrderCount:       oc.SnpOrderCount,
 			PutgOrderCount:      oc.PutgOrderCount,
+			RingOrderCount:      oc.RingOrderCount,
+			KitOrderCount:       oc.KitOrderCount,
 			PositionCount:       oc.PositionCount,
 			SnpPositionCount:    oc.PositionSnpCount,
 			PutgPositionCount:   oc.PositionPutgCount,
