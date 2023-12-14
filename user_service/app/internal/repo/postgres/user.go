@@ -150,9 +150,9 @@ func (r *UserRepo) GetManagers(ctx context.Context, req *user_api.GetNewUser) (u
 
 func (r *UserRepo) GetAnalytics(ctx context.Context, req *user_api.GetUserAnalytics) (*user_api.Analytics, error) {
 	var data models.Analytics
-	query := fmt.Sprintf(`SELECT COUNT(distinct CASE WHEN is_inner=false THEN inn END) as company_count,
-		COUNT(CASE WHEN is_inner=false THEN is_inner END) as user_count, 
-		COUNT(CASE WHEN use_link=true AND is_inner=false THEN use_link END) as link_count FROM "%s"`,
+	query := fmt.Sprintf(`SELECT COUNT(distinct CASE WHEN is_inner=false AND confirmed=true THEN inn END) as company_count,
+		COUNT(CASE WHEN is_inner=false AND confirmed=true THEN is_inner END) as user_count, 
+		COUNT(CASE WHEN use_link=true AND is_inner=false AND confirmed=true THEN use_link END) as link_count FROM "%s"`,
 		UserTable,
 	)
 
