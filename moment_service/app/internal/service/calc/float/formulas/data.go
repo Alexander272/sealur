@@ -11,12 +11,12 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/float_model"
 )
 
-func (s *FormulasService) getDataFormulas(data models.DataFloat, result calc_api.FloatResponse, formulas *float_model.Formulas) *float_model.Formulas {
-	fWidth := strings.ReplaceAll(strconv.FormatFloat(result.Flange.Width, 'G', 3, 64), "E", "*10^")
-	DIn := strings.ReplaceAll(strconv.FormatFloat(result.Flange.DIn, 'G', 3, 64), "E", "*10^")
-	gWidth := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.Width, 'G', 3, 64), "E", "*10^")
-	gDOut := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.DOut, 'G', 3, 64), "E", "*10^")
-	b0 := strings.ReplaceAll(strconv.FormatFloat(data.B0, 'G', 3, 64), "E", "*10^")
+func (s *FormulasService) getDataFormulas(data models.DataFloat, result *calc_api.FloatResponse, formulas *float_model.Formulas) *float_model.Formulas {
+	fWidth := strings.ReplaceAll(strconv.FormatFloat(result.Flange.Width, 'G', 5, 64), "E", "*10^")
+	DIn := strings.ReplaceAll(strconv.FormatFloat(result.Flange.DIn, 'G', 5, 64), "E", "*10^")
+	gWidth := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.Width, 'G', 5, 64), "E", "*10^")
+	gDOut := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.DOut, 'G', 5, 64), "E", "*10^")
+	b0 := strings.ReplaceAll(strconv.FormatFloat(data.B0, 'G', 5, 64), "E", "*10^")
 
 	if result.Data.HasThorn {
 		formulas.B0 = fmt.Sprintf("(%s + %s) / 2", fWidth, gWidth)

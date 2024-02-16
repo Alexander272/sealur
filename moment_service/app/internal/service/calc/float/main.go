@@ -11,8 +11,10 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
+	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/float_model"
+	"github.com/goccy/go-json"
 )
 
 type FloatService struct {
@@ -63,7 +65,7 @@ func (s *FloatService) CalculationFloat(ctx context.Context, data *calc_api.Floa
 		return nil, err
 	}
 
-	result := calc_api.FloatResponse{
+	result := &calc_api.FloatResponse{
 		Data:   s.data.FormatInitData(data),
 		Flange: d.Flange,
 		Cap:    d.Cap,
@@ -161,7 +163,9 @@ func (s *FloatService) CalculationFloat(ctx context.Context, data *calc_api.Floa
 		result.Calc.Friction = data.Friction
 
 		// Крутящий момент при затяжке болтов/шпилек со смазкой снижается на 25%
-		result.Calc.Mkp1 = 0.75 * result.Calc.Mkp
+		if data.Friction == constants.DefaultFriction {
+			result.Calc.Mkp1 = 0.75 * result.Calc.Mkp
+		}
 
 		Prek := 0.8 * result.Calc.A * d.Bolt.SigmaAt20
 		// Напряжение на прокладке
@@ -174,14 +178,14 @@ func (s *FloatService) CalculationFloat(ctx context.Context, data *calc_api.Floa
 		// Максимальное напряжение на прокладке
 		result.Calc.Qmax = Pmax / (math.Pi * d.Dcp * d.Gasket.Width)
 
-		// if d.TypeGasket == "Soft" && result.Calc.Qmax > d.Gasket.PermissiblePres {
-		// 	Pmax = float64(d.Gasket.PermissiblePres) * (math.Pi * d.Dcp * d.Gasket.Width)
-		// 	result.Calc.Qmax = d.Gasket.PermissiblePres
-		// }
-		if result.Calc.Qmax > d.Gasket.PermissiblePres {
+		if d.TypeGasket == "Soft" && result.Calc.Qmax > d.Gasket.PermissiblePres {
 			Pmax = float64(d.Gasket.PermissiblePres) * (math.Pi * d.Dcp * d.Gasket.Width)
 			result.Calc.Qmax = d.Gasket.PermissiblePres
 		}
+		// if result.Calc.Qmax > d.Gasket.PermissiblePres {
+		// 	Pmax = float64(d.Gasket.PermissiblePres) * (math.Pi * d.Dcp * d.Gasket.Width)
+		// 	result.Calc.Qmax = d.Gasket.PermissiblePres
+		// }
 
 		if result.Calc.Mrek > result.Calc.Mmax {
 			result.Calc.Mrek = result.Calc.Mmax
@@ -205,5 +209,11 @@ func (s *FloatService) CalculationFloat(ctx context.Context, data *calc_api.Floa
 		)
 	}
 
-	return &result, nil
+	_, err = json.Marshal(result.Calc)
+	if err != nil {
+		result.Calc = &float_model.Calculated{}
+		logger.Error("failed to marshal json. error: " + err.Error())
+	}
+
+	return result, nil
 }

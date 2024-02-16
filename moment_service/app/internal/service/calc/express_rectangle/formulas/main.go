@@ -39,7 +39,7 @@ func NewFormulasService() *FormulasService {
 	}
 }
 
-func (s *FormulasService) GetFormulas(req calc_api.ExpressRectangleRequest, d models.DataExRect, result calc_api.ExpressRectangleResponse,
+func (s *FormulasService) GetFormulas(req *calc_api.ExpressRectangleRequest, d models.DataExRect, result *calc_api.ExpressRectangleResponse,
 ) *express_rectangle_model.Formulas {
 	formulas := &express_rectangle_model.Formulas{
 		Auxiliary:     s.getAuxiliaryFormulas(req, d, result),

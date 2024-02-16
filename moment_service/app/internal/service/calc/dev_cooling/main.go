@@ -11,8 +11,10 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
+	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/dev_cooling_model"
+	"github.com/goccy/go-json"
 )
 
 type CoolingService struct {
@@ -54,7 +56,7 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 		return nil, err
 	}
 
-	result := calc_api.DevCoolingResponse{
+	result := &calc_api.DevCoolingResponse{
 		Data:      s.data.FormatInitData(data),
 		Cap:       d.Cap,
 		TubeSheet: d.TubeSheet,
@@ -90,7 +92,7 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 	}
 
 	if result.Calc.Condition1.X > result.Calc.Condition1.Y || result.Calc.Condition2.X > result.Calc.Condition2.Y {
-		return &result, nil
+		return result, nil
 	}
 	result.Calc.IsConditionsMet = true
 
@@ -434,7 +436,9 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 		Moment.Friction = data.Friction
 
 		// Крутящий момент при затяжке болтов/шпилек со смазкой снижается на 25%
-		Moment.Mkp1 = 0.75 * Moment.Mkp
+		if data.Friction == constants.DefaultFriction {
+			Moment.Mkp1 = 0.75 * Moment.Mkp
+		}
 
 		Prek := 0.8 * Ab * d.Bolt.SigmaAt20
 		// Напряжение на прокладке
@@ -446,14 +450,15 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 		Pmax := Bolt.WorkCond.Y * Ab
 		// Максимальное напряжение на прокладке
 		Moment.Qmax = Pmax / (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
+
+		if d.TypeGasket == dev_cooling_model.GasketData_Oval && Moment.Qmax > d.Gasket.PermissiblePres {
+			Pmax = d.Gasket.PermissiblePres * (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
+			Moment.Qmax = d.Gasket.PermissiblePres
+		}
 		// if Moment.Qmax > d.Gasket.PermissiblePres {
 		// 	Pmax = d.Gasket.PermissiblePres * (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
 		// 	Moment.Qmax = d.Gasket.PermissiblePres
 		// }
-		if Moment.Qmax > d.Gasket.PermissiblePres {
-			Pmax = d.Gasket.PermissiblePres * (2 * (Bolt.Lp + Auxiliary.Bp) * d.Gasket.Width)
-			Moment.Qmax = d.Gasket.PermissiblePres
-		}
 
 		// Максимальный крутящий момент при затяжке болтов/шпилек
 		Moment.Mmax = (data.Friction * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
@@ -476,11 +481,26 @@ func (s *CoolingService) CalculateDevCooling(ctx context.Context, data *calc_api
 	if data.IsNeedFormulas {
 		result.Formulas = s.formulas.GetFormulas(
 			Ab, Lambda1, Lambda2, Alpha1, Alpha2,
-			*data,
+			data,
 			d,
 			result,
 		)
 	}
 
-	return &result, nil
+	_, err = json.Marshal(result.Calc)
+	if err != nil {
+		result.Calc = &dev_cooling_model.Calculated{
+			Condition1: &dev_cooling_model.Condition{},
+			Condition2: &dev_cooling_model.Condition{},
+			Auxiliary:  &dev_cooling_model.CalcAuxiliary{},
+			Bolt:       &dev_cooling_model.CalcBolt{},
+			GasketCond: &dev_cooling_model.Condition{},
+			TubeSheet:  &dev_cooling_model.CalcTubeSheet{},
+			Cap:        &dev_cooling_model.CalcCap{},
+			Moment:     &dev_cooling_model.CalcMoment{},
+		}
+		logger.Error("failed to marshal json. error: " + err.Error())
+	}
+
+	return result, nil
 }

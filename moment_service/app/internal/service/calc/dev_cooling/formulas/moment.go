@@ -12,32 +12,32 @@ import (
 )
 
 func (s *FormulasService) getMomentFormulas(
-	data calc_api.DevCoolingRequest,
+	data *calc_api.DevCoolingRequest,
 	d models.DataDevCooling,
-	result calc_api.DevCoolingResponse,
+	result *calc_api.DevCoolingResponse,
 ) *dev_cooling_model.MomentFormulas {
 	Moment := &dev_cooling_model.MomentFormulas{}
 
 	Ab := d.Bolt.Area * float64(d.Bolt.Count)
 
 	// перевод чисел в строки
-	friction := strconv.FormatFloat(data.Friction, 'G', 3, 64)
-	sAb := strings.ReplaceAll(strconv.FormatFloat(Ab, 'G', 3, 64), "E", "*10^")
+	friction := strconv.FormatFloat(data.Friction, 'G', 5, 64)
+	sAb := strings.ReplaceAll(strconv.FormatFloat(Ab, 'G', 5, 64), "E", "*10^")
 
-	diameter := strconv.FormatFloat(d.Bolt.Diameter, 'G', 3, 64)
-	sigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 3, 64)
+	diameter := strconv.FormatFloat(d.Bolt.Diameter, 'G', 5, 64)
+	sigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 5, 64)
 	count := d.Bolt.Count
 
-	gWidth := strconv.FormatFloat(d.Gasket.Width, 'G', 3, 64)
-	permissiblePres := strconv.FormatFloat(d.Gasket.PermissiblePres, 'G', 3, 64)
+	gWidth := strconv.FormatFloat(d.Gasket.Width, 'G', 5, 64)
+	permissiblePres := strconv.FormatFloat(d.Gasket.PermissiblePres, 'G', 5, 64)
 
-	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 3, 64), "E", "*10^")
+	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 5, 64), "E", "*10^")
 
-	Lp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Lp, 'G', 3, 64), "E", "*10^")
-	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Effort, 'G', 3, 64), "E", "*10^")
-	WorkCondY := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.WorkCond.Y, 'G', 3, 64), "E", "*10^")
+	Lp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Lp, 'G', 5, 64), "E", "*10^")
+	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Effort, 'G', 5, 64), "E", "*10^")
+	WorkCondY := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.WorkCond.Y, 'G', 5, 64), "E", "*10^")
 
-	Mkp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Moment.Mkp, 'G', 3, 64), "E", "*10^")
+	Mkp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Moment.Mkp, 'G', 5, 64), "E", "*10^")
 
 	if !(result.Calc.Bolt.WorkCond.X > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter) {
 		Moment.Mkp = fmt.Sprintf("(%s * %s * %s / %d) / 1000", friction, Effort, diameter, count)

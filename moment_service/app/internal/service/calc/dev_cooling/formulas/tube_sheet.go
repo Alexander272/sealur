@@ -11,45 +11,45 @@ import (
 )
 
 func (s *FormulasService) getTubeSheetFormulas(
-	data calc_api.DevCoolingRequest,
+	data *calc_api.DevCoolingRequest,
 	d models.DataDevCooling,
-	result calc_api.DevCoolingResponse,
+	result *calc_api.DevCoolingResponse,
 ) *dev_cooling_model.TubeSheetFormulas {
 	TubeSheet := &dev_cooling_model.TubeSheetFormulas{}
 
 	// перевод чисел в строки
-	pressure := strconv.FormatFloat(data.Pressure, 'G', 3, 64)
+	pressure := strconv.FormatFloat(data.Pressure, 'G', 5, 64)
 
-	tLength := strconv.FormatFloat(d.Tube.Length, 'G', 3, 64)
+	tLength := strconv.FormatFloat(d.Tube.Length, 'G', 5, 64)
 
-	zoneThick := strconv.FormatFloat(d.TubeSheet.ZoneThick, 'G', 3, 64)
-	tsSigma := strconv.FormatFloat(d.TubeSheet.Sigma, 'G', 3, 64)
-	corrosion := strconv.FormatFloat(d.TubeSheet.Corrosion, 'G', 3, 64)
+	zoneThick := strconv.FormatFloat(d.TubeSheet.ZoneThick, 'G', 5, 64)
+	tsSigma := strconv.FormatFloat(d.TubeSheet.Sigma, 'G', 5, 64)
+	corrosion := strconv.FormatFloat(d.TubeSheet.Corrosion, 'G', 5, 64)
 
-	CPressure := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Pressure, 'G', 3, 64), "E", "*10^")
+	CPressure := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Pressure, 'G', 5, 64), "E", "*10^")
 
-	RelativeWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.RelativeWidth, 'G', 3, 64), "E", "*10^")
-	EstimatedZoneWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedZoneWidth, 'G', 3, 64), "E", "*10^")
-	Upsilon := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Upsilon, 'G', 3, 64), "E", "*10^")
-	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 3, 64), "E", "*10^")
-	Arm1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Arm1, 'G', 3, 64), "E", "*10^")
-	Arm2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Arm2, 'G', 3, 64), "E", "*10^")
-	LoadTube := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.LoadTube, 'G', 3, 64), "E", "*10^")
-	PhiT := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.PhiT, 'G', 3, 64), "E", "*10^")
-	Phi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Phi, 'G', 3, 64), "E", "*10^")
+	RelativeWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.RelativeWidth, 'G', 5, 64), "E", "*10^")
+	EstimatedZoneWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedZoneWidth, 'G', 5, 64), "E", "*10^")
+	Upsilon := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Upsilon, 'G', 5, 64), "E", "*10^")
+	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 5, 64), "E", "*10^")
+	Arm1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Arm1, 'G', 5, 64), "E", "*10^")
+	Arm2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Arm2, 'G', 5, 64), "E", "*10^")
+	LoadTube := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.LoadTube, 'G', 5, 64), "E", "*10^")
+	PhiT := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.PhiT, 'G', 5, 64), "E", "*10^")
+	Phi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Phi, 'G', 5, 64), "E", "*10^")
 
-	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.WorkEffort, 'G', 3, 64), "E", "*10^")
-	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Effort, 'G', 3, 64), "E", "*10^")
-	Eta := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Eta, 'G', 3, 64), "E", "*10^")
-	Lp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Lp, 'G', 3, 64), "E", "*10^")
+	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.WorkEffort, 'G', 5, 64), "E", "*10^")
+	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Effort, 'G', 5, 64), "E", "*10^")
+	Eta := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Eta, 'G', 5, 64), "E", "*10^")
+	Lp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Lp, 'G', 5, 64), "E", "*10^")
 
-	OmegaP := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.OmegaP, 'G', 3, 64), "E", "*10^")
-	Psi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Psi, 'G', 3, 64), "E", "*10^")
-	Lambda := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Lambda, 'G', 3, 64), "E", "*10^")
-	TsEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Effort, 'G', 3, 64), "E", "*10^")
-	Omega := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Omega, 'G', 3, 64), "E", "*10^")
-	ZF := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.ZF, 'G', 3, 64), "E", "*10^")
-	ZM := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.ZM, 'G', 3, 64), "E", "*10^")
+	OmegaP := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.OmegaP, 'G', 5, 64), "E", "*10^")
+	Psi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Psi, 'G', 5, 64), "E", "*10^")
+	Lambda := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Lambda, 'G', 5, 64), "E", "*10^")
+	TsEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Effort, 'G', 5, 64), "E", "*10^")
+	Omega := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Omega, 'G', 5, 64), "E", "*10^")
+	ZF := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.ZF, 'G', 5, 64), "E", "*10^")
+	ZM := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.ZM, 'G', 5, 64), "E", "*10^")
 
 	//
 	TubeSheet.Psi = fmt.Sprintf("%s * (%s + 2)", RelativeWidth, RelativeWidth)

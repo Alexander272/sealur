@@ -28,9 +28,9 @@ func NewFormulasService() *FormulasService {
 
 func (s *FormulasService) GetFormulas(
 	Ab, Lambda1, Lambda2, Alpha1, Alpha2 float64,
-	req calc_api.DevCoolingRequest,
+	req *calc_api.DevCoolingRequest,
 	d models.DataDevCooling,
-	result calc_api.DevCoolingResponse,
+	result *calc_api.DevCoolingResponse,
 ) *dev_cooling_model.Formulas {
 	formulas := &dev_cooling_model.Formulas{
 		Auxiliary: s.getAuxiliaryFormulas(req, d, result),
@@ -41,32 +41,32 @@ func (s *FormulasService) GetFormulas(
 	}
 
 	// перевод чисел в строки
-	pressure := strconv.FormatFloat(req.Pressure, 'G', 3, 64)
+	pressure := strconv.FormatFloat(req.Pressure, 'G', 5, 64)
 
-	zoneThick := strconv.FormatFloat(d.TubeSheet.ZoneThick, 'G', 3, 64)
-	corrosion := strconv.FormatFloat(d.TubeSheet.Corrosion, 'G', 3, 64)
-	tsSigmaAt20 := strconv.FormatFloat(d.TubeSheet.SigmaAt20, 'G', 3, 64)
-	tsSigma := strconv.FormatFloat(d.TubeSheet.Sigma, 'G', 3, 64)
+	zoneThick := strconv.FormatFloat(d.TubeSheet.ZoneThick, 'G', 5, 64)
+	corrosion := strconv.FormatFloat(d.TubeSheet.Corrosion, 'G', 5, 64)
+	tsSigmaAt20 := strconv.FormatFloat(d.TubeSheet.SigmaAt20, 'G', 5, 64)
+	tsSigma := strconv.FormatFloat(d.TubeSheet.Sigma, 'G', 5, 64)
 
-	tSigmaAt20 := strconv.FormatFloat(d.Tube.SigmaAt20, 'G', 3, 64)
-	tSigma := strconv.FormatFloat(d.Tube.Sigma, 'G', 3, 64)
+	tSigmaAt20 := strconv.FormatFloat(d.Tube.SigmaAt20, 'G', 5, 64)
+	tSigma := strconv.FormatFloat(d.Tube.Sigma, 'G', 5, 64)
 
-	bottomThick := strconv.FormatFloat(d.Cap.BottomThick, 'G', 3, 64)
-	innerSize := strconv.FormatFloat(d.Cap.InnerSize, 'G', 3, 64)
-	capCorrosion := strconv.FormatFloat(d.Cap.Corrosion, 'G', 3, 64)
-	capSigmaAt20 := strconv.FormatFloat(d.Cap.SigmaAt20, 'G', 3, 64)
-	capSigma := strconv.FormatFloat(d.Cap.Sigma, 'G', 3, 64)
+	bottomThick := strconv.FormatFloat(d.Cap.BottomThick, 'G', 5, 64)
+	innerSize := strconv.FormatFloat(d.Cap.InnerSize, 'G', 5, 64)
+	capCorrosion := strconv.FormatFloat(d.Cap.Corrosion, 'G', 5, 64)
+	capSigmaAt20 := strconv.FormatFloat(d.Cap.SigmaAt20, 'G', 5, 64)
+	capSigma := strconv.FormatFloat(d.Cap.Sigma, 'G', 5, 64)
 
-	bSigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 3, 64)
-	bSigma := strconv.FormatFloat(d.Bolt.Sigma, 'G', 3, 64)
+	bSigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 5, 64)
+	bSigma := strconv.FormatFloat(d.Bolt.Sigma, 'G', 5, 64)
 
-	gWidth := strconv.FormatFloat(d.Gasket.Width, 'G', 3, 64)
+	gWidth := strconv.FormatFloat(d.Gasket.Width, 'G', 5, 64)
 
-	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 3, 64), "E", "*10^")
+	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 5, 64), "E", "*10^")
 
-	Lp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Lp, 'G', 3, 64), "E", "*10^")
-	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.WorkEffort, 'G', 3, 64), "E", "*10^")
-	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Effort, 'G', 3, 64), "E", "*10^")
+	Lp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Lp, 'G', 5, 64), "E", "*10^")
+	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.WorkEffort, 'G', 5, 64), "E", "*10^")
+	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Effort, 'G', 5, 64), "E", "*10^")
 
 	// Условия применения формул
 	formulas.Condition1 = fmt.Sprintf("(%s - %s) / %s", zoneThick, corrosion, Bp)

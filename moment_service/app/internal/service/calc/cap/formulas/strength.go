@@ -95,7 +95,7 @@ func (s *FormulasService) strengthFormulas(
 		result.Calc.Strength.Auxiliary.Flange,
 		result.Calc.Strength.StaticResistance2,
 		result.Calc.Strength.ConditionsForStrength2,
-		req.Data.IsWork, false,
+		req.Data.IsWork, true,
 	)
 
 	deformation := &cap_model.DeformationFormulas{
@@ -153,38 +153,38 @@ func (s *FormulasService) auxiliaryFormulas(data models.DataCap, req *calc_api.C
 	auxiliary := &cap_model.AuxiliaryFormulas{}
 
 	// перевод чисел в строки
-	width := strconv.FormatFloat(data.Gasket.Width, 'G', 3, 64)
-	thickness := strconv.FormatFloat(data.Gasket.Thickness, 'G', 3, 64)
-	dOut := strconv.FormatFloat(data.Gasket.DOut, 'G', 3, 64)
-	epsilon := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.Epsilon, 'G', 3, 64), "E", "*10^")
-	compression := strconv.FormatFloat(data.Gasket.Compression, 'G', 3, 64)
+	width := strconv.FormatFloat(data.Gasket.Width, 'G', 5, 64)
+	thickness := strconv.FormatFloat(data.Gasket.Thickness, 'G', 5, 64)
+	dOut := strconv.FormatFloat(data.Gasket.DOut, 'G', 5, 64)
+	epsilon := strings.ReplaceAll(strconv.FormatFloat(data.Gasket.Epsilon, 'G', 5, 64), "E", "*10^")
+	compression := strconv.FormatFloat(data.Gasket.Compression, 'G', 5, 64)
 
-	length := strconv.FormatFloat(data.Bolt.Length, 'G', 3, 64)
-	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 3, 64)
-	area := strconv.FormatFloat(data.Bolt.Area, 'G', 3, 64)
-	epsilonAt20 := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.EpsilonAt20, 'G', 3, 64), "E", "*10^")
-	bEpsilon := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Epsilon, 'G', 3, 64), "E", "*10^")
+	length := strconv.FormatFloat(data.Bolt.Length, 'G', 5, 64)
+	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 5, 64)
+	area := strconv.FormatFloat(data.Bolt.Area, 'G', 5, 64)
+	epsilonAt20 := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.EpsilonAt20, 'G', 5, 64), "E", "*10^")
+	bEpsilon := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Epsilon, 'G', 5, 64), "E", "*10^")
 	count := data.Bolt.Count
 
-	fEpAt201 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.EpsilonAt20, 'G', 3, 64), "E", "*10^")
-	fEpAt202 := strings.ReplaceAll(strconv.FormatFloat(data.Cap.EpsilonAt20, 'G', 3, 64), "E", "*10^")
-	fEp1 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Epsilon, 'G', 3, 64), "E", "*10^")
-	fEp2 := strings.ReplaceAll(strconv.FormatFloat(data.Cap.Epsilon, 'G', 3, 64), "E", "*10^")
+	fEpAt201 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.EpsilonAt20, 'G', 5, 64), "E", "*10^")
+	fEpAt202 := strings.ReplaceAll(strconv.FormatFloat(data.Cap.EpsilonAt20, 'G', 5, 64), "E", "*10^")
+	fEp1 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Epsilon, 'G', 5, 64), "E", "*10^")
+	fEp2 := strings.ReplaceAll(strconv.FormatFloat(data.Cap.Epsilon, 'G', 5, 64), "E", "*10^")
 
-	typeBolt := strconv.FormatFloat(s.typeBolt[req.Data.Type.String()], 'G', 3, 64)
+	typeBolt := strconv.FormatFloat(s.typeBolt[req.Data.Type.String()], 'G', 5, 64)
 
-	B0 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.B0, 'G', 3, 64), "E", "*10^")
-	Dcp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Dcp, 'G', 3, 64), "E", "*10^")
-	Lb := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Lb, 'G', 3, 64), "E", "*10^")
+	B0 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.B0, 'G', 5, 64), "E", "*10^")
+	Dcp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Dcp, 'G', 5, 64), "E", "*10^")
+	Lb := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Lb, 'G', 5, 64), "E", "*10^")
 
-	Yp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Yp, 'G', 3, 64), "E", "*10^")
-	Yb := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Yb, 'G', 3, 64), "E", "*10^")
-	Yf1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Flange.Yf, 'G', 3, 64), "E", "*10^")
-	Yk1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Flange.Yk, 'G', 3, 64), "E", "*10^")
-	A1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Flange.A, 'G', 3, 64), "E", "*10^")
-	E1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Flange.E, 'G', 3, 64), "E", "*10^")
-	B1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Flange.B, 'G', 3, 64), "E", "*10^")
-	Y := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Cap.Y, 'G', 3, 64), "E", "*10^")
+	Yp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Yp, 'G', 5, 64), "E", "*10^")
+	Yb := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Yb, 'G', 5, 64), "E", "*10^")
+	Yf1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Flange.Yf, 'G', 5, 64), "E", "*10^")
+	Yk1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Flange.Yk, 'G', 5, 64), "E", "*10^")
+	A1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Flange.A, 'G', 5, 64), "E", "*10^")
+	E1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Flange.E, 'G', 5, 64), "E", "*10^")
+	B1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Flange.B, 'G', 5, 64), "E", "*10^")
+	Y := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Cap.Y, 'G', 5, 64), "E", "*10^")
 
 	if data.TypeGasket == cap_model.GasketData_Oval {
 		// формула 4
@@ -232,8 +232,8 @@ func (s *FormulasService) auxiliaryFormulas(data models.DataCap, req *calc_api.C
 		Yp, Yb, epsilonAt20, bEpsilon, Yf1, fEpAt201, fEp1, B1, Y, fEpAt202, fEp2, B1)
 
 	if data.FlangeType == cap_model.FlangeData_free {
-		fEpsilonKAt201 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Ring.EpsilonAt20, 'G', 3, 64), "E", "*10^")
-		fEpsilonK1 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Ring.Epsilon, 'G', 3, 64), "E", "*10^")
+		fEpsilonKAt201 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Ring.EpsilonAt20, 'G', 5, 64), "E", "*10^")
+		fEpsilonK1 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Ring.Epsilon, 'G', 5, 64), "E", "*10^")
 
 		divider += fmt.Sprintf(" + (%s * %s / %s) * (%s)^2", Yk1, fEpsilonKAt201, fEpsilonK1, A1)
 	}
@@ -253,36 +253,36 @@ func (s *FormulasService) auxFlangeFormulas(
 	flange := &cap_model.AuxiliaryFormulas_Flange{}
 
 	// перевод чисел в строки
-	d6 := strconv.FormatFloat(data.D6, 'G', 3, 64)
-	d := strconv.FormatFloat(data.D, 'G', 3, 64)
-	dOut := strconv.FormatFloat(data.DOut, 'G', 3, 64)
-	s1 := strconv.FormatFloat(data.S1, 'G', 3, 64)
-	s0 := strconv.FormatFloat(data.S0, 'G', 3, 64)
-	l := strconv.FormatFloat(data.L, 'G', 3, 64)
-	h := strconv.FormatFloat(data.H, 'G', 3, 64)
-	epsilonAt20 := strings.ReplaceAll(strconv.FormatFloat(data.EpsilonAt20, 'G', 3, 64), "E", "*10^")
+	d6 := strconv.FormatFloat(data.D6, 'G', 5, 64)
+	d := strconv.FormatFloat(data.D, 'G', 5, 64)
+	dOut := strconv.FormatFloat(data.DOut, 'G', 5, 64)
+	s1 := strconv.FormatFloat(data.S1, 'G', 5, 64)
+	s0 := strconv.FormatFloat(data.S0, 'G', 5, 64)
+	l := strconv.FormatFloat(data.L, 'G', 5, 64)
+	h := strconv.FormatFloat(data.H, 'G', 5, 64)
+	epsilonAt20 := strings.ReplaceAll(strconv.FormatFloat(data.EpsilonAt20, 'G', 5, 64), "E", "*10^")
 	var epsilonKAt20, dk, dnk, hk, ds string
 	if data.Ring != nil {
-		epsilonAt20 = strings.ReplaceAll(strconv.FormatFloat(data.Ring.EpsilonAt20, 'G', 3, 64), "E", "*10^")
-		dk = strconv.FormatFloat(data.Ring.Dk, 'G', 3, 64)
-		dnk = strconv.FormatFloat(data.Ring.Dnk, 'G', 3, 64)
-		hk = strconv.FormatFloat(data.Ring.Hk, 'G', 3, 64)
-		ds = strconv.FormatFloat(data.Ring.Ds, 'G', 3, 64)
+		epsilonAt20 = strings.ReplaceAll(strconv.FormatFloat(data.Ring.EpsilonAt20, 'G', 5, 64), "E", "*10^")
+		dk = strconv.FormatFloat(data.Ring.Dk, 'G', 5, 64)
+		dnk = strconv.FormatFloat(data.Ring.Dnk, 'G', 5, 64)
+		hk = strconv.FormatFloat(data.Ring.Hk, 'G', 5, 64)
+		ds = strconv.FormatFloat(data.Ring.Ds, 'G', 5, 64)
 	}
 
-	Dcp_ := strings.ReplaceAll(strconv.FormatFloat(Dcp, 'G', 3, 64), "E", "*10^")
+	Dcp_ := strings.ReplaceAll(strconv.FormatFloat(Dcp, 'G', 5, 64), "E", "*10^")
 
-	Beta := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Beta, 'G', 3, 64), "E", "*10^")
-	X := strings.ReplaceAll(strconv.FormatFloat(flangeRes.X, 'G', 3, 64), "E", "*10^")
-	Xi := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Xi, 'G', 3, 64), "E", "*10^")
-	Se := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Se, 'G', 3, 64), "E", "*10^")
-	L0 := strings.ReplaceAll(strconv.FormatFloat(flangeRes.L0, 'G', 3, 64), "E", "*10^")
-	Lymda := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Lymda, 'G', 3, 64), "E", "*10^")
-	BetaF := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaF, 'G', 3, 64), "E", "*10^")
-	BetaT := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaT, 'G', 3, 64), "E", "*10^")
-	BetaV := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaV, 'G', 3, 64), "E", "*10^")
-	BetaU := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaU, 'G', 3, 64), "E", "*10^")
-	Psik := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Psik, 'G', 3, 64), "E", "*10^")
+	Beta := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Beta, 'G', 5, 64), "E", "*10^")
+	X := strings.ReplaceAll(strconv.FormatFloat(flangeRes.X, 'G', 5, 64), "E", "*10^")
+	Xi := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Xi, 'G', 5, 64), "E", "*10^")
+	Se := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Se, 'G', 5, 64), "E", "*10^")
+	L0 := strings.ReplaceAll(strconv.FormatFloat(flangeRes.L0, 'G', 5, 64), "E", "*10^")
+	Lymda := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Lymda, 'G', 5, 64), "E", "*10^")
+	BetaF := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaF, 'G', 5, 64), "E", "*10^")
+	BetaT := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaT, 'G', 5, 64), "E", "*10^")
+	BetaV := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaV, 'G', 5, 64), "E", "*10^")
+	BetaU := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaU, 'G', 5, 64), "E", "*10^")
+	Psik := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Psik, 'G', 5, 64), "E", "*10^")
 
 	if flangeType != cap_model.FlangeData_free {
 		// Плечи действия усилий в болтах/шпильках
@@ -337,28 +337,28 @@ func (s *FormulasService) auxCapFormulas(
 ) *cap_model.AuxiliaryFormulas_Cap {
 	formulas := &cap_model.AuxiliaryFormulas_Cap{}
 
-	Dcp_ := strings.ReplaceAll(strconv.FormatFloat(Dcp, 'G', 3, 64), "E", "*10^")
-	DOut_ := strings.ReplaceAll(strconv.FormatFloat(flange.DOut, 'G', 3, 64), "E", "*10^")
-	S0_ := strings.ReplaceAll(strconv.FormatFloat(flange.S0, 'G', 3, 64), "E", "*10^")
-	D_ := strings.ReplaceAll(strconv.FormatFloat(flange.D, 'G', 3, 64), "E", "*10^")
-	h_ := strings.ReplaceAll(strconv.FormatFloat(flange.H, 'G', 3, 64), "E", "*10^")
+	Dcp_ := strings.ReplaceAll(strconv.FormatFloat(Dcp, 'G', 5, 64), "E", "*10^")
+	DOut_ := strings.ReplaceAll(strconv.FormatFloat(flange.DOut, 'G', 5, 64), "E", "*10^")
+	S0_ := strings.ReplaceAll(strconv.FormatFloat(flange.S0, 'G', 5, 64), "E", "*10^")
+	D_ := strings.ReplaceAll(strconv.FormatFloat(flange.D, 'G', 5, 64), "E", "*10^")
+	h_ := strings.ReplaceAll(strconv.FormatFloat(flange.H, 'G', 5, 64), "E", "*10^")
 
-	k := strings.ReplaceAll(strconv.FormatFloat(cap.K, 'G', 3, 64), "E", "*10^")
-	x := strings.ReplaceAll(strconv.FormatFloat(cap.X, 'G', 3, 64), "E", "*10^")
-	eAt20 := strings.ReplaceAll(strconv.FormatFloat(data.EpsilonAt20, 'G', 3, 64), "E", "*10^")
+	k := strings.ReplaceAll(strconv.FormatFloat(cap.K, 'G', 5, 64), "E", "*10^")
+	x := strings.ReplaceAll(strconv.FormatFloat(cap.X, 'G', 5, 64), "E", "*10^")
+	eAt20 := strings.ReplaceAll(strconv.FormatFloat(data.EpsilonAt20, 'G', 5, 64), "E", "*10^")
 
 	if capType == cap_model.CapData_flat {
-		H := strings.ReplaceAll(strconv.FormatFloat(data.H, 'G', 3, 64), "E", "*10^")
-		delta := strings.ReplaceAll(strconv.FormatFloat(data.Delta, 'G', 3, 64), "E", "*10^")
+		H := strings.ReplaceAll(strconv.FormatFloat(data.H, 'G', 5, 64), "E", "*10^")
+		delta := strings.ReplaceAll(strconv.FormatFloat(data.Delta, 'G', 5, 64), "E", "*10^")
 
 		formulas.K = fmt.Sprintf("%s / %s", DOut_, Dcp_)
 		formulas.X = fmt.Sprintf("0.67 * (%s^2 + (1 + 8.55 * lg(%s) - 1)) / ((%s - 1) * %s^2 - 1 + (1.857 * %s^2 + 1) * %s^3/%s^3)",
 			k, k, k, k, k, H, delta)
 		formulas.Y = fmt.Sprintf("%s / (%s * %s)", x, delta, eAt20)
 	} else {
-		radius := strings.ReplaceAll(strconv.FormatFloat(data.Radius, 'G', 3, 64), "E", "*10^")
-		lambda := strings.ReplaceAll(strconv.FormatFloat(cap.Lambda, 'G', 3, 64), "E", "*10^")
-		omega := strings.ReplaceAll(strconv.FormatFloat(cap.Omega, 'G', 3, 64), "E", "*10^")
+		radius := strings.ReplaceAll(strconv.FormatFloat(data.Radius, 'G', 5, 64), "E", "*10^")
+		lambda := strings.ReplaceAll(strconv.FormatFloat(cap.Lambda, 'G', 5, 64), "E", "*10^")
+		omega := strings.ReplaceAll(strconv.FormatFloat(cap.Omega, 'G', 5, 64), "E", "*10^")
 
 		formulas.Lambda = fmt.Sprintf("(%s / %s) * Sqrt(%s / %s)", h_, D_, radius, S0_)
 		formulas.Omega = fmt.Sprintf("1 / (1 + 1.285*%s + 1.63*%s * (%s/%s)^2 * lg(%s/%s)", lambda, lambda, h_, S0_, DOut_, D_)
@@ -381,17 +381,17 @@ func (s *FormulasService) tightnessFormulas(data models.DataCap, req *calc_api.C
 
 	sigmaAt20 := strconv.FormatFloat(data.Bolt.SigmaAt20, 'f', -1, 64)
 
-	B0 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.B0, 'G', 3, 64), "E", "*10^")
-	Dcp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Dcp, 'G', 3, 64), "E", "*10^")
-	Ab := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.A, 'G', 3, 64), "E", "*10^")
-	Alpha := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Alpha, 'G', 3, 64), "E", "*10^")
+	B0 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.B0, 'G', 5, 64), "E", "*10^")
+	Dcp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Dcp, 'G', 5, 64), "E", "*10^")
+	Ab := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.A, 'G', 5, 64), "E", "*10^")
+	Alpha := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Alpha, 'G', 5, 64), "E", "*10^")
 
-	Po := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Po, 'G', 3, 64), "E", "*10^")
-	Qd := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Qd, 'G', 3, 64), "E", "*10^")
-	Rp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Rp, 'G', 3, 64), "E", "*10^")
-	Pb1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb1, 'G', 3, 64), "E", "*10^")
-	Pb2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb2, 'G', 3, 64), "E", "*10^")
-	Pb := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb, 'G', 3, 64), "E", "*10^")
+	Po := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Po, 'G', 5, 64), "E", "*10^")
+	Qd := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Qd, 'G', 5, 64), "E", "*10^")
+	Rp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Rp, 'G', 5, 64), "E", "*10^")
+	Pb1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb1, 'G', 5, 64), "E", "*10^")
+	Pb2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb2, 'G', 5, 64), "E", "*10^")
+	Pb := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb, 'G', 5, 64), "E", "*10^")
 
 	// формула 6
 	// Усилие необходимое для смятия прокладки при затяжке
@@ -440,44 +440,44 @@ func (s *FormulasService) staticResistanceFormulas(
 	static := &cap_model.StaticResistanceFormulas{}
 
 	// перевод чисел в строки
-	pressure := strconv.FormatFloat(req.Data.Pressure, 'G', 3, 64)
+	pressure := strconv.FormatFloat(req.Data.Pressure, 'G', 5, 64)
 	axialForce := req.Data.AxialForce
 
-	fD6 := strconv.FormatFloat(flange.D6, 'G', 3, 64)
-	fH := strconv.FormatFloat(flange.H, 'G', 3, 64)
-	fD := strconv.FormatFloat(flange.D, 'G', 3, 64)
-	fS0 := strconv.FormatFloat(flange.S0, 'G', 3, 64)
-	fS1 := strconv.FormatFloat(flange.S1, 'G', 3, 64)
-	fC := strconv.FormatFloat(flange.C, 'G', 3, 64)
+	fD6 := strconv.FormatFloat(flange.D6, 'G', 5, 64)
+	fH := strconv.FormatFloat(flange.H, 'G', 5, 64)
+	fD := strconv.FormatFloat(flange.D, 'G', 5, 64)
+	fS0 := strconv.FormatFloat(flange.S0, 'G', 5, 64)
+	fS1 := strconv.FormatFloat(flange.S1, 'G', 5, 64)
+	fC := strconv.FormatFloat(flange.C, 'G', 5, 64)
 
-	gM := strconv.FormatFloat(data.Gasket.M, 'G', 3, 64)
+	gM := strconv.FormatFloat(data.Gasket.M, 'G', 5, 64)
 
 	count := data.Bolt.Count
-	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 3, 64)
+	diameter := strconv.FormatFloat(data.Bolt.Diameter, 'G', 5, 64)
 
-	Pb := strings.ReplaceAll(strconv.FormatFloat(Pb_, 'G', 3, 64), "E", "*10^")
-	Pbr := strings.ReplaceAll(strconv.FormatFloat(Pbr_, 'G', 3, 64), "E", "*10^")
-	Qd := strings.ReplaceAll(strconv.FormatFloat(Qd_, 'G', 3, 64), "E", "*10^")
-	Qfm := strings.ReplaceAll(strconv.FormatFloat(Qfm_, 'G', 3, 64), "E", "*10^")
+	Pb := strings.ReplaceAll(strconv.FormatFloat(Pb_, 'G', 5, 64), "E", "*10^")
+	Pbr := strings.ReplaceAll(strconv.FormatFloat(Pbr_, 'G', 5, 64), "E", "*10^")
+	Qd := strings.ReplaceAll(strconv.FormatFloat(Qd_, 'G', 5, 64), "E", "*10^")
+	Qfm := strings.ReplaceAll(strconv.FormatFloat(Qfm_, 'G', 5, 64), "E", "*10^")
 
-	B := strings.ReplaceAll(strconv.FormatFloat(flangeRes.B, 'G', 3, 64), "E", "*10^")
-	E := strings.ReplaceAll(strconv.FormatFloat(flangeRes.E, 'G', 3, 64), "E", "*10^")
-	A := strings.ReplaceAll(strconv.FormatFloat(flangeRes.A, 'G', 3, 64), "E", "*10^")
-	F := strings.ReplaceAll(strconv.FormatFloat(flangeRes.F, 'G', 3, 64), "E", "*10^")
-	Lymda := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Lymda, 'G', 3, 64), "E", "*10^")
-	L0 := strings.ReplaceAll(strconv.FormatFloat(flangeRes.L0, 'G', 3, 64), "E", "*10^")
-	BetaF := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaF, 'G', 3, 64), "E", "*10^")
-	BetaY := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaY, 'G', 3, 64), "E", "*10^")
-	BetaZ := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaZ, 'G', 3, 64), "E", "*10^")
+	B := strings.ReplaceAll(strconv.FormatFloat(flangeRes.B, 'G', 5, 64), "E", "*10^")
+	E := strings.ReplaceAll(strconv.FormatFloat(flangeRes.E, 'G', 5, 64), "E", "*10^")
+	A := strings.ReplaceAll(strconv.FormatFloat(flangeRes.A, 'G', 5, 64), "E", "*10^")
+	F := strings.ReplaceAll(strconv.FormatFloat(flangeRes.F, 'G', 5, 64), "E", "*10^")
+	Lymda := strings.ReplaceAll(strconv.FormatFloat(flangeRes.Lymda, 'G', 5, 64), "E", "*10^")
+	L0 := strings.ReplaceAll(strconv.FormatFloat(flangeRes.L0, 'G', 5, 64), "E", "*10^")
+	BetaF := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaF, 'G', 5, 64), "E", "*10^")
+	BetaY := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaY, 'G', 5, 64), "E", "*10^")
+	BetaZ := strings.ReplaceAll(strconv.FormatFloat(flangeRes.BetaZ, 'G', 5, 64), "E", "*10^")
 
-	Cf := strings.ReplaceAll(strconv.FormatFloat(staticRes.Cf, 'G', 3, 64), "E", "*10^")
-	MM := strings.ReplaceAll(strconv.FormatFloat(staticRes.MM, 'G', 3, 64), "E", "*10^")
-	Dzv := strings.ReplaceAll(strconv.FormatFloat(staticRes.Dzv, 'G', 3, 64), "E", "*10^")
-	Mp := strings.ReplaceAll(strconv.FormatFloat(staticRes.Mp, 'G', 3, 64), "E", "*10^")
-	SigmaM1 := strings.ReplaceAll(strconv.FormatFloat(staticRes.SigmaM1, 'G', 3, 64), "E", "*10^")
-	SigmaR := strings.ReplaceAll(strconv.FormatFloat(staticRes.SigmaR, 'G', 3, 64), "E", "*10^")
-	SigmaRp := strings.ReplaceAll(strconv.FormatFloat(staticRes.SigmaRp, 'G', 3, 64), "E", "*10^")
-	SigmaP1 := strings.ReplaceAll(strconv.FormatFloat(staticRes.SigmaP1, 'G', 3, 64), "E", "*10^")
+	Cf := strings.ReplaceAll(strconv.FormatFloat(staticRes.Cf, 'G', 5, 64), "E", "*10^")
+	MM := strings.ReplaceAll(strconv.FormatFloat(staticRes.MM, 'G', 5, 64), "E", "*10^")
+	Dzv := strings.ReplaceAll(strconv.FormatFloat(staticRes.Dzv, 'G', 5, 64), "E", "*10^")
+	Mp := strings.ReplaceAll(strconv.FormatFloat(staticRes.Mp, 'G', 5, 64), "E", "*10^")
+	SigmaM1 := strings.ReplaceAll(strconv.FormatFloat(staticRes.SigmaM1, 'G', 5, 64), "E", "*10^")
+	SigmaR := strings.ReplaceAll(strconv.FormatFloat(staticRes.SigmaR, 'G', 5, 64), "E", "*10^")
+	SigmaRp := strings.ReplaceAll(strconv.FormatFloat(staticRes.SigmaRp, 'G', 5, 64), "E", "*10^")
+	SigmaP1 := strings.ReplaceAll(strconv.FormatFloat(staticRes.SigmaP1, 'G', 5, 64), "E", "*10^")
 
 	temp1 := fmt.Sprintf("%f * %s / %d", math.Pi, fD6, count)
 	temp2 := fmt.Sprintf("2 * %s + 6 * %s / (%s + 0.5)", diameter, fH, gM)
@@ -521,9 +521,9 @@ func (s *FormulasService) staticResistanceFormulas(
 	static.SigmaT = fmt.Sprintf("(%s * %s) / ((%s)^2 * %s) - %s * %s", BetaY, MM, fH, fD, BetaZ, SigmaR)
 
 	if typeFlange == cap_model.FlangeData_free {
-		Hk := strconv.FormatFloat(flange.Ring.Hk, 'G', 3, 64)
-		Dk := strconv.FormatFloat(flange.Ring.Dk, 'G', 3, 64)
-		MMk := strings.ReplaceAll(strconv.FormatFloat(staticRes.MMk, 'G', 3, 64), "E", "*10^")
+		Hk := strconv.FormatFloat(flange.Ring.Hk, 'G', 5, 64)
+		Dk := strconv.FormatFloat(flange.Ring.Dk, 'G', 5, 64)
+		MMk := strings.ReplaceAll(strconv.FormatFloat(staticRes.MMk, 'G', 5, 64), "E", "*10^")
 
 		static.SigmaK = fmt.Sprintf("%s * %s / ((%s)^2 * %s)", BetaY, MMk, Hk, Dk)
 	}
@@ -564,8 +564,8 @@ func (s *FormulasService) staticResistanceFormulas(
 	static.SigmaTp = fmt.Sprintf("%s * %s / ((%s)^2 * %s) - %s * %s", BetaY, Mp, fH, fD, BetaZ, SigmaRp)
 
 	if typeFlange == cap_model.FlangeData_free {
-		Hk := strconv.FormatFloat(flange.Ring.Hk, 'G', 3, 64)
-		Dk := strconv.FormatFloat(flange.Ring.Dk, 'G', 3, 64)
+		Hk := strconv.FormatFloat(flange.Ring.Hk, 'G', 5, 64)
+		Dk := strconv.FormatFloat(flange.Ring.Dk, 'G', 5, 64)
 
 		static.SigmaKp = fmt.Sprintf("%s * %s / ((%s)^2 * %s)", BetaY, Mp, Hk, Dk)
 	}
@@ -584,31 +584,31 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 	conditions := &cap_model.ConditionsForStrengthFormulas{}
 
 	// перевод чисел в строки
-	fEpsilon := strings.ReplaceAll(strconv.FormatFloat(flange.Epsilon, 'G', 3, 64), "E", "*10^")
-	fEpsilonAt20 := strings.ReplaceAll(strconv.FormatFloat(flange.EpsilonAt20, 'G', 3, 64), "E", "*10^")
-	fSigmaAt20 := strconv.FormatFloat(flange.SigmaAt20, 'G', 3, 64)
-	fSigma := strconv.FormatFloat(flange.Sigma, 'G', 3, 64)
-	fSigmaMAt20 := strconv.FormatFloat(flange.SigmaMAt20, 'G', 3, 64)
-	fSigmaM := strconv.FormatFloat(flange.SigmaM, 'G', 3, 64)
-	fSigmaRAt20 := strconv.FormatFloat(flange.SigmaRAt20, 'G', 3, 64)
-	fSigmaR := strconv.FormatFloat(flange.SigmaR, 'G', 3, 64)
+	fEpsilon := strings.ReplaceAll(strconv.FormatFloat(flange.Epsilon, 'G', 5, 64), "E", "*10^")
+	fEpsilonAt20 := strings.ReplaceAll(strconv.FormatFloat(flange.EpsilonAt20, 'G', 5, 64), "E", "*10^")
+	fSigmaAt20 := strconv.FormatFloat(flange.SigmaAt20, 'G', 5, 64)
+	fSigma := strconv.FormatFloat(flange.Sigma, 'G', 5, 64)
+	fSigmaMAt20 := strconv.FormatFloat(flange.SigmaMAt20, 'G', 5, 64)
+	fSigmaM := strconv.FormatFloat(flange.SigmaM, 'G', 5, 64)
+	fSigmaRAt20 := strconv.FormatFloat(flange.SigmaRAt20, 'G', 5, 64)
+	fSigmaR := strconv.FormatFloat(flange.SigmaR, 'G', 5, 64)
 
-	Yf := strings.ReplaceAll(strconv.FormatFloat(calcFlange.Yf, 'G', 3, 64), "E", "*10^")
+	Yf := strings.ReplaceAll(strconv.FormatFloat(calcFlange.Yf, 'G', 5, 64), "E", "*10^")
 
-	Mp := strings.ReplaceAll(strconv.FormatFloat(static.Mp, 'G', 3, 64), "E", "*10^")
-	SigmaM1 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaM1, 'G', 3, 64), "E", "*10^")
-	SigmaM0 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaM0, 'G', 3, 64), "E", "*10^")
-	SigmaR := strings.ReplaceAll(strconv.FormatFloat(static.SigmaR, 'G', 3, 64), "E", "*10^")
-	SigmaT := strings.ReplaceAll(strconv.FormatFloat(static.SigmaT, 'G', 3, 64), "E", "*10^")
-	SigmaP1 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaP1, 'G', 3, 64), "E", "*10^")
-	SigmaP0 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaP0, 'G', 3, 64), "E", "*10^")
-	SigmaMp := strings.ReplaceAll(strconv.FormatFloat(static.SigmaMp, 'G', 3, 64), "E", "*10^")
-	SigmaMp0 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaMp0, 'G', 3, 64), "E", "*10^")
-	SigmaMpm := strings.ReplaceAll(strconv.FormatFloat(static.SigmaMpm, 'G', 3, 64), "E", "*10^")
-	SigmaMpm0 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaMpm0, 'G', 3, 64), "E", "*10^")
-	SigmaRp := strings.ReplaceAll(strconv.FormatFloat(static.SigmaRp, 'G', 3, 64), "E", "*10^")
-	SigmaTp := strings.ReplaceAll(strconv.FormatFloat(static.SigmaTp, 'G', 3, 64), "E", "*10^")
-	SigmaMop := strings.ReplaceAll(strconv.FormatFloat(static.SigmaMop, 'G', 3, 64), "E", "*10^")
+	Mp := strings.ReplaceAll(strconv.FormatFloat(static.Mp, 'G', 5, 64), "E", "*10^")
+	SigmaM1 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaM1, 'G', 5, 64), "E", "*10^")
+	SigmaM0 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaM0, 'G', 5, 64), "E", "*10^")
+	SigmaR := strings.ReplaceAll(strconv.FormatFloat(static.SigmaR, 'G', 5, 64), "E", "*10^")
+	SigmaT := strings.ReplaceAll(strconv.FormatFloat(static.SigmaT, 'G', 5, 64), "E", "*10^")
+	SigmaP1 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaP1, 'G', 5, 64), "E", "*10^")
+	SigmaP0 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaP0, 'G', 5, 64), "E", "*10^")
+	SigmaMp := strings.ReplaceAll(strconv.FormatFloat(static.SigmaMp, 'G', 5, 64), "E", "*10^")
+	SigmaMp0 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaMp0, 'G', 5, 64), "E", "*10^")
+	SigmaMpm := strings.ReplaceAll(strconv.FormatFloat(static.SigmaMpm, 'G', 5, 64), "E", "*10^")
+	SigmaMpm0 := strings.ReplaceAll(strconv.FormatFloat(static.SigmaMpm0, 'G', 5, 64), "E", "*10^")
+	SigmaRp := strings.ReplaceAll(strconv.FormatFloat(static.SigmaRp, 'G', 5, 64), "E", "*10^")
+	SigmaTp := strings.ReplaceAll(strconv.FormatFloat(static.SigmaTp, 'G', 5, 64), "E", "*10^")
+	SigmaMop := strings.ReplaceAll(strconv.FormatFloat(static.SigmaMop, 'G', 5, 64), "E", "*10^")
 
 	chooseTeta := map[bool]float64{
 		true:  constants.WorkTeta,
@@ -627,9 +627,9 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 		false: constants.Kt,
 	}
 
-	kt := strconv.FormatFloat(Kt[isTemp], 'G', 3, 64)
-	ks := strconv.FormatFloat(Ks, 'G', 3, 64)
-	teta := strconv.FormatFloat(chooseTeta[isWork], 'G', 3, 64)
+	kt := strconv.FormatFloat(Kt[isTemp], 'G', 5, 64)
+	ks := strconv.FormatFloat(Ks, 'G', 5, 64)
+	teta := strconv.FormatFloat(chooseTeta[isWork], 'G', 5, 64)
 
 	var DTeta float64
 	if flangeType == cap_model.FlangeData_welded {
@@ -644,7 +644,7 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 	} else {
 		DTeta = constants.MaxDTeta
 	}
-	tmp := strconv.FormatFloat(DTeta, 'G', 3, 64)
+	tmp := strconv.FormatFloat(DTeta, 'G', 5, 64)
 	DTeta_ := fmt.Sprintf("%s * %s", teta, tmp)
 
 	conditions.Teta = fmt.Sprintf("%s * %s * %s / %s", Mp, Yf, fEpsilonAt20, fEpsilon)
@@ -654,10 +654,10 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 	}
 
 	if flangeType == cap_model.FlangeData_free {
-		fEpsilonK := strconv.FormatFloat(flange.Ring.Epsilon, 'G', 3, 64)
-		fEpsilonKAt20 := strconv.FormatFloat(flange.Ring.EpsilonAt20, 'G', 3, 64)
-		Yk := strings.ReplaceAll(strconv.FormatFloat(calcFlange.Yk, 'G', 3, 64), "E", "*10^")
-		Mpk := strings.ReplaceAll(strconv.FormatFloat(static.Mpk, 'G', 3, 64), "E", "*10^")
+		fEpsilonK := strconv.FormatFloat(flange.Ring.Epsilon, 'G', 5, 64)
+		fEpsilonKAt20 := strconv.FormatFloat(flange.Ring.EpsilonAt20, 'G', 5, 64)
+		Yk := strings.ReplaceAll(strconv.FormatFloat(calcFlange.Yk, 'G', 5, 64), "E", "*10^")
+		Mpk := strings.ReplaceAll(strconv.FormatFloat(static.Mpk, 'G', 5, 64), "E", "*10^")
 
 		DTetaK := fmt.Sprintf("%s * 0.02", teta)
 		conditions.TetaK = fmt.Sprintf("%s * %s * %s / %s", Mpk, Yk, fEpsilonKAt20, fEpsilonK)
@@ -742,10 +742,10 @@ func (s *FormulasService) conditionsForStrengthFormulas(
 	conditions.Max9 = &cap_model.ConditionFormulas{X: Max9, Y: max9Y}
 
 	if flangeType == cap_model.FlangeData_free {
-		SigmaK := strings.ReplaceAll(strconv.FormatFloat(static.SigmaK, 'G', 3, 64), "E", "*10^")
-		SigmaKp := strings.ReplaceAll(strconv.FormatFloat(static.SigmaKp, 'G', 3, 64), "E", "*10^")
-		fSigmaKAt20 := strconv.FormatFloat(flange.Ring.SigmaAt20, 'G', 3, 64)
-		fSigmaK := strconv.FormatFloat(flange.Ring.Sigma, 'G', 3, 64)
+		SigmaK := strings.ReplaceAll(strconv.FormatFloat(static.SigmaK, 'G', 5, 64), "E", "*10^")
+		SigmaKp := strings.ReplaceAll(strconv.FormatFloat(static.SigmaKp, 'G', 5, 64), "E", "*10^")
+		fSigmaKAt20 := strconv.FormatFloat(flange.Ring.SigmaAt20, 'G', 5, 64)
+		fSigmaK := strconv.FormatFloat(flange.Ring.Sigma, 'G', 5, 64)
 
 		max10Y := fmt.Sprintf("%s * %s", kt, fSigmaKAt20)
 		max11Y := fmt.Sprintf("%s * %s", kt, fSigmaK)
@@ -765,33 +765,33 @@ func (s *FormulasService) tightnessLoadFormulas(
 	tightness := &cap_model.TightnessLoadFormulas{}
 
 	// перевод чисел в строки
-	fAlpha1 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Alpha, 'G', 3, 64), "E", "*10^")
-	fH1 := strconv.FormatFloat(data.Flange.H, 'G', 3, 64)
-	fT1 := strconv.FormatFloat(data.Flange.T, 'G', 3, 64)
-	fAlpha2 := strings.ReplaceAll(strconv.FormatFloat(data.Cap.Alpha, 'G', 3, 64), "E", "*10^")
-	fH2 := strconv.FormatFloat(data.Cap.H, 'G', 3, 64)
-	fT2 := strconv.FormatFloat(data.Cap.T, 'G', 3, 64)
+	fAlpha1 := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Alpha, 'G', 5, 64), "E", "*10^")
+	fH1 := strconv.FormatFloat(data.Flange.H, 'G', 5, 64)
+	fT1 := strconv.FormatFloat(data.Flange.T, 'G', 5, 64)
+	fAlpha2 := strings.ReplaceAll(strconv.FormatFloat(data.Cap.Alpha, 'G', 5, 64), "E", "*10^")
+	fH2 := strconv.FormatFloat(data.Cap.H, 'G', 5, 64)
+	fT2 := strconv.FormatFloat(data.Cap.T, 'G', 5, 64)
 
-	bAlpha := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Alpha, 'G', 3, 64), "E", "*10^")
-	bTemp := strconv.FormatFloat(data.Bolt.Temp, 'G', 3, 64)
+	bAlpha := strings.ReplaceAll(strconv.FormatFloat(data.Bolt.Alpha, 'G', 5, 64), "E", "*10^")
+	bTemp := strconv.FormatFloat(data.Bolt.Temp, 'G', 5, 64)
 
-	Gamma := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Gamma, 'G', 3, 64), "E", "*10^")
-	Alpha := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Alpha, 'G', 3, 64), "E", "*10^")
+	Gamma := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Gamma, 'G', 5, 64), "E", "*10^")
+	Alpha := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Auxiliary.Alpha, 'G', 5, 64), "E", "*10^")
 
-	Rp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Rp, 'G', 3, 64), "E", "*10^")
-	Pb1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb1, 'G', 3, 64), "E", "*10^")
-	Pb2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb2, 'G', 3, 64), "E", "*10^")
-	Pb := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb, 'G', 3, 64), "E", "*10^")
-	Qd := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Qd, 'G', 3, 64), "E", "*10^")
+	Rp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Rp, 'G', 5, 64), "E", "*10^")
+	Pb1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb1, 'G', 5, 64), "E", "*10^")
+	Pb2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb2, 'G', 5, 64), "E", "*10^")
+	Pb := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Pb, 'G', 5, 64), "E", "*10^")
+	Qd := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.Tightness.Qd, 'G', 5, 64), "E", "*10^")
 
-	Qt := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.TightnessLoad.Qt, 'G', 3, 64), "E", "*10^")
+	Qt := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Strength.TightnessLoad.Qt, 'G', 5, 64), "E", "*10^")
 
 	var temp1, temp2 string
 	if req.IsUseWasher {
-		wAlpha1 := strings.ReplaceAll(strconv.FormatFloat(data.Washer1.Alpha, 'G', 3, 64), "E", "*10^")
-		wThick1 := strconv.FormatFloat(data.Washer1.Thickness, 'G', 3, 64)
-		wAlpha2 := strings.ReplaceAll(strconv.FormatFloat(data.Washer2.Alpha, 'G', 3, 64), "E", "*10^")
-		wThick2 := strconv.FormatFloat(data.Washer2.Thickness, 'G', 3, 64)
+		wAlpha1 := strings.ReplaceAll(strconv.FormatFloat(data.Washer1.Alpha, 'G', 5, 64), "E", "*10^")
+		wThick1 := strconv.FormatFloat(data.Washer1.Thickness, 'G', 5, 64)
+		wAlpha2 := strings.ReplaceAll(strconv.FormatFloat(data.Washer2.Alpha, 'G', 5, 64), "E", "*10^")
+		wThick2 := strconv.FormatFloat(data.Washer2.Thickness, 'G', 5, 64)
 
 		temp1 = fmt.Sprintf("(%s * %s + %s * %s) * (%s - 20) + (%s * %s + %s * %s)*(%s - 20)",
 			fAlpha1, fH1, wAlpha1, wThick1, fT1, fAlpha2, fH2, wAlpha2, wThick2, fT2)
@@ -801,18 +801,18 @@ func (s *FormulasService) tightnessLoadFormulas(
 	temp2 = fmt.Sprintf("%s + %s", fH1, fH2)
 
 	if data.FlangeType == cap_model.FlangeData_free {
-		fAlpha := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Ring.Alpha, 'G', 3, 64), "E", "*10^")
-		fH := strconv.FormatFloat(data.Flange.Ring.Hk, 'G', 3, 64)
-		fT := strconv.FormatFloat(data.Flange.Ring.T, 'G', 3, 64)
+		fAlpha := strings.ReplaceAll(strconv.FormatFloat(data.Flange.Ring.Alpha, 'G', 5, 64), "E", "*10^")
+		fH := strconv.FormatFloat(data.Flange.Ring.Hk, 'G', 5, 64)
+		fT := strconv.FormatFloat(data.Flange.Ring.T, 'G', 5, 64)
 
 		temp1 += fmt.Sprintf(" + (%s * %s) * (%s - 20)", fAlpha, fH, fT)
 		temp2 += " + " + fH
 	}
 
 	if req.Data.IsEmbedded {
-		eAlpha := strings.ReplaceAll(strconv.FormatFloat(data.Embed.Alpha, 'G', 3, 64), "E", "*10^")
-		eThick := strconv.FormatFloat(data.Embed.Thickness, 'G', 3, 64)
-		temp := strconv.FormatFloat(req.Data.Temp, 'G', 3, 64)
+		eAlpha := strings.ReplaceAll(strconv.FormatFloat(data.Embed.Alpha, 'G', 5, 64), "E", "*10^")
+		eThick := strconv.FormatFloat(data.Embed.Thickness, 'G', 5, 64)
+		temp := strconv.FormatFloat(req.Data.Temp, 'G', 5, 64)
 
 		temp1 += fmt.Sprintf(" + (%s * %s) * (%s - 20)", eAlpha, eThick, temp)
 		temp2 += " + " + eThick

@@ -11,21 +11,21 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_rectangle_model"
 )
 
-func (s *FormulasService) getBoltFormulas(req calc_api.ExpressRectangleRequest, d models.DataExRect, result calc_api.ExpressRectangleResponse,
+func (s *FormulasService) getBoltFormulas(req *calc_api.ExpressRectangleRequest, d models.DataExRect, result *calc_api.ExpressRectangleResponse,
 ) *express_rectangle_model.BoltsFormulas {
 	Bolts := &express_rectangle_model.BoltsFormulas{}
 
 	// перевод чисел в строки
-	sigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 3, 64)
+	sigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 5, 64)
 
-	width := strconv.FormatFloat(d.Gasket.Width, 'G', 3, 64)
+	width := strconv.FormatFloat(d.Gasket.Width, 'G', 5, 64)
 
-	SizeLong := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeLong, 'G', 3, 64), "E", "*10^")
-	SizeTrans := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeTrans, 'G', 3, 64), "E", "*10^")
+	SizeLong := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeLong, 'G', 5, 64), "E", "*10^")
+	SizeTrans := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeTrans, 'G', 5, 64), "E", "*10^")
 
-	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 3, 64), "E", "*10^")
-	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Effort, 'G', 3, 64), "E", "*10^")
-	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.WorkEffort, 'G', 3, 64), "E", "*10^")
+	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 5, 64), "E", "*10^")
+	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Effort, 'G', 5, 64), "E", "*10^")
+	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.WorkEffort, 'G', 5, 64), "E", "*10^")
 
 	Kyp := s.Kyp[true]
 	Kyz := s.Kyz[req.Condition.String()]

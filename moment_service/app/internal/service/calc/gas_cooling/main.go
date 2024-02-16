@@ -13,8 +13,10 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
+	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/gas_cooling_model"
+	"github.com/goccy/go-json"
 )
 
 type CoolingService struct {
@@ -79,6 +81,17 @@ func (s *CoolingService) CalculateGasCooling(ctx context.Context, data *calc_api
 
 	if data.IsNeedFormulas {
 		result.Formulas = s.formulas.GetFormulas(data, d, result)
+	}
+
+	_, err = json.Marshal(result.Calc)
+	if err != nil {
+		result.Calc = &gas_cooling_model.Calculated{
+			Auxiliary:     &gas_cooling_model.CalcAuxiliary{},
+			ForcesInBolts: &gas_cooling_model.CalcForcesInBolts{},
+			Bolt:          &gas_cooling_model.CalcBolts{},
+			Moment:        &gas_cooling_model.CalcMoment{},
+		}
+		logger.Error("failed to marshal json. error: " + err.Error())
 	}
 
 	return result, nil
@@ -165,7 +178,10 @@ func (s *CoolingService) CalcMoment(
 			// moment.Mkp = (0.3 * forces.Effort * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 		}
 		moment.Friction = Friction
-		moment.Mkp1 = 0.75 * moment.Mkp
+
+		if Friction == constants.DefaultFriction {
+			moment.Mkp1 = 0.75 * moment.Mkp
+		}
 
 		Prek := 0.8 * forces.Area * data.Bolt.SigmaAt20
 		moment.Qrek = Prek / (2 * (aux.SizeLong + aux.SizeTrans) * data.Gasket.Width)
@@ -175,14 +191,14 @@ func (s *CoolingService) CalcMoment(
 		Pmax := bolts.AllowableVoltage * forces.Area
 		moment.Qmax = Pmax / (2 * (aux.SizeLong + aux.SizeTrans) * data.Gasket.Width)
 
-		// if data.TypeGasket == gas_cooling_model.GasketData_Soft && moment.Qmax > data.Gasket.PermissiblePres {
-		// 	Pmax = data.Gasket.PermissiblePres * (2 * (aux.SizeLong + aux.SizeTrans) * data.Gasket.Width)
-		// 	moment.Qmax = data.Gasket.PermissiblePres
-		// }
-		if moment.Qmax > data.Gasket.PermissiblePres {
+		if data.TypeGasket == gas_cooling_model.GasketData_Soft && moment.Qmax > data.Gasket.PermissiblePres {
 			Pmax = data.Gasket.PermissiblePres * (2 * (aux.SizeLong + aux.SizeTrans) * data.Gasket.Width)
 			moment.Qmax = data.Gasket.PermissiblePres
 		}
+		// if moment.Qmax > data.Gasket.PermissiblePres {
+		// 	Pmax = data.Gasket.PermissiblePres * (2 * (aux.SizeLong + aux.SizeTrans) * data.Gasket.Width)
+		// 	moment.Qmax = data.Gasket.PermissiblePres
+		// }
 
 		moment.Mmax = (Friction * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 		// moment.Mmax = (0.3 * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000

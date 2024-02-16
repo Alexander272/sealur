@@ -12,41 +12,41 @@ import (
 )
 
 func (s *FormulasService) getAuxiliaryFormulas(
-	data calc_api.DevCoolingRequest,
+	data *calc_api.DevCoolingRequest,
 	d models.DataDevCooling,
-	result calc_api.DevCoolingResponse,
+	result *calc_api.DevCoolingResponse,
 ) *dev_cooling_model.AuxiliaryFormulas {
 	Auxiliary := &dev_cooling_model.AuxiliaryFormulas{}
 
 	// перевод чисел в строки
-	pressure := strconv.FormatFloat(data.Pressure, 'G', 3, 64)
+	pressure := strconv.FormatFloat(data.Pressure, 'G', 5, 64)
 
-	width := strconv.FormatFloat(d.Gasket.Width, 'G', 3, 64)
-	sizeTrans := strconv.FormatFloat(d.Gasket.SizeTrans, 'G', 3, 64)
+	width := strconv.FormatFloat(d.Gasket.Width, 'G', 5, 64)
+	sizeTrans := strconv.FormatFloat(d.Gasket.SizeTrans, 'G', 5, 64)
 
 	count := d.TubeSheet.Count
-	stepTrans := strconv.FormatFloat(d.TubeSheet.StepTrans, 'G', 3, 64)
-	stepLong := strconv.FormatFloat(d.TubeSheet.StepLong, 'G', 3, 64)
-	tsDiameter := strconv.FormatFloat(d.TubeSheet.Diameter, 'G', 3, 64)
-	tsSigma := strconv.FormatFloat(d.TubeSheet.Sigma, 'G', 3, 64)
+	stepTrans := strconv.FormatFloat(d.TubeSheet.StepTrans, 'G', 5, 64)
+	stepLong := strconv.FormatFloat(d.TubeSheet.StepLong, 'G', 5, 64)
+	tsDiameter := strconv.FormatFloat(d.TubeSheet.Diameter, 'G', 5, 64)
+	tsSigma := strconv.FormatFloat(d.TubeSheet.Sigma, 'G', 5, 64)
 
-	diameter := strconv.FormatFloat(d.Tube.Diameter, 'G', 3, 64)
-	thickness := strconv.FormatFloat(d.Tube.Thickness, 'G', 3, 64)
-	corrosion := strconv.FormatFloat(d.Tube.Corrosion, 'G', 3, 64)
-	depth := strconv.FormatFloat(d.Tube.Depth, 'G', 3, 64)
-	size := strconv.FormatFloat(d.Tube.Size, 'G', 3, 64)
-	sigma := strconv.FormatFloat(d.Tube.Sigma, 'G', 3, 64)
-	epsilon := strconv.FormatFloat(d.Tube.Epsilon, 'G', 3, 64)
-	reducedLength := strconv.FormatFloat(d.Tube.ReducedLength, 'G', 3, 64)
+	diameter := strconv.FormatFloat(d.Tube.Diameter, 'G', 5, 64)
+	thickness := strconv.FormatFloat(d.Tube.Thickness, 'G', 5, 64)
+	corrosion := strconv.FormatFloat(d.Tube.Corrosion, 'G', 5, 64)
+	depth := strconv.FormatFloat(d.Tube.Depth, 'G', 5, 64)
+	size := strconv.FormatFloat(d.Tube.Size, 'G', 5, 64)
+	sigma := strconv.FormatFloat(d.Tube.Sigma, 'G', 5, 64)
+	epsilon := strconv.FormatFloat(d.Tube.Epsilon, 'G', 5, 64)
+	reducedLength := strconv.FormatFloat(d.Tube.ReducedLength, 'G', 5, 64)
 
-	distance := strconv.FormatFloat(d.Bolt.Distance, 'G', 3, 64)
+	distance := strconv.FormatFloat(d.Bolt.Distance, 'G', 5, 64)
 
-	EstimatedGasketWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedGasketWidth, 'G', 3, 64), "E", "*10^")
-	EstimatedZoneWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedZoneWidth, 'G', 3, 64), "E", "*10^")
-	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 3, 64), "E", "*10^")
-	D := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.D, 'G', 3, 64), "E", "*10^")
-	Upsilon := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Upsilon, 'G', 3, 64), "E", "*10^")
-	Mu := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Mu, 'G', 3, 64), "E", "*10^")
+	EstimatedGasketWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedGasketWidth, 'G', 5, 64), "E", "*10^")
+	EstimatedZoneWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedZoneWidth, 'G', 5, 64), "E", "*10^")
+	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 5, 64), "E", "*10^")
+	D := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.D, 'G', 5, 64), "E", "*10^")
+	Upsilon := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Upsilon, 'G', 5, 64), "E", "*10^")
+	Mu := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Mu, 'G', 5, 64), "E", "*10^")
 
 	// расчетная ширина плоской прокладки
 	Auxiliary.EstimatedGasketWidth = fmt.Sprintf("min(%s; 3.87 * sqrt(%s))", width, width)

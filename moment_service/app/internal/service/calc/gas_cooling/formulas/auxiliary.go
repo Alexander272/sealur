@@ -15,11 +15,11 @@ func (s *FormulasService) getAuxiliaryFormulas(req *calc_api.GasCoolingRequest, 
 	Auxiliary := &gas_cooling_model.AuxiliaryFormulas{}
 
 	// перевод чисел в строки
-	width := strconv.FormatFloat(data.Gasket.Width, 'G', 3, 64)
+	width := strconv.FormatFloat(data.Gasket.Width, 'G', 5, 64)
 	sizeTrans := strconv.FormatFloat(data.Gasket.SizeTrans, 'f', -1, 64)
 	sizeLong := strconv.FormatFloat(data.Gasket.SizeLong, 'f', -1, 64)
 
-	EstimatedGasketWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedGasketWidth, 'G', 3, 64), "E", "*10^")
+	EstimatedGasketWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedGasketWidth, 'G', 5, 64), "E", "*10^")
 
 	// расчетная ширина плоской прокладки
 	Auxiliary.EstimatedGasketWidth = fmt.Sprintf("min(%s; 3.87 * sqrt(%s))", width, width)

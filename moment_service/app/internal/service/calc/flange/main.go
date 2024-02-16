@@ -5,14 +5,15 @@ import (
 
 	"github.com/Alexander272/sealur/moment_service/internal/constants"
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/flange/data"
-
 	"github.com/Alexander272/sealur/moment_service/internal/service/calc/flange/formulas"
 	"github.com/Alexander272/sealur/moment_service/internal/service/flange"
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
+	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/flange_model"
+	"github.com/goccy/go-json"
 )
 
 type FlangeService struct {
@@ -105,6 +106,39 @@ func (s *FlangeService) CalculationFlange(ctx context.Context, data *calc_api.Fl
 	if data.IsNeedFormulas {
 		// получение формул с подставленными значениями переменных
 		result.Formulas = s.formulas.GetFormulas(data, d, &result, aux)
+	}
+
+	_, err = json.Marshal(result.Calc)
+	if err != nil {
+		//? если не можем преобразовать в json обнуляем все значения
+		if data.Calculation == calc_api.FlangeRequest_basis {
+			// расчет основных величин
+			result.Calc.Basis = &flange_model.Calculated_Basis{
+				Deformation:   &flange_model.CalcDeformation{},
+				ForcesInBolts: &flange_model.CalcForcesInBolts{},
+				BoltStrength:  &flange_model.CalcBoltStrength{},
+				Moment:        &flange_model.CalcMoment{},
+			}
+		} else {
+			// прочностной расчет
+			result.Calc.Strength = &flange_model.Calculated_Strength{
+				Auxiliary:              &flange_model.CalcAuxiliary{},
+				Tightness:              &flange_model.CalcTightness{},
+				BoltStrength1:          &flange_model.CalcBoltStrength{},
+				Moment1:                &flange_model.CalcMoment{},
+				StaticResistance1:      []*flange_model.CalcStaticResistance{},
+				ConditionsForStrength1: []*flange_model.CalcConditionsForStrength{},
+				TightnessLoad:          &flange_model.CalcTightnessLoad{},
+				BoltStrength2:          &flange_model.CalcBoltStrength{},
+				Moment2:                &flange_model.CalcMoment{},
+				StaticResistance2:      []*flange_model.CalcStaticResistance{},
+				ConditionsForStrength2: []*flange_model.CalcConditionsForStrength{},
+				Deformation:            &flange_model.CalcDeformation{},
+				ForcesInBolts:          &flange_model.CalcForcesInBolts{},
+				FinalMoment:            &flange_model.CalcMoment{},
+			}
+		}
+		logger.Error("failed to marshal json. error: " + err.Error())
 	}
 
 	return &result, nil

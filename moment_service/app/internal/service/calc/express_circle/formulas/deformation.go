@@ -12,20 +12,20 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_circle_model"
 )
 
-func (s *FormulasService) getDeformationFormulas(req calc_api.ExpressCircleRequest, d models.DataExCircle, result calc_api.ExpressCircleResponse,
+func (s *FormulasService) getDeformationFormulas(req *calc_api.ExpressCircleRequest, d models.DataExCircle, result *calc_api.ExpressCircleResponse,
 ) *express_circle_model.DeformationFormulas {
 	Deformation := &express_circle_model.DeformationFormulas{}
 
 	// перевод чисел в строки
-	pressure := strconv.FormatFloat(req.Pressure, 'G', 3, 64)
+	pressure := strconv.FormatFloat(req.Pressure, 'G', 5, 64)
 
-	width := strconv.FormatFloat(d.Gasket.Width, 'G', 3, 64)
-	pres := strconv.FormatFloat(d.Gasket.Pres, 'G', 3, 64)
-	dOut := strconv.FormatFloat(d.Gasket.DOut, 'G', 3, 64)
-	m := strconv.FormatFloat(d.Gasket.M, 'G', 3, 64)
+	width := strconv.FormatFloat(d.Gasket.Width, 'G', 5, 64)
+	pres := strconv.FormatFloat(d.Gasket.Pres, 'G', 5, 64)
+	dOut := strconv.FormatFloat(d.Gasket.DOut, 'G', 5, 64)
+	m := strconv.FormatFloat(d.Gasket.M, 'G', 5, 64)
 
-	dWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Width, 'G', 3, 64), "E", "*10^")
-	dDiameter := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Diameter, 'G', 3, 64), "E", "*10^")
+	dWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Width, 'G', 5, 64), "E", "*10^")
+	dDiameter := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Diameter, 'G', 5, 64), "E", "*10^")
 
 	if d.TypeGasket == express_circle_model.GasketData_Oval {
 		// Эффективная ширина прокладки

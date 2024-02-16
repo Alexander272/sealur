@@ -12,27 +12,27 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_circle_model"
 )
 
-func (s *FormulasService) getMomentFormulas(req calc_api.ExpressCircleRequest, d models.DataExCircle, result calc_api.ExpressCircleResponse,
+func (s *FormulasService) getMomentFormulas(req *calc_api.ExpressCircleRequest, d models.DataExCircle, result *calc_api.ExpressCircleResponse,
 ) *express_circle_model.MomentFormulas {
 	Moment := &express_circle_model.MomentFormulas{}
 
 	// перевод чисел в строки
-	friction := strconv.FormatFloat(req.Friction, 'G', 3, 64)
-	diameter := strconv.FormatFloat(d.Bolt.Diameter, 'G', 3, 64)
+	friction := strconv.FormatFloat(req.Friction, 'G', 5, 64)
+	diameter := strconv.FormatFloat(d.Bolt.Diameter, 'G', 5, 64)
 	count := d.Bolt.Count
-	sigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 3, 64)
+	sigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 5, 64)
 
-	width := strconv.FormatFloat(d.Gasket.Width, 'G', 3, 64)
-	permissiblePres := strconv.FormatFloat(d.Gasket.PermissiblePres, 'G', 3, 64)
+	width := strconv.FormatFloat(d.Gasket.Width, 'G', 5, 64)
+	permissiblePres := strconv.FormatFloat(d.Gasket.PermissiblePres, 'G', 5, 64)
 
-	dDiameter := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Diameter, 'G', 3, 64), "E", "*10^")
+	dDiameter := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Diameter, 'G', 5, 64), "E", "*10^")
 
-	DesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.DesignLoad, 'G', 3, 64), "E", "*10^")
-	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 3, 64), "E", "*10^")
+	DesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.DesignLoad, 'G', 5, 64), "E", "*10^")
+	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 5, 64), "E", "*10^")
 
-	AllowableVoltage := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.AllowableVoltage, 'G', 3, 64), "E", "*10^")
+	AllowableVoltage := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.AllowableVoltage, 'G', 5, 64), "E", "*10^")
 
-	Mkp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Moment.Mkp, 'G', 3, 64), "E", "*10^")
+	Mkp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Moment.Mkp, 'G', 5, 64), "E", "*10^")
 
 	if !(result.Calc.Bolt.RatedStress > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter) {
 		Moment.Mkp = fmt.Sprintf("(%s * %s * %s / %d) / 1000", friction, DesignLoad, diameter, count)

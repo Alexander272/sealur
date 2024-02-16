@@ -50,4 +50,6 @@ const (
 
 	WorkTeta float64 = 1
 	TestTeta float64 = 1.3
+
+	DefaultFriction float64 = 0.3
 )

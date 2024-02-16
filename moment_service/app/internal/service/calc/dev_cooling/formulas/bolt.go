@@ -13,13 +13,13 @@ import (
 
 func (s *FormulasService) getBoltFormulas(
 	Lambda1, Lambda2, Alpha1, Alpha2 float64,
-	data calc_api.DevCoolingRequest,
+	data *calc_api.DevCoolingRequest,
 	d models.DataDevCooling,
-	result calc_api.DevCoolingResponse,
+	result *calc_api.DevCoolingResponse,
 ) *dev_cooling_model.BoltFormulas {
 	Bolt := &dev_cooling_model.BoltFormulas{}
 
-	// формулы (чтобы не передевать всю эту кучу фи)
+	// формулы (чтобы не передавать всю эту кучу фи)
 	// Phi для Угловые податливости крышки
 	var Phi1, Phi2, Phi3, Phi4, Phi5, Phi6 float64
 	if data.CameraDiagram == calc_api.DevCoolingRequest_schema1 || data.CameraDiagram == calc_api.DevCoolingRequest_schema4 {
@@ -42,61 +42,61 @@ func (s *FormulasService) getBoltFormulas(
 	Ab := d.Bolt.Area * float64(d.Bolt.Count)
 
 	// перевод чисел в строки
-	sPhi1 := strings.ReplaceAll(strconv.FormatFloat(Phi1, 'G', 3, 64), "E", "*10^")
-	sPhi2 := strings.ReplaceAll(strconv.FormatFloat(Phi2, 'G', 3, 64), "E", "*10^")
-	sPhi3 := strings.ReplaceAll(strconv.FormatFloat(Phi3, 'G', 3, 64), "E", "*10^")
-	sPhi4 := strings.ReplaceAll(strconv.FormatFloat(Phi4, 'G', 3, 64), "E", "*10^")
-	sPhi5 := strings.ReplaceAll(strconv.FormatFloat(Phi5, 'G', 3, 64), "E", "*10^")
-	sPhi6 := strings.ReplaceAll(strconv.FormatFloat(Phi6, 'G', 3, 64), "E", "*10^")
-	sLambda1 := strings.ReplaceAll(strconv.FormatFloat(Lambda1, 'G', 3, 64), "E", "*10^")
-	sLambda2 := strings.ReplaceAll(strconv.FormatFloat(Lambda2, 'G', 3, 64), "E", "*10^")
-	sAlpha1 := strings.ReplaceAll(strconv.FormatFloat(Alpha1, 'G', 3, 64), "E", "*10^")
-	sAlpha2 := strings.ReplaceAll(strconv.FormatFloat(Alpha2, 'G', 3, 64), "E", "*10^")
-	sLb := strings.ReplaceAll(strconv.FormatFloat(Lb, 'G', 3, 64), "E", "*10^")
-	sAb := strings.ReplaceAll(strconv.FormatFloat(Ab, 'G', 3, 64), "E", "*10^")
+	sPhi1 := strings.ReplaceAll(strconv.FormatFloat(Phi1, 'G', 5, 64), "E", "*10^")
+	sPhi2 := strings.ReplaceAll(strconv.FormatFloat(Phi2, 'G', 5, 64), "E", "*10^")
+	sPhi3 := strings.ReplaceAll(strconv.FormatFloat(Phi3, 'G', 5, 64), "E", "*10^")
+	sPhi4 := strings.ReplaceAll(strconv.FormatFloat(Phi4, 'G', 5, 64), "E", "*10^")
+	sPhi5 := strings.ReplaceAll(strconv.FormatFloat(Phi5, 'G', 5, 64), "E", "*10^")
+	sPhi6 := strings.ReplaceAll(strconv.FormatFloat(Phi6, 'G', 5, 64), "E", "*10^")
+	sLambda1 := strings.ReplaceAll(strconv.FormatFloat(Lambda1, 'G', 5, 64), "E", "*10^")
+	sLambda2 := strings.ReplaceAll(strconv.FormatFloat(Lambda2, 'G', 5, 64), "E", "*10^")
+	sAlpha1 := strings.ReplaceAll(strconv.FormatFloat(Alpha1, 'G', 5, 64), "E", "*10^")
+	sAlpha2 := strings.ReplaceAll(strconv.FormatFloat(Alpha2, 'G', 5, 64), "E", "*10^")
+	sLb := strings.ReplaceAll(strconv.FormatFloat(Lb, 'G', 5, 64), "E", "*10^")
+	sAb := strings.ReplaceAll(strconv.FormatFloat(Ab, 'G', 5, 64), "E", "*10^")
 
-	pressure := strconv.FormatFloat(data.Pressure, 'G', 3, 64)
+	pressure := strconv.FormatFloat(data.Pressure, 'G', 5, 64)
 
-	innerSize := strconv.FormatFloat(d.Cap.InnerSize, 'G', 3, 64)
-	bottomThick := strconv.FormatFloat(d.Cap.BottomThick, 'G', 3, 64)
-	wallThick := strconv.FormatFloat(d.Cap.WallThick, 'G', 3, 64)
-	capEpsilon := strconv.FormatFloat(d.Cap.Epsilon, 'G', 3, 64)
+	innerSize := strconv.FormatFloat(d.Cap.InnerSize, 'G', 5, 64)
+	bottomThick := strconv.FormatFloat(d.Cap.BottomThick, 'G', 5, 64)
+	wallThick := strconv.FormatFloat(d.Cap.WallThick, 'G', 5, 64)
+	capEpsilon := strconv.FormatFloat(d.Cap.Epsilon, 'G', 5, 64)
 
-	sizeLong := strconv.FormatFloat(d.Gasket.SizeLong, 'G', 3, 64)
-	gThickness := strconv.FormatFloat(d.Gasket.Thickness, 'G', 3, 64)
-	gWidth := strconv.FormatFloat(d.Gasket.Width, 'G', 3, 64)
-	m := strconv.FormatFloat(d.Gasket.M, 'G', 3, 64)
+	sizeLong := strconv.FormatFloat(d.Gasket.SizeLong, 'G', 5, 64)
+	gThickness := strconv.FormatFloat(d.Gasket.Thickness, 'G', 5, 64)
+	gWidth := strconv.FormatFloat(d.Gasket.Width, 'G', 5, 64)
+	m := strconv.FormatFloat(d.Gasket.M, 'G', 5, 64)
 
-	bEpsilon := strconv.FormatFloat(d.Bolt.Epsilon, 'G', 3, 64)
-	area := strconv.FormatFloat(d.Bolt.Area, 'G', 3, 64)
+	bEpsilon := strconv.FormatFloat(d.Bolt.Epsilon, 'G', 5, 64)
+	area := strconv.FormatFloat(d.Bolt.Area, 'G', 5, 64)
 	count := d.Bolt.Count
 
-	zoneThick := strconv.FormatFloat(d.TubeSheet.ZoneThick, 'G', 3, 64)
-	outZoneThick := strconv.FormatFloat(d.TubeSheet.OutZoneThick, 'G', 3, 64)
-	tsEpsilon := strconv.FormatFloat(d.TubeSheet.Epsilon, 'G', 3, 64)
+	zoneThick := strconv.FormatFloat(d.TubeSheet.ZoneThick, 'G', 5, 64)
+	outZoneThick := strconv.FormatFloat(d.TubeSheet.OutZoneThick, 'G', 5, 64)
+	tsEpsilon := strconv.FormatFloat(d.TubeSheet.Epsilon, 'G', 5, 64)
 
-	CPressure := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Pressure, 'G', 3, 64), "E", "*10^")
+	CPressure := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Pressure, 'G', 5, 64), "E", "*10^")
 
-	CapPsi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.Psi, 'G', 3, 64), "E", "*10^")
+	CapPsi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.Psi, 'G', 5, 64), "E", "*10^")
 
-	TsPsi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Psi, 'G', 3, 64), "E", "*10^")
+	TsPsi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Psi, 'G', 5, 64), "E", "*10^")
 
-	EstimatedGasketWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedGasketWidth, 'G', 3, 64), "E", "*10^")
-	EstimatedZoneWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedZoneWidth, 'G', 3, 64), "E", "*10^")
-	RelativeWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.RelativeWidth, 'G', 3, 64), "E", "*10^")
-	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 3, 64), "E", "*10^")
-	Arm1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Arm1, 'G', 3, 64), "E", "*10^")
+	EstimatedGasketWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedGasketWidth, 'G', 5, 64), "E", "*10^")
+	EstimatedZoneWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedZoneWidth, 'G', 5, 64), "E", "*10^")
+	RelativeWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.RelativeWidth, 'G', 5, 64), "E", "*10^")
+	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 5, 64), "E", "*10^")
+	Arm1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Arm1, 'G', 5, 64), "E", "*10^")
 
-	Lp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Lp, 'G', 3, 64), "E", "*10^")
-	UpsilonB := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.UpsilonB, 'G', 3, 64), "E", "*10^")
-	UpsilonP := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.UpsilonP, 'G', 3, 64), "E", "*10^")
-	CapUpsilonM := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.CapUpsilonM, 'G', 3, 64), "E", "*10^")
-	SheetUpsilonM := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.SheetUpsilonM, 'G', 3, 64), "E", "*10^")
-	CapUpsilonP := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.CapUpsilonP, 'G', 3, 64), "E", "*10^")
-	SheetUpsilonP := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.SheetUpsilonP, 'G', 3, 64), "E", "*10^")
-	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.WorkEffort, 'G', 3, 64), "E", "*10^")
-	Eta := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Eta, 'G', 3, 64), "E", "*10^")
-	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Effort, 'G', 3, 64), "E", "*10^")
+	Lp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Lp, 'G', 5, 64), "E", "*10^")
+	UpsilonB := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.UpsilonB, 'G', 5, 64), "E", "*10^")
+	UpsilonP := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.UpsilonP, 'G', 5, 64), "E", "*10^")
+	CapUpsilonM := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.CapUpsilonM, 'G', 5, 64), "E", "*10^")
+	SheetUpsilonM := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.SheetUpsilonM, 'G', 5, 64), "E", "*10^")
+	CapUpsilonP := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.CapUpsilonP, 'G', 5, 64), "E", "*10^")
+	SheetUpsilonP := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.SheetUpsilonP, 'G', 5, 64), "E", "*10^")
+	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.WorkEffort, 'G', 5, 64), "E", "*10^")
+	Eta := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Eta, 'G', 5, 64), "E", "*10^")
+	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Effort, 'G', 5, 64), "E", "*10^")
 
 	tmp1 := fmt.Sprintf("(%s)^3 / (%s * (%s)^3)", innerSize, capEpsilon, bottomThick)
 	var tmp2, tmp3, tmpPhi string

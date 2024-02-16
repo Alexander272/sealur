@@ -253,7 +253,9 @@ func (s *FlangeService) momentCalculate(
 		// moment.Mkp = (0.3 * Pbm * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 	}
 
-	moment.Mkp1 = 0.75 * moment.Mkp
+	if Friction == constants.DefaultFriction {
+		moment.Mkp1 = 0.75 * moment.Mkp
+	}
 
 	if fullCalculate {
 		Prek := 0.8 * Ab * data.Bolt.SigmaAt20
@@ -264,14 +266,15 @@ func (s *FlangeService) momentCalculate(
 		Pmax := DSigmaM * Ab
 		moment.Qmax = Pmax / (math.Pi * Dcp * data.Gasket.Width)
 
-		// if data.TypeGasket == flange_model.GasketData_Soft && moment.Qmax > data.Gasket.PermissiblePres {
-		// 	Pmax = float64(data.Gasket.PermissiblePres) * (math.Pi * Dcp * data.Gasket.Width)
-		// 	moment.Qmax = data.Gasket.PermissiblePres
-		// }
-		if moment.Qmax > data.Gasket.PermissiblePres {
+		// Лукиных попросил вернуть условие 09.01.2024
+		if data.TypeGasket == flange_model.GasketData_Soft && moment.Qmax > data.Gasket.PermissiblePres {
 			Pmax = float64(data.Gasket.PermissiblePres) * (math.Pi * Dcp * data.Gasket.Width)
 			moment.Qmax = data.Gasket.PermissiblePres
 		}
+		// if moment.Qmax > data.Gasket.PermissiblePres {
+		// 	Pmax = float64(data.Gasket.PermissiblePres) * (math.Pi * Dcp * data.Gasket.Width)
+		// 	moment.Qmax = data.Gasket.PermissiblePres
+		// }
 
 		moment.Mmax = (Friction * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 		// moment.Mmax = (0.3 * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000

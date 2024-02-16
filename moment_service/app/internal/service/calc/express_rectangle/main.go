@@ -11,8 +11,10 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
+	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_rectangle_model"
+	"github.com/goccy/go-json"
 )
 
 type ExRectService struct {
@@ -31,7 +33,7 @@ func NewExRectServiceService(graphic *graphic.GraphicService, flange *flange.Fla
 		"pin":  constants.PinD,
 	}
 
-	// занчение зависит от поля "Условия работы"
+	// значение зависит от поля "Условия работы"
 	kp := map[bool]float64{
 		true:  constants.WorkKyp,
 		false: constants.TestKyp,
@@ -64,7 +66,7 @@ func (s *ExRectService) CalculateExRect(ctx context.Context, data *calc_api.Expr
 		return nil, err
 	}
 
-	result := calc_api.ExpressRectangleResponse{
+	result := &calc_api.ExpressRectangleResponse{
 		Data:   s.data.FormatInitData(data),
 		Bolts:  d.Bolt,
 		Gasket: d.Gasket,
@@ -127,7 +129,10 @@ func (s *ExRectService) CalculateExRect(ctx context.Context, data *calc_api.Expr
 			// Moment.Mkp = (0.3 * ForcesInBolts.Effort * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 		}
 		Moment.Friction = data.Friction
-		Moment.Mkp1 = 0.75 * Moment.Mkp
+
+		if data.Friction == constants.DefaultFriction {
+			Moment.Mkp1 = 0.75 * Moment.Mkp
+		}
 
 		Prek := 0.8 * ForcesInBolts.Area * d.Bolt.SigmaAt20
 		Moment.Qrek = Prek / (2 * (Auxiliary.SizeLong + Auxiliary.SizeTrans) * d.Gasket.Width)
@@ -137,14 +142,14 @@ func (s *ExRectService) CalculateExRect(ctx context.Context, data *calc_api.Expr
 		Pmax := Bolts.AllowableVoltage * ForcesInBolts.Area
 		Moment.Qmax = Pmax / (2 * (Auxiliary.SizeLong + Auxiliary.SizeTrans) * d.Gasket.Width)
 
-		// if d.TypeGasket == express_rectangle_model.GasketData_Soft && Moment.Qmax > d.Gasket.PermissiblePres {
-		// 	Pmax = d.Gasket.PermissiblePres * (2 * (Auxiliary.SizeLong + Auxiliary.SizeTrans) * d.Gasket.Width)
-		// 	Moment.Qmax = d.Gasket.PermissiblePres
-		// }
-		if Moment.Qmax > d.Gasket.PermissiblePres {
+		if d.TypeGasket == express_rectangle_model.GasketData_Soft && Moment.Qmax > d.Gasket.PermissiblePres {
 			Pmax = d.Gasket.PermissiblePres * (2 * (Auxiliary.SizeLong + Auxiliary.SizeTrans) * d.Gasket.Width)
 			Moment.Qmax = d.Gasket.PermissiblePres
 		}
+		// if Moment.Qmax > d.Gasket.PermissiblePres {
+		// 	Pmax = d.Gasket.PermissiblePres * (2 * (Auxiliary.SizeLong + Auxiliary.SizeTrans) * d.Gasket.Width)
+		// 	Moment.Qmax = d.Gasket.PermissiblePres
+		// }
 
 		Moment.Mmax = (data.Friction * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 		// Moment.Mmax = (0.3 * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
@@ -163,8 +168,19 @@ func (s *ExRectService) CalculateExRect(ctx context.Context, data *calc_api.Expr
 	result.Calc.Moment = Moment
 
 	if data.IsNeedFormulas {
-		result.Formulas = s.formulas.GetFormulas(*data, d, result)
+		result.Formulas = s.formulas.GetFormulas(data, d, result)
 	}
 
-	return &result, nil
+	_, err = json.Marshal(result.Calc)
+	if err != nil {
+		result.Calc = &express_rectangle_model.Calculated{
+			Auxiliary:     &express_rectangle_model.CalcAuxiliary{},
+			ForcesInBolts: &express_rectangle_model.CalcForcesInBolts{},
+			Bolt:          &express_rectangle_model.CalcBolts{},
+			Moment:        &express_rectangle_model.CalcMoment{},
+		}
+		logger.Error("failed to marshal json. error: " + err.Error())
+	}
+
+	return result, nil
 }

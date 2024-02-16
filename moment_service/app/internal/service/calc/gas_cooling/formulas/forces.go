@@ -15,19 +15,19 @@ func (s *FormulasService) getForcesFormulas(req *calc_api.GasCoolingRequest, dat
 	ForcesInBolts := &gas_cooling_model.ForcesInBoltsFormulas{}
 
 	// перевод чисел в строки
-	pressure := strconv.FormatFloat(req.Data.Pressure.Value, 'G', 3, 64)
-	testPressure := strconv.FormatFloat(result.Data.TestPressure, 'G', 3, 64)
+	pressure := strconv.FormatFloat(req.Data.Pressure.Value, 'G', 5, 64)
+	testPressure := strconv.FormatFloat(result.Data.TestPressure, 'G', 5, 64)
 
-	area := strconv.FormatFloat(data.Bolt.Area, 'G', 3, 64)
+	area := strconv.FormatFloat(data.Bolt.Area, 'G', 5, 64)
 	count := data.Bolt.Count
 
-	m := strconv.FormatFloat(data.Gasket.M, 'G', 3, 64)
+	m := strconv.FormatFloat(data.Gasket.M, 'G', 5, 64)
 
-	EstimatedGasketWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedGasketWidth, 'G', 3, 64), "E", "*10^")
-	SizeLong := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeLong, 'G', 3, 64), "E", "*10^")
-	SizeTrans := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeTrans, 'G', 3, 64), "E", "*10^")
+	EstimatedGasketWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedGasketWidth, 'G', 5, 64), "E", "*10^")
+	SizeLong := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeLong, 'G', 5, 64), "E", "*10^")
+	SizeTrans := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeTrans, 'G', 5, 64), "E", "*10^")
 
-	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 3, 64), "E", "*10^")
+	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 5, 64), "E", "*10^")
 
 	// Суммарная площадь сечения болтов/шпилек
 	ForcesInBolts.Area = fmt.Sprintf("%d * %s", count, area)

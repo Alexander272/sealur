@@ -11,44 +11,44 @@ import (
 )
 
 func (s *FormulasService) getCapFormulas(
-	data calc_api.DevCoolingRequest,
+	data *calc_api.DevCoolingRequest,
 	d models.DataDevCooling,
-	result calc_api.DevCoolingResponse,
+	result *calc_api.DevCoolingResponse,
 ) *dev_cooling_model.CapFormulas {
 	Cap := &dev_cooling_model.CapFormulas{}
 
 	// перевод чисел в строки
-	pressure := strconv.FormatFloat(data.Pressure, 'G', 3, 64)
+	pressure := strconv.FormatFloat(data.Pressure, 'G', 5, 64)
 
-	innerSize := strconv.FormatFloat(d.Cap.InnerSize, 'G', 3, 64)
-	l := strconv.FormatFloat(d.Cap.L, 'G', 3, 64)
-	depth := strconv.FormatFloat(d.Cap.Depth, 'G', 3, 64)
-	flangeThick := strconv.FormatFloat(d.Cap.FlangeThick, 'G', 3, 64)
-	wallThick := strconv.FormatFloat(d.Cap.WallThick, 'G', 3, 64)
-	bottomThick := strconv.FormatFloat(d.Cap.BottomThick, 'G', 3, 64)
-	sigma := strconv.FormatFloat(d.Cap.Sigma, 'G', 3, 64)
-	strength := strconv.FormatFloat(d.Cap.Strength, 'G', 3, 64)
-	corrosion := strconv.FormatFloat(d.Cap.Corrosion, 'G', 3, 64)
+	innerSize := strconv.FormatFloat(d.Cap.InnerSize, 'G', 5, 64)
+	l := strconv.FormatFloat(d.Cap.L, 'G', 5, 64)
+	depth := strconv.FormatFloat(d.Cap.Depth, 'G', 5, 64)
+	flangeThick := strconv.FormatFloat(d.Cap.FlangeThick, 'G', 5, 64)
+	wallThick := strconv.FormatFloat(d.Cap.WallThick, 'G', 5, 64)
+	bottomThick := strconv.FormatFloat(d.Cap.BottomThick, 'G', 5, 64)
+	sigma := strconv.FormatFloat(d.Cap.Sigma, 'G', 5, 64)
+	strength := strconv.FormatFloat(d.Cap.Strength, 'G', 5, 64)
+	corrosion := strconv.FormatFloat(d.Cap.Corrosion, 'G', 5, 64)
 
-	distance := strconv.FormatFloat(d.Bolt.Distance, 'G', 3, 64)
+	distance := strconv.FormatFloat(d.Bolt.Distance, 'G', 5, 64)
 
-	tsSigma := strconv.FormatFloat(d.TubeSheet.Sigma, 'G', 3, 64)
+	tsSigma := strconv.FormatFloat(d.TubeSheet.Sigma, 'G', 5, 64)
 
-	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 3, 64), "E", "*10^")
-	Arm1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Arm1, 'G', 3, 64), "E", "*10^")
+	Bp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Bp, 'G', 5, 64), "E", "*10^")
+	Arm1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.Arm1, 'G', 5, 64), "E", "*10^")
 
-	Lp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Lp, 'G', 3, 64), "E", "*10^")
-	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.WorkEffort, 'G', 3, 64), "E", "*10^")
+	Lp := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.Lp, 'G', 5, 64), "E", "*10^")
+	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Bolt.WorkEffort, 'G', 5, 64), "E", "*10^")
 
-	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Effort, 'G', 3, 64), "E", "*10^")
+	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.TubeSheet.Effort, 'G', 5, 64), "E", "*10^")
 
-	F1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.F1, 'G', 3, 64), "E", "*10^")
-	F2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.F2, 'G', 3, 64), "E", "*10^")
-	Lambda := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.Lambda, 'G', 3, 64), "E", "*10^")
-	Psi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.Psi, 'G', 3, 64), "E", "*10^")
-	ChiK := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.ChiK, 'G', 3, 64), "E", "*10^")
-	Chi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.Chi, 'G', 3, 64), "E", "*10^")
-	WallThick := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.WallThick, 'G', 3, 64), "E", "*10^")
+	F1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.F1, 'G', 5, 64), "E", "*10^")
+	F2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.F2, 'G', 5, 64), "E", "*10^")
+	Lambda := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.Lambda, 'G', 5, 64), "E", "*10^")
+	Psi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.Psi, 'G', 5, 64), "E", "*10^")
+	ChiK := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.ChiK, 'G', 5, 64), "E", "*10^")
+	Chi := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.Chi, 'G', 5, 64), "E", "*10^")
+	WallThick := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Cap.WallThick, 'G', 5, 64), "E", "*10^")
 
 	//
 	Cap.Psi = fmt.Sprintf("((%s / %s)^2-1)*(%s / (%s + %s)) - 4 * (%s / %s)^2", Bp, innerSize, l, l, innerSize, depth, innerSize)

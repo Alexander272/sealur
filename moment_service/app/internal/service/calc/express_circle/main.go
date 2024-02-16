@@ -11,8 +11,10 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
+	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_circle_model"
+	"github.com/goccy/go-json"
 )
 
 type ExCircleService struct {
@@ -31,7 +33,7 @@ func NewExCircleService(graphic *graphic.GraphicService, flange *flange.FlangeSe
 		"pin":  constants.PinD,
 	}
 
-	// занчение зависит от поля "Условия работы"
+	// значение зависит от поля "Условия работы"
 	kp := map[bool]float64{
 		true:  constants.WorkKyp,
 		false: constants.TestKyp,
@@ -64,7 +66,7 @@ func (s *ExCircleService) CalculateExCircle(ctx context.Context, data *calc_api.
 		return nil, err
 	}
 
-	result := calc_api.ExpressCircleResponse{
+	result := &calc_api.ExpressCircleResponse{
 		Data:   s.data.FormatInitData(data),
 		Bolts:  d.Bolt,
 		Gasket: d.Gasket,
@@ -140,6 +142,10 @@ func (s *ExCircleService) CalculateExCircle(ctx context.Context, data *calc_api.
 	ok := Bolts.StrengthBolt.X <= Bolts.StrengthBolt.Y && (d.TypeGasket != express_circle_model.GasketData_Soft ||
 		(d.TypeGasket == express_circle_model.GasketData_Soft && Bolts.StrengthGasket.X <= Bolts.StrengthGasket.Y))
 
+	// logger.Debug(ok)
+	// logger.Debug(Bolts.StrengthBolt.X <= Bolts.StrengthBolt.Y, d.TypeGasket != express_circle_model.GasketData_Soft)
+	// logger.Debug(d.TypeGasket == express_circle_model.GasketData_Soft, Bolts.StrengthGasket.X <= Bolts.StrengthGasket.Y)
+
 	if ok {
 		if Bolts.RatedStress > constants.MaxSigmaB && d.Bolt.Diameter >= constants.MinDiameter && d.Bolt.Diameter <= constants.MaxDiameter {
 			Moment.Mkp = s.graphic.CalculateMkp(d.Bolt.Diameter, Bolts.RatedStress)
@@ -149,7 +155,10 @@ func (s *ExCircleService) CalculateExCircle(ctx context.Context, data *calc_api.
 			// Moment.Mkp = (0.3 * ForcesInBolts.DesignLoad * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 		}
 		Moment.Friction = data.Friction
-		Moment.Mkp1 = 0.75 * Moment.Mkp
+
+		if data.Friction == constants.DefaultFriction {
+			Moment.Mkp1 = 0.75 * Moment.Mkp
+		}
 
 		Prek := 0.8 * ForcesInBolts.Area * d.Bolt.SigmaAt20
 		Moment.Qrek = Prek / (math.Pi * Deformation.Diameter * d.Gasket.Width)
@@ -159,14 +168,14 @@ func (s *ExCircleService) CalculateExCircle(ctx context.Context, data *calc_api.
 		Pmax := Bolts.AllowableVoltage * ForcesInBolts.Area
 		Moment.Qmax = Pmax / (math.Pi * Deformation.Diameter * d.Gasket.Width)
 
-		// if d.TypeGasket == express_circle_model.GasketData_Soft && Moment.Qmax > d.Gasket.PermissiblePres {
-		// 	Pmax = d.Gasket.PermissiblePres * (math.Pi * Deformation.Diameter * d.Gasket.Width)
-		// 	Moment.Qmax = d.Gasket.PermissiblePres
-		// }
-		if Moment.Qmax > d.Gasket.PermissiblePres {
+		if d.TypeGasket == express_circle_model.GasketData_Soft && Moment.Qmax > d.Gasket.PermissiblePres {
 			Pmax = d.Gasket.PermissiblePres * (math.Pi * Deformation.Diameter * d.Gasket.Width)
 			Moment.Qmax = d.Gasket.PermissiblePres
 		}
+		// if Moment.Qmax > d.Gasket.PermissiblePres {
+		// 	Pmax = d.Gasket.PermissiblePres * (math.Pi * Deformation.Diameter * d.Gasket.Width)
+		// 	Moment.Qmax = d.Gasket.PermissiblePres
+		// }
 
 		Moment.Mmax = (data.Friction * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
 		// Moment.Mmax = (0.3 * Pmax * d.Bolt.Diameter / float64(d.Bolt.Count)) / 1000
@@ -185,8 +194,19 @@ func (s *ExCircleService) CalculateExCircle(ctx context.Context, data *calc_api.
 	result.Calc.Moment = Moment
 
 	if data.IsNeedFormulas {
-		result.Formulas = s.formulas.GetFormulas(*data, d, result)
+		result.Formulas = s.formulas.GetFormulas(data, d, result)
 	}
 
-	return &result, nil
+	_, err = json.Marshal(result.Calc)
+	if err != nil {
+		result.Calc = &express_circle_model.Calculated{
+			Deformation:   &express_circle_model.CalcDeformation{},
+			ForcesInBolts: &express_circle_model.CalcForcesInBolts{},
+			Bolt:          &express_circle_model.CalcBolts{},
+			Moment:        &express_circle_model.CalcMoment{},
+		}
+		logger.Error("failed to marshal json. error: " + err.Error())
+	}
+
+	return result, nil
 }

@@ -10,26 +10,26 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_circle_model"
 )
 
-func (s *FormulasService) getForcesFormulas(req calc_api.ExpressCircleRequest, d models.DataExCircle, result calc_api.ExpressCircleResponse,
+func (s *FormulasService) getForcesFormulas(req *calc_api.ExpressCircleRequest, d models.DataExCircle, result *calc_api.ExpressCircleResponse,
 ) *express_circle_model.ForcesInBoltsFormulas {
 	ForcesInBolts := &express_circle_model.ForcesInBoltsFormulas{}
 
 	// перевод чисел в строки
-	pressure := strconv.FormatFloat(req.Pressure, 'G', 3, 64)
+	pressure := strconv.FormatFloat(req.Pressure, 'G', 5, 64)
 
-	area := strconv.FormatFloat(d.Bolt.Area, 'G', 3, 64)
+	area := strconv.FormatFloat(d.Bolt.Area, 'G', 5, 64)
 	count := d.Bolt.Count
-	sigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 3, 64)
+	sigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 5, 64)
 
-	dDiameter := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Diameter, 'G', 3, 64), "E", "*10^")
-	dDeformation := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Deformation, 'G', 3, 64), "E", "*10^")
-	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Effort, 'G', 3, 64), "E", "*10^")
+	dDiameter := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Diameter, 'G', 5, 64), "E", "*10^")
+	dDeformation := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Deformation, 'G', 5, 64), "E", "*10^")
+	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Effort, 'G', 5, 64), "E", "*10^")
 
-	FArea := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 3, 64), "E", "*10^")
-	ResultantLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.ResultantLoad, 'G', 3, 64), "E", "*10^")
-	EstimatedLoad1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.EstimatedLoad1, 'G', 3, 64), "E", "*10^")
-	EstimatedLoad2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.EstimatedLoad2, 'G', 3, 64), "E", "*10^")
-	DesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.DesignLoad, 'G', 3, 64), "E", "*10^")
+	FArea := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 5, 64), "E", "*10^")
+	ResultantLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.ResultantLoad, 'G', 5, 64), "E", "*10^")
+	EstimatedLoad1 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.EstimatedLoad1, 'G', 5, 64), "E", "*10^")
+	EstimatedLoad2 := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.EstimatedLoad2, 'G', 5, 64), "E", "*10^")
+	DesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.DesignLoad, 'G', 5, 64), "E", "*10^")
 
 	// Суммарная площадь сечения болтов/шпилек
 	ForcesInBolts.Area = fmt.Sprintf("%d * %s", count, area)

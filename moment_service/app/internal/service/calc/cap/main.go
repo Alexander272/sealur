@@ -10,8 +10,10 @@ import (
 	"github.com/Alexander272/sealur/moment_service/internal/service/gasket"
 	"github.com/Alexander272/sealur/moment_service/internal/service/graphic"
 	"github.com/Alexander272/sealur/moment_service/internal/service/materials"
+	"github.com/Alexander272/sealur/moment_service/pkg/logger"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api"
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/cap_model"
+	"github.com/goccy/go-json"
 )
 
 type CapService struct {
@@ -98,6 +100,39 @@ func (s *CapService) CalculationCap(ctx context.Context, data *calc_api.CapReque
 	if data.IsNeedFormulas {
 		// получение формул с подставленными значениями переменных
 		result.Formulas = s.formulas.GetFormulas(data, d, &result, aux)
+	}
+
+	_, err = json.Marshal(result.Calc)
+	if err != nil {
+		//? если не можем преобразовать в json обнуляем все значения
+		if data.Data.Calculation == cap_model.MainData_basis {
+			// расчет основных величин
+			result.Calc.Basis = &cap_model.Calculated_Basis{
+				Deformation:   &cap_model.CalcDeformation{},
+				ForcesInBolts: &cap_model.CalcForcesInBolts{},
+				BoltStrength:  &cap_model.CalcBoltStrength{},
+				Moment:        &cap_model.CalcMoment{},
+			}
+		} else {
+			// прочностной расчет
+			result.Calc.Strength = &cap_model.Calculated_Strength{
+				Auxiliary:              &cap_model.CalcAuxiliary{},
+				Tightness:              &cap_model.CalcTightness{},
+				BoltStrength1:          &cap_model.CalcBoltStrength{},
+				Moment1:                &cap_model.CalcMoment{},
+				StaticResistance1:      &cap_model.CalcStaticResistance{},
+				ConditionsForStrength1: &cap_model.CalcConditionsForStrength{},
+				TightnessLoad:          &cap_model.CalcTightnessLoad{},
+				BoltStrength2:          &cap_model.CalcBoltStrength{},
+				Moment2:                &cap_model.CalcMoment{},
+				StaticResistance2:      &cap_model.CalcStaticResistance{},
+				ConditionsForStrength2: &cap_model.CalcConditionsForStrength{},
+				Deformation:            &cap_model.CalcDeformation{},
+				ForcesInBolts:          &cap_model.CalcForcesInBolts{},
+				FinalMoment:            &cap_model.CalcMoment{},
+			}
+		}
+		logger.Error("failed to marshal json. error: " + err.Error())
 	}
 
 	return &result, nil

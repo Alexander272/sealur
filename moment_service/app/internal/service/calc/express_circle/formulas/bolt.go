@@ -12,20 +12,20 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_circle_model"
 )
 
-func (s *FormulasService) getBoltFormulas(req calc_api.ExpressCircleRequest, d models.DataExCircle, result calc_api.ExpressCircleResponse,
+func (s *FormulasService) getBoltFormulas(req *calc_api.ExpressCircleRequest, d models.DataExCircle, result *calc_api.ExpressCircleResponse,
 ) *express_circle_model.BoltsFormulas {
 	Bolts := &express_circle_model.BoltsFormulas{}
 
 	// перевод чисел в строки
-	sigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 3, 64)
+	sigmaAt20 := strconv.FormatFloat(d.Bolt.SigmaAt20, 'G', 5, 64)
 
-	width := strconv.FormatFloat(d.Gasket.Width, 'G', 3, 64)
+	width := strconv.FormatFloat(d.Gasket.Width, 'G', 5, 64)
 
-	Diameter := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Diameter, 'G', 3, 64), "E", "*10^")
+	Diameter := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Deformation.Diameter, 'G', 5, 64), "E", "*10^")
 
-	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 3, 64), "E", "*10^")
-	DesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.DesignLoad, 'G', 3, 64), "E", "*10^")
-	WorkDesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.WorkDesignLoad, 'G', 3, 64), "E", "*10^")
+	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 5, 64), "E", "*10^")
+	DesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.DesignLoad, 'G', 5, 64), "E", "*10^")
+	WorkDesignLoad := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.WorkDesignLoad, 'G', 5, 64), "E", "*10^")
 
 	Kyp := s.Kyp[true]
 	Kyz := s.Kyz[req.Condition.String()]

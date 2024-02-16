@@ -12,9 +12,9 @@ func (s *FormulasService) getFlangeFormulas(flange *float_model.FlangeResult, ca
 ) *float_model.FlangeFormulas {
 	formulas := &float_model.FlangeFormulas{}
 
-	d6 := strings.ReplaceAll(strconv.FormatFloat(flange.D6, 'G', 3, 64), "E", "*10^")
-	d := strings.ReplaceAll(strconv.FormatFloat(flange.D, 'G', 3, 64), "E", "*10^")
-	cs := strings.ReplaceAll(strconv.FormatFloat(cap.S, 'G', 3, 64), "E", "*10^")
+	d6 := strings.ReplaceAll(strconv.FormatFloat(flange.D6, 'G', 5, 64), "E", "*10^")
+	d := strings.ReplaceAll(strconv.FormatFloat(flange.D, 'G', 5, 64), "E", "*10^")
+	cs := strings.ReplaceAll(strconv.FormatFloat(cap.S, 'G', 5, 64), "E", "*10^")
 
 	formulas.B = fmt.Sprintf("0.5 * (%s - %s)", d6, Dcp)
 	formulas.L0 = fmt.Sprintf("sqrt(%s * %s)", d, cs)

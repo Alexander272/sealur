@@ -39,7 +39,7 @@ func NewFormulasService() *FormulasService {
 	}
 }
 
-func (s *FormulasService) GetFormulas(req calc_api.ExpressCircleRequest, d models.DataExCircle, result calc_api.ExpressCircleResponse,
+func (s *FormulasService) GetFormulas(req *calc_api.ExpressCircleRequest, d models.DataExCircle, result *calc_api.ExpressCircleResponse,
 ) *express_circle_model.Formulas {
 	formulas := &express_circle_model.Formulas{
 		Deformation:   s.getDeformationFormulas(req, d, result),

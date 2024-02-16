@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/Alexander272/sealur_proto/api v0.0.0-20230504093903-c8f3647098ec
+	github.com/goccy/go-json v0.10.2
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.9

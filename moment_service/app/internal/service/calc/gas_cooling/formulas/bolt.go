@@ -16,16 +16,16 @@ func (s *FormulasService) getBoltFormulas(req *calc_api.GasCoolingRequest, data 
 	Bolts := &gas_cooling_model.BoltsFormulas{}
 
 	// перевод чисел в строки
-	sigmaAt20 := strconv.FormatFloat(data.Bolt.SigmaAt20, 'G', 3, 64)
+	sigmaAt20 := strconv.FormatFloat(data.Bolt.SigmaAt20, 'G', 5, 64)
 
-	width := strconv.FormatFloat(data.Gasket.Width, 'G', 3, 64)
+	width := strconv.FormatFloat(data.Gasket.Width, 'G', 5, 64)
 
-	SizeLong := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeLong, 'G', 3, 64), "E", "*10^")
-	SizeTrans := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeTrans, 'G', 3, 64), "E", "*10^")
+	SizeLong := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeLong, 'G', 5, 64), "E", "*10^")
+	SizeTrans := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeTrans, 'G', 5, 64), "E", "*10^")
 
-	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 3, 64), "E", "*10^")
-	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Effort, 'G', 3, 64), "E", "*10^")
-	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.WorkEffort, 'G', 3, 64), "E", "*10^")
+	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 5, 64), "E", "*10^")
+	Effort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Effort, 'G', 5, 64), "E", "*10^")
+	WorkEffort := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.WorkEffort, 'G', 5, 64), "E", "*10^")
 
 	Kyp := s.Kyp[true]
 	Kyz := s.Kyz[req.Data.Condition.String()]

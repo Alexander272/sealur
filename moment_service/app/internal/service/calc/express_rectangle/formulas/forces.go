@@ -10,24 +10,24 @@ import (
 	"github.com/Alexander272/sealur_proto/api/moment/calc_api/express_rectangle_model"
 )
 
-func (s *FormulasService) getForcesFormulas(req calc_api.ExpressRectangleRequest, d models.DataExRect, result calc_api.ExpressRectangleResponse,
+func (s *FormulasService) getForcesFormulas(req *calc_api.ExpressRectangleRequest, d models.DataExRect, result *calc_api.ExpressRectangleResponse,
 ) *express_rectangle_model.ForcesInBoltsFormulas {
 	ForcesInBolts := &express_rectangle_model.ForcesInBoltsFormulas{}
 
 	// перевод чисел в строки
-	pressure := strconv.FormatFloat(req.Pressure, 'G', 3, 64)
-	testPressure := strconv.FormatFloat(result.Data.TestPressure, 'G', 3, 64)
+	pressure := strconv.FormatFloat(req.Pressure, 'G', 5, 64)
+	testPressure := strconv.FormatFloat(result.Data.TestPressure, 'G', 5, 64)
 
-	area := strconv.FormatFloat(d.Bolt.Area, 'G', 3, 64)
+	area := strconv.FormatFloat(d.Bolt.Area, 'G', 5, 64)
 	count := d.Bolt.Count
 
-	m := strconv.FormatFloat(d.Gasket.M, 'G', 3, 64)
+	m := strconv.FormatFloat(d.Gasket.M, 'G', 5, 64)
 
-	EstimatedGasketWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedGasketWidth, 'G', 3, 64), "E", "*10^")
-	SizeLong := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeLong, 'G', 3, 64), "E", "*10^")
-	SizeTrans := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeTrans, 'G', 3, 64), "E", "*10^")
+	EstimatedGasketWidth := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.EstimatedGasketWidth, 'G', 5, 64), "E", "*10^")
+	SizeLong := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeLong, 'G', 5, 64), "E", "*10^")
+	SizeTrans := strings.ReplaceAll(strconv.FormatFloat(result.Calc.Auxiliary.SizeTrans, 'G', 5, 64), "E", "*10^")
 
-	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 3, 64), "E", "*10^")
+	Area := strings.ReplaceAll(strconv.FormatFloat(result.Calc.ForcesInBolts.Area, 'G', 5, 64), "E", "*10^")
 
 	// Суммарная площадь сечения болтов/шпилек
 	ForcesInBolts.Area = fmt.Sprintf("%d * %s", count, area)

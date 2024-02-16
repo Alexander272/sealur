@@ -91,6 +91,9 @@ func (s *CapService) forcesInBoltsCalculate(
 	if data.TypeGasket == cap_model.GasketData_Soft {
 		// Податливость прокладки
 		yp = (data.Gasket.Thickness * data.Gasket.Compression) / (data.Gasket.Epsilon * math.Pi * def.Dcp * data.Gasket.Width)
+		// if math.IsNaN(yp) {
+		// 	return forces, &cap_model.CalcAuxiliary{}
+		// }
 	}
 
 	// приложение К пояснение к формуле К.2
@@ -98,6 +101,9 @@ func (s *CapService) forcesInBoltsCalculate(
 	// формула К.2
 	// Податливость болтов/шпилек
 	yb := Lb / (data.Bolt.EpsilonAt20 * data.Bolt.Area * float64(data.Bolt.Count))
+	// if math.IsNaN(yb) {
+	// 	return forces, &cap_model.CalcAuxiliary{}
+	// }
 
 	flange := s.auxFlangeCalculate(req.FlangeData.Type, data.Flange, def.Dcp)
 	cap := s.auxCapCalculate(req.CapData.Type, data.Cap, data.Flange, def.Dcp)
@@ -117,6 +123,10 @@ func (s *CapService) forcesInBoltsCalculate(
 		// формула (Е.11)
 		// Коэффициент жесткости
 		forces.Alpha = 1 - (yp-(flange.Yf*flange.E+cap.Y*flange.B)*flange.B)/(yp+yb+(flange.Yf+cap.Y)*math.Pow(flange.B, 2))
+		// if math.IsNaN(forces.Alpha) {
+		// 	forces.Alpha = 0
+		// 	return forces, aux
+		// }
 	}
 
 	minB := 0.4 * forces.A * data.Bolt.SigmaAt20
@@ -137,6 +147,9 @@ func (s *CapService) forcesInBoltsCalculate(
 	// формула (Е.8)
 	gamma := 1 / divider
 	aux.Gamma = gamma
+	// if math.IsNaN(gamma) {
+	// 	return forces, aux
+	// }
 
 	var temp1, temp2 float64
 	if req.IsUseWasher {
@@ -225,7 +238,9 @@ func (s *CapService) momentCalculate(
 		// moment.Mkp = (0.3 * Pbm * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 	}
 
-	moment.Mkp1 = 0.75 * moment.Mkp
+	if Friction == constants.DefaultFriction {
+		moment.Mkp1 = 0.75 * moment.Mkp
+	}
 
 	if fullCalculate {
 		Prek := 0.8 * Ab * data.Bolt.SigmaAt20
@@ -236,14 +251,14 @@ func (s *CapService) momentCalculate(
 		Pmax := DSigmaM * Ab
 		moment.Qmax = Pmax / (math.Pi * Dcp * data.Gasket.Width)
 
-		// if data.TypeGasket == cap_model.GasketData_Soft && moment.Qmax > data.Gasket.PermissiblePres {
-		// 	Pmax = float64(data.Gasket.PermissiblePres) * (math.Pi * Dcp * data.Gasket.Width)
-		// 	moment.Qmax = data.Gasket.PermissiblePres
-		// }
-		if moment.Qmax > data.Gasket.PermissiblePres {
+		if data.TypeGasket == cap_model.GasketData_Soft && moment.Qmax > data.Gasket.PermissiblePres {
 			Pmax = float64(data.Gasket.PermissiblePres) * (math.Pi * Dcp * data.Gasket.Width)
 			moment.Qmax = data.Gasket.PermissiblePres
 		}
+		// if moment.Qmax > data.Gasket.PermissiblePres {
+		// 	Pmax = float64(data.Gasket.PermissiblePres) * (math.Pi * Dcp * data.Gasket.Width)
+		// 	moment.Qmax = data.Gasket.PermissiblePres
+		// }
 
 		moment.Mmax = (Friction * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
 		// moment.Mmax = (0.3 * Pmax * data.Bolt.Diameter / float64(data.Bolt.Count)) / 1000
